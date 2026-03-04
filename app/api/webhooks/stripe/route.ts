@@ -11,7 +11,7 @@ const metaPixelId = process.env.META_PIXEL_ID;
 
 const stripe =
   stripeSecretKey && stripeSecretKey.length > 0
-    ? new Stripe(stripeSecretKey, { apiVersion: "2023-10-16" })
+    ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
     : null;
 
 function sha256(value: string) {
