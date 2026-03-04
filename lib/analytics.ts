@@ -6,7 +6,8 @@ type EventName =
   | "optin_viewed"
   | "lead_submitted"
   | "result_viewed"
-  | "cta_clicked";
+  | "cta_clicked"
+  | "purchase";
 
 const SESSION_KEY = "sf_quiz_session_id";
 
@@ -23,6 +24,19 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
   if (typeof window === "undefined") return;
   // Placeholder for future analytics wiring.
   console.log(`[event] ${name}`, payload);
+
+  const fbq = (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq;
+  if (typeof fbq === "function") {
+    if (name === "quiz_started") {
+      fbq("trackCustom", "StartQuiz");
+    }
+    if (name === "lead_submitted") {
+      fbq("track", "Lead");
+    }
+    if (name === "purchase") {
+      fbq("track", "Purchase");
+    }
+  }
 
   fetch("/api/track", {
     method: "POST",
