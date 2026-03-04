@@ -24,14 +24,22 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
   // Placeholder for future analytics wiring.
   console.log(`[event] ${name}`, payload);
 
-  const fbq = (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq;
-  if (typeof fbq === "function") {
-    if (name === "quiz_started") {
-      fbq("trackCustom", "StartQuiz");
+  const callFbq = (args: unknown[], retries = 3) => {
+    const fbq = (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq;
+    if (typeof fbq === "function") {
+      fbq(...args);
+      return;
     }
-    if (name === "lead_submitted") {
-      fbq("track", "Lead");
+    if (retries > 0) {
+      window.setTimeout(() => callFbq(args, retries - 1), 250);
     }
+  };
+
+  if (name === "quiz_started") {
+    callFbq(["trackCustom", "StartQuiz"]);
+  }
+  if (name === "lead_submitted") {
+    callFbq(["track", "Lead"]);
   }
 
   fetch("/api/track", {
