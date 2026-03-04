@@ -9,7 +9,7 @@ import { quizQuestions, COPY } from "../lib/quizConfig";
 import { trackEvent } from "../lib/analytics";
 import { getScoringResult } from "../lib/scoring";
 import { getUtmParams } from "../lib/utm";
-import { loadQuizState, saveQuizState } from "../lib/storage";
+import { clearQuizState, loadQuizState, saveQuizState } from "../lib/storage";
 import type { AnswerMap } from "../lib/scoring";
 
 const TOTAL_QUESTIONS = quizQuestions.length;
@@ -26,18 +26,25 @@ export default function HomePage() {
 
   useEffect(() => {
     const saved = loadQuizState();
-    if (saved) {
+    if (saved && saved.step <= TOTAL_QUESTIONS) {
       setStep(saved.step ?? -1);
       setAnswers(saved.answers ?? {});
       setEmail(saved.email);
       setStartedAt(saved.startedAt);
       setUtm(saved.utm ?? {});
     } else {
+      if (saved && saved.step > TOTAL_QUESTIONS) {
+        clearQuizState();
+      }
       setUtm(getUtmParams());
     }
   }, []);
 
   useEffect(() => {
+    if (step > TOTAL_QUESTIONS) {
+      clearQuizState();
+      return;
+    }
     saveQuizState({ step, answers, email, startedAt, utm });
   }, [step, answers, email, startedAt, utm]);
 
