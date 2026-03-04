@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
+import { sendMetaEvent } from "../../../lib/metaCapi";
 
 type TrackPayload = {
   sessionId: string;
@@ -17,6 +18,7 @@ export async function POST(request: Request) {
   }
 
   const createdAt = body.createdAt ?? new Date().toISOString();
+  const eventTime = Math.floor(new Date(createdAt).getTime() / 1000) || Math.floor(Date.now() / 1000);
 
   const { error } = await supabaseAdmin.from("event_sessions").upsert(
     {
@@ -31,6 +33,23 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  }
+
+  if (body.event === "quiz_started") {
+    const userAgent = request.headers.get("user-agent") ?? undefined;
+    const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+    const eventSourceUrl =
+      request.headers.get("referer") ?? request.headers.get("origin") ?? undefined;
+
+    await sendMetaEvent({
+      eventName: "StartQuiz",
+      eventTime,
+      eventId: `${body.sessionId}:quiz_started`,
+      actionSource: "website",
+      eventSourceUrl,
+      userAgent,
+      ipAddress
+    });
   }
 
   return NextResponse.json({ ok: true });
