@@ -6,8 +6,7 @@ type EventName =
   | "optin_viewed"
   | "lead_submitted"
   | "result_viewed"
-  | "cta_clicked"
-  | "purchase";
+  | "cta_clicked";
 
 const SESSION_KEY = "sf_quiz_session_id";
 
@@ -32,9 +31,6 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
     }
     if (name === "lead_submitted") {
       fbq("track", "Lead");
-    }
-    if (name === "purchase") {
-      fbq("track", "Purchase");
     }
   }
 
