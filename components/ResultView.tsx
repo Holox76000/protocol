@@ -49,36 +49,40 @@ export function ResultView({ result, onCtaClick }: ResultViewProps) {
       : resultCopy.low;
 
   return (
-    <div className="rounded-3xl border border-black bg-white p-6 shadow-hard">
+    <div className="card-raise rounded-3xl border border-black/20 bg-white p-6">
       <div className="flex flex-col gap-2">
-        <p className="text-[11px] uppercase tracking-[0.4em] text-charcoal/70">Your Results</p>
-        <h2 className="text-3xl font-display font-semibold text-ink">{copy.headline}</h2>
-        <p className="text-base text-charcoal">{copy.body}</p>
+        <p className="text-[11px] uppercase tracking-[0.4em] text-black/60">Your Results</p>
+        <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.1em] text-black">
+          {copy.headline}
+        </h2>
+        <p className="text-base text-black/70">{copy.body}</p>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-black/10 bg-fog p-4">
-        <p className="text-sm font-semibold text-charcoal">
-          Skinny-Fat Trap Likelihood: <span className="text-ink">{result.score}/100</span>
+      <div className="mt-5 rounded-2xl border border-black/10 bg-black/5 p-4">
+        <p className="text-sm font-semibold text-black/80">
+          Skinny-Fat Trap Likelihood: <span className="text-black">{result.score}/100</span>
         </p>
-        <p className="mt-2 text-sm text-charcoal">
-          Primary blocker: <span className="font-semibold text-ink">{result.blocker}</span>
+        <p className="mt-2 text-sm text-black/70">
+          Primary blocker: <span className="font-semibold text-black">{result.blocker}</span>
         </p>
       </div>
 
-      <ul className="mt-5 list-disc pl-5 text-base text-charcoal">
+      <div className="mt-5 grid gap-3">
         {copy.bullets.map((bullet) => (
-          <li key={bullet}>{bullet}</li>
+          <div key={bullet} className="border-l-2 border-black/60 pl-4 text-base text-black/75">
+            {bullet}
+          </div>
         ))}
-      </ul>
+      </div>
 
       <a
         href={CTA_URL}
         onClick={onCtaClick}
-        className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-black px-5 py-3 text-base font-semibold text-white transition hover:bg-charcoal"
+        className="mt-6 inline-flex w-full items-center justify-center rounded-2xl border border-black bg-black px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
       >
         {copy.cta}
       </a>
-      <p className="mt-3 text-xs uppercase tracking-[0.2em] text-charcoal/70">
+      <p className="mt-3 text-xs uppercase tracking-[0.3em] text-black/50">
         We’ll send the 30-day blueprint to your email as well.
       </p>
     </div>

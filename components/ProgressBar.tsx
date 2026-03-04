@@ -8,13 +8,13 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-charcoal/70">
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-black/60">
         <span>Progress</span>
         <span>{current} / {total}</span>
       </div>
-      <div className="mt-3 h-2 w-full rounded-full bg-fog">
+      <div className="mt-3 h-[3px] w-full bg-black/10">
         <div
-          className="h-2 rounded-full bg-ink transition-all"
+          className="h-[3px] bg-black transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>

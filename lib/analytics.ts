@@ -8,8 +8,33 @@ type EventName =
   | "result_viewed"
   | "cta_clicked";
 
+const SESSION_KEY = "sf_quiz_session_id";
+
+function getSessionId(): string {
+  if (typeof window === "undefined") return "server";
+  const existing = window.localStorage.getItem(SESSION_KEY);
+  if (existing) return existing;
+  const fresh = window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  window.localStorage.setItem(SESSION_KEY, fresh);
+  return fresh;
+}
+
 export function trackEvent(name: EventName, payload: EventPayload = {}) {
   if (typeof window === "undefined") return;
   // Placeholder for future analytics wiring.
   console.log(`[event] ${name}`, payload);
+
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: getSessionId(),
+      event: name,
+      step: typeof payload.step === "number" ? payload.step : undefined,
+      payload,
+      createdAt: new Date().toISOString()
+    })
+  }).catch(() => {
+    // Ignore tracking errors in the UI flow.
+  });
 }

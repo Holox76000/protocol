@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../lib/supabase";
 
 type LeadPayload = {
   email: string;
@@ -11,8 +12,6 @@ type LeadPayload = {
   blocker?: string;
   userAgent?: string;
 };
-
-const leads: LeadPayload[] = [];
 
 export async function POST(request: Request) {
   const body = (await request.json()) as LeadPayload;
@@ -27,7 +26,14 @@ export async function POST(request: Request) {
     email
   };
 
-  leads.push(payload);
+  const { error } = await supabaseAdmin.from("leads").insert({
+    email,
+    payload,
+    created_at: new Date().toISOString()
+  });
+  if (error) {
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  }
   console.log("[lead]", payload);
 
   // TODO: Send payload to Klaviyo/Mailchimp and persist to database.

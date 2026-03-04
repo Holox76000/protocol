@@ -22,7 +22,7 @@ export function QuizShell({
     <div className="min-h-screen bg-ash">
       <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 py-10">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-semibold uppercase tracking-[0.4em] text-charcoal">
+          <div className="text-xs font-semibold uppercase tracking-[0.4em] text-black/70">
             Protocol
           </div>
           {onBack ? (
@@ -30,7 +30,7 @@ export function QuizShell({
               type="button"
               onClick={onBack}
               disabled={backDisabled}
-              className="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+              className="text-xs font-semibold uppercase tracking-[0.2em] text-black/60 transition hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
             >
               Back
             </button>
@@ -47,7 +47,7 @@ export function QuizShell({
           {children}
         </div>
 
-        <p className="mt-8 text-center text-xs uppercase tracking-[0.3em] text-charcoal/70">
+        <p className="mt-8 text-center text-xs uppercase tracking-[0.3em] text-black/50">
           Built for men stuck between cutting and bulking.
         </p>
       </div>
