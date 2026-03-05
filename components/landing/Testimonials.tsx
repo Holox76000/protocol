@@ -13,21 +13,21 @@ export function Testimonials({ items }: TestimonialsProps) {
   return (
     <div className="mt-10 grid gap-4 md:grid-cols-3">
       {items.map((item) => (
-        <div key={item.name} className="card-raise rounded-2xl border border-black/15 bg-white p-6">
-          <div className="flex items-center gap-4">
+        <div key={item.name} className="card-raise overflow-hidden rounded-2xl border border-black/15 bg-white">
+          <div className="aspect-[4/3] w-full border-b border-black/10 bg-black/5">
             <img
               src={item.image}
               alt={item.name}
-              className="h-12 w-12 rounded-full border border-black/20 object-cover"
+              className="h-full w-full object-cover"
             />
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-black/60">{item.name}</p>
-              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em] text-black">
-                {item.result}
-              </p>
-            </div>
           </div>
-          <p className="mt-4 text-sm text-black/70">“{item.quote}”</p>
+          <div className="p-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-black/60">{item.name}</p>
+            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em] text-black">
+              {item.result}
+            </p>
+            <p className="mt-4 text-sm text-black/70">“{item.quote}”</p>
+          </div>
         </div>
       ))}
     </div>
