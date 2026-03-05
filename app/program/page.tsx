@@ -156,7 +156,7 @@ export default function ProgramPage() {
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <a
                 href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-                className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+                className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
               >
                 Apply Now
               </a>
@@ -236,7 +236,7 @@ export default function ProgramPage() {
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
           <a
             href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-            className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+            className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
           >
             Apply Now
           </a>
@@ -383,7 +383,7 @@ export default function ProgramPage() {
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
             <a
               href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
             >
               Apply Now
             </a>
@@ -449,7 +449,7 @@ export default function ProgramPage() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
             >
               Apply Now
             </a>

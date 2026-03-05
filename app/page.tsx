@@ -152,28 +152,28 @@ export default function HomePage() {
     if (step === -1) {
       return (
         <div className="flex flex-col gap-6">
-          <div className="card-raise rounded-3xl border border-black/20 bg-white p-6">
+          <div className="card-raise rounded-3xl border border-black/40 bg-white p-6 shadow-hard">
             <p className="text-[11px] uppercase tracking-[0.4em] text-black/60">
               60-Second Assessment
             </p>
             <h1 className="mt-3 text-3xl font-display font-semibold uppercase tracking-[0.12em] text-black">
               {COPY.landing.headline}
             </h1>
-            <p className="mt-3 text-base text-black/70">{COPY.landing.sub}</p>
+            <p className="mt-3 text-base text-black/85">{COPY.landing.sub}</p>
             <button
               type="button"
               onClick={startQuiz}
-              className="mt-6 w-full rounded-2xl border border-black bg-black px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+              className="mt-6 w-full rounded-2xl border border-black bg-black px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
             >
               {COPY.landing.cta}
             </button>
           </div>
 
-          <div className="grid gap-3 text-sm text-black/70">
-            <div className="card-raise rounded-2xl border border-black/10 bg-white px-4 py-3">
+          <div className="grid gap-3 text-sm text-black/80">
+            <div className="card-raise rounded-2xl border border-black/20 bg-white px-4 py-3 shadow-soft">
               Built for men who train but still feel soft.
             </div>
-            <div className="card-raise rounded-2xl border border-black/10 bg-white px-4 py-3">
+            <div className="card-raise rounded-2xl border border-black/20 bg-white px-4 py-3 shadow-soft">
               Get a clear next step without 100 tabs open.
             </div>
           </div>
