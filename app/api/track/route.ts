@@ -12,6 +12,7 @@ type TrackPayload = {
 
 export async function POST(request: Request) {
   const body = (await request.json()) as TrackPayload;
+  console.log("[track] incoming", body);
 
   if (!body.sessionId || !body.event) {
     return NextResponse.json({ ok: false, error: "Missing sessionId or event" }, { status: 400 });
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
   );
 
   if (error) {
+    console.error("[track] db error", error);
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -49,6 +51,10 @@ export async function POST(request: Request) {
       eventSourceUrl,
       userAgent,
       ipAddress
+    });
+    console.log("[track] meta sent", {
+      event: "StartQuiz",
+      sessionId: body.sessionId
     });
   }
 

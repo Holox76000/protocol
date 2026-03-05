@@ -17,6 +17,7 @@ type LeadPayload = {
 export async function POST(request: Request) {
   const body = (await request.json()) as LeadPayload;
   const email = body.email?.trim();
+  console.log("[lead] incoming", { email });
 
   if (!email || !/\S+@\S+\.\S+/.test(email)) {
     return NextResponse.json({ ok: false, error: "Invalid email" }, { status: 400 });
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
     created_at: createdAt
   });
   if (error) {
+    console.error("[lead] db error", error);
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
   console.log("[lead]", payload);
@@ -53,6 +55,7 @@ export async function POST(request: Request) {
     ipAddress,
     email
   });
+  console.log("[lead] meta sent", { email });
 
   // TODO: Send payload to Klaviyo/Mailchimp and persist to database.
 
