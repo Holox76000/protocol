@@ -152,7 +152,7 @@ export default function HomePage() {
     if (step === -1) {
       return (
         <div className="flex flex-col gap-6">
-          <div className="card-raise rounded-3xl border border-black/40 bg-white p-6 shadow-hard">
+          <div className="card-raise rounded-3xl border border-black/60 bg-white p-6 shadow-hard">
             <p className="text-[11px] uppercase tracking-[0.4em] text-black/60">
               60-Second Assessment
             </p>
@@ -163,17 +163,17 @@ export default function HomePage() {
             <button
               type="button"
               onClick={startQuiz}
-              className="mt-6 w-full rounded-2xl border border-black bg-black px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard transition hover:bg-white hover:text-black"
+              className="mt-6 w-full rounded-2xl border border-black bg-black px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
             >
               {COPY.landing.cta}
             </button>
           </div>
 
-          <div className="grid gap-3 text-sm text-black/80">
-            <div className="card-raise rounded-2xl border border-black/20 bg-white px-4 py-3 shadow-soft">
+          <div className="grid gap-3 text-sm text-black/85">
+            <div className="card-raise rounded-2xl border border-black/40 bg-white px-4 py-3 shadow-soft">
               Built for men who train but still feel soft.
             </div>
-            <div className="card-raise rounded-2xl border border-black/20 bg-white px-4 py-3 shadow-soft">
+            <div className="card-raise rounded-2xl border border-black/40 bg-white px-4 py-3 shadow-soft">
               Get a clear next step without 100 tabs open.
             </div>
           </div>
