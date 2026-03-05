@@ -220,7 +220,21 @@ export default function ProgramPage() {
             </p>
           </div>
         </div>
-        <Testimonials items={testimonials} />
+      </SectionShell>
+
+      <SectionShell className="bg-black text-white bg-grid-dark" tone="dark">
+        <div className="mx-auto max-w-3xl text-center fade-in">
+          <p className="text-xs uppercase tracking-[0.5em] text-white/70">Proof</p>
+          <h2 className="mt-4 text-3xl font-display font-semibold uppercase tracking-[0.18em]">
+            Real Outcomes From Real Clients
+          </h2>
+          <p className="mt-4 text-base text-white/75">
+            Results from men who were stuck in the same loop.
+          </p>
+        </div>
+        <div className="mt-10">
+          <Testimonials items={testimonials} />
+        </div>
       </SectionShell>
 
       <SectionShell>
