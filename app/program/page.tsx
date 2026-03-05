@@ -27,17 +27,20 @@ const testimonials = [
   {
     quote: "Dropped 4 cm off my waist and finally saw shoulder lines.",
     name: "Alex M., 31",
-    result: "-4 cm waist"
+    result: "-4 cm waist",
+    image: "/1.webp"
   },
   {
     quote: "Stopped spinning my wheels. Clear plan, weekly targets, real change.",
     name: "Damien R., 28",
-    result: "+2 kg lean mass"
+    result: "+2 kg lean mass",
+    image: "/2.jpeg"
   },
   {
     quote: "Structure + accountability made the difference. I feel in control again.",
     name: "Julien P., 34",
-    result: "Visible recomposition"
+    result: "Visible recomposition",
+    image: "/3.jpeg"
   }
 ];
 
