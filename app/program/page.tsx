@@ -268,7 +268,7 @@ export default function ProgramPage() {
           <SplitFeature
             title="Holistic Athlete Protocol"
             body="Training, nutrition, sleep, and supplements are built as one system around your body."
-            image="https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1200&q=80"
+            image="/system.png"
             flipped
             tone="dark"
           />
