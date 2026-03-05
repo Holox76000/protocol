@@ -44,6 +44,7 @@ export async function sendMetaEvent(event: MetaEvent) {
         custom_data: event.customData
       }
     ],
+    test_event_code: process.env.META_TEST_EVENT_CODE ?? undefined,
     access_token: accessToken
   };
 
