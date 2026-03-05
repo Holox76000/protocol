@@ -47,12 +47,6 @@ export async function sendMetaEvent(event: MetaEvent) {
     test_event_code: process.env.META_TEST_EVENT_CODE ?? undefined,
     access_token: accessToken
   };
-  console.log("[meta] payload", {
-    eventName: event.eventName,
-    eventId: event.eventId,
-    actionSource: event.actionSource,
-    hasTestCode: Boolean(process.env.META_TEST_EVENT_CODE)
-  });
 
   try {
     const response = await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
@@ -66,7 +60,6 @@ export async function sendMetaEvent(event: MetaEvent) {
       console.error("[meta] failed", response.status, text);
       return { ok: false, status: response.status, body: text };
     }
-    console.log("[meta] ok", text);
     return { ok: true, status: response.status, body: text };
   } catch (error) {
     console.error("[meta] error", error);
