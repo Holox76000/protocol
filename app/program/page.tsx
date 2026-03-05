@@ -364,14 +364,19 @@ export default function ProgramPage() {
             <p className="mt-4 text-lg text-black/70">
               A complete coaching system with daily human accountability, personalized plans, and full execution support.
             </p>
-          <div className="card-raise mt-8 rounded-3xl border border-black/20 bg-white p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-black/60">Program Investment</p>
-            <p className="mt-4 text-4xl font-display font-semibold uppercase tracking-[0.12em] text-black">
+          <div className="card-raise mt-8 rounded-3xl border border-black/60 bg-gradient-to-br from-white via-white to-black/5 p-6 shadow-hard">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.35em] text-black/70">Program Investment</p>
+              <span className="rounded-full border border-black bg-black px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-white">
+                Best Value
+              </span>
+            </div>
+            <p className="mt-4 text-5xl font-display font-semibold uppercase tracking-[0.12em] text-black">
               $250
             </p>
-            <p className="mt-3 text-sm text-black/70">One-time. Unlimited daily coaching included.</p>
+            <p className="mt-3 text-sm text-black/80">One-time. Unlimited daily coaching included.</p>
           </div>
-          <div className="card-raise mt-6 rounded-3xl border border-black/20 bg-black p-6 text-white">
+          <div className="card-raise mt-6 rounded-3xl border border-black/40 bg-black p-6 text-white shadow-hard">
             <p className="text-xs uppercase tracking-[0.35em] text-white/70">February Intake</p>
             <p className="mt-4 text-lg text-white/80">
               Only 3 spots left this month. One coach, limited capacity.
