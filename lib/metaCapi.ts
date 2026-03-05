@@ -58,10 +58,12 @@ export async function sendMetaEvent(event: MetaEvent) {
     const text = await response.text();
     if (!response.ok) {
       console.error("[meta] failed", response.status, text);
-      return;
+      return { ok: false, status: response.status, body: text };
     }
     console.log("[meta] ok", text);
+    return { ok: true, status: response.status, body: text };
   } catch (error) {
     console.error("[meta] error", error);
+    return { ok: false, status: 0, body: String(error) };
   }
 }

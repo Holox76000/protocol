@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   const eventTime = Math.floor(Date.now() / 1000);
   const eventId = `test-purchase-${Date.now()}`;
 
-  await sendMetaEvent({
+  const metaResponse = await sendMetaEvent({
     eventName: "Purchase",
     eventTime,
     eventId,
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
   });
 
-  return NextResponse.json({ ok: true, eventId });
+  return NextResponse.json({ ok: true, eventId, metaResponse });
 }
 
 export async function GET(request: Request) {
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   const eventTime = Math.floor(Date.now() / 1000);
   const eventId = `test-purchase-${Date.now()}`;
 
-  await sendMetaEvent({
+  const metaResponse = await sendMetaEvent({
     eventName: "Purchase",
     eventTime,
     eventId,
@@ -70,5 +70,5 @@ export async function GET(request: Request) {
     }
   });
 
-  return NextResponse.json({ ok: true, eventId });
+  return NextResponse.json({ ok: true, eventId, metaResponse });
 }
