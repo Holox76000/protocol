@@ -15,16 +15,37 @@ export function TrackedLink({
   trackingPayload,
   ...props
 }: TrackedLinkProps) {
+  const destination = typeof href === "string" ? href : undefined;
+
   return (
     <a
       {...props}
       href={href}
       onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+
         trackEvent("cta_clicked", {
-          href,
+          href: destination,
           ...trackingPayload
         });
-        onClick?.(event);
+
+        // External checkout redirects can interrupt the pixel request before Meta Helper sees it.
+        if (
+          destination &&
+          /^https?:\/\//.test(destination) &&
+          event.button === 0 &&
+          !event.metaKey &&
+          !event.ctrlKey &&
+          !event.shiftKey &&
+          !event.altKey &&
+          props.target !== "_blank"
+        ) {
+          event.preventDefault();
+          window.setTimeout(() => {
+            window.location.assign(destination);
+          }, 150);
+        }
       }}
     >
       {children}
