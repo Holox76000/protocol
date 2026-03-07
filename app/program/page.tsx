@@ -9,6 +9,7 @@ import { WhoFor } from "../../components/landing/WhoFor";
 import { ProcessSteps } from "../../components/landing/ProcessSteps";
 import { FAQ } from "../../components/landing/FAQ";
 import { StickyCta } from "../../components/landing/StickyCta";
+import { TrackedLink } from "../../components/TrackedLink";
 
 export const metadata: Metadata = {
   title: "Protocol | The 30-Day Recomp Reset (Coached Edition)",
@@ -157,12 +158,13 @@ export default function ProgramPage() {
               You’ve done the work. The strategy is what’s miscalibrated.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <a
+              <TrackedLink
                 href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
+                trackingPayload={{ ctaLocation: "hero", destination: "stripe_checkout" }}
                 className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
               >
                 Apply Now
-              </a>
+              </TrackedLink>
               <a
                 href="#problem"
                 className="inline-flex items-center justify-center border border-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black transition hover:bg-black hover:text-white"
@@ -251,12 +253,13 @@ export default function ProgramPage() {
         </div>
         <ThreeColumn items={rootCauses} />
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <a
+          <TrackedLink
             href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
+            trackingPayload={{ ctaLocation: "problem_section", destination: "stripe_checkout" }}
             className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
           >
             Apply Now
-          </a>
+          </TrackedLink>
         </div>
       </SectionShell>
 
@@ -403,12 +406,13 @@ export default function ProgramPage() {
             </p>
           </div>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-            <a
+            <TrackedLink
               href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
+              trackingPayload={{ ctaLocation: "offer_section", destination: "stripe_checkout" }}
               className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
             >
               Apply Now
-            </a>
+            </TrackedLink>
           </div>
             <p className="mt-4 text-xs uppercase tracking-[0.3em] text-black/60">
               Results or refunded guarantee included.
@@ -469,12 +473,13 @@ export default function ProgramPage() {
             Capacity is limited to keep it personal and accountable.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
+            <TrackedLink
               href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
+              trackingPayload={{ ctaLocation: "final_section", destination: "stripe_checkout" }}
               className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
             >
               Apply Now
-            </a>
+            </TrackedLink>
           </div>
         </div>
       </SectionShell>

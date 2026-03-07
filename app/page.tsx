@@ -207,6 +207,8 @@ export default function HomePage() {
           result={result}
           onCtaClick={() =>
             trackEvent("cta_clicked", {
+              ctaLocation: "quiz_result",
+              destination: "program_page",
               segment: result.segment,
               score: result.score,
               blocker: result.blocker
