@@ -1,485 +1,676 @@
-import type { Metadata } from "next";
-import { SectionShell } from "../../components/landing/SectionShell";
-import { StatList } from "../../components/landing/StatList";
-import { ThreeColumn } from "../../components/landing/ThreeColumn";
-import { Marquee } from "../../components/landing/Marquee";
-import { SplitFeature } from "../../components/landing/SplitFeature";
-import { Testimonials } from "../../components/landing/Testimonials";
-import { WhoFor } from "../../components/landing/WhoFor";
-import { ProcessSteps } from "../../components/landing/ProcessSteps";
-import { FAQ } from "../../components/landing/FAQ";
-import { StickyCta } from "../../components/landing/StickyCta";
+import fs from "fs";
+import path from "path";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import Script from "next/script";
+import "./program.css";
+import LegacyHtml from "./LegacyHtml";
+import type { ResearchTab } from "./ResearchImpactSection";
+import NewApproachSection from "./NewApproachSection";
+import PricingSection from "./PricingSection";
+import ExpertsSection from "./ExpertsSection";
+import StorySection from "./StorySection";
+import VisualizationSection from "./VisualizationSection";
+import WhySection from "./WhySection";
+import TransformationSection from "./TransformationSection";
+import ClientTransformationsSection from "./ClientTransformationsSection";
+import TechnologySection from "./TechnologySection";
+import MoreScoresSection from "./MoreScoresSection";
+import SupportSection from "./SupportSection";
+import NoSurgerySection from "./NoSurgerySection";
+import ProtocolSection from "./ProtocolSection";
+import ExpertAdviceSection from "./ExpertAdviceSection";
+import GaryLinkovQuoteSection from "./GaryLinkovQuoteSection";
+import FollowersSection from "./FollowersSection";
+import AestheticTestsSection from "./AestheticTestsSection";
+import InformativeSection from "./InformativeSection";
+import PersonalizedSection from "./PersonalizedSection";
+import CompleteFacialAnalysisSection from "./CompleteFacialAnalysisSection";
 
-export const metadata: Metadata = {
-  title: "Protocol | The 30-Day Recomp Reset (Coached Edition)",
-  description:
-    "A premium 30-day transformation for men stuck between cutting and bulking. Calibrated training, nutrition, and execution support."
+const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
+const ResearchImpactSection = dynamic(() => import("./ResearchImpactSection"), { ssr: false });
+
+const PROGRAM_HTML_PATH = path.join(process.cwd(), "data", "program.html");
+const RESEARCH_SLOT = "<!--PROGRAM_RESEARCH-->";
+const SURGERY_SLOT = "<!--PROGRAM_SURGERY-->";
+const SUPPORT_SLOT = "<!--PROGRAM_SUPPORT-->";
+const SCORE_SLOT = "<!--PROGRAM_MORE_SCORES-->";
+const TECH_SLOT = "<!--PROGRAM_TECH-->";
+const VISUALIZATION_SLOT = "<!--PROGRAM_VISUALIZATION-->";
+const STORY_SLOT = "<!--PROGRAM_STORY-->";
+const EXPERTS_SLOT = "<!--PROGRAM_EXPERTS-->";
+const SOCIAL_SLOT = "<!--PROGRAM_SOCIAL-->";
+const APPROACH_SLOT = "<!--PROGRAM_APPROACH-->";
+const TRANSFORMATION_SLOT = "<!--PROGRAM_TRANSFORMATION-->";
+const FACIAL_ANALYSIS_SLOT = "<!--PROGRAM_FACIAL_ANALYSIS-->";
+const WHY_SLOT = "<!--PROGRAM_WHY-->";
+const PRICING_SLOT = "<!--PROGRAM_PRICING-->";
+const HERO_GOALS = [
+  "Finally look good shirtless",
+  "Kill the skinny-fat look for good",
+  "Make a stronger first impression",
+  "Improve your dating life",
+  "Get a better salary",
+];
+const HERO_LOGOS = [
+  { src: "/program/static/landing/images/home/logo/usa-today.webp", alt: "USA Today" },
+  { src: "/program/static/landing/images/home/logo/the-guardian.webp", alt: "The Guardian" },
+  { src: "/program/static/landing/images/home/logo/daily-mail.webp", alt: "Daily Mail" },
+  { src: "/program/static/landing/images/home/logo/business-insider.webp", alt: "Business Insider" },
+  { src: "/program/static/landing/images/home/logo/the-sun.webp", alt: "The Sun" },
+  { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
+  { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
+  { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
+  { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
+  { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
+];
+const FACIAL_ANALYSIS_ITEMS = [
+  {
+    number: "1",
+    title: "You learn exactly what's happening with your body.",
+    description:
+      "Many things you hate about your physique are 100% fixable. Our analysis helps men stop guessing and start acting.",
+    image: "/program/static/landing/images/home/face-analysis-list/image-1.webp",
+  },
+  {
+    number: "2",
+    title: "You get clarity on what can actually change — and how fast.",
+    description:
+      "For example, some belly fat is hormonal and clears up in weeks with the right protocol. Flat chest responds to specific loading patterns most guys never use.",
+    image: "/program/static/landing/images/home/face-analysis-list/image-2.webp",
+  },
+  {
+    number: "3",
+    title: "You gain control through knowledge.",
+    description: "A clear, science-based plan removes the paralysis of cut vs bulk forever.",
+    image: "/program/static/landing/images/home/face-analysis-list/image-3.webp",
+  },
+];
+
+const RESEARCH_TABS: ResearchTab[] = [
+  {
+    label: "Finances",
+    items: [
+      {
+        titleHtml: "Higher <strong>salary</strong>",
+        description: "Lean, muscular men earn 10-15% more",
+        source: "Hamermesh, D. S., and J. E. Biddle. (1994). The American Economic Review.",
+      },
+      {
+        titleHtml: "More <strong>respect</strong>",
+        description: "Men with athletic builds are perceived as more competent and dominant",
+        source: "Puleo, R. (2006). Journal of Undergraduate Psychological Research.",
+      },
+      {
+        titleHtml: "More <strong>dates</strong>",
+        description: "Men with visible muscle and low body fat receive 40% more matches",
+        source: "Parrett, M. (2015). Journal of Economic Psychology.",
+      },
+      {
+        titleHtml: "More <strong>confidence</strong>",
+        description: "Men who feel good about their body report 2x higher self-esteem scores",
+        source: "Reingen, P. H., & Kernan, J. B. (1993). Journal of Consumer Psychology.",
+      },
+    ],
+  },
+  {
+    label: "Dating",
+    items: [
+      {
+        titleHtml: "More <strong>swipes</strong>",
+        description: "On dating apps, looks matter about 9 times more than biographies",
+        source:
+          "Witmer, J., Rosenbusch, H., & Meral, E. O. (2025). Computers in Human Behavior Reports.",
+      },
+      {
+        titleHtml: "More <strong>second-dates</strong>",
+        description: "In speed-dating studies, looks consistently predict success",
+        source:
+          "Eastwick, P. W., & Finkel, E. J. (2008). Journal of Personality and Social Psychology; Luo, S., & Zhang, G. (2009).",
+      },
+      {
+        titleHtml: "More desirable <strong>partners</strong>",
+        description: 'People usually end up with someone “in their league,” looks-wise',
+        source: "Luo, S. Social & Personality Psychology. 2017.",
+      },
+      {
+        titleHtml: "More <strong>important</strong> than we think",
+        description: "People understate how much looks affect their romantic choices",
+        source: "Eastwick et al. (2024). Journal of Personality and Social Psychology.",
+      },
+    ],
+  },
+  {
+    label: "Socializing",
+    items: [
+      {
+        titleHtml: "<strong>Funnier</strong>",
+        description: "Attractive people are found funnier on video than in audio",
+        source: "Cowan, M. L., & Little, A. C. (2013). Personality and Individual Differences.",
+      },
+      {
+        titleHtml: "<strong>Healthier</strong>",
+        description: "Attractive people are perceived to be healthier",
+        source: "Zebrowitz, L. A., & Franklin Jr, R. G. (2014). Experimental Aging Research.",
+      },
+      {
+        titleHtml: "<strong>Smarter</strong>",
+        description: "Attractive people are thought to be more intelligent",
+        source: "Moore, F. R., Filippou, D., & Perrett, D. I. (2011). Journal of Evolutionary Psychology.",
+      },
+      {
+        titleHtml: "<strong>Better</strong>",
+        description: "Attractive people are perceived as more moral and trustworthy",
+        source:
+          "Shinners, E. (2009). UW-L Journal of Undergraduate Research; Klebl et al. (2022). Journal of Nonverbal Behavior.",
+      },
+    ],
+  },
+  {
+    label: "Health",
+    items: [
+      {
+        titleHtml: "Better <strong>treatment</strong>",
+        description: "Doctors miss 3.67 times more diagnoses for unattractive patients",
+        source:
+          "Tsiga, E., Panagopoulou, E., & Benos, A. (2016). European Journal for Person Centered Healthcare.",
+      },
+      {
+        titleHtml: "Healthier <strong>lifestyle</strong>",
+        description: "Activities that make you more attractive are often good for you",
+        source: "Arnocky, S., & Davis, A. C. (2024). Frontiers in Psychology.",
+      },
+      {
+        titleHtml: "Longer <strong>lives</strong>",
+        description: "Attractive people live longer (perhaps, partially, due to the above reasons)",
+        source: "Henderson, J.J.A., & Anglin, J.M. (2003). Evolution and Human Behavior.",
+      },
+    ],
+  },
+  {
+    label: "Education",
+    items: [
+      {
+        titleHtml: "Better teacher <strong>perceptions</strong>",
+        description: "Attractive students are perceived more positively by teachers",
+        source:
+          "Ritts, V., Patterson, M. L., & Tubbs, M. E. (1992). Review of Educational Research; Talamas, S. N., Mavor, K. I., & Perrett, D. I. (2016). PLoS ONE.",
+      },
+      {
+        titleHtml: "Better student <strong>perceptions</strong>",
+        description: "Attractive professors receive stronger student evaluations",
+        source: "Theyson, K. C. (2015). Practical Assessment, Research, and Evaluation.",
+      },
+      {
+        titleHtml: "Higher <strong>grades</strong>",
+        description: "Attractive students get higher grades in-person than in online classes",
+        source:
+          "Hernández-Julián, R., & Peters, C. (2017). Journal of Human Capital; Mehic, A. (2022). Economics Letters.",
+      },
+    ],
+  },
+  {
+    label: "Law",
+    items: [
+      {
+        titleHtml: "Fewer <strong>arrests</strong>",
+        description: "Attractive people are less likely to get arrested",
+        source:
+          "Beaver, K. M., Boccio, C., Smith, S., & Ferguson, C. J. (2019). Psychiatry, Psychology and Law.",
+      },
+      {
+        titleHtml: "Fewer <strong>convictions</strong>",
+        description: "Attractive people are less likely to be convicted",
+        source:
+          "Beaver, K. M., Boccio, C., Smith, S., & Ferguson, C. J. (2019). Psychiatry, Psychology and Law.",
+      },
+      {
+        titleHtml: "Lighter <strong>sentences</strong>",
+        description: "If convicted, attractive people are given lighter sentences",
+        source: "Mazzella, R., & Feingold, A. (1994). Journal of Applied Social Psychology.",
+      },
+    ],
+  },
+  {
+    label: "Influence",
+    items: [
+      {
+        titleHtml: "Better <strong>networking</strong>",
+        description: "Attractive people build denser social networks",
+        source: "O’Connor, K. M., & Gladstone, E. (2018). Social Networks.",
+      },
+      {
+        titleHtml: "More <strong>leadership</strong>",
+        description: "Attractive politicians get more votes",
+        source: "Jaeger et al. (2021). Social Psychology.",
+      },
+      {
+        titleHtml: "More <strong>promotions</strong>",
+        description: "Attractive people are more likely to get promoted",
+        source:
+          "Morrow, P. C., McElroy, J. C., Stamper, B. G., & Wilson, M. A. (1990). Journal of Management.",
+      },
+      {
+        titleHtml: "More <strong>followers</strong>",
+        description: "Attractive people get more favorable social media engagement",
+        source:
+          "Gladstone, E. C., & O'Connor, K. (2013). Academy of Management Proceedings; Strey, S. (2019). MSc dissertation; Lund University.",
+      },
+    ],
+  },
+  {
+    label: "Happiness",
+    items: [
+      {
+        titleHtml: "Higher <strong>well-being</strong>",
+        description: "Attractive people report higher well-being",
+        source: "Datta Gupta, N., Etcoff, N. L., & Jaeger, M. M. (2016). Journal of Happiness Studies.",
+      },
+      {
+        titleHtml: "Lower <strong>mental illness</strong>",
+        description: "Mentally healthier people are more attractive, on average",
+        source:
+          "Farina et al. (1977). Journal of Abnormal Psychology; Borráz-León et al. (2021). Adaptive Human Behavior and Physiology.",
+      },
+    ],
+  },
+];
+
+const extractBody = (html: string) => {
+  const match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  let body = match ? match[1] : html;
+  body = body.replace(/<script[\s\S]*?<\/script>/gi, "");
+  body = body.replace(/<noscript[\s\S]*?<\/noscript>/gi, "");
+  body = body.replace(/<!--[\s\S]*?-->/g, "");
+  return body;
 };
 
-const frustrations = [
-  "You train consistently but still look soft.",
-  "Cutting makes you smaller, bulking makes you thicker in the waist.",
-  "You do more cardio, but the mirror doesn’t change.",
-  "You feel stuck, unsure of the next move."
-];
+const stripLegacyHero = (body: string) =>
+  body.replace(
+    /<section class="Home_hero_container__VP_Jx"[\s\S]*?<\/section><section aria-labelledby="research-heading">/i,
+    '<section aria-labelledby="research-heading">',
+  );
 
-const testimonials = [
-  {
-    quote: "Dropped 4 cm off my waist and finally saw shoulder lines.",
-    name: "Alex M., 31",
-    result: "-4 cm waist",
-    image: "/1.webp"
-  },
-  {
-    quote: "Stopped spinning my wheels. Clear plan, weekly targets, real change.",
-    name: "Damien R., 28",
-    result: "+2 kg lean mass",
-    image: "/2.jpeg"
-  },
-  {
-    quote: "Structure + accountability made the difference. I feel in control again.",
-    name: "Julien P., 34",
-    result: "Visible recomposition",
-    image: "/3.jpeg"
-  }
-];
+const replaceLegacyResearch = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="research-heading">[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
+    `${RESEARCH_SLOT}<section aria-labelledby="visualization-heading">`,
+  );
 
-const rootCauses = [
-  {
-    title: "Over-Cardio",
-    body: "High volume cardio without the right training signal keeps you flat and drains recovery."
-  },
-  {
-    title: "No Progressive Overload",
-    body: "Without measurable strength increases, your body has no reason to build muscle."
-  },
-  {
-    title: "Nutrition Miscalibration",
-    body: "Eating clean isn’t the same as eating for recomposition. Precision matters."
-  }
-];
+const replaceLegacyResearchFallback = (body: string) =>
+  body.replace(
+    /<section id="why-glowup"[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
+    `${RESEARCH_SLOT}<section aria-labelledby="visualization-heading">`,
+  );
 
-const includedItems = [
-  {
-    title: "Daily Coach Check-Ins",
-    detail: "A real coach follows up every day. No AI. No automation."
-  },
-  {
-    title: "Personalized Nutrition Plan",
-    detail: "Built for your body, schedule, and goals."
-  },
-  {
-    title: "Personalized Training Plan",
-    detail: "Progressive plan calibrated to your current level."
-  },
-  {
-    title: "Supplements Delivered",
-    detail: "Supplements shipped to your door with a simple protocol."
-  },
-  {
-    title: "Video Walkthroughs",
-    detail: "Short, clear videos on how to execute each step."
-  },
-  {
-    title: "Sleep & Recovery Optimization",
-    detail: "Better sleep signals faster, leaner progress."
-  }
-];
+const replaceLegacyTech = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="tech-heading">[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
+    `${TECH_SLOT}<section aria-labelledby="visualization-heading">`,
+  );
 
-const whoFor = [
-  "You train but still feel soft or undefined.",
-  "You’re stuck between cutting and bulking.",
-  "You want a clear 30-day execution plan.",
-  "You want daily coaching and accountability."
-];
+const replaceLegacyMoreScores = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="score-heading">[\s\S]*?<\/section><section aria-labelledby="tech-heading">/i,
+    `${SCORE_SLOT}<section aria-labelledby="tech-heading">`,
+  );
 
-const notFor = [
-  "You’re looking for a quick trick or hack.",
-  "You won’t follow a structured plan.",
-  "You want extreme bulking or cutting.",
-  "You’re not ready to track progress."
-];
+const replaceLegacySupport = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="support-heading">[\s\S]*?<\/section><section aria-labelledby="score-heading">/i,
+    `${SUPPORT_SLOT}<section aria-labelledby="score-heading">`,
+  );
 
-const processSteps = ["Apply", "Calibrate", "Execute"];
+const replaceLegacySurgery = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="surgery-heading">[\s\S]*?<\/section><section aria-labelledby="support-heading">/i,
+    `${SURGERY_SLOT}<section aria-labelledby="support-heading">`,
+  );
 
-const faqItems = [
-  {
-    question: "How much time does it take each week?",
-    answer: "Most clients train 4x/week with 60-minute sessions. Coaching is unlimited."
-  },
-  {
-    question: "Do I need a full gym?",
-    answer: "A standard gym setup is ideal. We can adjust to limited equipment if needed."
-  },
-  {
-    question: "What if I’m new to structured training?",
-    answer: "That’s exactly who this is for. We keep it simple, progressive, and measurable."
-  },
-  {
-    question: "Will I have to track everything I eat?",
-    answer: "We calibrate nutrition without obsessive tracking. You’ll get a clear plan and adjustments."
-  },
-  {
-    question: "What kind of support do I get?",
-    answer: "Unlimited coaching with daily access, plus clear targets for training, nutrition, sleep, and supplements."
-  },
-  {
-    question: "Is this AI or automated?",
-    answer: "No. You’re supported by real coaches who follow up daily and adjust your plan."
-  }
-];
+const replaceLegacyVisualization = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="visualization-heading">[\s\S]*?<\/section><section aria-labelledby="story-heading">/i,
+    `${VISUALIZATION_SLOT}<section aria-labelledby="story-heading">`,
+  );
+
+const replaceLegacyStory = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="story-heading">[\s\S]*?<\/section><section aria-labelledby="experts-heading">/i,
+    `${STORY_SLOT}<section aria-labelledby="experts-heading">`,
+  );
+
+const replaceLegacyExperts = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="experts-heading">[\s\S]*?<\/section><section aria-labelledby="social-heading">/i,
+    `${EXPERTS_SLOT}<section aria-labelledby="social-heading">`,
+  );
+const replaceLegacySocial = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="social-heading">[\s\S]*?<\/section><section class="Home_testimonial_pricing_container__SBp0E"[\s\S]*?<div class="Pricing_element__hCT3q"/i,
+    `${SOCIAL_SLOT}<section class="Home_testimonial_pricing_container__SBp0E"><div class="Pricing_element__hCT3q"`,
+  );
+
+const stripLegacyResearch = (body: string) =>
+  body.replace(/<section id="why-glowup"[\s\S]*?<\/section>/i, "");
+
+const stripLegacyCta = (body: string) =>
+  body.replace(/<section aria-labelledby="cta-heading">[\s\S]*?<\/section>/i, "");
+
+const stripLegacyFooter = (body: string) => body.replace(/<footer class="Footer_element__CHu2S[\s\S]*?<\/footer>/i, "");
+const replaceLegacyApproach = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="approach-heading">[\s\S]*?<\/section><section aria-labelledby="transformation-heading">/i,
+    `${APPROACH_SLOT}<section aria-labelledby="transformation-heading">`,
+  );
+const replaceLegacyTransformation = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="transformation-heading">[\s\S]*?<\/section><section aria-labelledby="analysis-list-heading">/i,
+    `${TRANSFORMATION_SLOT}<section aria-labelledby="analysis-list-heading">`,
+  );
+const replaceLegacyPricing = (body: string) =>
+  body.replace(
+    /<div class="Pricing_element__hCT3q"[\s\S]*?<\/div><section aria-labelledby="faq-heading">/i,
+    `${PRICING_SLOT}<section aria-labelledby="faq-heading">`,
+  );
+const replaceLegacyFacialAnalysis = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="analysis-list-heading">[\s\S]*?<\/section><section aria-labelledby="why-heading">/i,
+    `${FACIAL_ANALYSIS_SLOT}<section aria-labelledby="why-heading">`,
+  );
+const replaceLegacyWhy = (body: string) =>
+  body.replace(
+    /<section aria-labelledby="why-heading">[\s\S]*?<\/section>/i,
+    WHY_SLOT,
+  );
 
 export default function ProgramPage() {
+  const html = fs.readFileSync(PROGRAM_HTML_PATH, "utf8");
+  let bodyHtml = replaceLegacyFacialAnalysis(
+    replaceLegacyTransformation(
+      replaceLegacyApproach(
+        replaceLegacyStory(
+          replaceLegacyExperts(
+            replaceLegacySocial(
+              replaceLegacyVisualization(
+                replaceLegacyTech(
+                  replaceLegacyMoreScores(
+                    replaceLegacySupport(
+                      replaceLegacySurgery(
+                        replaceLegacyResearch(stripLegacyFooter(stripLegacyCta(stripLegacyHero(extractBody(html))))),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  bodyHtml = replaceLegacyWhy(bodyHtml);
+  bodyHtml = replaceLegacyPricing(bodyHtml);
+
+  if (!bodyHtml.includes(RESEARCH_SLOT)) {
+    bodyHtml = replaceLegacyFacialAnalysis(replaceLegacyResearchFallback(bodyHtml));
+  }
+
+  if (!bodyHtml.includes(RESEARCH_SLOT)) {
+    bodyHtml = stripLegacyResearch(bodyHtml);
+    bodyHtml = `${bodyHtml}${RESEARCH_SLOT}`;
+  }
+  const [bodyBeforeResearch, bodyAfterResearch] = bodyHtml.split(RESEARCH_SLOT);
+  const [bodyBeforeSurgery, bodyAfterSurgery] = (bodyAfterResearch ?? "").split(SURGERY_SLOT);
+  const [bodyBeforeSupport, bodyAfterSupport] = (bodyAfterSurgery ?? "").split(SUPPORT_SLOT);
+  const [bodyBeforeScores, bodyAfterScores] = (bodyAfterSupport ?? "").split(SCORE_SLOT);
+  const [bodyBeforeTech, bodyAfterTech] = (bodyAfterScores ?? "").split(TECH_SLOT);
+  const [bodyBeforeVisualization, bodyAfterVisualization] = (bodyAfterTech ?? "").split(VISUALIZATION_SLOT);
+  const [bodyBeforeStory, bodyAfterStory] = (bodyAfterVisualization ?? "").split(STORY_SLOT);
+  const [bodyBeforeExperts, bodyAfterExperts] = (bodyAfterStory ?? "").split(EXPERTS_SLOT);
+  const [bodyBeforeSocial, bodyAfterSocial] = (bodyAfterExperts ?? "").split(SOCIAL_SLOT);
+  const [bodyBeforeApproach, bodyAfterApproach] = (bodyAfterSocial ?? "").split(APPROACH_SLOT);
+  const [bodyBeforeTransformation, bodyAfterTransformation] = (bodyAfterApproach ?? "").split(TRANSFORMATION_SLOT);
+  const [bodyBeforeFacialAnalysis, bodyAfterFacialAnalysis] = (bodyAfterTransformation ?? "").split(FACIAL_ANALYSIS_SLOT);
+  const [bodyBeforeWhy, bodyAfterWhy] = (bodyAfterFacialAnalysis ?? "").split(WHY_SLOT);
+  const [bodyBeforePricing, bodyAfterPricing] = (bodyAfterWhy ?? "").split(PRICING_SLOT);
+
   return (
-    <main className="bg-white text-black">
-      <SectionShell className="relative overflow-hidden bg-grid" ghost="Protocol" sparkle>
-        <div className="pointer-events-none absolute inset-0 opacity-[0.08]">
-          <div
-            className="h-full w-full"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1600&q=80')",
-              backgroundSize: "cover",
-              backgroundPosition: "center"
-            }}
-          />
-        </div>
-        <div className="relative grid items-center gap-10 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="fade-in">
-            <p className="text-xs uppercase tracking-[0.5em] text-black/60">Protocol Presents</p>
-            <h1 className="mt-6 text-4xl font-display font-semibold uppercase tracking-[0.12em] md:text-6xl">
-              Still Skinny-Fat… Even Though You Train?
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-black/70">
-              You don’t need more discipline. You need a calibrated strategy.
-            </p>
-            <p className="mt-4 text-base text-black/70">
-              You’ve done the work. The strategy is what’s miscalibrated.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <a
-                href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-                className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
-              >
-                Apply Now
-              </a>
-              <a
-                href="#problem"
-                className="inline-flex items-center justify-center border border-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black transition hover:bg-black hover:text-white"
-              >
-                See The Framework
-              </a>
-            </div>
-          </div>
-          <div className="fade-in">
-            <div className="card-raise overflow-hidden rounded-[32px] border border-black/20 bg-white shadow-soft">
-              <div className="aspect-[4/3] w-full">
-                <img
-                  src="https://skinnyfattransformation.com/wp-content/uploads/2023/11/Daniel-Ngan-skinny-fat-transformation.jpeg"
-                  alt="Marble statue torso"
-                  className="h-full w-full object-cover object-[center_20%] grayscale"
+    <div className="program-page">
+      <header className="program-nav">
+        <div className="program-nav__inner">
+          <a href="/program" className="program-nav__logo" aria-label="Qoves home">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <mask id="program-logo-mask">
+                  <rect width="32" height="32" fill="black" />
+                  <circle cx="14" cy="14" r="12" fill="none" stroke="white" strokeWidth="24" />
+                </mask>
+              </defs>
+              <g mask="url(#program-logo-mask)">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M9.11495 19.1086C5.42092 12.6972 5.16924 5.91332 8.55161 3.9569C11.934 1.9993 17.6708 5.61043 21.3649 12.0218C22.8785 14.65 23.8146 17.3407 24.1592 19.7356C25.2647 17.9984 25.9021 15.9571 25.9021 13.7744C25.9021 7.43368 20.5299 2.29395 13.9015 2.29395C7.27441 2.29395 1.90213 7.43368 1.90213 13.7744C1.90213 20.1139 7.27441 25.2536 13.9015 25.2536C14.0039 25.2536 14.1062 25.2524 14.2085 25.2501C12.3715 23.7604 10.5827 21.6554 9.11495 19.1086Z"
+                  fill="#233137"
                 />
-              </div>
-            </div>
-            <p className="mt-4 text-xs uppercase tracking-[0.35em] text-black/60">
-              Discipline. Structure. Execution.
-            </p>
-          </div>
-        </div>
-      </SectionShell>
-
-      <Marquee
-        items={[
-          "CALIBRATED TRAINING",
-          "HOLISTIC COACHING",
-          "SLEEP & RECOVERY",
-          "SUPPLEMENT OPTIMIZATION",
-          "UNLIMITED COACHING",
-          "PROTOCOL DISCIPLINE"
-        ]}
-      />
-
-      <SectionShell id="problem" className="bg-white">
-        <div className="mx-auto max-w-3xl text-center fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            The Frustration Is Real
-          </h2>
-          <p className="mt-6 text-lg text-black/70">
-            You’re not lazy. You’re not broken. You’re just running a strategy built for someone else.
-          </p>
-        </div>
-        <StatList items={frustrations} />
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="card-raise rounded-3xl border border-black/15 bg-white p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-black/60">Proof</p>
-            <p className="mt-4 text-lg text-black/80">
-              Clients report tighter waists, stronger lifts, and a body that finally looks trained.
-            </p>
-          </div>
-          <div className="card-raise rounded-3xl border border-black/15 bg-black p-6 text-white">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">What Changes</p>
-            <p className="mt-4 text-lg text-white/80">
-              Daily coaching removes guesswork. Your nutrition, training, and recovery are aligned to one goal.
-            </p>
-          </div>
-        </div>
-      </SectionShell>
-
-      <SectionShell className="bg-black text-white bg-grid-dark" tone="dark">
-        <div className="mx-auto max-w-3xl text-center fade-in">
-          <p className="text-xs uppercase tracking-[0.5em] text-white/70">Proof</p>
-          <h2 className="mt-4 text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            Real Outcomes From Real Clients
-          </h2>
-          <p className="mt-4 text-base text-white/75">
-            Results from men who were stuck in the same loop.
-          </p>
-        </div>
-        <div className="mt-10">
-          <Testimonials items={testimonials} />
-        </div>
-      </SectionShell>
-
-      <SectionShell>
-        <div className="max-w-3xl fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            The Real Problem
-          </h2>
-          <p className="mt-4 text-lg text-black/70">
-            Skinny-fat isn’t about effort. It’s about the wrong plan and no clear structure.
-          </p>
-        </div>
-        <ThreeColumn items={rootCauses} />
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <a
-            href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-            className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
-          >
-            Apply Now
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M24.1592 19.7354C22.1023 22.9658 18.4259 25.1485 14.2085 25.2499C16.9946 27.5104 19.8889 28.353 21.9282 27.1733C23.924 26.0195 24.6543 23.1838 24.1592 19.7354Z"
+                  fill="#233137"
+                />
+              </g>
+            </svg>
           </a>
+          <nav className="program-nav__links" aria-label="Primary">
+            <a href="/program#why-glowup">Why Glow-up</a>
+            <a href="/program#how-it-works">How it works</a>
+            <a href="/program#faq">FAQ</a>
+          </nav>
+          <div className="program-nav__actions">
+            <a href="https://app.qoves.com/" className="program-nav__login">Login</a>
+            <a href="/welcome/checkout" className="program-nav__cta">Join Now</a>
+          </div>
         </div>
-      </SectionShell>
-
-      <SectionShell className="bg-black text-white bg-grid-dark" tone="dark">
-        <div className="max-w-3xl fade-in">
-          <p className="text-xs uppercase tracking-[0.5em] text-white/70">The Solution</p>
-          <h2 className="mt-4 text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            The 30-Day Recomp Reset
-          </h2>
-          <p className="mt-6 text-lg text-white/75">
-            A holistic 30-day coaching program with real coaches who follow up daily. You get a personalized
-            training plan, personalized nutrition plan, sleep optimization, supplement delivery, and daily
-            execution guidance — built like an athlete’s protocol.
-          </p>
-          <p className="mt-4 text-base text-white/70">
-            This is not an app. Not AI. It’s human coaching with daily accountability.
-          </p>
+      </header>
+      <section className="program-hero" aria-labelledby="program-hero-title">
+        <div className="program-hero__shell">
+          <div className="program-hero__copy">
+            <p className="program-hero__eyebrow">Science-Based Body Transformation</p>
+            <h1 id="program-hero-title" className="program-hero__title">
+              Get Lean <span>Without Steroids</span>
+            </h1>
+            <p className="program-hero__subtitle">
+              Get your personalized body analysis and transformation plan based on 2000+ academic studies.
+              Updated every year.
+            </p>
+            <div className="program-hero__actions">
+              <a href="/welcome/checkout" className="program-hero__cta">
+                <span>Start Now</span>
+                <span className="program-hero__cta-icon" aria-hidden="true">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 14H22M22 14L14 6M22 14L14 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </a>
+            </div>
+          </div>
         </div>
-        <div className="mt-12 grid gap-10 md:grid-cols-2">
-          <SplitFeature
-            title="Daily Human Coaching"
-            body="You’re followed up every day by real coaches who review your execution and adjust the plan."
-            image="/coach2.png"
-            tone="dark"
-          />
-          <SplitFeature
-            title="Holistic Athlete Protocol"
-            body="Training, nutrition, sleep, and supplements are built as one system around your body."
-            image="/system.png"
-            flipped
-            tone="dark"
-          />
+        <div className="program-hero__stage">
+          <ol className="program-hero__benefits">
+            {HERO_GOALS.map((goal, index) => (
+              <li key={goal}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <p>{goal}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="program-hero__gallery">
+            <BeforeAfterSlider
+              subject="Man"
+              beforeSrc="/program/static/landing/images/home/hero/man-before.webp"
+              afterSrc="/program/static/landing/images/home/hero/man-after.webp"
+              beforePosition="68% 50%"
+              afterPosition="50% 50%"
+              beforeScale={1}
+              beforeTranslateX="0%"
+            />
+          </div>
         </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {[
-            {
-              title: "Personalized Nutrition",
-              body: "Built for your metabolism, schedule, and goals — not a template."
-            },
-            {
-              title: "Personalized Training",
-              body: "Progressive plan calibrated to your current level and equipment."
-            },
-            {
-              title: "Supplements + Videos",
-              body: "Supplements delivered plus short videos to execute perfectly."
-            }
-          ].map((item) => (
-            <div key={item.title} className="card-raise border border-white/20 bg-white/5 p-6">
-              <p className="text-xs uppercase tracking-[0.35em] text-white/70">{item.title}</p>
-              <p className="mt-4 text-base text-white/75">{item.body}</p>
+        <div className="program-hero__logos" aria-label="Featured in">
+          {HERO_LOGOS.map((logo) => (
+            <div key={logo.alt} className="program-hero__logo">
+              <Image src={logo.src} alt={logo.alt} width={140} height={44} />
             </div>
           ))}
         </div>
-      </SectionShell>
-
-      <SectionShell>
-        <div className="max-w-3xl fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            Your Coach
-          </h2>
-          <p className="mt-4 text-lg text-black/70">
-            A coach who lived the skinny-fat loop — and now helps men escape it with a clear system.
-          </p>
-        </div>
-        <div className="mt-10 grid items-center gap-8 md:grid-cols-2">
-          <div className="card-raise overflow-hidden rounded-3xl border border-black/15">
-            <img
-              src="/coach.png"
-              alt="Program coach"
-              className="h-full w-full object-cover grayscale"
-            />
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-black/60">Coach Story</p>
-            <h3 className="mt-4 text-2xl font-display font-semibold uppercase tracking-[0.18em]">
-              From Skinny-Fat To Coach
-            </h3>
-            <p className="mt-4 text-base text-black/70">
-              He trained hard, ate clean, and still felt soft. No plan. No measurable progress.
-              Protocol became a holistic coaching system — training, nutrition, sleep, and supplements
-              aligned to one outcome.
-            </p>
-            <p className="mt-4 text-base text-black/70">
-              Today the method is the same: structured plans, daily coaching, and accountability that sticks.
-            </p>
-          </div>
-        </div>
-      </SectionShell>
-
-      <SectionShell>
-        <div className="max-w-3xl fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            Who It’s For
-          </h2>
-          <p className="mt-4 text-lg text-black/70">
-            This is a disciplined reset. If you want clarity and results, you’ll fit right in.
-          </p>
-        </div>
-        <WhoFor forItems={whoFor} notForItems={notFor} />
-      </SectionShell>
-
-      <SectionShell>
-        <div className="max-w-3xl fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            The Process
-          </h2>
-          <p className="mt-4 text-lg text-black/70">
-            Simple sequence. Clear expectations. Structured accountability.
-          </p>
-        </div>
-        <ProcessSteps steps={processSteps} />
-      </SectionShell>
-
-      <SectionShell>
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-          <div className="fade-in">
-            <p className="text-xs uppercase tracking-[0.5em] text-black/60">Offer</p>
-            <h2 className="mt-4 text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-              The 30-Day Recomp Reset (Coached Edition)
+      </section>
+      <Script src="/program/static/landing/jquery-3.7.1.min.js" strategy="afterInteractive" />
+      <Script src="/program/static/landing/landing.js" strategy="afterInteractive" />
+      <LegacyHtml className="program-root" html={bodyBeforeResearch ?? bodyHtml} />
+      <ResearchImpactSection tabs={RESEARCH_TABS} />
+      {bodyBeforeSurgery ? <LegacyHtml className="program-root" html={bodyBeforeSurgery} /> : null}
+      <NoSurgerySection />
+      {bodyBeforeSupport ? <LegacyHtml className="program-root" html={bodyBeforeSupport} /> : null}
+      <SupportSection />
+      {bodyBeforeScores ? <LegacyHtml className="program-root" html={bodyBeforeScores} /> : null}
+      <MoreScoresSection />
+      {bodyBeforeTech ? <LegacyHtml className="program-root" html={bodyBeforeTech} /> : null}
+      <TechnologySection />
+      {bodyBeforeVisualization ? <LegacyHtml className="program-root" html={bodyBeforeVisualization} /> : null}
+      <VisualizationSection />
+      <StorySection />
+      {bodyBeforeExperts ? <LegacyHtml className="program-root" html={bodyBeforeExperts} /> : null}
+      <ExpertsSection />
+      {bodyBeforeSocial ? <LegacyHtml className="program-root" html={bodyBeforeSocial} /> : null}
+      <ClientTransformationsSection />
+      {bodyBeforeApproach ? <LegacyHtml className="program-root" html={bodyBeforeApproach} /> : null}
+      <NewApproachSection />
+      <GaryLinkovQuoteSection />
+      {bodyBeforeTransformation ? <LegacyHtml className="program-root" html={bodyBeforeTransformation} /> : null}
+      <TransformationSection />
+      <ProtocolSection />
+      <FollowersSection />
+      <AestheticTestsSection />
+      <InformativeSection />
+      <PersonalizedSection />
+      <CompleteFacialAnalysisSection />
+      {bodyBeforeFacialAnalysis ? <LegacyHtml className="program-root" html={bodyBeforeFacialAnalysis} /> : null}
+      <section className="program-analysis" aria-labelledby="program-analysis-title">
+        <div className="program-analysis__shell">
+          <header className="program-analysis__header">
+            <p className="program-analysis__eyebrow">Facial Analysis</p>
+            <h2 id="program-analysis-title" className="program-analysis__title">
+              Will Analyzing My <span>Body Make Me Feel Worse About Myself?</span>
             </h2>
-            <p className="mt-4 text-lg text-black/70">
-              A complete coaching system with daily human accountability, personalized plans, and full execution support.
+            <p className="program-analysis__subtitle">
+              Most insecurity comes from uncertainty — not knowing if your body can actually change, or if
+              you're just stuck like this. When you're guessing, your mind assumes the worst.
             </p>
-          <div className="card-raise mt-8 rounded-3xl border border-black/60 bg-gradient-to-br from-white via-white to-black/5 p-6 shadow-hard">
-            <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.35em] text-black/70">Program Investment</p>
-              <span className="rounded-full border border-black bg-black px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-white">
-                Best Value
-              </span>
-            </div>
-            <p className="mt-4 text-5xl font-display font-semibold uppercase tracking-[0.12em] text-black">
-              $250
-            </p>
-            <p className="mt-3 text-sm text-black/80">One-time. Unlimited daily coaching included.</p>
-          </div>
-          <div className="card-raise mt-6 rounded-3xl border border-black/40 bg-black p-6 text-white shadow-hard">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">February Intake</p>
-            <p className="mt-4 text-lg text-white/80">
-              Only 3 spots left this month. One coach, limited capacity.
-            </p>
-            <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">
-              Apply now to secure your place.
-            </p>
-          </div>
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-            <a
-              href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
-            >
-              Apply Now
-            </a>
-          </div>
-            <p className="mt-4 text-xs uppercase tracking-[0.3em] text-black/60">
-              Results or refunded guarantee included.
-            </p>
-          </div>
-          <div className="card-raise rounded-3xl border border-black/15 bg-white p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-black/60">What’s Included</p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {includedItems.map((item, index) => (
-                <div
-                  key={item.title}
-                  className="card-raise rounded-2xl border border-black/10 px-4 py-3"
-                >
-                  <span className="block text-[10px] uppercase tracking-[0.3em] text-black/60">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="mt-2 block text-sm uppercase tracking-[0.2em] text-black">
-                    {item.title}
-                  </span>
-                  <span className="mt-2 block text-xs text-black/60">{item.detail}</span>
+          </header>
+          <div className="program-analysis__grid">
+            {FACIAL_ANALYSIS_ITEMS.map((item) => (
+              <article key={item.number} className="program-analysis__card">
+                <div className="program-analysis__card-top">
+                  <div>
+                    <p className="program-analysis__number">{item.number}</p>
+                    <h3 className="program-analysis__card-title">{item.title}</h3>
+                  </div>
+                  <div className="program-analysis__image" style={{ backgroundImage: `url(${item.image})` }} />
                 </div>
-              ))}
+                <p className="program-analysis__description">{item.description}</p>
+              </article>
+            ))}
+          </div>
+          <blockquote className="program-analysis__quote">
+            Think of it like getting a body composition scan from a sports scientist. The goal isn't to shame you
+            — it's to give you the exact data you need to transform.
+          </blockquote>
+        </div>
+      </section>
+      {bodyBeforeWhy ? <LegacyHtml className="program-root" html={bodyBeforeWhy} /> : null}
+      <WhySection />
+      <ExpertAdviceSection />
+      {bodyBeforePricing ? <LegacyHtml className="program-root" html={bodyBeforePricing} /> : null}
+      <PricingSection />
+      {bodyAfterPricing ? <LegacyHtml className="program-root" html={bodyAfterPricing} /> : null}
+      <footer className="program-footer">
+        <div className="program-footer__cta">
+          <div>
+            <h2 className="program-footer__cta-title">Join Thousands of Men Already Escaping the Skinny-Fat Trap.</h2>
+          </div>
+          <a href="/welcome/checkout" className="program-footer__cta-button">
+            Get Your $19 Body Analysis Today
+          </a>
+        </div>
+
+        <div className="program-footer__main">
+          <div className="program-footer__brand">
+            <div className="program-footer__mark" aria-hidden="true">
+              <svg width="44" height="44" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <mask id="program-footer-logo-mask">
+                    <rect width="32" height="32" fill="black" />
+                    <circle cx="14" cy="14" r="12" fill="none" stroke="white" strokeWidth="24" />
+                  </mask>
+                </defs>
+                <g mask="url(#program-footer-logo-mask)">
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M9.11495 19.1086C5.42092 12.6972 5.16924 5.91332 8.55161 3.9569C11.934 1.9993 17.6708 5.61043 21.3649 12.0218C22.8785 14.65 23.8146 17.3407 24.1592 19.7356C25.2647 17.9984 25.9021 15.9571 25.9021 13.7744C25.9021 7.43368 20.5299 2.29395 13.9015 2.29395C7.27441 2.29395 1.90213 7.43368 1.90213 13.7744C1.90213 20.1139 7.27441 25.2536 13.9015 25.2536C14.0039 25.2536 14.1062 25.2524 14.2085 25.2501C12.3715 23.7604 10.5827 21.6554 9.11495 19.1086Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M24.1592 19.7354C22.1023 22.9658 18.4259 25.1485 14.2085 25.2499C16.9946 27.5104 19.8889 28.353 21.9282 27.1733C23.924 26.0195 24.6543 23.1838 24.1592 19.7354Z"
+                    fill="currentColor"
+                  />
+                </g>
+              </svg>
+            </div>
+            <div className="program-footer__info-block">
+              <p className="program-footer__heading">Qoves Inc. /</p>
+              <a href="mailto:support@qoves.com">support@qoves.com</a>
+            </div>
+            <div className="program-footer__info-block">
+              <p className="program-footer__heading">Disclaimer /</p>
+              <p>
+                Some body visualizations are digitally generated to illustrate potential changes. Individual
+                results may vary based on consistency and adherence to the protocol.
+              </p>
             </div>
           </div>
-        </div>
-      </SectionShell>
 
-      <SectionShell className="bg-black text-white bg-grid-dark" tone="dark">
-        <div className="mx-auto max-w-3xl text-center fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            The Protocol Guarantee
-          </h2>
-          <p className="mt-6 text-lg text-white/75">
-            Execute the plan for 30 days. If you don’t see measurable progress,
-            you get your money back. Results or refunded.
-          </p>
+          <nav className="program-footer__nav" aria-label="Footer">
+            <div className="program-footer__column">
+              <p className="program-footer__heading">Company /</p>
+              <a href="/program">Products</a>
+              <a href="/program/resources.html">Research</a>
+              <a href="/program/contact-us.html">Contact Us</a>
+              <a href="/program/for-doctors.html">Qoves for Clinics</a>
+            </div>
+            <div className="program-footer__column">
+              <p className="program-footer__heading">Others /</p>
+              <a href="/program/legal/privacy-policy.html">Privacy Policy</a>
+              <a href="/program/legal/terms-and-conditions.html">Terms of Service</a>
+            </div>
+            <div className="program-footer__column">
+              <p className="program-footer__heading">Connect /</p>
+              <a href="https://www.linkedin.com/company/qoves" target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+              <a href="https://www.youtube.com/@QOVESStudio" target="_blank" rel="noreferrer">
+                YouTube
+              </a>
+              <a href="https://www.instagram.com/qoves" target="_blank" rel="noreferrer">
+                Instagram
+              </a>
+            </div>
+          </nav>
         </div>
-      </SectionShell>
-
-      <SectionShell className="bg-white">
-        <div className="max-w-3xl fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            Questions, Answered
-          </h2>
-          <p className="mt-4 text-lg text-black/70">
-            No fluff. Just clear expectations before you commit.
-          </p>
-        </div>
-        <FAQ items={faqItems} />
-      </SectionShell>
-
-      <SectionShell className="bg-white">
-        <div className="mx-auto max-w-4xl text-center fade-in">
-          <h2 className="text-3xl font-display font-semibold uppercase tracking-[0.18em]">
-            Ready To Reset?
-          </h2>
-          <p className="mt-6 text-lg text-black/70">
-            Capacity is limited to keep it personal and accountable.
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href="https://buy.stripe.com/00weVd8dVdoG0LVbv4ebu00"
-              className="inline-flex items-center justify-center border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-hard ring-2 ring-black/70 ring-offset-2 ring-offset-white transition hover:bg-white hover:text-black"
-            >
-              Apply Now
-            </a>
-          </div>
-        </div>
-      </SectionShell>
-
-      <StickyCta />
-    </main>
+      </footer>
+    </div>
   );
 }

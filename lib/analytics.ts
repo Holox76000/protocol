@@ -6,7 +6,9 @@ type EventName =
   | "optin_viewed"
   | "lead_submitted"
   | "result_viewed"
-  | "cta_clicked";
+  | "cta_clicked"
+  | "program_landing_viewed"
+  | "program_cta_clicked";
 
 const SESSION_KEY = "sf_quiz_session_id";
 
