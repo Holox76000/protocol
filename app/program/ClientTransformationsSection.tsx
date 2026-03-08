@@ -5,6 +5,20 @@ import customBeforeTwo from "../../2-before.png";
 import customAfterTwo from "../../2-after.png";
 import customBeforeThree from "../../3-before.png";
 import customAfterThree from "../../3-after.png";
+import customBeforeFour from "../../4-before.png";
+import customAfterFour from "../../4-after.png";
+import customBeforeFive from "../../5-before.png";
+import customAfterFive from "../../5-after.png";
+import customBeforeSix from "../../6-before.png";
+import customAfterSix from "../../6-after.png";
+import customBeforeSeven from "../../7-before.png";
+import customAfterSeven from "../../7-after.png";
+import customBeforeEight from "../../8-before.png";
+import customAfterEight from "../../8-after.png";
+import customBeforeNine from "../../9-before.png";
+import customAfterNine from "../../9-after.png";
+import customBeforeTen from "../../10-before.png";
+import customAfterTen from "../../10-after.png";
 
 const CLIENT_TRANSFORMATIONS = [
   {
@@ -22,14 +36,46 @@ const CLIENT_TRANSFORMATIONS = [
     beforeSrc: customBeforeThree.src,
     afterSrc: customAfterThree.src,
   },
-  ...Array.from({ length: 10 }, (_, index) => {
-    const item = index + 1;
-    return {
-      id: String(item),
-      beforeSrc: `/program/static/landing/images/home/client-transformations/${item}-before.webp`,
-      afterSrc: `/program/static/landing/images/home/client-transformations/${item}-after.webp`,
-    };
-  }),
+  {
+    id: "custom-4",
+    beforeSrc: customBeforeFour.src,
+    afterSrc: customAfterFour.src,
+  },
+  {
+    id: "custom-5",
+    beforeSrc: customBeforeFive.src,
+    afterSrc: customAfterFive.src,
+  },
+  {
+    id: "custom-6",
+    beforeSrc: customBeforeSix.src,
+    afterSrc: customAfterSix.src,
+  },
+  {
+    id: "custom-7",
+    beforeSrc: customBeforeSeven.src,
+    afterSrc: customAfterSeven.src,
+  },
+  {
+    id: "custom-8",
+    beforeSrc: customBeforeEight.src,
+    afterSrc: customAfterEight.src,
+  },
+  {
+    id: "custom-9",
+    beforeSrc: customBeforeNine.src,
+    afterSrc: customAfterNine.src,
+  },
+  {
+    id: "custom-10",
+    beforeSrc: customBeforeTen.src,
+    afterSrc: customAfterTen.src,
+  },
+  {
+    id: "6",
+    beforeSrc: "/program/static/landing/images/home/client-transformations/6-before.webp",
+    afterSrc: "/program/static/landing/images/home/client-transformations/6-after.webp",
+  },
 ];
 
 export default function ClientTransformationsSection() {
