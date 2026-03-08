@@ -698,9 +698,23 @@
   border-color: transparent;
 }
 
-.program-page--theme-test .program-no-surgery__timeline-card,
-.program-page--theme-test .program-no-surgery__quote {
+.program-page--theme-test .program-no-surgery,
+.program-page--theme-test .program-no-surgery__inner,
+.program-page--theme-test .program-no-surgery__bottom,
+.program-page--theme-test .program-no-surgery__timeline,
+.program-page--theme-test .program-no-surgery__timeline-card {
   background: #fff !important;
+}
+
+.program-page--theme-test .program-no-surgery__quote,
+.program-page--theme-test .program-no-surgery__quote-copy {
+  background: transparent !important;
+}
+
+.program-page--theme-test .program-no-surgery__timeline-title span,
+.program-page--theme-test .program-no-surgery__timeline-row p:last-child,
+.program-page--theme-test .program-no-surgery__quote-mark {
+  color: var(--program-theme-text-muted) !important;
 }
 
 .program-page--theme-test :where(
