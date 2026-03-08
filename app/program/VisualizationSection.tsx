@@ -1,5 +1,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import visualizationBeforeImage from "../../1-before.png";
+import visualizationAfterImage from "../../1-after.png";
 
 const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
 
@@ -47,12 +49,12 @@ export default function VisualizationSection() {
           <BeforeAfterSlider
             className="program-visualization__slider"
             subject="Future you"
-            beforeSrc="/program/static/landing/images/home/visualization/before.webp"
-            afterSrc="/program/static/landing/images/home/visualization/after.webp"
+            beforeSrc={visualizationBeforeImage.src}
+            afterSrc={visualizationAfterImage.src}
             beforePosition="50% 46%"
             afterPosition="50% 46%"
-            beforeScale={0.94}
-            beforeTranslateX="2%"
+            beforeScale={1}
+            beforeTranslateX="0%"
           />
 
           <div className="program-visualization__cards">

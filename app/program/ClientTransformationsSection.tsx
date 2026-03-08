@@ -1,13 +1,36 @@
 import Image from "next/image";
+import customBeforeOne from "../../1-before.png";
+import customAfterOne from "../../1-after.png";
+import customBeforeTwo from "../../2-before.png";
+import customAfterTwo from "../../2-after.png";
+import customBeforeThree from "../../3-before.png";
+import customAfterThree from "../../3-after.png";
 
-const CLIENT_TRANSFORMATIONS = Array.from({ length: 10 }, (_, index) => {
-  const item = index + 1;
-  return {
-    id: String(item),
-    beforeSrc: `/program/static/landing/images/home/client-transformations/${item}-before.webp`,
-    afterSrc: `/program/static/landing/images/home/client-transformations/${item}-after.webp`,
-  };
-});
+const CLIENT_TRANSFORMATIONS = [
+  {
+    id: "custom-1",
+    beforeSrc: customBeforeOne.src,
+    afterSrc: customAfterOne.src,
+  },
+  {
+    id: "custom-2",
+    beforeSrc: customBeforeTwo.src,
+    afterSrc: customAfterTwo.src,
+  },
+  {
+    id: "custom-3",
+    beforeSrc: customBeforeThree.src,
+    afterSrc: customAfterThree.src,
+  },
+  ...Array.from({ length: 10 }, (_, index) => {
+    const item = index + 1;
+    return {
+      id: String(item),
+      beforeSrc: `/program/static/landing/images/home/client-transformations/${item}-before.webp`,
+      afterSrc: `/program/static/landing/images/home/client-transformations/${item}-after.webp`,
+    };
+  }),
+];
 
 export default function ClientTransformationsSection() {
   return (

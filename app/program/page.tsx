@@ -3,6 +3,8 @@ import path from "path";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Script from "next/script";
+import heroBeforeImage from "../../2-before.png";
+import heroAfterImage from "../../2-after.png";
 import "./program.css";
 import LegacyHtml from "./LegacyHtml";
 import type { ResearchTab } from "./ResearchImpactSection";
@@ -478,7 +480,7 @@ export default function ProgramPage() {
           <div className="program-hero__copy">
             <p className="program-hero__eyebrow">Science-Based Body Transformation</p>
             <h1 id="program-hero-title" className="program-hero__title">
-              Get Lean <span>Without Steroids</span>
+              Get Lean <span>Without Guesswork</span>
             </h1>
             <p className="program-hero__subtitle">
               Get your personalized body analysis and transformation plan based on 2000+ academic studies.
@@ -508,8 +510,8 @@ export default function ProgramPage() {
           <div className="program-hero__gallery">
             <BeforeAfterSlider
               subject="Man"
-              beforeSrc="/program/static/landing/images/home/hero/man-before.webp"
-              afterSrc="/program/static/landing/images/home/hero/man-after.webp"
+              beforeSrc={heroBeforeImage.src}
+              afterSrc={heroAfterImage.src}
               beforePosition="68% 50%"
               afterPosition="50% 50%"
               beforeScale={1}
