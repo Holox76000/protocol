@@ -700,7 +700,7 @@
 
 .program-page--theme-test .program-no-surgery__timeline-card,
 .program-page--theme-test .program-no-surgery__quote {
-  background: var(--program-theme-surface-soft);
+  background: #fff !important;
 }
 
 .program-page--theme-test :where(
