@@ -8,7 +8,7 @@ const OLD_WAY_STEPS = [
 
 const NEW_WAY_STEPS = [
   "Focus on Overall Facial Harmony",
-  "Qoves Analysis",
+  "Protocol Analysis",
   "See Your Future Self",
   "Personalised Protocol",
   "Real Results, No Surgery",

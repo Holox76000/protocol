@@ -40,11 +40,11 @@ export default function FollowersSection() {
           style={{ ["--followers-bg" as string]: "url(/program/static/landing/images/home/features-grid/background.webp)" }}
         >
           <div className="program-followers__hero-top">
-            <p className="program-followers__num">2M+</p>
-            <p className="program-followers__label">Followers</p>
+            <p className="program-followers__num">25k+</p>
+            <p className="program-followers__label">men</p>
           </div>
           <h2 id="program-followers-title" className="program-followers__hero-copy">
-            <span>The world&apos;s largest</span> male body transformation science community.
+            The world&apos;s largest male body transformation science community
           </h2>
         </aside>
 

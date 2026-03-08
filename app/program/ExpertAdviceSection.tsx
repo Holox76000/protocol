@@ -14,7 +14,7 @@ export default function ExpertAdviceSection() {
         <header className="program-advice__header">
           <p className="program-advice__eyebrow">Expert Advice Enhanced by Technology</p>
           <h2 id="program-advice-title" className="program-advice__title">
-            Get a Proven <span>Qoves™</span> Plan
+            Get a Proven <span>Protocol</span> Plan
           </h2>
           <p className="program-advice__subtitle">
             Understand your facial features and start your glow-up today
@@ -29,7 +29,7 @@ export default function ExpertAdviceSection() {
               <div className="program-advice__image">
                 <Image
                   src="/program/static/landing/images/home/expert-advice/before.webp"
-                  alt="Before Qoves plan"
+                  alt="Before Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
                   style={{ objectFit: "cover", objectPosition: "center center" }}
@@ -50,7 +50,7 @@ export default function ExpertAdviceSection() {
               <div className="program-advice__image">
                 <Image
                   src="/program/static/landing/images/home/expert-advice/after.webp"
-                  alt="After Qoves plan"
+                  alt="After Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
                   style={{ objectFit: "cover", objectPosition: "center center" }}

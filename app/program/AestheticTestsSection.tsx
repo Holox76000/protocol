@@ -87,7 +87,7 @@ function MetaIcon({ kind }: { kind: "home" | "annual" }) {
   );
 }
 
-function QovesMark() {
+function ProtocolMark() {
   return (
     <svg viewBox="0 0 32 32" aria-hidden="true" className="program-tests__mark">
       <path
@@ -107,7 +107,7 @@ export default function AestheticTestsSection() {
     <section className="program-tests" aria-labelledby="program-tests-title">
       <div className="program-tests__shell">
         <header className="program-tests__header">
-          <QovesMark />
+          <ProtocolMark />
           <h2 id="program-tests-title" className="program-tests__title">
             <span>100+</span> Body Composition Tests
           </h2>

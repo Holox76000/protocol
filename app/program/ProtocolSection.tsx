@@ -27,7 +27,7 @@ export default function ProtocolSection() {
           <div className="program-protocol__main-frame">
             <Image
               src="/program/static/landing/images/home/transformation-protocol/main-frame.webp"
-              alt="Qoves protocol dashboard"
+              alt="Protocol dashboard"
               fill
               sizes="(max-width: 767px) 100vw, 92vw"
             />

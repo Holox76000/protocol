@@ -14,9 +14,9 @@ export default function ExpertsSection() {
         </div>
 
         <div className="program-experts__content">
-          <p className="program-experts__eyebrow">What experts think about Qoves</p>
+          <p className="program-experts__eyebrow">What experts think about Protocol</p>
           <blockquote id="program-experts-quote" className="program-experts__quote">
-            “I am excited to be partnering with Qoves, an innovative state of the art facial analysis system
+            “I am excited to be partnering with Protocol, an innovative state of the art facial analysis system
             that I believe is the future of the aesthetic medicine.”
           </blockquote>
           <div className="program-experts__author">

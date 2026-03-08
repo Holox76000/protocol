@@ -437,10 +437,10 @@ export default function ProgramPage() {
   const [bodyBeforePricing, bodyAfterPricing] = (bodyAfterWhy ?? "").split(PRICING_SLOT);
 
   return (
-    <div className="program-page">
+    <div className="program-page program-page--theme-test">
       <header className="program-nav">
         <div className="program-nav__inner">
-          <a href="/program" className="program-nav__logo" aria-label="Qoves home">
+          <a href="/program" className="program-nav__logo" aria-label="Protocol home">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <mask id="program-logo-mask">
@@ -470,7 +470,7 @@ export default function ProgramPage() {
             <a href="/program#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
-            <a href="https://app.qoves.com/" className="program-nav__login">Login</a>
+            <a href="/login" className="program-nav__login">Login</a>
             <a href="/welcome/checkout" className="program-nav__cta">Join Now</a>
           </div>
         </div>
@@ -633,8 +633,8 @@ export default function ProgramPage() {
               </svg>
             </div>
             <div className="program-footer__info-block">
-              <p className="program-footer__heading">Qoves Inc. /</p>
-              <a href="mailto:support@qoves.com">support@qoves.com</a>
+              <p className="program-footer__heading">Protocol /</p>
+              <a href="mailto:support@protocol-club.com">support@protocol-club.com</a>
             </div>
             <div className="program-footer__info-block">
               <p className="program-footer__heading">Disclaimer /</p>
@@ -649,14 +649,14 @@ export default function ProgramPage() {
             <div className="program-footer__column">
               <p className="program-footer__heading">Company /</p>
               <a href="/program">Products</a>
-              <a href="/program/resources.html">Research</a>
+              <a href="/program/resources">Research</a>
               <a href="/program/contact-us.html">Contact Us</a>
-              <a href="/program/for-doctors.html">Qoves for Clinics</a>
+              <a href="/program/for-doctors.html">Protocol for Clinics</a>
             </div>
             <div className="program-footer__column">
               <p className="program-footer__heading">Others /</p>
-              <a href="/program/legal/privacy-policy.html">Privacy Policy</a>
-              <a href="/program/legal/terms-and-conditions.html">Terms of Service</a>
+              <a href="/program/legal/privacy-policy">Privacy Policy</a>
+              <a href="/program/legal">Terms of Service</a>
             </div>
             <div className="program-footer__column">
               <p className="program-footer__heading">Connect /</p>

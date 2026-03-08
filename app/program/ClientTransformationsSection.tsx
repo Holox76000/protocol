@@ -86,7 +86,7 @@ export default function ClientTransformationsSection() {
           <p className="program-social-proof__eyebrow">Client transformations</p>
           <h2 id="program-social-proof-title" className="program-social-proof__title">
             Real Transformations By
-            <span>Qoves™ Clients</span>
+            <span>Protocol Clients</span>
           </h2>
           <p className="program-social-proof__subtitle">
             Our clients achieve remarkable, surgery-free transformations every day.
