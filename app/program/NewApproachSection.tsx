@@ -7,7 +7,7 @@ const OLD_WAY_STEPS = [
 ];
 
 const NEW_WAY_STEPS = [
-  "Focus on Overall Facial Harmony",
+  "Focus on Overall Body Proportions",
   "Protocol Analysis",
   "See Your Future Self",
   "Personalised Protocol",

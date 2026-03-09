@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 const ADVICE_STEPS = [
-  { number: "01/", title: "Get your expert facial analysis" },
-  { number: "02/", title: "Visualise your best-looking self" },
-  { number: "03/", title: "Get your personalized glow-up protocol" },
-  { number: "04/", title: "Track your progress and see dramatic results" },
+  { number: "01/", title: "Get your expert body analysis" },
+  { number: "02/", title: "Visualize your target physique" },
+  { number: "03/", title: "Get your personalized body protocol" },
+  { number: "04/", title: "Track your progress and transform your body" },
 ];
 
 export default function ExpertAdviceSection() {
@@ -17,8 +17,8 @@ export default function ExpertAdviceSection() {
             Get a Proven <span>Protocol</span> Plan
           </h2>
           <p className="program-advice__subtitle">
-            Understand your facial features and start your glow-up today
-            <span>with a proven action plan—no plastic surgery needed.</span>
+            Understand your body composition and start your transformation today
+            <span>with a proven action plan—no surgery needed.</span>
           </p>
         </header>
 
@@ -38,11 +38,7 @@ export default function ExpertAdviceSection() {
             </article>
 
             <div className="program-advice__connector" aria-hidden="true">
-              <div className="program-advice__connector-box program-advice__connector-box--top" />
               <div className="program-advice__connector-line" />
-              <div className="program-advice__connector-dot" />
-              <div className="program-advice__connector-line" />
-              <div className="program-advice__connector-box program-advice__connector-box--bottom" />
             </div>
 
             <article className="program-advice__card">
@@ -57,6 +53,21 @@ export default function ExpertAdviceSection() {
                 />
               </div>
             </article>
+
+            <div className="program-advice__orbit" aria-hidden="true">
+              <svg viewBox="0 0 860 408" preserveAspectRatio="none">
+                <path
+                  id="program-advice-orbit-path"
+                  className="program-advice__orbit-path"
+                  d="M358 204 L358 8 L8 8 L8 400 L358 400 L358 204 L502 204 L502 8 L852 8 L852 400 L502 400 L502 204 L358 204"
+                />
+                <circle className="program-advice__orbit-dot" r="4.5">
+                  <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#program-advice-orbit-path" />
+                  </animateMotion>
+                </circle>
+              </svg>
+            </div>
           </div>
         </div>
 

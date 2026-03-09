@@ -1,67 +1,192 @@
 import Image from "next/image";
+import bellyCompositionImage from "../../belly-composition.png";
+import bodyFatDistributionImage from "../../body-fat-distribution.png";
+import chestStructureImage from "../../chest-structure.png";
+import coreStrengthIndicatorsImage from "../../core-strength-indicators.png";
+import generalMorphologyImage from "../../general-morphology.png";
+import hormoneImage from "../../hormone.png";
+import muscleSymmetryImage from "../../muscle-symmetry.png";
+import postureFrameImage from "../../posture-frame.png";
+import ribCageImage from "../../rib-cage.png";
+import skinImage from "../../skin.png";
+import upperBodyDevelopmentImage from "../../upper-body-development.png";
 
 const TEST_CATEGORIES = [
   {
     title: "General Morphology",
-    count: 8,
-    image: "/program/static/landing/images/home/aesthetics-tests/face-shape.webp",
+    image: generalMorphologyImage.src,
+    tests: [
+      "Frame width classification",
+      "Bone structure profile",
+      "Waist-to-shoulder visual balance",
+      "Limb proportion check",
+      "Torso length analysis",
+      "Leg-to-torso ratio review",
+      "Overall symmetry screen",
+      "Athletic build potential score",
+    ],
   },
   {
     title: "Chest Structure",
-    count: 14,
-    image: "/program/static/landing/images/home/aesthetics-tests/eyebrows.webp",
+    image: chestStructureImage.src,
+    tests: [
+      "Upper chest fullness",
+      "Lower chest softness",
+      "Sternum depth check",
+      "Clavicle spread estimate",
+      "Pectoral insertion pattern",
+      "Left-right pec balance",
+      "Nipple line symmetry",
+      "Rib flare visibility",
+      "Chest fat accumulation pattern",
+      "Pressing response potential",
+      "Posture effect on chest look",
+      "Push-up baseline strength",
+    ],
   },
   {
     title: "Shoulder-to-Waist Ratio",
-    count: 26,
     image: "/program/static/landing/images/home/aesthetics-tests/eyes.webp",
+    tests: [
+      "Current V-taper ratio",
+      "Deltoid width potential",
+      "Lat flare potential",
+      "Waist tightness score",
+      "Oblique thickness review",
+      "Shoulder posture effect",
+      "Upper back width estimate",
+      "Visual taper projection",
+      "Taper after fat loss estimate",
+      "Taper after muscle gain estimate",
+    ],
   },
   {
     title: "Belly Composition",
-    count: 17,
-    image: "/program/static/landing/images/home/aesthetics-tests/nose.webp",
+    image: bellyCompositionImage.src,
+    tests: [
+      "Lower belly fat concentration",
+      "Upper belly softness",
+      "Bloating pattern review",
+      "Visceral fat indicators",
+      "Ab definition visibility",
+      "Waist control score",
+      "Digestive stress signals",
+      "Core tension baseline",
+    ],
   },
   {
     title: "Posture & Frame",
-    count: 16,
-    image: "/program/static/landing/images/home/aesthetics-tests/lips.webp",
+    image: postureFrameImage.src,
+    tests: [
+      "Forward shoulder severity",
+      "Pelvic tilt screening",
+      "Rounded upper-back score",
+      "Neck alignment check",
+      "Rib cage position review",
+      "Standing posture baseline",
+      "Walking gait posture cues",
+      "Frame presentation score",
+    ],
   },
   {
     title: "Body Fat Distribution",
-    count: 13,
-    image: "/program/static/landing/images/home/aesthetics-tests/cheeks.webp",
+    image: bodyFatDistributionImage.src,
+    tests: [
+      "Chest fat storage",
+      "Waist fat storage",
+      "Love handle prominence",
+      "Lower back fat pattern",
+      "Glute-fat storage pattern",
+      "Thigh fat storage pattern",
+      "Arm leanness score",
+      "Leanness bottleneck zone",
+    ],
   },
   {
     title: "Core Strength Indicators",
-    count: 11,
-    image: "/program/static/landing/images/home/aesthetics-tests/jaw.webp",
+    image: coreStrengthIndicatorsImage.src,
+    tests: [
+      "Bracing control score",
+      "Abdominal wall tension",
+      "Rotation stability baseline",
+      "Hip stability pattern",
+      "Lower back compensation risk",
+      "Plank endurance estimate",
+      "Core fatigue markers",
+      "Strength carryover potential",
+    ],
   },
   {
     title: "Hormonal Profile Markers",
-    count: 8,
-    image: "/program/static/landing/images/home/aesthetics-tests/chin.webp",
+    image: hormoneImage.src,
+    tests: [
+      "Low-testosterone visual markers",
+      "High-stress recovery markers",
+      "Sleep deprivation markers",
+      "Inflammation indicators",
+      "Water retention cues",
+      "Energy regulation clues",
+      "Metabolic slowdown clues",
+      "Recovery capacity estimate",
+    ],
   },
   {
     title: "Muscle Symmetry",
-    count: 13,
-    image: "/program/static/landing/images/home/aesthetics-tests/smile.webp",
+    image: muscleSymmetryImage.src,
+    tests: [
+      "Left-right shoulder balance",
+      "Arm size symmetry",
+      "Chest symmetry",
+      "Lat symmetry",
+      "Waist symmetry",
+      "Quad symmetry",
+      "Glute symmetry",
+      "Calf symmetry",
+    ],
   },
   {
     title: "Upper Body Development",
-    count: 11,
-    image: "/program/static/landing/images/home/aesthetics-tests/neck.webp",
+    image: upperBodyDevelopmentImage.src,
+    tests: [
+      "Deltoid development",
+      "Upper chest development",
+      "Lat width score",
+      "Trap dominance review",
+      "Arm fullness score",
+      "Back thickness estimate",
+      "Upper body maturity score",
+      "Most lagging muscle group",
+    ],
   },
   {
     title: "Lower Chest / Rib Cage",
-    count: 12,
-    image: "/program/static/landing/images/home/aesthetics-tests/ear.webp",
+    image: ribCageImage.src,
+    tests: [
+      "Lower chest shape",
+      "Rib cage width",
+      "Rib flare severity",
+      "Lower pec insertion pattern",
+      "Chest-to-waist transition",
+      "Vacuum potential",
+      "Breathing mechanics clues",
+      "Thoracic expansion baseline",
+    ],
   },
   {
     title: "Skin & Subcutaneous Fat",
-    count: 20,
-    image: "/program/static/landing/images/home/aesthetics-tests/skin.webp",
+    image: skinImage.src,
+    tests: [
+      "Skin tightness baseline",
+      "Subcutaneous fat thickness",
+      "Water retention visibility",
+      "Texture consistency",
+      "Inflammation markers",
+      "Stretch mark review",
+      "Cellulite visibility",
+      "Skin quality improvement potential",
+    ],
   },
-];
+] as const;
 
 function MetaIcon({ kind }: { kind: "home" | "annual" }) {
   if (kind === "home") {
@@ -130,20 +255,32 @@ export default function AestheticTestsSection() {
 
         <div className="program-tests__panel">
           {TEST_CATEGORIES.map((item) => (
-            <article key={item.title} className="program-tests__row">
-              <div className="program-tests__row-main">
-                <div className="program-tests__thumb">
-                  <Image src={item.image} alt="" fill sizes="64px" />
+            <details key={item.title} className="program-tests__row">
+              <summary className="program-tests__summary">
+                <div className="program-tests__row-main">
+                  <div className="program-tests__thumb">
+                    <Image src={item.image} alt="" fill sizes="64px" />
+                  </div>
+                  <h3 className="program-tests__row-title">{item.title}</h3>
                 </div>
-                <h3 className="program-tests__row-title">{item.title}</h3>
+                <div className="program-tests__row-side">
+                  <p className="program-tests__count">{item.tests.length} Tests Included</p>
+                  <span className="program-tests__plus" aria-hidden="true">
+                    +
+                  </span>
+                </div>
+              </summary>
+              <div className="program-tests__content">
+                <ul className="program-tests__list">
+                  {item.tests.map((test) => (
+                    <li key={test} className="program-tests__list-item">
+                      <span className="program-tests__list-dot" aria-hidden="true" />
+                      <span>{test}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="program-tests__row-side">
-                <p className="program-tests__count">{item.count} Tests Available</p>
-                <span className="program-tests__plus" aria-hidden="true">
-                  +
-                </span>
-              </div>
-            </article>
+            </details>
           ))}
         </div>
       </div>

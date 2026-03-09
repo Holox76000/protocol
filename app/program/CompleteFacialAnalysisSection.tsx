@@ -1,4 +1,5 @@
 import Image from "next/image";
+import manImage from "../../man.png";
 
 const ANALYSIS_CARDS = [
   {
@@ -36,7 +37,7 @@ export default function CompleteFacialAnalysisSection() {
     <section className="program-complete-analysis" aria-labelledby="program-complete-analysis-title">
       <div className="program-complete-analysis__shell">
         <header className="program-complete-analysis__header">
-          <p className="program-complete-analysis__eyebrow">Facial Analysis</p>
+          <p className="program-complete-analysis__eyebrow">Body Analysis</p>
           <h2 id="program-complete-analysis-title" className="program-complete-analysis__title">
             Your Complete <span>Body Analysis</span>
           </h2>
@@ -71,8 +72,8 @@ export default function CompleteFacialAnalysisSection() {
 
           <div className="program-complete-analysis__portrait">
             <Image
-              src="/program/static/landing/images/home/facial-analysis/facial-analysis-woman.webp"
-              alt="Facial analysis portrait"
+              src={manImage}
+              alt="Body analysis portrait"
               fill
               sizes="760px"
               className="program-complete-analysis__portrait-image"

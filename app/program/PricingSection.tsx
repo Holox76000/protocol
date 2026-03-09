@@ -3,22 +3,22 @@ import Image from "next/image";
 const PRICING_FEATURES = [
   {
     title: "Complete body composition analysis",
-    description: "Get an in-depth breakdown of your facial structure and features.",
+    description: "Get an in-depth breakdown of your body composition, proportions, and weak points.",
     featured: false,
   },
   {
     title: "Personalized 12-week recomposition protocol",
-    description: "Receive a step-by-step plan on how to improve your facial aesthetics.",
+    description: "Receive a step-by-step plan on how to improve your body aesthetics.",
     featured: true,
   },
   {
     title: "Body metrics scores and progress tracking",
-    description: "Understand your current facial biometric scores and track your progress over time.",
+    description: "Understand your current body metrics and track your progress over time.",
     featured: false,
   },
   {
     title: "Before-and-after visualization of your transformation target",
-    description: "See what your face could accurately look like after your glow-up.",
+    description: "See what your body could accurately look like after your transformation.",
     featured: false,
   },
   {

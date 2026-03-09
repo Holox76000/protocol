@@ -561,7 +561,7 @@ export default function ProgramPage() {
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">
           <header className="program-analysis__header">
-            <p className="program-analysis__eyebrow">Facial Analysis</p>
+            <p className="program-analysis__eyebrow">Body Analysis</p>
             <h2 id="program-analysis-title" className="program-analysis__title">
               Will Analyzing My <span>Body Make Me Feel Worse About Myself?</span>
             </h2>

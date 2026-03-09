@@ -1,4 +1,5 @@
 import Image from "next/image";
+import interfaceImage from "../../interface.png";
 
 const PROTOCOL_FEATURES = [
   "Full breakdown of what to train, eat, and supplement — specific to your body",
@@ -26,7 +27,7 @@ export default function ProtocolSection() {
         <div className="program-protocol__canvas">
           <div className="program-protocol__main-frame">
             <Image
-              src="/program/static/landing/images/home/transformation-protocol/main-frame.webp"
+              src={interfaceImage}
               alt="Protocol dashboard"
               fill
               sizes="(max-width: 767px) 100vw, 92vw"
@@ -38,22 +39,6 @@ export default function ProtocolSection() {
               alt="Predictions panel"
               fill
               sizes="(max-width: 767px) 44vw, 24vw"
-            />
-          </div>
-          <div className="program-protocol__floating program-protocol__floating--steps">
-            <Image
-              src="/program/static/landing/images/home/transformation-protocol/steps.webp"
-              alt="Steps panel"
-              fill
-              sizes="(max-width: 767px) 44vw, 22vw"
-            />
-          </div>
-          <div className="program-protocol__floating program-protocol__floating--recommended">
-            <Image
-              src="/program/static/landing/images/home/transformation-protocol/recommended.webp"
-              alt="Recommended products panel"
-              fill
-              sizes="(max-width: 767px) 44vw, 22vw"
             />
           </div>
         </div>

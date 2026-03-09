@@ -16,8 +16,8 @@ export default function ExpertsSection() {
         <div className="program-experts__content">
           <p className="program-experts__eyebrow">What experts think about Protocol</p>
           <blockquote id="program-experts-quote" className="program-experts__quote">
-            “I am excited to be partnering with Protocol, an innovative state of the art facial analysis system
-            that I believe is the future of the aesthetic medicine.”
+            “I am excited to be partnering with Protocol, an innovative state of the art body analysis system
+            that I believe represents the future of personalized body transformation.”
           </blockquote>
           <div className="program-experts__author">
             <p className="program-experts__name">
