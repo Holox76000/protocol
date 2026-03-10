@@ -7292,3 +7292,130 @@
 .program-complete-analysis {
   background: #fff;
 }
+
+.program-faq {
+  padding: 0 3.2rem 12rem;
+  background: #fff;
+}
+
+.program-faq__inner {
+  width: min(132rem, 100%);
+  margin: 0 auto;
+}
+
+.program-faq__header {
+  text-align: center;
+  margin-bottom: 4.8rem;
+}
+
+.program-faq__title {
+  margin: 0;
+  color: var(--program-text-strong);
+  font-size: clamp(4.2rem, 5vw, 7.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.program-faq__title span {
+  display: block;
+  color: var(--program-accent-text);
+}
+
+.program-faq__groups {
+  display: grid;
+  gap: 2.4rem;
+}
+
+.program-faq__group {
+  border: 1px solid rgba(116, 125, 114, 0.14);
+  border-radius: 3.2rem;
+  background: #fff;
+  overflow: hidden;
+}
+
+.program-faq__group-title {
+  margin: 0;
+  padding: 2.6rem 3rem 1.2rem;
+  color: var(--program-text-strong);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.program-faq__items {
+  display: grid;
+}
+
+.program-faq__item {
+  border-top: 1px solid rgba(116, 125, 114, 0.12);
+}
+
+.program-faq__item:first-child {
+  border-top: 0;
+}
+
+.program-faq__summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2.4rem 3rem;
+  cursor: pointer;
+  color: var(--program-text-strong);
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.program-faq__summary::-webkit-details-marker {
+  display: none;
+}
+
+.program-faq__icon {
+  flex: 0 0 auto;
+  color: var(--program-accent-text);
+  font-size: 2.4rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.program-faq__item[open] .program-faq__icon {
+  transform: rotate(45deg);
+}
+
+.program-faq__answer {
+  padding: 0 3rem 2.6rem;
+}
+
+.program-faq__answer p {
+  margin: 0;
+  max-width: 92rem;
+  color: var(--program-text-muted);
+  font-size: 1.7rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 767px) {
+  .program-faq {
+    padding: 0 1.6rem 8rem;
+  }
+
+  .program-faq__header {
+    margin-bottom: 3.2rem;
+  }
+
+  .program-faq__group-title,
+  .program-faq__summary,
+  .program-faq__answer {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .program-faq__summary {
+    font-size: 1.6rem;
+  }
+
+  .program-faq__answer p {
+    font-size: 1.5rem;
+  }
+}

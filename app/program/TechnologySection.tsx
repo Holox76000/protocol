@@ -1,4 +1,6 @@
 import Image from "next/image";
+import analysisCardImage from "../../analysis-card.png";
+import technologyCard3Image from "../../technology-card3.png";
 
 const TECHNOLOGY_CARDS = [
   {
@@ -19,14 +21,14 @@ const TECHNOLOGY_CARDS = [
     title: "Evidence-Based Approach",
     description:
       "We use measurable body composition data and peer-reviewed research — not Instagram bro-science.",
-    image: "/program/images/home/the-technology/the-science-of-facial-attractiveness.png",
+    image: technologyCard3Image,
     imagePosition: "center center",
   },
   {
     title: "The Science of Male Physique",
     description:
       "Our database analyzes body composition science across thousands of cases to find what works for your specific body type.",
-    image: "/program/images/home/the-technology/reviewed-by-real-doctors.png",
+    image: analysisCardImage,
     imagePosition: "center top",
   },
 ];

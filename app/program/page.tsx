@@ -1,12 +1,8 @@
-import fs from "fs";
-import path from "path";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import Script from "next/script";
 import heroBeforeImage from "../../2-before.png";
 import heroAfterImage from "../../2-after.png";
 import "./program.css";
-import LegacyHtml from "./LegacyHtml";
 import type { ResearchTab } from "./ResearchImpactSection";
 import NewApproachSection from "./NewApproachSection";
 import PricingSection from "./PricingSection";
@@ -28,25 +24,11 @@ import AestheticTestsSection from "./AestheticTestsSection";
 import InformativeSection from "./InformativeSection";
 import PersonalizedSection from "./PersonalizedSection";
 import CompleteFacialAnalysisSection from "./CompleteFacialAnalysisSection";
+import FAQSection from "./FAQSection";
 
 const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
 const ResearchImpactSection = dynamic(() => import("./ResearchImpactSection"), { ssr: false });
 
-const PROGRAM_HTML_PATH = path.join(process.cwd(), "data", "program.html");
-const RESEARCH_SLOT = "<!--PROGRAM_RESEARCH-->";
-const SURGERY_SLOT = "<!--PROGRAM_SURGERY-->";
-const SUPPORT_SLOT = "<!--PROGRAM_SUPPORT-->";
-const SCORE_SLOT = "<!--PROGRAM_MORE_SCORES-->";
-const TECH_SLOT = "<!--PROGRAM_TECH-->";
-const VISUALIZATION_SLOT = "<!--PROGRAM_VISUALIZATION-->";
-const STORY_SLOT = "<!--PROGRAM_STORY-->";
-const EXPERTS_SLOT = "<!--PROGRAM_EXPERTS-->";
-const SOCIAL_SLOT = "<!--PROGRAM_SOCIAL-->";
-const APPROACH_SLOT = "<!--PROGRAM_APPROACH-->";
-const TRANSFORMATION_SLOT = "<!--PROGRAM_TRANSFORMATION-->";
-const FACIAL_ANALYSIS_SLOT = "<!--PROGRAM_FACIAL_ANALYSIS-->";
-const WHY_SLOT = "<!--PROGRAM_WHY-->";
-const PRICING_SLOT = "<!--PROGRAM_PRICING-->";
 const HERO_GOALS = [
   "Finally look good shirtless",
   "Kill the skinny-fat look for good",
@@ -278,164 +260,7 @@ const RESEARCH_TABS: ResearchTab[] = [
   },
 ];
 
-const extractBody = (html: string) => {
-  const match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  let body = match ? match[1] : html;
-  body = body.replace(/<script[\s\S]*?<\/script>/gi, "");
-  body = body.replace(/<noscript[\s\S]*?<\/noscript>/gi, "");
-  body = body.replace(/<!--[\s\S]*?-->/g, "");
-  return body;
-};
-
-const stripLegacyHero = (body: string) =>
-  body.replace(
-    /<section class="Home_hero_container__VP_Jx"[\s\S]*?<\/section><section aria-labelledby="research-heading">/i,
-    '<section aria-labelledby="research-heading">',
-  );
-
-const replaceLegacyResearch = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="research-heading">[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
-    `${RESEARCH_SLOT}<section aria-labelledby="visualization-heading">`,
-  );
-
-const replaceLegacyResearchFallback = (body: string) =>
-  body.replace(
-    /<section id="why-glowup"[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
-    `${RESEARCH_SLOT}<section aria-labelledby="visualization-heading">`,
-  );
-
-const replaceLegacyTech = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="tech-heading">[\s\S]*?<\/section><section aria-labelledby="visualization-heading">/i,
-    `${TECH_SLOT}<section aria-labelledby="visualization-heading">`,
-  );
-
-const replaceLegacyMoreScores = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="score-heading">[\s\S]*?<\/section><section aria-labelledby="tech-heading">/i,
-    `${SCORE_SLOT}<section aria-labelledby="tech-heading">`,
-  );
-
-const replaceLegacySupport = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="support-heading">[\s\S]*?<\/section><section aria-labelledby="score-heading">/i,
-    `${SUPPORT_SLOT}<section aria-labelledby="score-heading">`,
-  );
-
-const replaceLegacySurgery = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="surgery-heading">[\s\S]*?<\/section><section aria-labelledby="support-heading">/i,
-    `${SURGERY_SLOT}<section aria-labelledby="support-heading">`,
-  );
-
-const replaceLegacyVisualization = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="visualization-heading">[\s\S]*?<\/section><section aria-labelledby="story-heading">/i,
-    `${VISUALIZATION_SLOT}<section aria-labelledby="story-heading">`,
-  );
-
-const replaceLegacyStory = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="story-heading">[\s\S]*?<\/section><section aria-labelledby="experts-heading">/i,
-    `${STORY_SLOT}<section aria-labelledby="experts-heading">`,
-  );
-
-const replaceLegacyExperts = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="experts-heading">[\s\S]*?<\/section><section aria-labelledby="social-heading">/i,
-    `${EXPERTS_SLOT}<section aria-labelledby="social-heading">`,
-  );
-const replaceLegacySocial = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="social-heading">[\s\S]*?<\/section><section class="Home_testimonial_pricing_container__SBp0E"[\s\S]*?<div class="Pricing_element__hCT3q"/i,
-    `${SOCIAL_SLOT}<section class="Home_testimonial_pricing_container__SBp0E"><div class="Pricing_element__hCT3q"`,
-  );
-
-const stripLegacyResearch = (body: string) =>
-  body.replace(/<section id="why-glowup"[\s\S]*?<\/section>/i, "");
-
-const stripLegacyCta = (body: string) =>
-  body.replace(/<section aria-labelledby="cta-heading">[\s\S]*?<\/section>/i, "");
-
-const stripLegacyFooter = (body: string) => body.replace(/<footer class="Footer_element__CHu2S[\s\S]*?<\/footer>/i, "");
-const replaceLegacyApproach = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="approach-heading">[\s\S]*?<\/section><section aria-labelledby="transformation-heading">/i,
-    `${APPROACH_SLOT}<section aria-labelledby="transformation-heading">`,
-  );
-const replaceLegacyTransformation = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="transformation-heading">[\s\S]*?<\/section><section aria-labelledby="analysis-list-heading">/i,
-    `${TRANSFORMATION_SLOT}<section aria-labelledby="analysis-list-heading">`,
-  );
-const replaceLegacyPricing = (body: string) =>
-  body.replace(
-    /<div class="Pricing_element__hCT3q"[\s\S]*?<\/div><section aria-labelledby="faq-heading">/i,
-    `${PRICING_SLOT}<section aria-labelledby="faq-heading">`,
-  );
-const replaceLegacyFacialAnalysis = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="analysis-list-heading">[\s\S]*?<\/section><section aria-labelledby="why-heading">/i,
-    `${FACIAL_ANALYSIS_SLOT}<section aria-labelledby="why-heading">`,
-  );
-const replaceLegacyWhy = (body: string) =>
-  body.replace(
-    /<section aria-labelledby="why-heading">[\s\S]*?<\/section>/i,
-    WHY_SLOT,
-  );
-
 export default function ProgramPage() {
-  const html = fs.readFileSync(PROGRAM_HTML_PATH, "utf8");
-  let bodyHtml = replaceLegacyFacialAnalysis(
-    replaceLegacyTransformation(
-      replaceLegacyApproach(
-        replaceLegacyStory(
-          replaceLegacyExperts(
-            replaceLegacySocial(
-              replaceLegacyVisualization(
-                replaceLegacyTech(
-                  replaceLegacyMoreScores(
-                    replaceLegacySupport(
-                      replaceLegacySurgery(
-                        replaceLegacyResearch(stripLegacyFooter(stripLegacyCta(stripLegacyHero(extractBody(html))))),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-  bodyHtml = replaceLegacyWhy(bodyHtml);
-  bodyHtml = replaceLegacyPricing(bodyHtml);
-
-  if (!bodyHtml.includes(RESEARCH_SLOT)) {
-    bodyHtml = replaceLegacyFacialAnalysis(replaceLegacyResearchFallback(bodyHtml));
-  }
-
-  if (!bodyHtml.includes(RESEARCH_SLOT)) {
-    bodyHtml = stripLegacyResearch(bodyHtml);
-    bodyHtml = `${bodyHtml}${RESEARCH_SLOT}`;
-  }
-  const [bodyBeforeResearch, bodyAfterResearch] = bodyHtml.split(RESEARCH_SLOT);
-  const [bodyBeforeSurgery, bodyAfterSurgery] = (bodyAfterResearch ?? "").split(SURGERY_SLOT);
-  const [bodyBeforeSupport, bodyAfterSupport] = (bodyAfterSurgery ?? "").split(SUPPORT_SLOT);
-  const [bodyBeforeScores, bodyAfterScores] = (bodyAfterSupport ?? "").split(SCORE_SLOT);
-  const [bodyBeforeTech, bodyAfterTech] = (bodyAfterScores ?? "").split(TECH_SLOT);
-  const [bodyBeforeVisualization, bodyAfterVisualization] = (bodyAfterTech ?? "").split(VISUALIZATION_SLOT);
-  const [bodyBeforeStory, bodyAfterStory] = (bodyAfterVisualization ?? "").split(STORY_SLOT);
-  const [bodyBeforeExperts, bodyAfterExperts] = (bodyAfterStory ?? "").split(EXPERTS_SLOT);
-  const [bodyBeforeSocial, bodyAfterSocial] = (bodyAfterExperts ?? "").split(SOCIAL_SLOT);
-  const [bodyBeforeApproach, bodyAfterApproach] = (bodyAfterSocial ?? "").split(APPROACH_SLOT);
-  const [bodyBeforeTransformation, bodyAfterTransformation] = (bodyAfterApproach ?? "").split(TRANSFORMATION_SLOT);
-  const [bodyBeforeFacialAnalysis, bodyAfterFacialAnalysis] = (bodyAfterTransformation ?? "").split(FACIAL_ANALYSIS_SLOT);
-  const [bodyBeforeWhy, bodyAfterWhy] = (bodyAfterFacialAnalysis ?? "").split(WHY_SLOT);
-  const [bodyBeforePricing, bodyAfterPricing] = (bodyAfterWhy ?? "").split(PRICING_SLOT);
-
   return (
     <div className="program-page program-page--theme-test">
       <header className="program-nav">
@@ -527,29 +352,17 @@ export default function ProgramPage() {
           ))}
         </div>
       </section>
-      <Script src="/program/static/landing/jquery-3.7.1.min.js" strategy="afterInteractive" />
-      <Script src="/program/static/landing/landing.js" strategy="afterInteractive" />
-      <LegacyHtml className="program-root" html={bodyBeforeResearch ?? bodyHtml} />
       <ResearchImpactSection tabs={RESEARCH_TABS} />
-      {bodyBeforeSurgery ? <LegacyHtml className="program-root" html={bodyBeforeSurgery} /> : null}
       <NoSurgerySection />
-      {bodyBeforeSupport ? <LegacyHtml className="program-root" html={bodyBeforeSupport} /> : null}
       <SupportSection />
-      {bodyBeforeScores ? <LegacyHtml className="program-root" html={bodyBeforeScores} /> : null}
       <MoreScoresSection />
-      {bodyBeforeTech ? <LegacyHtml className="program-root" html={bodyBeforeTech} /> : null}
       <TechnologySection />
-      {bodyBeforeVisualization ? <LegacyHtml className="program-root" html={bodyBeforeVisualization} /> : null}
       <VisualizationSection />
       <StorySection />
-      {bodyBeforeExperts ? <LegacyHtml className="program-root" html={bodyBeforeExperts} /> : null}
       <ExpertsSection />
-      {bodyBeforeSocial ? <LegacyHtml className="program-root" html={bodyBeforeSocial} /> : null}
       <ClientTransformationsSection />
-      {bodyBeforeApproach ? <LegacyHtml className="program-root" html={bodyBeforeApproach} /> : null}
       <NewApproachSection />
       <GaryLinkovQuoteSection />
-      {bodyBeforeTransformation ? <LegacyHtml className="program-root" html={bodyBeforeTransformation} /> : null}
       <TransformationSection />
       <ProtocolSection />
       <FollowersSection />
@@ -557,7 +370,6 @@ export default function ProgramPage() {
       <InformativeSection />
       <PersonalizedSection />
       <CompleteFacialAnalysisSection />
-      {bodyBeforeFacialAnalysis ? <LegacyHtml className="program-root" html={bodyBeforeFacialAnalysis} /> : null}
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">
           <header className="program-analysis__header">
@@ -590,12 +402,10 @@ export default function ProgramPage() {
           </blockquote>
         </div>
       </section>
-      {bodyBeforeWhy ? <LegacyHtml className="program-root" html={bodyBeforeWhy} /> : null}
       <WhySection />
       <ExpertAdviceSection />
-      {bodyBeforePricing ? <LegacyHtml className="program-root" html={bodyBeforePricing} /> : null}
       <PricingSection />
-      {bodyAfterPricing ? <LegacyHtml className="program-root" html={bodyAfterPricing} /> : null}
+      <FAQSection />
       <footer className="program-footer">
         <div className="program-footer__cta">
           <div>
