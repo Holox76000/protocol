@@ -2068,16 +2068,21 @@
   }
 
   .program-hero__logos {
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
     padding: 0 8px;
     margin-top: 32px;
     gap: 8px;
+    align-items: center;
+    justify-items: center;
   }
 
   .program-hero__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     min-height: 5.2rem;
-    padding: 1rem 0.8rem;
     min-width: 0;
     padding: 0.4rem 0;
     border: 0;
@@ -2086,8 +2091,9 @@
   }
 
   .program-hero__logo img {
-    height: 2.4rem;
-    max-width: 10rem;
+    width: min(100%, 9.6rem);
+    height: auto;
+    max-width: 9.6rem;
     max-height: 2.4rem;
   }
 
