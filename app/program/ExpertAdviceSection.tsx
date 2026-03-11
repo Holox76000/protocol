@@ -1,4 +1,6 @@
 import Image from "next/image";
+import beforeSevenImage from "../../7-before.png";
+import afterSevenImage from "../../7-after.png";
 
 const ADVICE_STEPS = [
   { number: "01/", title: "Get your expert body analysis" },
@@ -28,7 +30,7 @@ export default function ExpertAdviceSection() {
               <span className="program-advice__label">Before</span>
               <div className="program-advice__image">
                 <Image
-                  src="/program/static/landing/images/home/expert-advice/before.webp"
+                  src={beforeSevenImage}
                   alt="Before Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
@@ -36,16 +38,16 @@ export default function ExpertAdviceSection() {
                 />
               </div>
             </article>
-
             <div className="program-advice__connector" aria-hidden="true">
+              <div className="program-advice__connector-box program-advice__connector-box--top" />
               <div className="program-advice__connector-line" />
+              <div className="program-advice__connector-box program-advice__connector-box--bottom" />
             </div>
-
             <article className="program-advice__card">
               <span className="program-advice__label">After</span>
               <div className="program-advice__image">
                 <Image
-                  src="/program/static/landing/images/home/expert-advice/after.webp"
+                  src={afterSevenImage}
                   alt="After Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
@@ -53,21 +55,6 @@ export default function ExpertAdviceSection() {
                 />
               </div>
             </article>
-
-            <div className="program-advice__orbit" aria-hidden="true">
-              <svg viewBox="0 0 860 408" preserveAspectRatio="none">
-                <path
-                  id="program-advice-orbit-path"
-                  className="program-advice__orbit-path"
-                  d="M358 204 L358 8 L8 8 L8 400 L358 400 L358 204 L502 204 L502 8 L852 8 L852 400 L502 400 L502 204 L358 204"
-                />
-                <circle className="program-advice__orbit-dot" r="4.5">
-                  <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
-                    <mpath href="#program-advice-orbit-path" />
-                  </animateMotion>
-                </circle>
-              </svg>
-            </div>
           </div>
         </div>
 

@@ -6,7 +6,7 @@ export default function LoginPage() {
     <main className="program-login program-login--theme-test">
       <section className="program-login__hero">
         <div className="program-login__shell">
-          <Link href="/program" className="program-login__logo" aria-label="Back to program">
+          <Link href="/" className="program-login__logo" aria-label="Back to homepage">
             <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <mask id="program-login-logo-mask">
@@ -69,7 +69,7 @@ export default function LoginPage() {
               </form>
 
               <div className="program-login__links">
-                <a href="/program">Back to program</a>
+                <a href="/">Back to homepage</a>
                 <a href="/welcome/checkout">Need access?</a>
               </div>
             </div>

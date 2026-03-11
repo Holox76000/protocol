@@ -105,7 +105,7 @@ export const QUIZ_MAX_SCORE = quizQuestions.reduce((total, question) => {
   return total + maxForQuestion;
 }, 0);
 
-export const CTA_URL = "/program";
+export const CTA_URL = "/";
 
 export const COPY = {
   landing: {

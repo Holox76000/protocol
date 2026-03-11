@@ -48,7 +48,7 @@ export default function CompleteFacialAnalysisSection() {
         </header>
 
         <div
-          className="program-complete-analysis__stage"
+          className="program-complete-analysis__stage program-complete-analysis__stage--desktop"
           style={{
             backgroundImage:
               "linear-gradient(180deg, rgba(187, 206, 214, 0.28) 0%, rgba(171, 192, 201, 0.7) 100%), url('/program/static/landing/images/home/facial-analysis/background.webp')",
@@ -91,6 +91,40 @@ export default function CompleteFacialAnalysisSection() {
           <article className={`program-complete-analysis__card ${ANALYSIS_CARDS[6].modifier}`}>
             <Image src={ANALYSIS_CARDS[6].image} alt="" fill className="program-complete-analysis__card-art" sizes="430px" />
           </article>
+        </div>
+
+        <div
+          className="program-complete-analysis__stage program-complete-analysis__stage--mobile"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, rgba(187, 206, 214, 0.18) 0%, rgba(171, 192, 201, 0.34) 100%)",
+          }}
+        >
+          <div className="program-complete-analysis__portrait-panel">
+            <div className="program-complete-analysis__portrait">
+              <Image
+                src={manImage}
+                alt="Body analysis portrait"
+                fill
+                sizes="(max-width: 767px) 88vw, (max-width: 1280px) 70vw, 760px"
+                className="program-complete-analysis__portrait-image"
+              />
+            </div>
+          </div>
+
+          <div className="program-complete-analysis__mobile-cards">
+            {ANALYSIS_CARDS.map((card) => (
+              <article key={card.image} className={`program-complete-analysis__card ${card.modifier}`}>
+                <Image
+                  src={card.image}
+                  alt=""
+                  fill
+                  className="program-complete-analysis__card-art"
+                  sizes="(max-width: 767px) 44vw, (max-width: 1280px) 32vw, 430px"
+                />
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

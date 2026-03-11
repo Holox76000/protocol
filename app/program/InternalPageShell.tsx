@@ -20,7 +20,7 @@ export default function InternalPageShell({
       <section className="program-internal__hero">
         <div className="program-internal__shell">
           <div className="program-internal__topbar">
-            <Link href="/program" className="program-internal__logo" aria-label="Back to program">
+            <Link href="/" className="program-internal__logo" aria-label="Back to homepage">
               <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <mask id="program-internal-logo-mask">
@@ -45,8 +45,8 @@ export default function InternalPageShell({
               </svg>
             </Link>
             <div className="program-internal__actions">
-              <Link href="/program" className="program-internal__back">
-                Back to program
+              <Link href="/" className="program-internal__back">
+                Back to homepage
               </Link>
               <Link href="/welcome/checkout" className="program-internal__cta">
                 Get started

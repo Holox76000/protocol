@@ -29,7 +29,7 @@ const TECHNOLOGY_CARDS = [
     description:
       "Our database analyzes body composition science across thousands of cases to find what works for your specific body type.",
     image: analysisCardImage,
-    imagePosition: "center top",
+    imagePosition: "center 18%",
   },
 ];
 

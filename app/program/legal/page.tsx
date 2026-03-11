@@ -27,7 +27,7 @@ export default function ProgramLegalPage() {
           </p>
           <div className="program-internal__links">
             <Link href="/program/legal/privacy-policy">Privacy Policy</Link>
-            <Link href="/program">Product page</Link>
+            <Link href="/">Product page</Link>
           </div>
         </article>
       </section>

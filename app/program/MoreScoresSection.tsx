@@ -1,4 +1,5 @@
 import Image from "next/image";
+import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
 
 const SCORE_CARDS = [
   { src: "/program/static/landing/images/home/more-score/card-1.webp", alt: "Skin score" },
@@ -33,8 +34,8 @@ export default function MoreScoresSection() {
 
             <div className="program-more-scores__main">
               <Image
-                src="/program/static/landing/images/home/more-score/main.webp"
-                alt="Hyperpigmentation score prediction"
+                src={bodyFatDistributionScoreImage}
+                alt="Body fat distribution score improvement over time"
                 fill
                 sizes="(max-width: 767px) 92vw, (max-width: 1099px) 78vw, 58vw"
               />

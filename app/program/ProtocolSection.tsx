@@ -33,14 +33,6 @@ export default function ProtocolSection() {
               sizes="(max-width: 767px) 100vw, 92vw"
             />
           </div>
-          <div className="program-protocol__floating program-protocol__floating--predictions">
-            <Image
-              src="/program/static/landing/images/home/transformation-protocol/predictions.webp"
-              alt="Predictions panel"
-              fill
-              sizes="(max-width: 767px) 44vw, 24vw"
-            />
-          </div>
         </div>
 
         <div className="program-protocol__bottom">
