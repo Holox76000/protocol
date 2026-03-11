@@ -11,9 +11,7 @@ const FOLLOWERS_CARDS = [
   {
     title: "Steroid-Free",
     description: "Effective enhancements, no surgery required.",
-    image: "/program/static/landing/images/home/no-surgery/woman-after.webp",
-    imageFit: "contain" as const,
-    imagePosition: "center center",
+    renderMedia: <SkinnyFatRecompositionGraphic />,
   },
   {
     title: "100% Personalised",
@@ -30,6 +28,125 @@ const FOLLOWERS_CARDS = [
     imagePosition: "center center",
   },
 ];
+
+function SkinnyFatRecompositionGraphic() {
+  return (
+    <div className="program-followers__skinny-fat" aria-hidden="true">
+      <svg viewBox="0 0 560 360" role="presentation">
+        <defs>
+          <linearGradient id="skinny-fat-surface" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fbfcfb" />
+            <stop offset="100%" stopColor="#eef2ef" />
+          </linearGradient>
+          <linearGradient id="skinny-fat-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#c8d2c7" />
+            <stop offset="100%" stopColor="#8ea08b" />
+          </linearGradient>
+          <linearGradient id="skinny-fat-line" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#d4ddd3" />
+            <stop offset="100%" stopColor="#a8b4a5" />
+          </linearGradient>
+        </defs>
+
+        <rect x="34" y="30" width="492" height="294" rx="28" fill="url(#skinny-fat-surface)" />
+
+        <g opacity="0.9">
+          <rect x="64" y="58" width="110" height="106" rx="24" fill="#f6f8f6" stroke="#dbe3da" />
+          <rect x="202" y="58" width="156" height="106" rx="24" fill="#f9fbf9" stroke="#dbe3da" />
+          <rect x="386" y="58" width="104" height="106" rx="24" fill="#f6f8f6" stroke="#dbe3da" />
+          <rect x="64" y="186" width="206" height="100" rx="24" fill="#f9fbf9" stroke="#dbe3da" />
+          <rect x="286" y="186" width="204" height="100" rx="24" fill="#f6f8f6" stroke="#dbe3da" />
+        </g>
+
+        <g transform="translate(92 74) scale(0.92)">
+          <path
+            d="M28 12c18 0 31 14 31 32v9c0 10-4 20-11 27l-8 8v29h-24V88l-8-8C1 73-3 63-3 53v-9C-3 26 10 12 28 12Z"
+            fill="#dbe4db"
+          />
+          <path
+            d="M28 30c8 0 14 6 14 15v6c0 7-3 13-8 18l-6 7-6-7c-5-5-8-11-8-18v-6c0-9 6-15 14-15Z"
+            fill="#a8b8a5"
+          />
+          <path d="M28 76v41" stroke="url(#skinny-fat-line)" strokeWidth="8" strokeLinecap="round" />
+          <path d="M2 116h52" stroke="#c2ccc0" strokeWidth="8" strokeLinecap="round" />
+          <path d="M11 126h34" stroke="#d3dbd1" strokeWidth="8" strokeLinecap="round" />
+        </g>
+
+        <g transform="translate(220 76)">
+          <text x="0" y="0" className="program-followers__skinny-fat-label">
+            SKINNY FAT
+          </text>
+          <text x="0" y="30" className="program-followers__skinny-fat-title">
+            <tspan x="0" dy="0">
+              Recomposition
+            </tspan>
+            <tspan x="0" dy="20">
+              path
+            </tspan>
+          </text>
+          <text x="0" y="68" className="program-followers__skinny-fat-copy">
+            Reduce waist softness
+          </text>
+          <text x="0" y="86" className="program-followers__skinny-fat-copy">
+            Build shoulders, chest, arms
+          </text>
+          <text x="0" y="104" className="program-followers__skinny-fat-copy">
+            No surgery, no steroids
+          </text>
+        </g>
+
+        <g transform="translate(414 82) scale(0.88)">
+          <circle cx="30" cy="30" r="26" fill="#eef3ee" stroke="#d2dbd1" />
+          <path
+            d="M30 14c9 0 16 7 16 16s-7 16-16 16-16-7-16-16 7-16 16-16Zm0 8c-4 0-7 4-7 8 0 5 3 8 7 8s7-3 7-8c0-4-3-8-7-8Z"
+            fill="#91a38e"
+          />
+          <path d="M14 56h32" stroke="#bac6b8" strokeWidth="8" strokeLinecap="round" />
+        </g>
+
+        <g transform="translate(84 208) scale(0.9)">
+          <path
+            d="M0 42h40l26-18 42 8 38-24 44 12"
+            fill="none"
+            stroke="url(#skinny-fat-accent)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="0" cy="42" r="8" fill="#d2dbd1" />
+          <circle cx="66" cy="24" r="8" fill="#bcc8ba" />
+          <circle cx="108" cy="32" r="8" fill="#a9b9a6" />
+          <circle cx="146" cy="8" r="8" fill="#95a692" />
+          <circle cx="190" cy="20" r="8" fill="#7f947d" />
+          <text x="0" y="84" className="program-followers__skinny-fat-small">
+            Leaner waist
+          </text>
+          <text x="118" y="78" className="program-followers__skinny-fat-small">
+            <tspan x="128" dy="0">
+              More upper-body
+            </tspan>
+            <tspan x="128" dy="16">
+              shape
+            </tspan>
+          </text>
+        </g>
+
+        <g transform="translate(336 210)">
+          <rect x="0" y="0" width="134" height="66" rx="18" fill="#f9fbf9" stroke="#d7e0d6" />
+          <text x="18" y="24" className="program-followers__skinny-fat-stat">
+            + Shoulder width
+          </text>
+          <text x="18" y="42" className="program-followers__skinny-fat-stat">
+            - Lower abdomen
+          </text>
+          <text x="18" y="60" className="program-followers__skinny-fat-stat">
+            + Visible structure
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 export default function FollowersSection() {
   return (
@@ -52,13 +169,17 @@ export default function FollowersSection() {
           {FOLLOWERS_CARDS.map((card) => (
             <article key={card.title} className="program-followers__card">
               <div className="program-followers__media">
-                <Image
-                  src={card.image}
-                  alt=""
-                  fill
-                  sizes="(max-width: 767px) 100vw, (max-width: 1099px) 50vw, 33vw"
-                  style={{ objectFit: card.imageFit, objectPosition: card.imagePosition }}
-                />
+                {"renderMedia" in card ? (
+                  card.renderMedia
+                ) : (
+                  <Image
+                    src={card.image}
+                    alt=""
+                    fill
+                    sizes="(max-width: 767px) 100vw, (max-width: 1099px) 50vw, 33vw"
+                    style={{ objectFit: card.imageFit, objectPosition: card.imagePosition }}
+                  />
+                )}
               </div>
               <div className="program-followers__text">
                 <h3>{card.title}</h3>

@@ -4,10 +4,8 @@ import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png
 const SCORE_CARDS = [
   { src: "/program/static/landing/images/home/more-score/card-1.webp", alt: "Skin score" },
   { src: "/program/static/landing/images/home/more-score/card-3.webp", alt: "Lips score" },
-  { src: "/program/static/landing/images/home/more-score/card-2.webp", alt: "Cheek score" },
   { src: "/program/static/landing/images/home/more-score/card-4.webp", alt: "Eyebrow score" },
   { src: "/program/static/landing/images/home/more-score/card-5.webp", alt: "Jaw score" },
-  { src: "/program/static/landing/images/home/more-score/card-6.webp", alt: "Eye score" },
 ];
 
 export default function MoreScoresSection() {
@@ -26,7 +24,7 @@ export default function MoreScoresSection() {
           </div>
 
           <div className="program-more-scores__cards">
-            {SCORE_CARDS.slice(0, 3).map((card, index) => (
+            {SCORE_CARDS.slice(0, 2).map((card, index) => (
               <div key={card.src} className={`program-more-scores__card program-more-scores__card--left-${index + 1}`}>
                 <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 44vw, 20vw" />
               </div>
@@ -41,7 +39,7 @@ export default function MoreScoresSection() {
               />
             </div>
 
-            {SCORE_CARDS.slice(3).map((card, index) => (
+            {SCORE_CARDS.slice(2).map((card, index) => (
               <div key={card.src} className={`program-more-scores__card program-more-scores__card--right-${index + 1}`}>
                 <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 44vw, 20vw" />
               </div>

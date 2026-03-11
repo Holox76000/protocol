@@ -29,7 +29,8 @@ const TECHNOLOGY_CARDS = [
     description:
       "Our database analyzes body composition science across thousands of cases to find what works for your specific body type.",
     image: analysisCardImage,
-    imagePosition: "center 18%",
+    imagePosition: "center center",
+    cardClassName: "program-tech__card--science-physique",
   },
 ];
 
@@ -52,7 +53,7 @@ export default function TechnologySection() {
 
         <div className="program-tech__grid">
           {TECHNOLOGY_CARDS.map((card) => (
-            <article key={card.title} className="program-tech__card">
+            <article key={card.title} className={`program-tech__card ${card.cardClassName ?? ""}`.trim()}>
               <div className="program-tech__image">
                 <Image
                   src={card.image}
