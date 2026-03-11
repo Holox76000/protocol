@@ -4500,11 +4500,45 @@
   display: block;
 }
 
+.program-followers__science {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(204, 213, 202, 0.42), transparent 28%),
+    linear-gradient(180deg, #f6f9f6 0%, #edf2ed 100%);
+}
+
+.program-followers__science svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.program-followers__personalised {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 24% 22%, rgba(208, 217, 206, 0.5), transparent 28%),
+    linear-gradient(180deg, #f6f9f6 0%, #edf2ed 100%);
+}
+
+.program-followers__personalised svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .program-followers__skinny-fat-label,
 .program-followers__skinny-fat-title,
 .program-followers__skinny-fat-copy,
 .program-followers__skinny-fat-small,
-.program-followers__skinny-fat-stat {
+.program-followers__skinny-fat-stat,
+.program-followers__science-label,
+.program-followers__science-title,
+.program-followers__science-small,
+.program-followers__personalised-label,
+.program-followers__personalised-title,
+.program-followers__personalised-small {
   font-family: "Instrument Serif", Georgia, serif;
   fill: #2f3d33;
 }
@@ -4533,6 +4567,38 @@
 .program-followers__skinny-fat-stat {
   font-size: 10px;
   fill: #445147;
+}
+
+.program-followers__science-label {
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  fill: #8d9b8b;
+}
+
+.program-followers__science-title {
+  font-size: 16px;
+  letter-spacing: -0.4px;
+}
+
+.program-followers__science-small {
+  font-size: 9px;
+  fill: #6d7a70;
+}
+
+.program-followers__personalised-label {
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  fill: #8d9b8b;
+}
+
+.program-followers__personalised-title {
+  font-size: 17px;
+  letter-spacing: -0.35px;
+}
+
+.program-followers__personalised-small {
+  font-size: 9px;
+  fill: #6d7a70;
 }
 
 .program-followers__text {

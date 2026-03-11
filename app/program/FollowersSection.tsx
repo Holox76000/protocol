@@ -16,16 +16,12 @@ const FOLLOWERS_CARDS = [
   {
     title: "100% Personalised",
     description: "Every recommendation is tailored to you.",
-    image: "/program/static/landing/images/home/transformation-protocol/steps.webp",
-    imageFit: "contain" as const,
-    imagePosition: "center center",
+    renderMedia: <PersonalisedPlanGraphic />,
   },
   {
     title: "Science-Backed",
     description: "Backed by research, proven by results.",
-    image: "/program/static/landing/images/home/facial-analysis/averageness.webp",
-    imageFit: "contain" as const,
-    imagePosition: "center center",
+    renderMedia: <ScienceBackedGraphic />,
   },
 ];
 
@@ -84,15 +80,6 @@ function SkinnyFatRecompositionGraphic() {
               path
             </tspan>
           </text>
-          <text x="0" y="68" className="program-followers__skinny-fat-copy">
-            Reduce waist softness
-          </text>
-          <text x="0" y="86" className="program-followers__skinny-fat-copy">
-            Build shoulders, chest, arms
-          </text>
-          <text x="0" y="104" className="program-followers__skinny-fat-copy">
-            No surgery, no steroids
-          </text>
         </g>
 
         <g transform="translate(414 82) scale(0.88)">
@@ -141,6 +128,150 @@ function SkinnyFatRecompositionGraphic() {
           </text>
           <text x="18" y="60" className="program-followers__skinny-fat-stat">
             + Visible structure
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function ScienceBackedGraphic() {
+  return (
+    <div className="program-followers__science" aria-hidden="true">
+      <svg viewBox="0 0 560 360" role="presentation">
+        <defs>
+          <linearGradient id="science-surface" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fbfcfb" />
+            <stop offset="100%" stopColor="#eef2ef" />
+          </linearGradient>
+          <linearGradient id="science-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#b7c0b5" />
+            <stop offset="100%" stopColor="#7f8f7c" />
+          </linearGradient>
+        </defs>
+
+        <rect x="34" y="30" width="492" height="294" rx="28" fill="url(#science-surface)" />
+
+        <g opacity="0.94">
+          <rect x="76" y="62" width="126" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="220" y="62" width="142" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="380" y="62" width="104" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="76" y="186" width="194" height="92" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="290" y="186" width="194" height="92" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+        </g>
+
+        <g transform="translate(104 88)">
+          <rect x="0" y="0" width="88" height="54" rx="16" fill="#edf2ed" stroke="#d4ddd3" />
+          <path d="M18 38h16V22H18zm27 0h16V14H45zm27 0h16V28H72z" fill="#91a18e" />
+          <path d="M18 10h58" stroke="#bcc7ba" strokeWidth="6" strokeLinecap="round" />
+        </g>
+
+        <g transform="translate(248 86)">
+          <text x="0" y="0" className="program-followers__science-label">
+            SCIENCE-BACKED
+          </text>
+          <text x="0" y="30" className="program-followers__science-title">
+            <tspan x="0" dy="0">Research-led</tspan>
+            <tspan x="0" dy="18">protocols</tspan>
+          </text>
+        </g>
+
+        <g transform="translate(412 88)">
+          <circle cx="26" cy="26" r="24" fill="#edf2ed" stroke="#d4ddd3" />
+          <path d="m14 28 8 8 16-18" fill="none" stroke="#7f917c" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+
+        <g transform="translate(108 212)">
+          <rect x="0" y="0" width="130" height="42" rx="16" fill="#fbfcfb" stroke="#d7dfd6" />
+          <path d="M20 22h54" stroke="#97a796" strokeWidth="7" strokeLinecap="round" />
+          <circle cx="96" cy="22" r="9" fill="#7f917c" />
+          <text x="0" y="68" className="program-followers__science-small">Measured inputs</text>
+        </g>
+
+        <g transform="translate(320 212)">
+          <rect x="0" y="0" width="138" height="42" rx="16" fill="#fbfcfb" stroke="#d7dfd6" />
+          <path d="M20 22h40" stroke="#97a796" strokeWidth="7" strokeLinecap="round" />
+          <path d="m92 22 10 10 18-18" fill="none" stroke="#7f917c" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+          <text x="0" y="68" className="program-followers__science-small">Validated results</text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function PersonalisedPlanGraphic() {
+  return (
+    <div className="program-followers__personalised" aria-hidden="true">
+      <svg viewBox="0 0 560 360" role="presentation">
+        <defs>
+          <linearGradient id="personalised-surface" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fbfcfb" />
+            <stop offset="100%" stopColor="#eef2ef" />
+          </linearGradient>
+          <linearGradient id="personalised-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#c5cec3" />
+            <stop offset="100%" stopColor="#829381" />
+          </linearGradient>
+        </defs>
+
+        <rect x="34" y="30" width="492" height="294" rx="28" fill="url(#personalised-surface)" />
+
+        <g opacity="0.94">
+          <rect x="64" y="58" width="116" height="104" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="196" y="58" width="168" height="104" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="382" y="58" width="108" height="104" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="64" y="182" width="220" height="104" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="302" y="182" width="188" height="104" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+        </g>
+
+        <g transform="translate(92 82)">
+          <circle cx="30" cy="28" r="24" fill="#edf2ed" stroke="#d3dbd2" />
+          <path
+            d="M30 16c6 0 11 5 11 11s-5 11-11 11-11-5-11-11 5-11 11-11Zm0 26c12 0 22 8 24 20H6c2-12 12-20 24-20Z"
+            fill="#94a491"
+          />
+        </g>
+
+        <g transform="translate(218 78)">
+          <text x="0" y="0" className="program-followers__personalised-label">
+            100% PERSONALISED
+          </text>
+          <text x="0" y="28" className="program-followers__personalised-title">
+            Tailored plan
+            <tspan x="0" dy="18">
+              for your body
+            </tspan>
+          </text>
+        </g>
+
+        <g transform="translate(408 80)">
+          <rect x="0" y="0" width="56" height="52" rx="14" fill="#eef3ee" stroke="#d5ddd4" />
+          <path d="M16 18h24M16 28h18M16 38h20" stroke="#9aac97" strokeWidth="6" strokeLinecap="round" />
+        </g>
+
+        <g transform="translate(86 202)">
+          <rect x="0" y="0" width="176" height="68" rx="18" fill="#fbfcfb" stroke="#d7dfd6" />
+          <path d="M22 24h46M22 42h68" stroke="#98a896" strokeWidth="7" strokeLinecap="round" />
+          <circle cx="126" cy="24" r="10" fill="#c4cec2" />
+          <circle cx="146" cy="42" r="10" fill="#8ea08b" />
+        </g>
+
+        <g transform="translate(322 196)">
+          <path
+            d="M0 58c28-20 56-32 84-36 22-3 42 0 62 10"
+            fill="none"
+            stroke="url(#personalised-accent)"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <circle cx="0" cy="58" r="8" fill="#c6cfc4" />
+          <circle cx="82" cy="22" r="8" fill="#9daf9a" />
+          <circle cx="146" cy="32" r="8" fill="#7f917c" />
+          <text x="4" y="90" className="program-followers__personalised-small">
+            Inputs
+          </text>
+          <text x="106" y="90" className="program-followers__personalised-small">
+            Custom output
           </text>
         </g>
       </svg>
