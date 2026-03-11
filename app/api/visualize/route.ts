@@ -1,0 +1,217 @@
+import { NextResponse } from "next/server";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const DEFAULT_PROMPT =
+  "Create a realistic athletic transformation preview of this exact person. Preserve identity, face, skin tone, hair, camera angle, and lighting. Improve body composition into a natural muscular physique with broader shoulders, more upper chest, visible arms, a tighter waist, and lower body fat. Keep the result believable, proportional, and non-steroidal.";
+
+export const runtime = "nodejs";
+const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
+const DEFAULT_MODEL = "gemini-3.1-flash-image-preview";
+
+function jsonError(message: string, status: number) {
+  return NextResponse.json({ error: message }, { status });
+}
+
+function toDataUrl(base64: string, mimeType = "image/png") {
+  return `data:${mimeType};base64,${base64}`;
+}
+
+function extractImageUrl(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+
+  const record = payload as Record<string, unknown>;
+
+  if (typeof record.imageUrl === "string") return record.imageUrl;
+  if (typeof record.url === "string") return record.url;
+  if (typeof record.output === "string") return record.output;
+  if (typeof record.result === "string") return record.result;
+
+  if (typeof record.b64_json === "string") {
+    return toDataUrl(record.b64_json);
+  }
+
+  if (Array.isArray(record.data)) {
+    for (const item of record.data) {
+      const url = extractImageUrl(item);
+      if (url) return url;
+    }
+  }
+
+  if (Array.isArray(record.output)) {
+    for (const item of record.output) {
+      const url = extractImageUrl(item);
+      if (url) return url;
+      if (typeof item === "string") return item;
+    }
+  }
+
+  if (record.image && typeof record.image === "object") {
+    const nested = record.image as Record<string, unknown>;
+    if (typeof nested.url === "string") return nested.url;
+    if (typeof nested.base64 === "string") {
+      return toDataUrl(nested.base64, typeof nested.mimeType === "string" ? nested.mimeType : "image/png");
+    }
+  }
+
+  if (typeof record.base64 === "string") {
+    return toDataUrl(record.base64, typeof record.mimeType === "string" ? record.mimeType : "image/png");
+  }
+
+  if (Array.isArray(record.candidates)) {
+    for (const candidate of record.candidates) {
+      const url = extractImageUrl(candidate);
+      if (url) return url;
+    }
+  }
+
+  if (record.content && typeof record.content === "object") {
+    const content = record.content as Record<string, unknown>;
+    if (Array.isArray(content.parts)) {
+      for (const part of content.parts) {
+        if (!part || typeof part !== "object") continue;
+        const partRecord = part as Record<string, unknown>;
+
+        if (partRecord.inlineData && typeof partRecord.inlineData === "object") {
+          const inlineData = partRecord.inlineData as Record<string, unknown>;
+          if (typeof inlineData.data === "string") {
+            return toDataUrl(
+              inlineData.data,
+              typeof inlineData.mimeType === "string" ? inlineData.mimeType : "image/png"
+            );
+          }
+        }
+
+        if (partRecord.inline_data && typeof partRecord.inline_data === "object") {
+          const inlineData = partRecord.inline_data as Record<string, unknown>;
+          if (typeof inlineData.data === "string") {
+            return toDataUrl(
+              inlineData.data,
+              typeof inlineData.mime_type === "string" ? inlineData.mime_type : "image/png"
+            );
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+export async function POST(request: Request) {
+  const configuredUrl = process.env.NANOBANANA_API_URL;
+  const apiKey = process.env.NANOBANANA_API_KEY;
+  const model = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
+
+  if (!apiKey) {
+    return jsonError("NANOBANANA_API_KEY is not configured on the server.", 503);
+  }
+
+  const formData = await request.formData();
+  const image = formData.get("image");
+  const promptInput = formData.get("prompt");
+
+  if (!(image instanceof File)) {
+    return jsonError("Please upload an image.", 400);
+  }
+
+  if (!image.type.startsWith("image/")) {
+    return jsonError("Only image uploads are supported.", 400);
+  }
+
+  if (image.size > MAX_FILE_SIZE) {
+    return jsonError("Image too large. Use a file under 10 MB.", 400);
+  }
+
+  const prompt = typeof promptInput === "string" && promptInput.trim() ? promptInput.trim() : DEFAULT_PROMPT;
+  const base64 = Buffer.from(await image.arrayBuffer()).toString("base64");
+  const requestUrl = (() => {
+    if (!configuredUrl) {
+      return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
+    }
+
+    const candidate = new URL(configuredUrl);
+
+    if (!candidate.hostname.includes("googleapis.com")) {
+      return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
+    }
+
+    if (configuredUrl.includes(":generateContent")) {
+      return candidate;
+    }
+
+    const normalized = configuredUrl.replace(/\/$/, "");
+
+    if (normalized.endsWith("/v1beta")) {
+      return new URL(`${normalized}/models/${model}:generateContent`);
+    }
+
+    if (normalized.includes("/models/")) {
+      return new URL(`${normalized}:generateContent`);
+    }
+
+    return new URL(`${normalized}/models/${model}:generateContent`);
+  })();
+
+  const upstreamResponse = await fetch(requestUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              inline_data: {
+                mime_type: image.type,
+                data: base64,
+              },
+            },
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
+        imageConfig: {
+          aspectRatio: "3:4",
+          imageSize: "1K",
+        },
+      },
+    }),
+  });
+
+  const responseText = await upstreamResponse.text();
+
+  if (!upstreamResponse.ok) {
+    return jsonError(responseText || "Nanobanana returned an error.", upstreamResponse.status);
+  }
+
+  let parsed: unknown = null;
+
+  try {
+    parsed = responseText ? JSON.parse(responseText) : null;
+  } catch {
+    if (responseText.startsWith("data:image/") || responseText.startsWith("http")) {
+      return NextResponse.json({ imageUrl: responseText });
+    }
+
+    return jsonError("Nanobanana response could not be parsed.", 502);
+  }
+
+  const imageUrl = extractImageUrl(parsed);
+
+  if (!imageUrl) {
+    const summary =
+      parsed && typeof parsed === "object"
+        ? JSON.stringify(parsed).slice(0, 800)
+        : responseText.slice(0, 800);
+    return jsonError(`Gemini response did not contain an image. Payload: ${summary}`, 502);
+  }
+
+  return NextResponse.json({ imageUrl });
+}

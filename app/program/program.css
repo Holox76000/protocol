@@ -6133,6 +6133,27 @@
     line-height: 1;
   }
 
+  .program-support__grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(28rem, 84vw);
+    gap: 1.2rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 0.8rem 0.4rem 0;
+  }
+
+  .program-support__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .program-support__card {
+    scroll-snap-align: start;
+  }
+
   .program-support__visual {
     height: 28rem;
   }

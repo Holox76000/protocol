@@ -52,7 +52,7 @@ export default function MoreScoresSection() {
         <header className="program-more-scores__header">
           <p className="program-more-scores__eyebrow">And 30+ more scores</p>
           <h2 id="program-more-scores-title" className="program-more-scores__title">
-            Track Your Progress &amp;
+            Track Your Progress &amp;{" "}
             <span>Predict the Future</span>
           </h2>
           <p className="program-more-scores__subtitle">

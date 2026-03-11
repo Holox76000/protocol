@@ -298,6 +298,7 @@ export default function ProgramLanding() {
           <nav className="program-nav__links" aria-label="Primary">
             <a href="/#why-glowup">Why Glow-up</a>
             <a href="/#how-it-works">How it works</a>
+            <a href="/visualization">Visualizer</a>
             <a href="/#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
@@ -465,6 +466,7 @@ export default function ProgramLanding() {
             <div className="program-footer__column">
               <p className="program-footer__heading">Company /</p>
               <a href="/">Products</a>
+              <a href="/visualization">Visualizer</a>
               <a href="/program/resources">Research</a>
               <a href="/program/contact-us.html">Contact Us</a>
               <a href="/program/for-doctors.html">Protocol for Clinics</a>
