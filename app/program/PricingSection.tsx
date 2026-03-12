@@ -121,7 +121,7 @@ function AssuranceIcon({ icon }: { icon: "spark" | "lock" | "shield" }) {
   );
 }
 
-export default function PricingSection() {
+export default function PricingSection({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) {
   return (
     <section className="program-pricing" aria-labelledby="program-pricing-title">
       <div className="program-pricing__inner">
@@ -166,8 +166,8 @@ export default function PricingSection() {
                 </p>
                 <div className="program-pricing__divider" />
                 <p className="program-pricing__note">No hidden fees. One-time payment.</p>
-                <a href="/welcome/checkout" className="program-pricing__cta">
-                  <span>Get Access</span>
+                <a href={ctaHref} className="program-pricing__cta">
+                  <span>{ctaLabel}</span>
                   <span className="program-pricing__cta-sep" aria-hidden="true" />
                   <ArrowIcon />
                 </a>

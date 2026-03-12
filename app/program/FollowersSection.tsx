@@ -144,29 +144,27 @@ function ScienceBackedGraphic() {
             <stop offset="0%" stopColor="#fbfcfb" />
             <stop offset="100%" stopColor="#eef2ef" />
           </linearGradient>
-          <linearGradient id="science-accent" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#b7c0b5" />
-            <stop offset="100%" stopColor="#7f8f7c" />
-          </linearGradient>
         </defs>
 
         <rect x="34" y="30" width="492" height="294" rx="28" fill="url(#science-surface)" />
 
         <g opacity="0.94">
-          <rect x="76" y="62" width="126" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
-          <rect x="220" y="62" width="142" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
-          <rect x="380" y="62" width="104" height="102" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
-          <rect x="76" y="186" width="194" height="92" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
-          <rect x="290" y="186" width="194" height="92" rx="24" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="90" y="72" width="110" height="86" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="220" y="72" width="160" height="86" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="400" y="72" width="70" height="86" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="90" y="188" width="150" height="86" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
+          <rect x="258" y="188" width="212" height="86" rx="22" fill="#f8faf8" stroke="#d9e0d7" />
         </g>
 
-        <g transform="translate(104 88)">
-          <rect x="0" y="0" width="88" height="54" rx="16" fill="#edf2ed" stroke="#d4ddd3" />
-          <path d="M18 38h16V22H18zm27 0h16V14H45zm27 0h16V28H72z" fill="#91a18e" />
-          <path d="M18 10h58" stroke="#bcc7ba" strokeWidth="6" strokeLinecap="round" />
+        <g transform="translate(116 92)">
+          <path d="M0 42h28l22-18 24 10 20-16" fill="none" stroke="#98a896" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="0" cy="42" r="7" fill="#c5cec3" />
+          <circle cx="50" cy="24" r="7" fill="#aab9a7" />
+          <circle cx="74" cy="34" r="7" fill="#95a492" />
+          <circle cx="94" cy="18" r="7" fill="#7f917c" />
         </g>
 
-        <g transform="translate(248 86)">
+        <g transform="translate(240 94)">
           <text x="0" y="0" className="program-followers__science-label">
             SCIENCE-BACKED
           </text>
@@ -176,23 +174,24 @@ function ScienceBackedGraphic() {
           </text>
         </g>
 
-        <g transform="translate(412 88)">
-          <circle cx="26" cy="26" r="24" fill="#edf2ed" stroke="#d4ddd3" />
-          <path d="m14 28 8 8 16-18" fill="none" stroke="#7f917c" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        <g transform="translate(418 92)">
+          <circle cx="18" cy="18" r="16" fill="#edf2ed" stroke="#d4ddd3" />
+          <path d="m10 18 5 5 11-12" fill="none" stroke="#7f917c" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
         </g>
 
-        <g transform="translate(108 212)">
-          <rect x="0" y="0" width="130" height="42" rx="16" fill="#fbfcfb" stroke="#d7dfd6" />
-          <path d="M20 22h54" stroke="#97a796" strokeWidth="7" strokeLinecap="round" />
-          <circle cx="96" cy="22" r="9" fill="#7f917c" />
-          <text x="0" y="68" className="program-followers__science-small">Measured inputs</text>
+        <g transform="translate(112 212)">
+          <path d="M0 42h38l30-16 34 10" fill="none" stroke="#a6b4a3" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="0" cy="42" r="8" fill="#d0d8ce" />
+          <circle cx="68" cy="26" r="8" fill="#adbcaa" />
+          <circle cx="102" cy="36" r="8" fill="#8e9f8a" />
+          <text x="0" y="74" className="program-followers__science-small">Measured inputs</text>
         </g>
 
-        <g transform="translate(320 212)">
-          <rect x="0" y="0" width="138" height="42" rx="16" fill="#fbfcfb" stroke="#d7dfd6" />
-          <path d="M20 22h40" stroke="#97a796" strokeWidth="7" strokeLinecap="round" />
-          <path d="m92 22 10 10 18-18" fill="none" stroke="#7f917c" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-          <text x="0" y="68" className="program-followers__science-small">Validated results</text>
+        <g transform="translate(284 205)">
+          <rect x="0" y="0" width="160" height="52" rx="18" fill="#fbfcfb" stroke="#d7dfd6" />
+          <path d="M24 19h46M24 33h70" stroke="#97a796" strokeWidth="7" strokeLinecap="round" />
+          <path d="m118 18 10 10 18-18" fill="none" stroke="#7f917c" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+          <text x="0" y="76" className="program-followers__science-small">Validated results</text>
         </g>
       </svg>
     </div>

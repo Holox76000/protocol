@@ -7382,7 +7382,8 @@
   height: calc(100% + 3.6rem) !important;
   object-fit: contain;
   object-position: center bottom;
-  transform: none;
+  transform: scale(1.07) translateY(2.8rem);
+  transform-origin: center bottom;
 }
 
 .program-complete-analysis__card--colors {

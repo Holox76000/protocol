@@ -46,7 +46,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Shoulder-to-Waist Ratio",
-    image: "/program/static/landing/images/home/aesthetics-tests/eyes.webp",
+    image: bodyFatDistributionImage.src,
     tests: [
       "Current V-taper ratio",
       "Deltoid width potential",

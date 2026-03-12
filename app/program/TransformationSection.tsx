@@ -5,7 +5,7 @@ const TRANSFORMATION_STEPS = [
   { number: "4", label: ["Start Your 12-Week", "Recomposition"] },
 ];
 
-export default function TransformationSection() {
+export default function TransformationSection({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) {
   return (
     <section className="program-transformation" aria-labelledby="program-transformation-title">
       <div className="program-transformation__inner">
@@ -16,8 +16,8 @@ export default function TransformationSection() {
                 Get Your $19 <span>Body Analysis Today</span>
               </h2>
             </div>
-            <a href="/welcome/checkout" className="program-transformation__cta">
-              <span>Start Your Glow-Up</span>
+            <a href={ctaHref} className="program-transformation__cta">
+              <span>{ctaLabel}</span>
               <span className="program-transformation__cta-separator" aria-hidden="true" />
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path

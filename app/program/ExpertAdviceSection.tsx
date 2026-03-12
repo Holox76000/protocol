@@ -26,6 +26,22 @@ export default function ExpertAdviceSection() {
 
         <div className="program-advice__visual-shell">
           <div className="program-advice__visual">
+            <div className="program-advice__orbit" aria-hidden="true">
+              <svg viewBox="0 0 1000 420" preserveAspectRatio="none">
+                <path
+                  className="program-advice__orbit-path"
+                  d="M24 8H336C349.255 8 360 18.745 360 32V210H640V32C640 18.745 650.745 8 664 8H976C989.255 8 1000 18.745 1000 32V388C1000 401.255 989.255 412 976 412H664C650.745 412 640 401.255 640 388V210H360V388C360 401.255 349.255 412 336 412H24C10.745 412 0 401.255 0 388V32C0 18.745 10.745 8 24 8Z"
+                />
+                <circle className="program-advice__orbit-dot" r="6">
+                  <animateMotion
+                    dur="22.5s"
+                    repeatCount="indefinite"
+                    rotate="auto"
+                    path="M24 8H336C349.255 8 360 18.745 360 32V210H640V32C640 18.745 650.745 8 664 8H976C989.255 8 1000 18.745 1000 32V388C1000 401.255 989.255 412 976 412H664C650.745 412 640 401.255 640 388V210H360V388C360 401.255 349.255 412 336 412H24C10.745 412 0 401.255 0 388V32C0 18.745 10.745 8 24 8Z"
+                  />
+                </circle>
+              </svg>
+            </div>
             <article className="program-advice__card">
               <span className="program-advice__label">Before</span>
               <div className="program-advice__image">
