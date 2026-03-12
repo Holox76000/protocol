@@ -6,4 +6,6 @@ export const metadata: Metadata = {
   description: "Get your personalized body analysis and transformation plan based on 2000+ academic studies."
 };
 
-export default ProgramLanding;
+export default function HomePage() {
+  return <ProgramLanding funnel="main" />;
+}
