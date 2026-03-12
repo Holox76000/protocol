@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import crypto from "node:crypto";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -41,6 +39,28 @@ function bufferFromImageUrl(imageUrl: string) {
     mimeType,
     buffer: Buffer.from(base64Data, "base64"),
   };
+}
+
+async function parseVisualizationRequest(request: Request) {
+  const formData = await request.formData();
+  const image = formData.get("image");
+  const promptInput = formData.get("prompt");
+
+  if (!(image instanceof File)) {
+    return { error: jsonError("Please upload an image.", 400) } as const;
+  }
+
+  if (!image.type.startsWith("image/")) {
+    return { error: jsonError("Only image uploads are supported.", 400) } as const;
+  }
+
+  if (image.size > MAX_FILE_SIZE) {
+    return { error: jsonError("Image too large. Use a file under 10 MB.", 400) } as const;
+  }
+
+  const prompt = typeof promptInput === "string" && promptInput.trim() ? promptInput.trim() : DEFAULT_PROMPT;
+
+  return { image, prompt } as const;
 }
 
 function extractImageUrl(payload: unknown): string | null {
@@ -125,167 +145,145 @@ function extractImageUrl(payload: unknown): string | null {
 }
 
 export async function POST(request: Request) {
-  const configuredUrl = process.env.NANOBANANA_API_URL;
-  const apiKey = process.env.NANOBANANA_API_KEY;
-  const model = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
-
-  if (!apiKey) {
-    return jsonError("NANOBANANA_API_KEY is not configured on the server.", 503);
-  }
-
-  const formData = await request.formData();
-  const image = formData.get("image");
-  const promptInput = formData.get("prompt");
-
-  if (!(image instanceof File)) {
-    return jsonError("Please upload an image.", 400);
-  }
-
-  if (!image.type.startsWith("image/")) {
-    return jsonError("Only image uploads are supported.", 400);
-  }
-
-  if (image.size > MAX_FILE_SIZE) {
-    return jsonError("Image too large. Use a file under 10 MB.", 400);
-  }
-
-  const prompt = typeof promptInput === "string" && promptInput.trim() ? promptInput.trim() : DEFAULT_PROMPT;
-  const base64 = Buffer.from(await image.arrayBuffer()).toString("base64");
-  const requestUrl = (() => {
-    if (!configuredUrl) {
-      return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
-    }
-
-    const candidate = new URL(configuredUrl);
-
-    if (!candidate.hostname.includes("googleapis.com")) {
-      return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
-    }
-
-    if (configuredUrl.includes(":generateContent")) {
-      return candidate;
-    }
-
-    const normalized = configuredUrl.replace(/\/$/, "");
-
-    if (normalized.endsWith("/v1beta")) {
-      return new URL(`${normalized}/models/${model}:generateContent`);
-    }
-
-    if (normalized.includes("/models/")) {
-      return new URL(`${normalized}:generateContent`);
-    }
-
-    return new URL(`${normalized}/models/${model}:generateContent`);
-  })();
-
-  const upstreamResponse = await fetch(requestUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": apiKey,
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              inline_data: {
-                mime_type: image.type,
-                data: base64,
-              },
-            },
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        responseModalities: ["TEXT", "IMAGE"],
-        imageConfig: {
-          aspectRatio: "3:4",
-          imageSize: "1K",
-        },
-      },
-    }),
-  });
-
-  const responseText = await upstreamResponse.text();
-
-  console.log("[api/visualize] upstream response", {
-    status: upstreamResponse.status,
-    ok: upstreamResponse.ok,
-    responsePreview: responseText.slice(0, 300),
-  });
-
-  if (!upstreamResponse.ok) {
-    return jsonError(responseText || "Nanobanana returned an error.", upstreamResponse.status);
-  }
-
-  let parsed: unknown = null;
-
   try {
-    parsed = responseText ? JSON.parse(responseText) : null;
-  } catch {
-    if (responseText.startsWith("data:image/") || responseText.startsWith("http")) {
-      return NextResponse.json({ imageUrl: responseText });
+    const configuredUrl = process.env.NANOBANANA_API_URL;
+    const apiKey = process.env.NANOBANANA_API_KEY;
+    const model = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
+
+    if (!apiKey) {
+      return jsonError("NANOBANANA_API_KEY is not configured on the server.", 503);
     }
 
-    return jsonError("Nanobanana response could not be parsed.", 502);
-  }
+    const parsedRequest = await parseVisualizationRequest(request);
+    if ("error" in parsedRequest) {
+      return parsedRequest.error;
+    }
 
-  const imageUrl = extractImageUrl(parsed);
+    const { image, prompt } = parsedRequest;
+    const sourceBuffer = Buffer.from(await image.arrayBuffer());
+    const base64 = sourceBuffer.toString("base64");
+    const sourceImageUrl = toDataUrl(base64, image.type);
 
-  console.log("[api/visualize] extracted image", {
-    hasImageUrl: Boolean(imageUrl),
-    isDataUrl: imageUrl?.startsWith("data:") ?? false,
-  });
+    const requestUrl = (() => {
+      if (!configuredUrl) {
+        return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
+      }
 
-  if (!imageUrl) {
-    const summary =
-      parsed && typeof parsed === "object"
-        ? JSON.stringify(parsed).slice(0, 800)
-        : responseText.slice(0, 800);
-    return jsonError(`Gemini response did not contain an image. Payload: ${summary}`, 502);
-  }
+      const candidate = new URL(configuredUrl);
 
-  const previewId = crypto.randomUUID();
-  const previewsDir = path.join(process.cwd(), "public", "generated", "previews");
-  await mkdir(previewsDir, { recursive: true });
+      if (!candidate.hostname.includes("googleapis.com")) {
+        return new URL(`${DEFAULT_API_BASE}/models/${model}:generateContent`);
+      }
 
-  const sourceExtension = extensionFromMimeType(image.type);
-  const sourceFileName = `${previewId}-before.${sourceExtension}`;
-  const sourceFilePath = path.join(previewsDir, sourceFileName);
-  await writeFile(sourceFilePath, Buffer.from(await image.arrayBuffer()));
+      if (configuredUrl.includes(":generateContent")) {
+        return candidate;
+      }
 
-  const generatedImage = bufferFromImageUrl(imageUrl);
-  const generatedExtension = extensionFromMimeType(generatedImage.mimeType);
-  const generatedFileName = `${previewId}-after.${generatedExtension}`;
-  const generatedFilePath = path.join(previewsDir, generatedFileName);
-  await writeFile(generatedFilePath, generatedImage.buffer);
+      const normalized = configuredUrl.replace(/\/$/, "");
 
-  const sourceImageUrl = `/generated/previews/${sourceFileName}`;
-  const generatedImageUrl = `/generated/previews/${generatedFileName}`;
-  const metadataPath = path.join(previewsDir, `${previewId}.json`);
-  await writeFile(
-    metadataPath,
-    JSON.stringify(
-      {
-        previewId,
-        beforeSrc: sourceImageUrl,
-        afterSrc: generatedImageUrl,
+      if (normalized.endsWith("/v1beta")) {
+        return new URL(`${normalized}/models/${model}:generateContent`);
+      }
+
+      if (normalized.includes("/models/")) {
+        return new URL(`${normalized}:generateContent`);
+      }
+
+      return new URL(`${normalized}/models/${model}:generateContent`);
+    })();
+
+    const upstreamResponse = await fetch(requestUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
       },
-      null,
-      2
-    ),
-    "utf8"
-  );
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inline_data: {
+                  mime_type: image.type,
+                  data: base64,
+                },
+              },
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+          imageConfig: {
+            aspectRatio: "3:4",
+            imageSize: "1K",
+          },
+        },
+      }),
+    });
 
-  return NextResponse.json({
-    imageUrl: generatedImageUrl,
-    sourceImageUrl,
-    previewId,
-  });
+    const responseText = await upstreamResponse.text();
+
+    console.log("[api/visualize] upstream response", {
+      status: upstreamResponse.status,
+      ok: upstreamResponse.ok,
+      responsePreview: responseText.slice(0, 300),
+    });
+
+    if (!upstreamResponse.ok) {
+      return jsonError(responseText || "Nanobanana returned an error.", upstreamResponse.status);
+    }
+
+    let parsed: unknown = null;
+
+    try {
+      parsed = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      if (responseText.startsWith("data:image/") || responseText.startsWith("http")) {
+        return NextResponse.json({
+          imageUrl: responseText,
+          sourceImageUrl,
+          previewId: crypto.randomUUID(),
+        });
+      }
+
+      return jsonError("Nanobanana response could not be parsed.", 502);
+    }
+
+    const imageUrl = extractImageUrl(parsed);
+
+    console.log("[api/visualize] extracted image", {
+      hasImageUrl: Boolean(imageUrl),
+      isDataUrl: imageUrl?.startsWith("data:") ?? false,
+    });
+
+    if (!imageUrl) {
+      const summary =
+        parsed && typeof parsed === "object"
+          ? JSON.stringify(parsed).slice(0, 800)
+          : responseText.slice(0, 800);
+      return jsonError(`Gemini response did not contain an image. Payload: ${summary}`, 502);
+    }
+
+    if (imageUrl.startsWith("data:")) {
+      const generatedImage = bufferFromImageUrl(imageUrl);
+      return NextResponse.json({
+        imageUrl: toDataUrl(generatedImage.buffer.toString("base64"), generatedImage.mimeType),
+        sourceImageUrl,
+        previewId: crypto.randomUUID(),
+      });
+    }
+
+    return NextResponse.json({
+      imageUrl,
+      sourceImageUrl,
+      previewId: crypto.randomUUID(),
+    });
+  } catch (error) {
+    console.error("[api/visualize] unhandled error", error);
+    return jsonError(error instanceof Error ? error.message : "The visualizer failed on the server.", 500);
+  }
 }

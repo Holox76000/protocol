@@ -11,6 +11,8 @@ type HeroComparisonProps = {
   previewId?: string;
 };
 
+const PREVIEW_STORAGE_PREFIX = "protocol-preview:";
+
 export default function HeroComparison({
   funnel,
   defaultBeforeSrc,
@@ -26,6 +28,18 @@ export default function HeroComparison({
 
     const syncPreview = async () => {
       try {
+        const cachedPreview = window.sessionStorage.getItem(`${PREVIEW_STORAGE_PREFIX}${previewId}`);
+        if (cachedPreview) {
+          const parsed = JSON.parse(cachedPreview) as { beforeSrc?: string; afterSrc?: string };
+          if (isActive && parsed.beforeSrc && parsed.afterSrc) {
+            setPreview({
+              beforeSrc: parsed.beforeSrc,
+              afterSrc: parsed.afterSrc,
+            });
+            return;
+          }
+        }
+
         const response = await fetch(`/generated/previews/${previewId}.json`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Preview metadata request failed with status ${response.status}`);

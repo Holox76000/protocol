@@ -19,6 +19,8 @@ type ApiResponse =
       error?: string;
     };
 
+const PREVIEW_STORAGE_PREFIX = "protocol-preview:";
+
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -33,6 +35,20 @@ function readFileAsDataUrl(file: File) {
     reader.onerror = () => reject(new Error("The selected image could not be read."));
     reader.readAsDataURL(file);
   });
+}
+
+async function parseApiResponse(response: Response) {
+  const raw = await response.text();
+
+  if (!raw.trim()) {
+    throw new Error("The visualizer returned an empty response.");
+  }
+
+  try {
+    return JSON.parse(raw) as ApiResponse;
+  } catch {
+    throw new Error(response.ok ? "The visualizer returned an invalid response." : raw);
+  }
 }
 
 const FLOW_STEPS = [
@@ -140,7 +156,7 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
         body: formData,
       });
 
-      const payload = (await response.json()) as ApiResponse;
+      const payload = await parseApiResponse(response);
 
       if (!response.ok || !("imageUrl" in payload)) {
         throw new Error(
@@ -154,8 +170,19 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
       });
 
       setResultUrl(payload.imageUrl);
-      setSavedSourceUrl(payload.sourceImageUrl ?? persistedSourceUrl);
+      const nextSourceUrl = payload.sourceImageUrl ?? persistedSourceUrl;
+      setSavedSourceUrl(nextSourceUrl);
       setPreviewId(payload.previewId ?? null);
+
+      if (payload.previewId) {
+        window.sessionStorage.setItem(
+          `${PREVIEW_STORAGE_PREFIX}${payload.previewId}`,
+          JSON.stringify({
+            beforeSrc: nextSourceUrl,
+            afterSrc: payload.imageUrl,
+          })
+        );
+      }
     } catch (nextError) {
       console.error("[visualization] generation failed", nextError);
       setError(nextError instanceof Error ? nextError.message : "The visualizer failed.");
