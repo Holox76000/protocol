@@ -1,0 +1,228 @@
+.page {
+  --text: #667163;
+  --text-strong: #243129;
+  --text-soft: #8a9687;
+  --border: rgba(97, 111, 100, 0.14);
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-soft: rgba(246, 248, 243, 0.9);
+  --accent: #31443a;
+  min-height: 100dvh;
+  padding: 20px;
+  background:
+    radial-gradient(circle at top left, rgba(190, 203, 191, 0.16), transparent 28%),
+    linear-gradient(180deg, #f6f8f3 0%, #fbfcf8 40%, #ffffff 100%);
+  color: var(--text);
+}
+
+.shell {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+.headerCard,
+.questionCard {
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px rgba(90, 105, 92, 0.08);
+}
+
+.headerCard {
+  padding: 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.eyebrow,
+.questionEyebrow {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title,
+.questionTitle,
+.summaryTitle {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: "Kessler", "Iowan Old Style", "Palatino Linotype", serif;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.title {
+  font-size: clamp(38px, 5vw, 62px);
+  line-height: 0.95;
+}
+
+.subtitle,
+.questionHelper,
+.summaryText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.progressMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.progressMeta strong {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--text-strong);
+}
+
+.headerTop {
+  display: grid;
+  gap: 8px;
+  max-width: 760px;
+}
+
+.progressTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(49, 68, 58, 0.08);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #445b4f, #75866f);
+}
+
+.questionCard {
+  padding: 26px;
+  display: grid;
+  gap: 22px;
+}
+
+.questionTop {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.questionNumber {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(49, 68, 58, 0.08);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.questionTitle {
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 0.96;
+}
+
+.optionsGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.optionButton {
+  min-height: 64px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-strong);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.optionButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(49, 68, 58, 0.28);
+}
+
+.optionButtonSelected {
+  border-color: rgba(49, 68, 58, 0.38);
+  background: rgba(228, 238, 226, 0.95);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 56px;
+  padding: 0 18px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: #fff;
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.secondaryButton {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-strong);
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 10px;
+  }
+
+  .headerCard,
+  .questionCard {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .headerTop,
+  .questionTop,
+  .actions {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .progressHeader {
+    display: grid;
+  }
+}

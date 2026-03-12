@@ -146,7 +146,7 @@ export default function BeforeAfterSlider({
       >
         <div
           className="program-hero__compare-pane program-hero__compare-pane--before"
-          style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
+          style={{ clipPath: `inset(0 ${100 - position}% 0 0)`, zIndex: 1 }}
           aria-hidden="true"
         >
           <img
@@ -154,18 +154,20 @@ export default function BeforeAfterSlider({
             src={beforeSrc}
             alt={beforeAlt ?? `${subject} before`}
             draggable={false}
-            style={getImageStyle({
-              position: beforePosition,
-              scale: beforeScale,
-              translateX: beforeTranslateX,
-              translateY: beforeTranslateY,
-            })}
+            style={{
+              ...getImageStyle({
+                position: beforePosition,
+                scale: beforeScale,
+                translateX: beforeTranslateX,
+                translateY: beforeTranslateY,
+              }),
+            }}
           />
         </div>
 
         <div
           className="program-hero__compare-pane program-hero__compare-pane--after"
-          style={{ clipPath: `inset(0 0 0 ${position}%)` }}
+          style={{ clipPath: `inset(0 0 0 ${position}%)`, zIndex: 0 }}
           aria-hidden="true"
         >
           <img
@@ -173,12 +175,14 @@ export default function BeforeAfterSlider({
             src={afterSrc}
             alt={afterAlt ?? `${subject} after`}
             draggable={false}
-            style={getImageStyle({
-              position: afterPosition,
-              scale: afterScale,
-              translateX: afterTranslateX,
-              translateY: afterTranslateY,
-            })}
+            style={{
+              ...getImageStyle({
+                position: afterPosition,
+                scale: afterScale,
+                translateX: afterTranslateX,
+                translateY: afterTranslateY,
+              }),
+            }}
           />
         </div>
 

@@ -6,6 +6,7 @@ import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png
 import bodyScanImage from "../../body-scan.png";
 import youGetClarityImage from "../../you-get-clarity.png";
 import youGainControlImage from "../../you-gain-control.png";
+import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import "./program.css";
 import type { ResearchTab } from "./ResearchImpactSection";
 import NewApproachSection from "./NewApproachSection";
@@ -29,8 +30,8 @@ import InformativeSection from "./InformativeSection";
 import PersonalizedSection from "./PersonalizedSection";
 import CompleteFacialAnalysisSection from "./CompleteFacialAnalysisSection";
 import FAQSection from "./FAQSection";
+import HeroComparison from "./HeroComparison";
 
-const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
 const ResearchImpactSection = dynamic(() => import("./ResearchImpactSection"), { ssr: false });
 
 const HERO_GOALS = [
@@ -266,12 +267,21 @@ const RESEARCH_TABS: ResearchTab[] = [
   },
 ];
 
-export default function ProgramLanding() {
+export default function ProgramLanding({
+  funnel = "main",
+  previewId,
+}: {
+  funnel?: FunnelVariant;
+  previewId?: string;
+}) {
+  const funnelConfig = getFunnelConfig(funnel);
+  const landingAnchorBase = funnelConfig.landingHref;
+
   return (
     <div className="program-page program-page--theme-test">
       <header className="program-nav">
         <div className="program-nav__inner">
-          <a href="/" className="program-nav__logo" aria-label="Protocol home">
+          <a href={funnelConfig.landingHref} className="program-nav__logo" aria-label="Protocol home">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <mask id="program-logo-mask">
@@ -296,14 +306,14 @@ export default function ProgramLanding() {
             </svg>
           </a>
           <nav className="program-nav__links" aria-label="Primary">
-            <a href="/#why-glowup">Why Glow-up</a>
-            <a href="/#how-it-works">How it works</a>
-            <a href="/visualization">Visualizer</a>
-            <a href="/#faq">FAQ</a>
+            <a href={`${landingAnchorBase}#why-glowup`}>Why Glow-up</a>
+            <a href={`${landingAnchorBase}#how-it-works`}>How it works</a>
+            <a href={funnelConfig.visualizationHref}>Visualizer</a>
+            <a href={`${landingAnchorBase}#faq`}>FAQ</a>
           </nav>
           <div className="program-nav__actions">
             <a href="/login" className="program-nav__login">Login</a>
-            <a href="/welcome/checkout" className="program-nav__cta">Join Now</a>
+            <a href={funnelConfig.landingPrimaryHref} className="program-nav__cta">{funnelConfig.landingPrimaryLabel}</a>
           </div>
         </div>
       </header>
@@ -312,15 +322,15 @@ export default function ProgramLanding() {
           <div className="program-hero__copy">
             <p className="program-hero__eyebrow">Science-Based Body Transformation</p>
             <h1 id="program-hero-title" className="program-hero__title">
-              Get Lean <span>Without Guesswork</span>
+              From Skinny Fat <span>to Athletic.</span>
             </h1>
             <p className="program-hero__subtitle">
               Get your personalized body analysis and transformation plan based on 2000+ academic studies.
               Updated every year.
             </p>
             <div className="program-hero__actions">
-              <a href="/welcome/checkout" className="program-hero__cta">
-                <span>Start Now</span>
+              <a href={funnelConfig.landingPrimaryHref} className="program-hero__cta">
+                <span>{funnelConfig.landingSecondaryLabel}</span>
                 <span className="program-hero__cta-icon" aria-hidden="true">
                   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 14H22M22 14L14 6M22 14L14 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -340,14 +350,11 @@ export default function ProgramLanding() {
             ))}
           </ol>
           <div className="program-hero__gallery">
-            <BeforeAfterSlider
-              subject="Man"
-              beforeSrc={heroBeforeImage.src}
-              afterSrc={heroAfterImage.src}
-              beforePosition="68% 50%"
-              afterPosition="50% 50%"
-              beforeScale={1}
-              beforeTranslateX="0%"
+            <HeroComparison
+              funnel={funnel}
+              previewId={previewId}
+              defaultBeforeSrc={heroBeforeImage.src}
+              defaultAfterSrc={heroAfterImage.src}
             />
           </div>
         </div>
@@ -370,7 +377,7 @@ export default function ProgramLanding() {
       <ClientTransformationsSection />
       <NewApproachSection />
       <GaryLinkovQuoteSection />
-      <TransformationSection />
+      <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} />
       <ProtocolSection />
       <FollowersSection />
       <AestheticTestsSection />
@@ -411,15 +418,15 @@ export default function ProgramLanding() {
       </section>
       <WhySection />
       <ExpertAdviceSection />
-      <PricingSection />
+      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} />
       <FAQSection />
       <footer className="program-footer">
         <div className="program-footer__cta">
           <div>
             <h2 className="program-footer__cta-title">Join Thousands of Men Already Escaping the Skinny-Fat Trap.</h2>
           </div>
-          <a href="/welcome/checkout" className="program-footer__cta-button">
-            Get Your $19 Body Analysis Today
+          <a href={funnelConfig.landingPrimaryHref} className="program-footer__cta-button">
+            {funnelConfig.footerCtaLabel}
           </a>
         </div>
 
@@ -465,8 +472,8 @@ export default function ProgramLanding() {
           <nav className="program-footer__nav" aria-label="Footer">
             <div className="program-footer__column">
               <p className="program-footer__heading">Company /</p>
-              <a href="/">Products</a>
-              <a href="/visualization">Visualizer</a>
+              <a href={funnelConfig.landingHref}>Products</a>
+              <a href={funnelConfig.visualizationHref}>Visualizer</a>
               <a href="/program/resources">Research</a>
               <a href="/program/contact-us.html">Contact Us</a>
               <a href="/program/for-doctors.html">Protocol for Clinics</a>

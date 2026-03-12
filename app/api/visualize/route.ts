@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import crypto from "node:crypto";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DEFAULT_PROMPT =
@@ -14,6 +17,30 @@ function jsonError(message: string, status: number) {
 
 function toDataUrl(base64: string, mimeType = "image/png") {
   return `data:${mimeType};base64,${base64}`;
+}
+
+function extensionFromMimeType(mimeType: string) {
+  if (mimeType === "image/jpeg") return "jpg";
+  if (mimeType === "image/png") return "png";
+  if (mimeType === "image/webp") return "webp";
+  return "bin";
+}
+
+function bufferFromImageUrl(imageUrl: string) {
+  if (!imageUrl.startsWith("data:")) {
+    throw new Error("Only data URLs are supported for server-side persistence.");
+  }
+
+  const match = imageUrl.match(/^data:(.+?);base64,(.+)$/);
+  if (!match) {
+    throw new Error("The generated data URL is invalid.");
+  }
+
+  const [, mimeType, base64Data] = match;
+  return {
+    mimeType,
+    buffer: Buffer.from(base64Data, "base64"),
+  };
 }
 
 function extractImageUrl(payload: unknown): string | null {
@@ -187,6 +214,12 @@ export async function POST(request: Request) {
 
   const responseText = await upstreamResponse.text();
 
+  console.log("[api/visualize] upstream response", {
+    status: upstreamResponse.status,
+    ok: upstreamResponse.ok,
+    responsePreview: responseText.slice(0, 300),
+  });
+
   if (!upstreamResponse.ok) {
     return jsonError(responseText || "Nanobanana returned an error.", upstreamResponse.status);
   }
@@ -205,6 +238,11 @@ export async function POST(request: Request) {
 
   const imageUrl = extractImageUrl(parsed);
 
+  console.log("[api/visualize] extracted image", {
+    hasImageUrl: Boolean(imageUrl),
+    isDataUrl: imageUrl?.startsWith("data:") ?? false,
+  });
+
   if (!imageUrl) {
     const summary =
       parsed && typeof parsed === "object"
@@ -213,5 +251,41 @@ export async function POST(request: Request) {
     return jsonError(`Gemini response did not contain an image. Payload: ${summary}`, 502);
   }
 
-  return NextResponse.json({ imageUrl });
+  const previewId = crypto.randomUUID();
+  const previewsDir = path.join(process.cwd(), "public", "generated", "previews");
+  await mkdir(previewsDir, { recursive: true });
+
+  const sourceExtension = extensionFromMimeType(image.type);
+  const sourceFileName = `${previewId}-before.${sourceExtension}`;
+  const sourceFilePath = path.join(previewsDir, sourceFileName);
+  await writeFile(sourceFilePath, Buffer.from(await image.arrayBuffer()));
+
+  const generatedImage = bufferFromImageUrl(imageUrl);
+  const generatedExtension = extensionFromMimeType(generatedImage.mimeType);
+  const generatedFileName = `${previewId}-after.${generatedExtension}`;
+  const generatedFilePath = path.join(previewsDir, generatedFileName);
+  await writeFile(generatedFilePath, generatedImage.buffer);
+
+  const sourceImageUrl = `/generated/previews/${sourceFileName}`;
+  const generatedImageUrl = `/generated/previews/${generatedFileName}`;
+  const metadataPath = path.join(previewsDir, `${previewId}.json`);
+  await writeFile(
+    metadataPath,
+    JSON.stringify(
+      {
+        previewId,
+        beforeSrc: sourceImageUrl,
+        afterSrc: generatedImageUrl,
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  return NextResponse.json({
+    imageUrl: generatedImageUrl,
+    sourceImageUrl,
+    previewId,
+  });
 }
