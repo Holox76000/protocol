@@ -1,3 +1,5 @@
+import { getVisualizationStepHref } from "./visualizationFlow";
+
 export type FunnelVariant = "main" | "f2" | "v3";
 
 type FunnelConfig = {
@@ -19,17 +21,18 @@ type FunnelConfig = {
 
 function withQuery(path: string, funnel: FunnelVariant) {
   const separator = path.includes("?") ? "&" : "?";
-  return `${path}${separator}funnel=${funnel}`;
+  const publicFunnel = funnel === "f2" ? "v2" : funnel;
+  return `${path}${separator}funnel=${publicFunnel}`;
 }
 
 export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   if (funnel === "f2") {
-    const checkoutHref = withQuery("/welcome/checkout", funnel);
+    const checkoutHref = withQuery("/checkout", funnel);
 
     return {
       funnel,
       landingHref: "/f2/landing",
-      visualizationHref: "/f2",
+      visualizationHref: getVisualizationStepHref(funnel, "upload"),
       checkoutHref,
       landingPrimaryHref: checkoutHref,
       landingPrimaryLabel: "Join Now",
@@ -45,14 +48,14 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   }
 
   if (funnel === "v3") {
-    const checkoutHref = withQuery("/welcome/checkout", funnel);
+    const checkoutHref = withQuery("/checkout", funnel);
 
     return {
       funnel,
       landingHref: "/v3",
-      visualizationHref: "/v3",
+      visualizationHref: getVisualizationStepHref(funnel, "upload"),
       checkoutHref,
-      landingPrimaryHref: "/v3",
+      landingPrimaryHref: getVisualizationStepHref(funnel, "upload"),
       landingPrimaryLabel: "Start Visualization",
       landingSecondaryLabel: "See Your Potential",
       pricingCtaLabel: "Continue to Questions",
@@ -68,15 +71,15 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   return {
     funnel: "main",
     landingHref: "/",
-    visualizationHref: "/visualization",
-    checkoutHref: withQuery("/welcome/checkout", "main"),
-    landingPrimaryHref: "/visualization",
+    visualizationHref: getVisualizationStepHref("main", "upload"),
+    checkoutHref: withQuery("/checkout", "main"),
+    landingPrimaryHref: getVisualizationStepHref("main", "upload"),
     landingPrimaryLabel: "Start Here",
     landingSecondaryLabel: "See Your Potential",
     pricingCtaLabel: "Continue to Visualizer",
     transformationCtaLabel: "Continue to Visualizer",
     footerCtaLabel: "Continue to Visualizer",
-    visualizationNextHref: withQuery("/welcome/checkout", "main"),
+    visualizationNextHref: withQuery("/checkout", "main"),
     visualizationNextLabel: "Reach my potential",
     visualizationNextTitle: "Next step: reach your potential",
     visualizationNextDescription: "Your preview is ready. Unlock the full body analysis and transformation protocol behind it.",

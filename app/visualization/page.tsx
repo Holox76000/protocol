@@ -1,5 +1,6 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import VisualizationExperience from "./visualization-experience";
+import { getVisualizationStepHref } from "../../lib/visualizationFlow";
 
 export const metadata: Metadata = {
   title: "Protocol | Body Visualizer",
@@ -7,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function VisualizationPage() {
-  return <VisualizationExperience funnel="main" />;
+  redirect(getVisualizationStepHref("main", "upload"));
 }

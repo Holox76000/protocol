@@ -2,6 +2,9 @@
 
 import type { CSSProperties, ChangeEvent, DragEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { clearVisualizationPreview, loadVisualizationPreview, saveVisualizationPreview } from "../../lib/visualizationPreviewClient";
+import { getVisualizationStepHref, getVisualizationStepNumber, type VisualizationStep } from "../../lib/visualizationFlow";
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import styles from "./visualization.module.css";
@@ -21,7 +24,7 @@ type ApiResponse =
 
 const PREVIEW_STORAGE_PREFIX = "protocol-preview:";
 
-function readFileAsDataUrl(file: File) {
+function readFileAsDataUrl(file: Blob) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -35,6 +38,31 @@ function readFileAsDataUrl(file: File) {
     reader.onerror = () => reject(new Error("The selected image could not be read."));
     reader.readAsDataURL(file);
   });
+}
+
+function parseMimeTypeFromDataUrl(dataUrl: string) {
+  const match = dataUrl.match(/^data:(.+?);base64,/);
+  return match?.[1] ?? "image/png";
+}
+
+function fileNameFromMimeType(mimeType: string) {
+  if (mimeType === "image/jpeg") return "upload.jpg";
+  if (mimeType === "image/webp") return "upload.webp";
+  return "upload.png";
+}
+
+async function blobFromImageUrl(imageUrl: string) {
+  if (imageUrl.startsWith("data:")) {
+    const response = await fetch(imageUrl);
+    return response.blob();
+  }
+
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error("The generated preview could not be loaded.");
+  }
+
+  return response.blob();
 }
 
 async function parseApiResponse(response: Response) {
@@ -72,47 +100,102 @@ const FLOW_STEPS = [
   },
 ] as const;
 
-export default function VisualizationExperience({ funnel = "main" }: { funnel?: FunnelVariant }) {
+export default function VisualizationExperience({
+  funnel = "main",
+  step,
+}: {
+  funnel?: FunnelVariant;
+  step: VisualizationStep;
+}) {
   const funnelConfig = getFunnelConfig(funnel);
+  const router = useRouter();
+  const currentStep = getVisualizationStepNumber(step);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
-  const [persistedSourceUrl, setPersistedSourceUrl] = useState<string | null>(null);
-  const [savedSourceUrl, setSavedSourceUrl] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [sourceImageRatio, setSourceImageRatio] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const currentStep = resultUrl ? 3 : sourceFile ? 2 : 1;
+  useEffect(() => {
+    let isActive = true;
+
+    const restorePreview = async () => {
+      try {
+        const storedPreview = await loadVisualizationPreview(funnel);
+        if (!isActive || !storedPreview?.beforeBlob) return;
+
+        setSourceBlob(storedPreview.beforeBlob);
+        setResultBlob(storedPreview.afterBlob ?? null);
+        setPreviewId(storedPreview.previewId ?? null);
+      } catch (nextError) {
+        console.error("[visualization] failed to restore preview", nextError);
+      } finally {
+        if (isActive) {
+          setIsRestoring(false);
+        }
+      }
+    };
+
+    void restorePreview();
+
+    return () => {
+      isActive = false;
+    };
+  }, [funnel]);
 
   useEffect(() => {
-    if (!sourceFile) {
+    if (!sourceBlob) {
       setSourceUrl(null);
       return;
     }
 
-    const nextUrl = URL.createObjectURL(sourceFile);
+    const nextUrl = URL.createObjectURL(sourceBlob);
     setSourceUrl(nextUrl);
 
     return () => {
       URL.revokeObjectURL(nextUrl);
     };
-  }, [sourceFile]);
+  }, [sourceBlob]);
+
+  useEffect(() => {
+    if (!resultBlob) {
+      setResultUrl(null);
+      return;
+    }
+
+    const nextUrl = URL.createObjectURL(resultBlob);
+    setResultUrl(nextUrl);
+
+    return () => {
+      URL.revokeObjectURL(nextUrl);
+    };
+  }, [resultBlob]);
+
+  useEffect(() => {
+    if (isRestoring) return;
+
+    if (step === "preview" && !sourceBlob) {
+      router.replace(getVisualizationStepHref(funnel, "upload"));
+      return;
+    }
+
+    if (step === "unlock" && !resultBlob) {
+      router.replace(getVisualizationStepHref(funnel, sourceBlob ? "preview" : "upload"));
+    }
+  }, [funnel, isRestoring, resultBlob, router, sourceBlob, step]);
 
   const setFile = async (file: File | null) => {
     setError(null);
-    setResultUrl(null);
     setSourceImageRatio(null);
 
     if (!file) {
-      setSourceFile(null);
-      setPersistedSourceUrl(null);
-      setSavedSourceUrl(null);
-      setPreviewId(null);
       return;
     }
 
@@ -121,17 +204,27 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
       return;
     }
 
+    setSourceBlob(file);
+    setResultBlob(null);
+    setPreviewId(null);
+
     try {
-      const dataUrl = await readFileAsDataUrl(file);
-      setPersistedSourceUrl(dataUrl);
-      setSourceFile(file);
+      await clearVisualizationPreview(funnel);
+      await saveVisualizationPreview(funnel, {
+        beforeBlob: file,
+        afterBlob: null,
+        previewId: null,
+      });
+      router.push(getVisualizationStepHref(funnel, "preview"));
     } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : "The selected image could not be read.");
+      console.error("[visualization] failed to persist source image", nextError);
+      setError("The selected image could not be saved locally.");
     }
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     await setFile(event.target.files?.[0] ?? null);
+    event.target.value = "";
   };
 
   const handleDrop = async (event: DragEvent<HTMLButtonElement>) => {
@@ -141,14 +234,15 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
   };
 
   const handleGenerate = async () => {
-    if (!sourceFile || !persistedSourceUrl || isLoading) return;
+    if (!sourceBlob || isLoading) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
+      const mimeType = sourceBlob.type || "image/png";
       const formData = new FormData();
-      formData.append("image", sourceFile);
+      formData.append("image", new File([sourceBlob], fileNameFromMimeType(mimeType), { type: mimeType }));
       formData.append("prompt", DEFAULT_PROMPT);
 
       const response = await fetch("/api/visualize", {
@@ -164,31 +258,48 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
         );
       }
 
-      console.log("[visualization] generation succeeded", {
-        funnel,
-        isDataUrl: payload.imageUrl.startsWith("data:"),
-      });
+      const nextResultBlob = await blobFromImageUrl(payload.imageUrl);
 
-      setResultUrl(payload.imageUrl);
-      const nextSourceUrl = payload.sourceImageUrl ?? persistedSourceUrl;
-      setSavedSourceUrl(nextSourceUrl);
+      setResultBlob(nextResultBlob);
       setPreviewId(payload.previewId ?? null);
 
+      await saveVisualizationPreview(funnel, {
+        beforeBlob: sourceBlob,
+        afterBlob: nextResultBlob,
+        previewId: payload.previewId ?? null,
+      });
+
       if (payload.previewId) {
+        const beforeSrc = await readFileAsDataUrl(sourceBlob);
+        const afterSrc =
+          payload.imageUrl.startsWith("data:") ? payload.imageUrl : await readFileAsDataUrl(nextResultBlob);
+
         window.sessionStorage.setItem(
           `${PREVIEW_STORAGE_PREFIX}${payload.previewId}`,
           JSON.stringify({
-            beforeSrc: nextSourceUrl,
-            afterSrc: payload.imageUrl,
+            beforeSrc,
+            afterSrc,
           })
         );
       }
+
+      router.push(getVisualizationStepHref(funnel, "unlock"));
     } catch (nextError) {
       console.error("[visualization] generation failed", nextError);
       setError(nextError instanceof Error ? nextError.message : "The visualizer failed.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRestart = async () => {
+    setError(null);
+    setSourceBlob(null);
+    setResultBlob(null);
+    setPreviewId(null);
+    setSourceImageRatio(null);
+    await clearVisualizationPreview(funnel);
+    router.push(getVisualizationStepHref(funnel, "upload"));
   };
 
   const openFilePicker = () => inputRef.current?.click();
@@ -206,6 +317,26 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
       : undefined;
   const currentStepMeta = FLOW_STEPS[currentStep - 1];
 
+  if (isRestoring) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.flowShell}>
+          <div className={styles.flowLayout}>
+            <section className={styles.workspace}>
+              <div className={styles.flowCard}>
+                <div className={styles.flowHeader}>
+                  <p className={styles.flowEyebrow}>Loading</p>
+                  <h1 className={styles.flowTitle}>Restoring your visualization</h1>
+                  <p className={styles.flowSubtitle}>Please wait while we reload your current step.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.page}>
       <div className={styles.flowShell}>
@@ -214,19 +345,19 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
           <section className={styles.workspace}>
             <div className={styles.flowCard}>
               <div className={styles.stepRail} aria-label="Visualization steps">
-                {FLOW_STEPS.map((step, index) => {
+                {FLOW_STEPS.map((flowStep, index) => {
                   const isActive = currentStep >= index + 1;
                   const isCurrent = currentStep === index + 1;
 
                   return (
                     <div
-                      key={step.number}
+                      key={flowStep.number}
                       className={`${styles.stepRailItem} ${isActive ? styles.stepRailItemActive : ""} ${isCurrent ? styles.stepRailItemCurrent : ""}`}
                     >
-                      <span className={styles.stepRailIndex}>{step.number}</span>
+                      <span className={styles.stepRailIndex}>{flowStep.number}</span>
                       <span className={styles.stepRailCopy}>
-                        <strong>{step.title}</strong>
-                        <small>{step.description}</small>
+                        <strong>{flowStep.title}</strong>
+                        <small>{flowStep.description}</small>
                       </span>
                     </div>
                   );
@@ -297,7 +428,7 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
                     <button type="button" className={styles.secondaryButton} onClick={openFilePicker}>
                       Change image
                     </button>
-                    <button type="button" className={styles.primaryButton} onClick={handleGenerate} disabled={!sourceFile || isLoading}>
+                    <button type="button" className={styles.primaryButton} onClick={handleGenerate} disabled={!sourceBlob || isLoading}>
                       {isLoading ? "Calculating..." : "See my preview"}
                     </button>
                   </div>
@@ -322,7 +453,7 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
                   </div>
 
                   <div className={styles.flowActions}>
-                    <button type="button" className={styles.secondaryButton} onClick={openFilePicker}>
+                    <button type="button" className={styles.secondaryButton} onClick={handleRestart}>
                       Use another image
                     </button>
                     <a
@@ -388,11 +519,11 @@ export default function VisualizationExperience({ funnel = "main" }: { funnel?: 
 
               {currentStep === 3 ? (
                 <div className={styles.compareFrame} style={compareFrameStyle}>
-                  {(savedSourceUrl ?? persistedSourceUrl) && resultUrl ? (
+                  {sourceUrl && resultUrl ? (
                     <BeforeAfterSlider
                       className={styles.compareSlider}
                       subject="Potential body preview"
-                      beforeSrc={savedSourceUrl ?? persistedSourceUrl ?? ""}
+                      beforeSrc={sourceUrl}
                       afterSrc={resultUrl}
                       beforeAlt="Current body preview"
                       afterAlt="Potential body preview"

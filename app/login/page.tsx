@@ -70,7 +70,7 @@ export default function LoginPage() {
 
               <div className="program-login__links">
                 <a href="/">Back to homepage</a>
-                <a href="/welcome/checkout">Need access?</a>
+                <a href="/checkout?funnel=main">Need access?</a>
               </div>
             </div>
           </div>

@@ -48,7 +48,7 @@ export default function InternalPageShell({
               <Link href="/" className="program-internal__back">
                 Back to homepage
               </Link>
-              <Link href="/welcome/checkout" className="program-internal__cta">
+              <Link href="/checkout?funnel=main" className="program-internal__cta">
                 Get started
               </Link>
             </div>

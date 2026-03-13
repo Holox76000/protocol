@@ -59,3 +59,19 @@ export async function loadVisualizationPreview(funnel: FunnelVariant) {
   database.close();
   return preview;
 }
+
+export async function clearVisualizationPreview(funnel: FunnelVariant) {
+  const database = await openDatabase();
+
+  await new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction(STORE_NAME, "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+    store.delete(getVisualizationPreviewStorageKey(funnel));
+
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error ?? new Error("Could not clear preview data."));
+    transaction.onabort = () => reject(transaction.error ?? new Error("Could not clear preview data."));
+  });
+
+  database.close();
+}
