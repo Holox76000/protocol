@@ -1,11 +1,12 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
 
 const SCORE_CARDS = [
-  { src: "/program/static/landing/images/home/more-score/card-1.webp", alt: "Skin score" },
-  { src: "/program/static/landing/images/home/more-score/card-3.webp", alt: "Lips score" },
-  { src: "/program/static/landing/images/home/more-score/card-4.webp", alt: "Eyebrow score" },
-  { src: "/program/static/landing/images/home/more-score/card-5.webp", alt: "Jaw score" },
+  { src: "/program/static/landing/images/home/more-score/card-1.webp", alt: "Skin score", ratio: "687 / 536" },
+  { src: "/program/static/landing/images/home/more-score/card-3.webp", alt: "Lips score", ratio: "687 / 536" },
+  { src: "/program/static/landing/images/home/more-score/card-4.webp", alt: "Eyebrow score", ratio: "687 / 536" },
+  { src: "/program/static/landing/images/home/more-score/card-5.webp", alt: "Jaw score", ratio: "550 / 429" },
 ];
 
 export default function MoreScoresSection() {
@@ -24,12 +25,6 @@ export default function MoreScoresSection() {
           </div>
 
           <div className="program-more-scores__cards">
-            {SCORE_CARDS.slice(0, 2).map((card, index) => (
-              <div key={card.src} className={`program-more-scores__card program-more-scores__card--left-${index + 1}`}>
-                <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 44vw, 20vw" />
-              </div>
-            ))}
-
             <div className="program-more-scores__main">
               <Image
                 src={bodyFatDistributionScoreImage}
@@ -39,11 +34,27 @@ export default function MoreScoresSection() {
               />
             </div>
 
-            {SCORE_CARDS.slice(2).map((card, index) => (
-              <div key={card.src} className={`program-more-scores__card program-more-scores__card--right-${index + 1}`}>
-                <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 44vw, 20vw" />
-              </div>
-            ))}
+            <div className="program-more-scores__rail" aria-label="Additional score previews">
+              {SCORE_CARDS.slice(0, 2).map((card, index) => (
+                <div
+                  key={card.src}
+                  className={`program-more-scores__card program-more-scores__card--left-${index + 1}`}
+                  style={{ "--card-ratio": card.ratio } as CSSProperties}
+                >
+                  <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 78vw, 20vw" />
+                </div>
+              ))}
+
+              {SCORE_CARDS.slice(2).map((card, index) => (
+                <div
+                  key={card.src}
+                  className={`program-more-scores__card program-more-scores__card--right-${index + 1}`}
+                  style={{ "--card-ratio": card.ratio } as CSSProperties}
+                >
+                  <Image src={card.src} alt={card.alt} fill sizes="(max-width: 767px) 78vw, 20vw" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -3905,6 +3905,10 @@
   min-height: 85rem;
 }
 
+.program-more-scores__rail {
+  display: contents;
+}
+
 .program-more-scores__card,
 .program-more-scores__main {
   position: absolute;
@@ -3920,9 +3924,14 @@
   object-fit: cover;
 }
 
+.program-more-scores__main img {
+  object-fit: contain;
+  object-position: center;
+}
+
 .program-more-scores__card {
   width: 30rem;
-  height: 22.8rem;
+  aspect-ratio: var(--card-ratio, 687 / 536);
 }
 
 .program-more-scores__card--left-1 {
@@ -4156,6 +4165,7 @@
 }
 
 .program-no-surgery__compare {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
@@ -4760,10 +4770,7 @@
 }
 
 .program-advice__connector-dot {
-  width: 0.8rem;
-  height: 0.8rem;
-  border-radius: 50%;
-  background: #9fb2b9;
+  display: none;
 }
 
 .program-advice__steps {
@@ -4811,6 +4818,26 @@
 
 .program-advice__step-arrow {
   color: #8ea2aa;
+}
+
+@keyframes program-advice-connector-travel {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 5rem);
+  }
 }
 
 .program-why {
@@ -5262,46 +5289,67 @@
   }
 
   .program-approach__cards {
-    padding: 8px;
-    border-radius: 16px;
-    gap: 12px;
+    padding: 6px;
+    border-radius: 14px;
+    gap: 10px;
   }
 
   .program-approach__card {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px 16px 16px;
-    border-radius: 14px;
+    gap: 14px;
+    padding: 18px 14px 14px;
+    border-radius: 12px;
+  }
+
+  .program-approach__card-title {
+    gap: 12px;
+    min-height: auto;
   }
 
   .program-approach__card-title h3 {
-    font-size: 2rem;
-    line-height: 2.4rem;
+    font-size: 1.8rem;
+    line-height: 2.2rem;
   }
 
   .program-approach__icon {
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
   }
 
   .program-approach__rail {
     grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 14px;
-    border-radius: 14px;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .program-approach__step {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-height: 4rem;
   }
 
   .program-approach__step-top {
-    margin-bottom: 10px;
+    margin-bottom: 0;
   }
 
   .program-approach__step-line {
     display: none;
   }
 
+  .program-approach__step-number {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
   .program-approach__step p {
-    font-size: 1.6rem;
-    line-height: 2rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: -0.01rem;
   }
 
   .program-transformation {
@@ -5559,8 +5607,10 @@
   }
 
   .program-protocol__main-frame {
-    width: calc(100% - 12rem);
-    height: 52rem;
+    width: min(100%, 96rem);
+    aspect-ratio: 1710 / 897;
+    height: auto;
+    padding: 1rem;
   }
 
   .program-protocol__floating--steps {
@@ -5675,7 +5725,6 @@
 
   .program-more-scores__card {
     width: 22rem;
-    height: 17rem;
   }
 
   .program-more-scores__card--left-1,
@@ -5738,7 +5787,9 @@
   }
 
   .program-followers__hero {
-    min-height: 48rem;
+    min-height: 40rem;
+    justify-content: flex-start;
+    gap: 10rem;
   }
 
   .program-followers__num {
@@ -5867,6 +5918,7 @@
   .program-why__subtitle {
     font-size: 1.4rem;
     line-height: 1.8rem;
+    padding: 0 18px;
   }
 
   .program-why__groups {
@@ -5881,15 +5933,16 @@
   .program-why__group-title {
     font-size: 24px;
     line-height: 28px;
+    padding: 0 18px;
   }
 
   .program-why__panel {
-    padding: 8px;
+    padding: 14px;
     border-radius: 16px;
   }
 
   .program-why__item {
-    padding: 14px 10px;
+    padding: 18px 18px;
     font-size: 16px;
     line-height: 20px;
   }
@@ -5901,11 +5954,24 @@
 
   .program-analysis__card-top {
     grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .program-analysis__card-top > div:first-child {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 1rem;
   }
 
   .program-analysis__image {
     min-height: 0;
     aspect-ratio: 11 / 6;
+  }
+
+  .program-analysis__number {
+    margin: 0;
+    line-height: 1.2;
   }
 
   .program-pricing {
@@ -6144,7 +6210,16 @@
   }
 
   .program-protocol__main-frame {
-    height: 30rem;
+    aspect-ratio: 1710 / 897;
+    height: auto;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .program-protocol__main-frame img {
+    object-fit: cover;
   }
 
   .program-protocol__floating--steps,
@@ -6300,16 +6375,32 @@
 
   .program-more-scores__stage {
     min-height: auto;
-    padding: 8px;
+    padding: 10px;
     border-radius: 1.6rem;
   }
 
   .program-more-scores__cards {
     min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .program-more-scores__rail {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding-top: 0;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(26rem, 78vw);
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 2px 4px;
+  }
+
+  .program-more-scores__rail::-webkit-scrollbar {
+    display: none;
   }
 
   .program-more-scores__card,
@@ -6323,35 +6414,26 @@
   }
 
   .program-more-scores__card {
-    height: 15rem;
-    border-radius: 1.2rem;
+    width: auto;
+    border-radius: 1.4rem;
+    scroll-snap-align: start;
+  }
+
+  .program-more-scores__card img {
+    object-fit: cover;
+    object-position: center;
   }
 
   .program-more-scores__main {
-    grid-column: 1 / -1;
-    height: 26rem;
-    border-radius: 1.4rem;
-    order: 3;
-  }
-
-  .program-more-scores__card--left-3 {
-    order: 4;
-  }
-
-  .program-more-scores__card--right-1 {
-    order: 5;
-  }
-
-  .program-more-scores__card--right-2 {
-    order: 6;
-  }
-
-  .program-more-scores__card--right-3 {
-    order: 7;
+    height: 28rem;
+    border-radius: 1.6rem;
+    order: 1;
+    padding: 0.4rem;
+    background: rgba(255, 255, 255, 0.52);
   }
 
   .program-more-scores__header {
-    margin-top: 2rem;
+    margin-top: 2.4rem;
     gap: 1.2rem;
   }
 
@@ -6394,9 +6476,15 @@
   }
 
   .program-followers__hero {
-    min-height: 34rem;
+    min-height: 0;
     padding: 2rem 1.6rem;
     border-radius: 1.2rem;
+    justify-content: flex-start;
+    gap: 5.2rem;
+  }
+
+  .program-followers__hero-top {
+    gap: 0.2rem;
   }
 
   .program-followers__num {
@@ -6411,6 +6499,9 @@
   .program-followers__hero-copy {
     font-size: 2.4rem;
     letter-spacing: -0.03rem;
+    max-width: 28rem;
+    line-height: 1.02;
+    margin-top: auto;
   }
 
   .program-followers__grid {
@@ -6493,6 +6584,7 @@
   }
 
   .program-advice__connector {
+    position: relative;
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
     padding: 0.6rem 0;
@@ -6509,7 +6601,20 @@
   }
 
   .program-advice__connector-dot {
-    display: none;
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 2.5rem);
+    display: block;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 999px;
+    background: #f7fbfc;
+    border: 1px solid rgba(143, 167, 176, 0.7);
+    box-shadow:
+      0 0 0 0.25rem rgba(255, 255, 255, 0.28),
+      0 0.2rem 0.8rem rgba(89, 113, 122, 0.16);
+    transform: translateX(-50%);
+    animation: program-advice-connector-travel 0.8s linear infinite;
   }
 
   .program-advice__orbit {
@@ -6894,8 +6999,33 @@
   }
 
   .program-tests__meta {
-    flex-direction: column;
-    gap: 1.2rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 1.4rem;
+  }
+
+  .program-tests__meta-item {
+    gap: 0.8rem;
+    font-size: 1.2rem;
+    line-height: 1.4rem;
+    white-space: nowrap;
+  }
+
+  .program-tests__meta-item + .program-tests__meta-item::before {
+    content: "•";
+    margin-right: 0.6rem;
+    color: #a5b5bc;
+  }
+
+  .program-tests__meta-icon {
+    width: 3.6rem;
+    height: 2.8rem;
+  }
+
+  .program-tests__meta-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 
   .program-tests__summary {
@@ -7520,57 +7650,38 @@
   .program-complete-analysis__stage--mobile {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
-    padding: 1.2rem;
+    gap: 0;
+    padding: 0;
     min-height: 0;
     border-radius: 1.6rem;
+    overflow: hidden;
+  }
+
+  .program-complete-analysis__stage--mobile .program-complete-analysis__portrait-panel {
+    display: contents;
   }
 
   .program-complete-analysis__stage--mobile .program-complete-analysis__portrait {
     width: 100%;
     max-width: none;
     min-height: 0;
-    aspect-ratio: 1 / 1.08;
     margin: 0;
-    border-radius: 1.6rem;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(223, 230, 232, 0.9);
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
   }
 
   .program-complete-analysis__stage--mobile .program-complete-analysis__portrait-image {
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+    display: block;
+    width: 100%;
+    height: auto;
     object-fit: contain;
     object-position: center bottom;
-    padding: 1.2rem 1.2rem 0;
   }
 
   .program-complete-analysis__mobile-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card {
-    width: 100%;
-    min-height: 14rem;
-    border-radius: 1.2rem;
-    background: rgba(255, 255, 255, 0.9);
-  }
-
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--thirds,
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--scatter,
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--colors {
-    grid-column: 1 / -1;
-    min-height: 16rem;
-  }
-
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--smoothness,
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--average,
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--bell,
-  .program-complete-analysis__mobile-cards .program-complete-analysis__card--symmetry {
-    min-height: 13rem;
+    display: none;
   }
 }
 

@@ -57,6 +57,7 @@ export default function ExpertAdviceSection() {
             <div className="program-advice__connector" aria-hidden="true">
               <div className="program-advice__connector-box program-advice__connector-box--top" />
               <div className="program-advice__connector-line" />
+              <span className="program-advice__connector-dot" />
               <div className="program-advice__connector-box program-advice__connector-box--bottom" />
             </div>
             <article className="program-advice__card">

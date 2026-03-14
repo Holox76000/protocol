@@ -105,7 +105,8 @@ export default function CompleteFacialAnalysisSection() {
               <Image
                 src={manImage}
                 alt="Body analysis portrait"
-                fill
+                width={manImage.width}
+                height={manImage.height}
                 sizes="(max-width: 767px) 88vw, (max-width: 1280px) 70vw, 760px"
                 className="program-complete-analysis__portrait-image"
               />

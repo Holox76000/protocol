@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { FunnelVariant } from "../../lib/funnels";
+import { loadVisualizationPreview } from "../../lib/visualizationPreviewClient";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 
 type HeroComparisonProps = {
@@ -10,8 +11,6 @@ type HeroComparisonProps = {
   defaultAfterSrc: string;
   previewId?: string;
 };
-
-const PREVIEW_STORAGE_PREFIX = "protocol-preview:";
 
 export default function HeroComparison({
   funnel,
@@ -25,19 +24,28 @@ export default function HeroComparison({
     if (funnel !== "f2" || !previewId) return;
 
     let isActive = true;
+    let beforeObjectUrl: string | null = null;
+    let afterObjectUrl: string | null = null;
 
     const syncPreview = async () => {
       try {
-        const cachedPreview = window.sessionStorage.getItem(`${PREVIEW_STORAGE_PREFIX}${previewId}`);
-        if (cachedPreview) {
-          const parsed = JSON.parse(cachedPreview) as { beforeSrc?: string; afterSrc?: string };
-          if (isActive && parsed.beforeSrc && parsed.afterSrc) {
+        const storedPreview = await loadVisualizationPreview("f2");
+        if (
+          storedPreview?.previewId === previewId &&
+          storedPreview.beforeBlob &&
+          storedPreview.afterBlob
+        ) {
+          beforeObjectUrl = URL.createObjectURL(storedPreview.beforeBlob);
+          afterObjectUrl = URL.createObjectURL(storedPreview.afterBlob);
+
+          if (isActive) {
             setPreview({
-              beforeSrc: parsed.beforeSrc,
-              afterSrc: parsed.afterSrc,
+              beforeSrc: beforeObjectUrl,
+              afterSrc: afterObjectUrl,
             });
-            return;
           }
+
+          return;
         }
 
         const response = await fetch(`/generated/previews/${previewId}.json`, { cache: "no-store" });
@@ -67,6 +75,12 @@ export default function HeroComparison({
 
     return () => {
       isActive = false;
+      if (beforeObjectUrl) {
+        URL.revokeObjectURL(beforeObjectUrl);
+      }
+      if (afterObjectUrl) {
+        URL.revokeObjectURL(afterObjectUrl);
+      }
     };
   }, [funnel, previewId]);
 
