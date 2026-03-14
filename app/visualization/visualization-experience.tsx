@@ -5,7 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { clearVisualizationPreview, loadVisualizationPreview, saveVisualizationPreview } from "../../lib/visualizationPreviewClient";
-import { getVisualizationStepHref, getVisualizationStepNumber, type VisualizationStep } from "../../lib/visualizationFlow";
+import {
+  getMainVisualizationScreenHref,
+  getVisualizationStepHref,
+  getVisualizationStepNumber,
+  type VisualizationScreenMode,
+  type VisualizationStep,
+} from "../../lib/visualizationFlow";
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import styles from "./visualization.module.css";
@@ -67,7 +73,7 @@ const FLOW_STEPS = [
     number: "01",
     shortLabel: "Upload",
     title: "Upload",
-    description: "Add one clear front-facing body photo.",
+    description: "Add one clear shirtless front-facing body photo.",
   },
   {
     number: "02",
@@ -83,12 +89,44 @@ const FLOW_STEPS = [
   },
 ] as const;
 
+const MOBILE_UPLOAD_INTRO = [
+  {
+    title: "Upload one clear body photo",
+    description: "Use a clear shirtless front-facing photo in clean light. It stays private and is only used to generate your preview.",
+  },
+  {
+    title: "We generate a realistic preview",
+    description: "Built from your actual starting point, not a generic fake transformation. A shirtless photo helps the preview read your frame accurately.",
+  },
+  {
+    title: "Then you continue into your plan",
+    description: "Use the preview as the visual anchor for the next step. You can always replace the photo before moving on.",
+  },
+] as const;
+
+const NEXT_STEPS = [
+  {
+    title: "$19 once, lifetime access",
+    description: "One payment. Lifetime access to your analysis and plan.",
+  },
+  {
+    title: "Complete your assessment",
+    description: "Answer detailed questions about your habits, nutrition, training, and lifestyle.",
+  },
+  {
+    title: "Reviewed by specialists and AI",
+    description: "Our specialists and AI review everything and deliver your full analysis within up to 7 days.",
+  },
+] as const;
+
 export default function VisualizationExperience({
   funnel = "main",
   step,
+  screenMode = "default",
 }: {
   funnel?: FunnelVariant;
   step: VisualizationStep;
+  screenMode?: VisualizationScreenMode;
 }) {
   const funnelConfig = getFunnelConfig(funnel);
   const router = useRouter();
@@ -105,7 +143,24 @@ export default function VisualizationExperience({
   const [isLoading, setIsLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [uploadIntroDismissed, setUploadIntroDismissed] = useState(false);
+  const [showNextStepIntro, setShowNextStepIntro] = useState(false);
   const hasTrackedUnlockRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(max-width: 760px)");
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewport);
+    };
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -191,6 +246,18 @@ export default function VisualizationExperience({
       step,
     });
   }, [funnel, isRestoring, step]);
+
+  useEffect(() => {
+    if (currentStep !== 1) {
+      setUploadIntroDismissed(false);
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (currentStep !== 3) {
+      setShowNextStepIntro(false);
+    }
+  }, [currentStep]);
 
   const setFile = async (file: File | null) => {
     setError(null);
@@ -322,6 +389,10 @@ export default function VisualizationExperience({
         } as CSSProperties)
       : undefined;
   const currentStepMeta = FLOW_STEPS[currentStep - 1];
+  const showUploadIntro =
+    screenMode === "uploadIntro" || (funnel !== "main" && currentStep === 1 && isMobileViewport && !uploadIntroDismissed);
+  const showUnlockInfo = screenMode === "unlockInfo" || (funnel !== "main" && showNextStepIntro);
+  const currentYear = new Date().getFullYear();
 
   if (isRestoring) {
     return (
@@ -346,10 +417,18 @@ export default function VisualizationExperience({
   return (
     <main className={styles.page}>
       <div className={styles.flowShell}>
-        <div className={styles.flowLayout}>
+        <div className={`${styles.flowLayout} ${styles.flowLayoutSingle}`}>
           <input ref={inputRef} className={styles.fileInput} type="file" accept="image/*" onChange={handleFileChange} />
           <section className={styles.workspace}>
             <div className={styles.flowCard}>
+              <div className={styles.brandLockup}>
+                <img src="/program/images/shared/menu/logo.svg" alt="Protocol" className={styles.brandLogo} />
+                <div className={styles.brandCopy}>
+                  <strong>Protocol</strong>
+                  <span>Body transformation preview</span>
+                </div>
+              </div>
+
               <div className={styles.stepRail} aria-label="Visualization steps">
                 {FLOW_STEPS.map((flowStep, index) => {
                   const isActive = currentStep >= index + 1;
@@ -370,25 +449,66 @@ export default function VisualizationExperience({
                 })}
               </div>
 
-              <div className={styles.flowHeader}>
-                <p className={styles.flowEyebrow}>{currentStepMeta.shortLabel}</p>
+              <div className={`${styles.flowHeader} ${currentStep === 3 ? styles.flowHeaderUnlock : ""}`}>
+                {currentStep !== 3 ? <p className={styles.flowEyebrow}>{currentStepMeta.shortLabel}</p> : null}
                 <h1 className={styles.flowTitle}>
-                  {currentStep === 1
+                  {showUploadIntro
+                    ? "How your preview works"
+                    : currentStep === 1
                     ? "Upload your photo"
                     : currentStep === 2
-                      ? "Generate your preview"
-                      : "Reach your potential"}
+                      ? "Check your photo"
+                      : showUnlockInfo
+                        ? "What happens next"
+                        : "Your preview"}
                 </h1>
                 <p className={styles.flowSubtitle}>
-                  {currentStep === 1
-                    ? "Use one clear front-facing body photo. We only need a simple, well-lit shot to start."
+                  {showUploadIntro
+                    ? "Before uploading, here’s exactly what happens next and why we ask for one clear shirtless photo."
+                    : currentStep === 1
+                    ? "Use one clear shirtless front-facing body photo. We only need a simple, well-lit shot to start."
                     : currentStep === 2
-                      ? "Your image is ready. Generate a realistic before and after before moving to the next step."
-                      : "Your preview is ready. Continue to unlock the personalized plan built to make it real."}
+                      ? "Make sure the framing looks right, then generate your realistic preview."
+                      : showUnlockInfo
+                        ? "A few quick steps stand between this preview and your complete transformation plan."
+                        : "Slide to compare your current photo with the realistic preview we generated for you."}
                 </p>
               </div>
 
-              {currentStep === 1 ? (
+              {showUploadIntro ? (
+                <>
+                  <div className={styles.introList}>
+                    {MOBILE_UPLOAD_INTRO.map((item, index) => (
+                      <div key={item.title} className={styles.introCard}>
+                        <span className={styles.introIndex}>0{index + 1}</span>
+                        <div className={styles.introCopy}>
+                          <strong>{item.title}</strong>
+                          <span>{item.description}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={styles.flowActions}>
+                    <button
+                      type="button"
+                      className={styles.primaryButton}
+                      onClick={() => {
+                        if (funnel === "main") {
+                          router.push(getMainVisualizationScreenHref("upload"));
+                          return;
+                        }
+
+                        setUploadIntroDismissed(true);
+                      }}
+                    >
+                      Continue to upload
+                    </button>
+                  </div>
+                </>
+              ) : null}
+
+              {currentStep === 1 && !showUploadIntro ? (
                 <>
                   <button
                     type="button"
@@ -402,22 +522,23 @@ export default function VisualizationExperience({
                     onDrop={handleDrop}
                   >
                     <span className={styles.uploadIcon}>+</span>
-                    <strong>Upload a clear front-facing body photo</strong>
-                    <span>JPG, PNG or WEBP. Neutral pose, clean light, torso visible if possible.</span>
+                    <strong>Upload a clear shirtless front photo</strong>
+                    <span className={styles.uploadMeta}>JPG, PNG or WEBP. Neutral pose, clean light, torso visible, no shirt.</span>
+                    <span className={styles.uploadCta}>Tap to choose a photo</span>
                   </button>
 
                   <div className={styles.helperRow}>
                     <div className={styles.helperCard}>
+                      <span>Shirtless</span>
+                      <small>Your torso should be fully visible with no shirt or outer layer.</small>
+                    </div>
+                    <div className={styles.helperCard}>
                       <span>Front-facing</span>
-                      <small>Stand straight and keep your full torso visible.</small>
+                      <small>Stand straight and keep your full torso visible from the front.</small>
                     </div>
                     <div className={styles.helperCard}>
                       <span>Natural lighting</span>
-                      <small>Avoid mirrors that are too dark, blurry shots, or heavy filters.</small>
-                    </div>
-                    <div className={styles.helperCard}>
-                      <span>No pressure</span>
-                      <small>You can always change the photo before generating the preview.</small>
+                      <small>Avoid dark mirrors, blurry shots, heavy filters, or anything hiding your shape.</small>
                     </div>
                   </div>
                 </>
@@ -425,9 +546,22 @@ export default function VisualizationExperience({
 
               {currentStep === 2 ? (
                 <>
-                  <div className={styles.stageNote}>
-                    <span className={styles.stageNoteDot} />
-                    <p>Your image is loaded. If it looks good, generate the realistic preview now.</p>
+                  <div className={styles.inlinePreviewCard}>
+                    <div className={styles.singlePreviewFrame} style={previewFrameStyle}>
+                      {sourceUrl ? (
+                        <img
+                          src={sourceUrl}
+                          alt="Uploaded source preview"
+                          className={styles.previewImage}
+                          onLoad={(event) => {
+                            const { naturalWidth, naturalHeight } = event.currentTarget;
+                            if (naturalWidth > 0 && naturalHeight > 0) {
+                              setSourceImageRatio(naturalWidth / naturalHeight);
+                            }
+                          }}
+                        />
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className={styles.flowActions}>
@@ -443,115 +577,104 @@ export default function VisualizationExperience({
 
               {currentStep === 3 ? (
                 <>
-                  <div className={styles.benefitList}>
-                    <div className={styles.benefitItem}>
-                      <strong>Realistic</strong>
-                      <span>Built from your exact body photo, not a generic mockup.</span>
-                    </div>
-                    <div className={styles.benefitItem}>
-                      <strong>Actionable</strong>
-                      <span>Use this preview as the visual anchor for your protocol.</span>
-                    </div>
-                    <div className={styles.benefitItem}>
-                      <strong>Personalized</strong>
-                      <span>Unlock the analysis and plan tailored to your starting point.</span>
-                    </div>
-                  </div>
+                  {!showUnlockInfo ? (
+                    <>
+                      <div className={styles.inlinePreviewCard}>
+                        <div className={styles.compareFrame} style={compareFrameStyle}>
+                          {sourceUrl && resultUrl ? (
+                            <BeforeAfterSlider
+                              className={styles.compareSlider}
+                              subject="Potential body preview"
+                              beforeSrc={sourceUrl}
+                              afterSrc={resultUrl}
+                              beforeAlt="Current body preview"
+                              afterAlt="Potential body preview"
+                              beforePosition="50% 18%"
+                              afterPosition="50% 18%"
+                            />
+                          ) : null}
+                        </div>
+                      </div>
 
-                  <div className={styles.flowActions}>
-                    <button type="button" className={styles.secondaryButton} onClick={handleRestart}>
-                      Use another image
-                    </button>
-                    <a
-                      href={funnel === "f2" && previewId ? `/f2/landing?preview=${encodeURIComponent(previewId)}` : funnelConfig.visualizationNextHref}
-                      className={styles.primaryButton}
-                      onClick={() =>
-                        trackGa4Event("reach_potential_clicked", {
-                          funnel,
-                          step: "unlock",
-                          destination:
-                            funnel === "f2" && previewId
-                              ? `/f2/landing?preview=${encodeURIComponent(previewId)}`
-                              : funnelConfig.visualizationNextHref,
-                        })
-                      }
-                    >
-                      {funnelConfig.visualizationNextLabel}
-                    </a>
-                  </div>
+                      <div className={styles.flowActions}>
+                        <button type="button" className={styles.secondaryButton} onClick={handleRestart}>
+                          Use another image
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.primaryButton}
+                          onClick={() => {
+                            if (funnel === "main") {
+                              router.push(getMainVisualizationScreenHref("unlock-info"));
+                              return;
+                            }
+
+                            setShowNextStepIntro(true);
+                          }}
+                        >
+                          Continue
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className={styles.nextStepList}>
+                        {NEXT_STEPS.map((item, index) => (
+                          <div key={item.title} className={styles.nextStepCard}>
+                            <span className={styles.nextStepIndex}>0{index + 1}</span>
+                            <div className={styles.nextStepCopy}>
+                              <strong>{item.title}</strong>
+                              <span>{item.description}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className={`${styles.flowActions} ${styles.flowActionsUnlock}`}>
+                        <a
+                          href={funnel === "f2" && previewId ? `/f2/landing?preview=${encodeURIComponent(previewId)}` : funnelConfig.visualizationNextHref}
+                          className={styles.primaryButton}
+                          onClick={() =>
+                            trackGa4Event("reach_potential_clicked", {
+                              funnel,
+                              step: "unlock",
+                              destination:
+                                funnel === "f2" && previewId
+                                  ? `/f2/landing?preview=${encodeURIComponent(previewId)}`
+                                  : funnelConfig.visualizationNextHref,
+                            })
+                          }
+                        >
+                          {funnelConfig.visualizationNextLabel}
+                        </a>
+                        <button
+                          type="button"
+                          className={styles.secondaryButton}
+                          onClick={() => {
+                            if (funnel === "main") {
+                              router.push(getMainVisualizationScreenHref("unlock"));
+                              return;
+                            }
+
+                            setShowNextStepIntro(false);
+                          }}
+                        >
+                          Back to preview
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </>
               ) : null}
 
               {error ? <p className={styles.error}>{error}</p> : null}
             </div>
           </section>
-
-          <aside className={styles.previewPane}>
-            <div className={styles.previewCard}>
-              <p className={styles.previewEyebrow}>Live preview</p>
-              <h2 className={styles.previewTitle}>
-                {currentStep === 1 ? "What we’ll generate for you" : currentStep === 2 ? "Your uploaded photo" : "Your before and after"}
-              </h2>
-              <p className={styles.previewSubtitle}>
-                {currentStep === 1
-                  ? "A realistic transformation preview based on your exact starting point."
-                  : currentStep === 2
-                    ? "Check that the framing looks clean before generating your preview."
-                    : "Slide to compare where you are now with where you could realistically go."}
-              </p>
-
-              {currentStep === 1 ? (
-                <div className={styles.previewPlaceholder}>
-                  <div className={styles.previewPlaceholderFrame}>
-                    <span className={styles.previewPlaceholderBadge}>Before</span>
-                    <span className={styles.previewPlaceholderBadgeAlt}>After</span>
-                    <div className={styles.previewPlaceholderFigure} />
-                  </div>
-                  <div className={styles.previewChecklist}>
-                    <div><strong>Natural</strong><span>No exaggerated fake fitness edits.</span></div>
-                    <div><strong>Personalized</strong><span>Generated from your actual photo and structure.</span></div>
-                    <div><strong>Useful</strong><span>A preview that makes the next step feel tangible.</span></div>
-                  </div>
-                </div>
-              ) : null}
-
-              {currentStep === 2 ? (
-                <div className={styles.singlePreviewFrame} style={previewFrameStyle}>
-                  {sourceUrl ? (
-                    <img
-                      src={sourceUrl}
-                      alt="Uploaded source preview"
-                      className={styles.previewImage}
-                      onLoad={(event) => {
-                        const { naturalWidth, naturalHeight } = event.currentTarget;
-                        if (naturalWidth > 0 && naturalHeight > 0) {
-                          setSourceImageRatio(naturalWidth / naturalHeight);
-                        }
-                      }}
-                    />
-                  ) : null}
-                </div>
-              ) : null}
-
-              {currentStep === 3 ? (
-                <div className={styles.compareFrame} style={compareFrameStyle}>
-                  {sourceUrl && resultUrl ? (
-                    <BeforeAfterSlider
-                      className={styles.compareSlider}
-                      subject="Potential body preview"
-                      beforeSrc={sourceUrl}
-                      afterSrc={resultUrl}
-                      beforeAlt="Current body preview"
-                      afterAlt="Potential body preview"
-                      beforePosition="50% 18%"
-                      afterPosition="50% 18%"
-                    />
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-          </aside>
         </div>
+
+        <footer className={styles.footer}>
+          <span className={styles.footerCopy}>© {currentYear} Protocol. All rights reserved.</span>
+        </footer>
       </div>
     </main>
   );

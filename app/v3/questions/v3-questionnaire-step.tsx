@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { getFunnelConfig } from "../../../lib/funnels";
-import { QUESTIONS, QUESTION_COUNT } from "./questions";
+import { getV3QuestionStepHref, QUESTIONS, QUESTION_COUNT } from "./questions";
 import styles from "./v3-questionnaire-step.module.css";
 
 const STORAGE_KEY = "protocol.v3.questionnaire";
@@ -77,7 +77,7 @@ export default function V3QuestionnaireStep({ step }: { step: number }) {
       return;
     }
 
-    router.push(`/v3/questions/${step + 1}`);
+    router.push(getV3QuestionStepHref(step + 1));
   };
 
   const handleBack = () => {
@@ -86,7 +86,7 @@ export default function V3QuestionnaireStep({ step }: { step: number }) {
       return;
     }
 
-    router.push(`/v3/questions/${step - 1}`);
+    router.push(getV3QuestionStepHref(step - 1));
   };
 
   return (

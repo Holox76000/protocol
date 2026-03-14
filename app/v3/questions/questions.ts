@@ -80,3 +80,7 @@ export const QUESTIONS: Question[] = [
 ];
 
 export const QUESTION_COUNT = QUESTIONS.length;
+
+export function getV3QuestionStepHref(step: number) {
+  return `/v3/questions/${step}`;
+}

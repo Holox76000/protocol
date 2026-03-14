@@ -1,4 +1,4 @@
-import { getVisualizationStepHref } from "./visualizationFlow";
+import { getMainVisualizationScreenHref, getVisualizationStepHref } from "./visualizationFlow";
 
 export type FunnelVariant = "main" | "f2" | "v3";
 
@@ -71,9 +71,9 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   return {
     funnel: "main",
     landingHref: "/",
-    visualizationHref: getVisualizationStepHref("main", "upload"),
+    visualizationHref: getMainVisualizationScreenHref("upload-intro"),
     checkoutHref: withQuery("/checkout", "main"),
-    landingPrimaryHref: getVisualizationStepHref("main", "upload"),
+    landingPrimaryHref: getMainVisualizationScreenHref("upload-intro"),
     landingPrimaryLabel: "Start Here",
     landingSecondaryLabel: "See Your Potential",
     pricingCtaLabel: "Continue to Visualizer",

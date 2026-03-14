@@ -30,6 +30,8 @@ export function getGa4PageTitle(pagePath: string) {
   if (pathname === "/program/legal") return "Protocol | Legal";
   if (pathname === "/program/legal/privacy-policy") return "Protocol | Privacy Policy";
   if (pathname === "/program/resources") return "Protocol | Resources";
+  if (pathname === "/visualization/upload-intro") return "Protocol | Visualization | Upload Intro | Main";
+  if (pathname === "/visualization/unlock-info") return "Protocol | Visualization | Unlock Info | Main";
 
   const visualizationMatch = pathname.match(/^\/(?:(f2|v3)\/)?visualization\/(upload|preview|unlock)$/);
   if (visualizationMatch) {
