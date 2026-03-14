@@ -160,9 +160,7 @@ export async function POST(request: Request) {
     }
 
     const { image, prompt } = parsedRequest;
-    const sourceBuffer = Buffer.from(await image.arrayBuffer());
-    const base64 = sourceBuffer.toString("base64");
-    const sourceImageUrl = toDataUrl(base64, image.type);
+    const base64 = Buffer.from(await image.arrayBuffer()).toString("base64");
 
     const requestUrl = (() => {
       if (!configuredUrl) {
@@ -245,7 +243,6 @@ export async function POST(request: Request) {
       if (responseText.startsWith("data:image/") || responseText.startsWith("http")) {
         return NextResponse.json({
           imageUrl: responseText,
-          sourceImageUrl,
           previewId: crypto.randomUUID(),
         });
       }
@@ -272,14 +269,12 @@ export async function POST(request: Request) {
       const generatedImage = bufferFromImageUrl(imageUrl);
       return NextResponse.json({
         imageUrl: toDataUrl(generatedImage.buffer.toString("base64"), generatedImage.mimeType),
-        sourceImageUrl,
         previewId: crypto.randomUUID(),
       });
     }
 
     return NextResponse.json({
       imageUrl,
-      sourceImageUrl,
       previewId: crypto.randomUUID(),
     });
   } catch (error) {

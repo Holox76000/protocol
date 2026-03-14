@@ -1,0 +1,161 @@
+:root {
+  --bg: #f5f2ec;
+  --surface: #fffdfa;
+  --surface-strong: #f0ebe3;
+  --ink: #17313b;
+  --muted: #5d6f76;
+  --accent: #2b6777;
+  --accent-soft: #d9ebe8;
+  --border: rgba(23, 49, 59, 0.12);
+  --shadow: 0 18px 45px rgba(23, 49, 59, 0.08);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Instrument Sans", "Avenir Next", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(43, 103, 119, 0.12), transparent 28%),
+    linear-gradient(180deg, #fbf8f3 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+
+.page-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 80px;
+}
+
+.hero,
+.feature-band,
+.faq,
+.card {
+  background: rgba(255, 253, 250, 0.92);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.hero {
+  padding: 48px;
+  border-radius: var(--radius-lg);
+}
+
+.eyebrow,
+.section-kicker {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1,
+h2 {
+  font-family: "Ivar Text", "Canela", Georgia, serif;
+  line-height: 1.02;
+  margin: 0;
+}
+
+h1 {
+  max-width: 11ch;
+  font-size: clamp(3rem, 7vw, 5.8rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+}
+
+p,
+li {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.hero p {
+  max-width: 56ch;
+  margin: 20px 0 0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.button-primary {
+  color: white;
+  background: var(--accent);
+}
+
+.button-secondary {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+
+.trust-row,
+.steps {
+  padding-left: 18px;
+}
+
+.trust-row {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0 0;
+}
+
+.proof-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.card,
+.feature-band,
+.faq {
+  padding: 28px;
+  border-radius: var(--radius-md);
+}
+
+.feature-band,
+.faq {
+  margin-top: 22px;
+}
+
+@media (max-width: 800px) {
+  .page-shell {
+    width: min(100% - 20px, 1120px);
+    padding-top: 20px;
+  }
+
+  .hero,
+  .card,
+  .feature-band,
+  .faq {
+    padding: 22px;
+  }
+
+  .proof-grid {
+    grid-template-columns: 1fr;
+  }
+}
