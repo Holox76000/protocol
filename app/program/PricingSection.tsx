@@ -1,4 +1,6 @@
 import Image from "next/image";
+import type { FunnelVariant } from "../../lib/funnels";
+import TrackedLink from "../tracked-link";
 
 const PRICING_FEATURES = [
   {
@@ -121,7 +123,17 @@ function AssuranceIcon({ icon }: { icon: "spark" | "lock" | "shield" }) {
   );
 }
 
-export default function PricingSection({ ctaHref, ctaLabel }: { ctaHref: string; ctaLabel: string }) {
+export default function PricingSection({
+  ctaHref,
+  ctaLabel,
+  funnel,
+}: {
+  ctaHref: string;
+  ctaLabel: string;
+  funnel: FunnelVariant;
+}) {
+  const eventName = ctaHref.includes("/checkout?") ? "checkout_clicked" : "landing_cta_clicked";
+
   return (
     <section className="program-pricing" aria-labelledby="program-pricing-title">
       <div className="program-pricing__inner">
@@ -166,11 +178,21 @@ export default function PricingSection({ ctaHref, ctaLabel }: { ctaHref: string;
                 </p>
                 <div className="program-pricing__divider" />
                 <p className="program-pricing__note">No hidden fees. One-time payment.</p>
-                <a href={ctaHref} className="program-pricing__cta">
+                <TrackedLink
+                  href={ctaHref}
+                  className="program-pricing__cta"
+                  eventName={eventName}
+                  eventParams={{
+                    funnel,
+                    cta_label: ctaLabel,
+                    cta_location: "pricing_section",
+                    destination: ctaHref,
+                  }}
+                >
                   <span>{ctaLabel}</span>
                   <span className="program-pricing__cta-sep" aria-hidden="true" />
                   <ArrowIcon />
-                </a>
+                </TrackedLink>
               </div>
             </div>
 

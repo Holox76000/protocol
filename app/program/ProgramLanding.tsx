@@ -1,5 +1,6 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import TrackedLink from "../tracked-link";
 import heroBeforeImage from "../../2-before.png";
 import heroAfterImage from "../../2-after.png";
 import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
@@ -276,6 +277,33 @@ export default function ProgramLanding({
 }) {
   const funnelConfig = getFunnelConfig(funnel);
   const landingAnchorBase = funnelConfig.landingHref;
+  const primaryCtaEventName = funnelConfig.landingPrimaryHref.includes("/checkout?")
+    ? "checkout_clicked"
+    : "landing_cta_clicked";
+  const primaryCtaEventParams = {
+    funnel,
+    cta_label: funnelConfig.landingPrimaryLabel,
+    cta_location: "header",
+    destination: funnelConfig.landingPrimaryHref,
+  };
+  const heroCtaEventName = funnelConfig.landingPrimaryHref.includes("/checkout?")
+    ? "checkout_clicked"
+    : "landing_cta_clicked";
+  const heroCtaEventParams = {
+    funnel,
+    cta_label: funnelConfig.landingSecondaryLabel,
+    cta_location: "hero",
+    destination: funnelConfig.landingPrimaryHref,
+  };
+  const footerCtaEventName = funnelConfig.landingPrimaryHref.includes("/checkout?")
+    ? "checkout_clicked"
+    : "landing_cta_clicked";
+  const footerCtaEventParams = {
+    funnel,
+    cta_label: funnelConfig.footerCtaLabel,
+    cta_location: "footer",
+    destination: funnelConfig.landingPrimaryHref,
+  };
 
   return (
     <div className="program-page program-page--theme-test">
@@ -313,7 +341,14 @@ export default function ProgramLanding({
           </nav>
           <div className="program-nav__actions">
             <a href="/login" className="program-nav__login">Login</a>
-            <a href={funnelConfig.landingPrimaryHref} className="program-nav__cta">{funnelConfig.landingPrimaryLabel}</a>
+            <TrackedLink
+              href={funnelConfig.landingPrimaryHref}
+              className="program-nav__cta"
+              eventName={primaryCtaEventName}
+              eventParams={primaryCtaEventParams}
+            >
+              {funnelConfig.landingPrimaryLabel}
+            </TrackedLink>
           </div>
         </div>
       </header>
@@ -329,14 +364,19 @@ export default function ProgramLanding({
               Updated every year.
             </p>
             <div className="program-hero__actions">
-              <a href={funnelConfig.landingPrimaryHref} className="program-hero__cta">
+              <TrackedLink
+                href={funnelConfig.landingPrimaryHref}
+                className="program-hero__cta"
+                eventName={heroCtaEventName}
+                eventParams={heroCtaEventParams}
+              >
                 <span>{funnelConfig.landingSecondaryLabel}</span>
                 <span className="program-hero__cta-icon" aria-hidden="true">
                   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 14H22M22 14L14 6M22 14L14 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
-              </a>
+              </TrackedLink>
             </div>
           </div>
         </div>
@@ -377,7 +417,7 @@ export default function ProgramLanding({
       <ClientTransformationsSection />
       <NewApproachSection />
       <GaryLinkovQuoteSection />
-      <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} />
+      <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} funnel={funnel} />
       <ProtocolSection />
       <FollowersSection />
       <AestheticTestsSection />
@@ -418,16 +458,21 @@ export default function ProgramLanding({
       </section>
       <WhySection />
       <ExpertAdviceSection />
-      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} />
+      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
       <FAQSection />
       <footer className="program-footer">
         <div className="program-footer__cta">
           <div>
             <h2 className="program-footer__cta-title">Join Thousands of Men Already Escaping the Skinny-Fat Trap.</h2>
           </div>
-          <a href={funnelConfig.landingPrimaryHref} className="program-footer__cta-button">
+          <TrackedLink
+            href={funnelConfig.landingPrimaryHref}
+            className="program-footer__cta-button"
+            eventName={footerCtaEventName}
+            eventParams={footerCtaEventParams}
+          >
             {funnelConfig.footerCtaLabel}
-          </a>
+          </TrackedLink>
         </div>
 
         <div className="program-footer__main">

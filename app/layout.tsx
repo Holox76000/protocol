@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Cinzel, Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
+import Ga4RouteTracker from "./ga4-route-tracker";
 
 const displayFont = Cinzel({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-8PLVP5JKV0');`}
         </Script>
+        <Ga4RouteTracker />
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackGa4Event } from "../../../lib/ga4Event";
 import { getFunnelConfig } from "../../../lib/funnels";
 import { QUESTIONS, QUESTION_COUNT } from "./questions";
 import styles from "./v3-questionnaire-step.module.css";
@@ -32,16 +33,46 @@ export default function V3QuestionnaireStep({ step }: { step: number }) {
   );
   const progress = Math.round((step / QUESTION_COUNT) * 100);
 
+  useEffect(() => {
+    if (step === 1) {
+      trackGa4Event("questionnaire_started", {
+        funnel: "v3",
+      });
+    }
+
+    trackGa4Event("question_viewed", {
+      funnel: "v3",
+      question_number: step,
+      question_id: currentQuestion.id,
+    });
+  }, [currentQuestion.id, step]);
+
   const handleSelect = (option: string) => {
     const nextAnswers = { ...answers, [currentQuestion.id]: option };
     setAnswers(nextAnswers);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAnswers));
+    trackGa4Event("question_answered", {
+      funnel: "v3",
+      question_number: step,
+      question_id: currentQuestion.id,
+      answer_value: option,
+    });
   };
 
   const handleNext = () => {
     if (!currentAnswer) return;
 
     if (step === QUESTION_COUNT) {
+      trackGa4Event("questionnaire_completed", {
+        funnel: "v3",
+        question_count: QUESTION_COUNT,
+      });
+      trackGa4Event("checkout_clicked", {
+        funnel: "v3",
+        cta_location: "questionnaire",
+        question_number: step,
+        destination: funnelConfig.checkoutHref,
+      });
       router.push(funnelConfig.checkoutHref);
       return;
     }

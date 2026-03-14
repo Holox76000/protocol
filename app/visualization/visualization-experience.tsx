@@ -3,6 +3,7 @@
 import type { CSSProperties, ChangeEvent, DragEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackGa4Event } from "../../lib/ga4Event";
 import { clearVisualizationPreview, loadVisualizationPreview, saveVisualizationPreview } from "../../lib/visualizationPreviewClient";
 import { getVisualizationStepHref, getVisualizationStepNumber, type VisualizationStep } from "../../lib/visualizationFlow";
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
@@ -21,24 +22,6 @@ type ApiResponse =
   | {
       error?: string;
     };
-
-const PREVIEW_STORAGE_PREFIX = "protocol-preview:";
-
-function readFileAsDataUrl(file: Blob) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-        return;
-      }
-
-      reject(new Error("The selected image could not be read."));
-    };
-    reader.onerror = () => reject(new Error("The selected image could not be read."));
-    reader.readAsDataURL(file);
-  });
-}
 
 function parseMimeTypeFromDataUrl(dataUrl: string) {
   const match = dataUrl.match(/^data:(.+?);base64,/);
@@ -122,6 +105,7 @@ export default function VisualizationExperience({
   const [isLoading, setIsLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasTrackedUnlockRef = useRef(false);
 
   useEffect(() => {
     let isActive = true;
@@ -191,6 +175,23 @@ export default function VisualizationExperience({
     }
   }, [funnel, isRestoring, resultBlob, router, sourceBlob, step]);
 
+  useEffect(() => {
+    if (step !== "unlock") {
+      hasTrackedUnlockRef.current = false;
+      return;
+    }
+
+    if (isRestoring || step !== "unlock" || hasTrackedUnlockRef.current) {
+      return;
+    }
+
+    hasTrackedUnlockRef.current = true;
+    trackGa4Event("visualization_completed", {
+      funnel,
+      step,
+    });
+  }, [funnel, isRestoring, step]);
+
   const setFile = async (file: File | null) => {
     setError(null);
     setSourceImageRatio(null);
@@ -214,6 +215,11 @@ export default function VisualizationExperience({
         beforeBlob: file,
         afterBlob: null,
         previewId: null,
+      });
+      trackGa4Event("photo_uploaded", {
+        funnel,
+        step: "upload",
+        file_type: file.type,
       });
       router.push(getVisualizationStepHref(funnel, "preview"));
     } catch (nextError) {
@@ -240,6 +246,10 @@ export default function VisualizationExperience({
     setError(null);
 
     try {
+      trackGa4Event("preview_generation_started", {
+        funnel,
+        step: "preview",
+      });
       const mimeType = sourceBlob.type || "image/png";
       const formData = new FormData();
       formData.append("image", new File([sourceBlob], fileNameFromMimeType(mimeType), { type: mimeType }));
@@ -269,23 +279,19 @@ export default function VisualizationExperience({
         previewId: payload.previewId ?? null,
       });
 
-      if (payload.previewId) {
-        const beforeSrc = await readFileAsDataUrl(sourceBlob);
-        const afterSrc =
-          payload.imageUrl.startsWith("data:") ? payload.imageUrl : await readFileAsDataUrl(nextResultBlob);
-
-        window.sessionStorage.setItem(
-          `${PREVIEW_STORAGE_PREFIX}${payload.previewId}`,
-          JSON.stringify({
-            beforeSrc,
-            afterSrc,
-          })
-        );
-      }
+      trackGa4Event("preview_generation_succeeded", {
+        funnel,
+        step: "preview",
+      });
 
       router.push(getVisualizationStepHref(funnel, "unlock"));
     } catch (nextError) {
       console.error("[visualization] generation failed", nextError);
+      trackGa4Event("preview_generation_failed", {
+        funnel,
+        step: "preview",
+        error_message: nextError instanceof Error ? nextError.message : "unknown_error",
+      });
       setError(nextError instanceof Error ? nextError.message : "The visualizer failed.");
     } finally {
       setIsLoading(false);
@@ -459,6 +465,16 @@ export default function VisualizationExperience({
                     <a
                       href={funnel === "f2" && previewId ? `/f2/landing?preview=${encodeURIComponent(previewId)}` : funnelConfig.visualizationNextHref}
                       className={styles.primaryButton}
+                      onClick={() =>
+                        trackGa4Event("reach_potential_clicked", {
+                          funnel,
+                          step: "unlock",
+                          destination:
+                            funnel === "f2" && previewId
+                              ? `/f2/landing?preview=${encodeURIComponent(previewId)}`
+                              : funnelConfig.visualizationNextHref,
+                        })
+                      }
                     >
                       {funnelConfig.visualizationNextLabel}
                     </a>
