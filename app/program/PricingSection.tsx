@@ -142,7 +142,7 @@ export default function PricingSection({
           <h2 id="program-pricing-title" className="program-pricing__title">
             What personal trainers charge <span>$300/month</span> for is $19
           </h2>
-          <p className="program-pricing__subtitle">One simple payment. No hidden fees.</p>
+          <p className="program-pricing__subtitle">Summer Body Prep — one simple payment. No hidden fees.</p>
         </header>
 
         <div className="program-pricing__panel">
@@ -173,6 +173,7 @@ export default function PricingSection({
               </div>
               <div className="program-pricing__membership-bottom">
                 <p className="program-pricing__price">
+                  <span className="program-pricing__price-old">$39</span>
                   <strong>$19</strong>
                   <span>one-time</span>
                 </p>

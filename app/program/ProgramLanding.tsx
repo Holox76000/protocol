@@ -18,29 +18,39 @@ import VisualizationSection from "./VisualizationSection";
 import WhySection from "./WhySection";
 import TransformationSection from "./TransformationSection";
 import ClientTransformationsSection from "./ClientTransformationsSection";
-import TechnologySection from "./TechnologySection";
-import MoreScoresSection from "./MoreScoresSection";
-import SupportSection from "./SupportSection";
 import NoSurgerySection from "./NoSurgerySection";
 import ProtocolSection from "./ProtocolSection";
-import ExpertAdviceSection from "./ExpertAdviceSection";
 import GaryLinkovQuoteSection from "./GaryLinkovQuoteSection";
-import FollowersSection from "./FollowersSection";
-import AestheticTestsSection from "./AestheticTestsSection";
-import InformativeSection from "./InformativeSection";
-import PersonalizedSection from "./PersonalizedSection";
-import CompleteFacialAnalysisSection from "./CompleteFacialAnalysisSection";
 import FAQSection from "./FAQSection";
 import HeroComparison from "./HeroComparison";
 
 const ResearchImpactSection = dynamic(() => import("./ResearchImpactSection"), { ssr: false });
 
 const HERO_GOALS = [
-  "Finally look good shirtless",
   "Kill the skinny-fat look for good",
-  "Make a stronger first impression",
-  "Improve your dating life",
-  "Get a better salary",
+  "Get a personalized 12-week protocol",
+  "See your transformation before you start",
+];
+
+const CLIENT_TESTIMONIALS = [
+  {
+    name: "Marcus T.",
+    age: 28,
+    quote: "I was stuck at skinny-fat for 3 years. Protocol showed me exactly what was wrong and gave me a plan that actually worked. Down 14lbs of fat in 10 weeks.",
+    result: "Lost 14lbs in 10 weeks",
+  },
+  {
+    name: "Jake R.",
+    age: 31,
+    quote: "The visualization alone was worth it — seeing what I could actually look like motivated me more than any trainer ever did.",
+    result: "Visible muscle gain in 8 weeks",
+  },
+  {
+    name: "David K.",
+    age: 25,
+    quote: "Best $19 I've ever spent. The body analysis was eye-opening and the 12-week plan was exactly what I needed to stop spinning my wheels.",
+    result: "Complete recomposition in 12 weeks",
+  },
 ];
 
 const HERO_LOGOS = [
@@ -307,6 +317,9 @@ export default function ProgramLanding({
 
   return (
     <div className="program-page program-page--theme-test">
+      <div className="program-offer-bar">
+        <p>Summer Body Prep Sale — <strong>50% off</strong> your transformation plan. <span className="program-offer-bar__regular">Regular $39</span> — now <strong>$19</strong></p>
+      </div>
       <header className="program-nav">
         <div className="program-nav__inner">
           <a href={funnelConfig.landingHref} className="program-nav__logo" aria-label="Protocol home">
@@ -355,13 +368,12 @@ export default function ProgramLanding({
       <section className="program-hero" aria-labelledby="program-hero-title">
         <div className="program-hero__shell">
           <div className="program-hero__copy">
-            <p className="program-hero__eyebrow">Science-Based Body Transformation</p>
+            <p className="program-hero__eyebrow">For Men Who Are Done Being Skinny-Fat</p>
             <h1 id="program-hero-title" className="program-hero__title">
-              From Skinny Fat <span>to Athletic.</span>
+              See Your Athletic Body <span>Before You Build It.</span>
             </h1>
             <p className="program-hero__subtitle">
-              Get your personalized body analysis and transformation plan based on 2000+ academic studies.
-              Updated every year.
+              Upload a photo and preview your transformation. Get your personalized body analysis and 12-week protocol for just $19.
             </p>
             <div className="program-hero__actions">
               <TrackedLink
@@ -378,6 +390,13 @@ export default function ProgramLanding({
                 </span>
               </TrackedLink>
             </div>
+            <p className="program-hero__trust">
+              <span className="program-hero__trust-item">25,000+ men analyzed</span>
+              <span className="program-hero__trust-dot" aria-hidden="true" />
+              <span className="program-hero__trust-item">100% natural</span>
+              <span className="program-hero__trust-dot" aria-hidden="true" />
+              <span className="program-hero__trust-item">14-day money-back guarantee</span>
+            </p>
           </div>
         </div>
         <div className="program-hero__stage">
@@ -398,7 +417,8 @@ export default function ProgramLanding({
             />
           </div>
         </div>
-        <div className="program-hero__logos" aria-label="Featured in">
+        <div className="program-hero__logos">
+          <p className="program-hero__logos-label">As seen in</p>
           {HERO_LOGOS.map((logo) => (
             <div key={logo.alt} className="program-hero__logo">
               <Image src={logo.src} alt={logo.alt} width={140} height={44} />
@@ -406,24 +426,35 @@ export default function ProgramLanding({
           ))}
         </div>
       </section>
-      <ResearchImpactSection tabs={RESEARCH_TABS} />
-      <NoSurgerySection />
-      <SupportSection />
-      <MoreScoresSection />
-      <TechnologySection />
-      <VisualizationSection />
-      <StorySection />
-      <ExpertsSection />
       <ClientTransformationsSection />
+      <section className="program-testimonials" aria-label="Client testimonials">
+        <div className="program-testimonials__inner">
+          <div className="program-testimonials__grid">
+            {CLIENT_TESTIMONIALS.map((t) => (
+              <article key={t.name} className="program-testimonials__card">
+                <div className="program-testimonials__stars" aria-label="5 stars">
+                  {"★★★★★"}
+                </div>
+                <blockquote className="program-testimonials__quote">&ldquo;{t.quote}&rdquo;</blockquote>
+                <div className="program-testimonials__meta">
+                  <p className="program-testimonials__name">{t.name}, {t.age}</p>
+                  <p className="program-testimonials__result">{t.result}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      <VisualizationSection />
+      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
+      <NoSurgerySection />
       <NewApproachSection />
+      <ResearchImpactSection tabs={RESEARCH_TABS} />
+      <ExpertsSection />
       <GaryLinkovQuoteSection />
       <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} funnel={funnel} />
+      <StorySection />
       <ProtocolSection />
-      <FollowersSection />
-      <AestheticTestsSection />
-      <InformativeSection />
-      <PersonalizedSection />
-      <CompleteFacialAnalysisSection />
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">
           <header className="program-analysis__header">
@@ -433,7 +464,7 @@ export default function ProgramLanding({
             </h2>
             <p className="program-analysis__subtitle">
               Most insecurity comes from uncertainty — not knowing if your body can actually change, or if
-              you're just stuck like this. When you're guessing, your mind assumes the worst.
+              you&apos;re just stuck like this. When you&apos;re guessing, your mind assumes the worst.
             </p>
           </header>
           <div className="program-analysis__grid">
@@ -451,19 +482,27 @@ export default function ProgramLanding({
             ))}
           </div>
           <blockquote className="program-analysis__quote">
-            Think of it like getting a body composition scan from a sports scientist. The goal isn't to shame you
-            — it's to give you the exact data you need to transform.
+            Think of it like getting a body composition scan from a sports scientist. The goal isn&apos;t to shame you
+            — it&apos;s to give you the exact data you need to transform.
           </blockquote>
         </div>
       </section>
       <WhySection />
-      <ExpertAdviceSection />
-      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
       <FAQSection />
+      <div className="program-sticky-cta">
+        <TrackedLink
+          href={funnelConfig.landingPrimaryHref}
+          className="program-sticky-cta__button"
+          eventName={heroCtaEventName}
+          eventParams={{ ...heroCtaEventParams, cta_location: "sticky_mobile" }}
+        >
+          {funnelConfig.landingPrimaryLabel}
+        </TrackedLink>
+      </div>
       <footer className="program-footer">
         <div className="program-footer__cta">
           <div>
-            <h2 className="program-footer__cta-title">Join Thousands of Men Already Escaping the Skinny-Fat Trap.</h2>
+            <h2 className="program-footer__cta-title">Join 25,000+ Men Already Escaping the Skinny-Fat Trap.</h2>
           </div>
           <TrackedLink
             href={funnelConfig.landingPrimaryHref}

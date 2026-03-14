@@ -20,7 +20,7 @@ export default function GaryLinkovQuoteSection() {
           </svg>
           <h2 id="program-gary-quote-title" className="program-gary-quote__title">
             I’m thrilled by Protocol’s innovative approach to
-            <span>cosmetic care</span>
+            <span>nutrition</span>
           </h2>
           <p className="program-gary-quote__author">Dr Gary Linkov</p>
         </div>
