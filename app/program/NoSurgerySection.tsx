@@ -1,13 +1,13 @@
 import Image from "next/image";
-import caseTwoBefore from "../../2-before.png";
-import caseTwoAfter from "../../2-after.png";
+import caseFourteenBefore from "../../14-before.png";
+import caseFourteenAfter from "../../14-after.png";
 import caseEightBefore from "../../8-before.png";
 import caseEightAfter from "../../8-after.png";
 
 const NO_SURGERY_CASES = [
   {
-    before: caseTwoBefore.src,
-    after: caseTwoAfter.src,
+    before: caseFourteenBefore.src,
+    after: caseFourteenAfter.src,
     duration: "12 Weeks",
     items: [
       {

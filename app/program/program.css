@@ -1288,6 +1288,20 @@
   gap: 24px;
 }
 
+.program-nav__logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.program-nav__logo-image {
+  width: 50px;
+  height: 50px;
+  display: block;
+  object-fit: contain;
+}
+
 .program-nav__links {
   display: flex;
   justify-content: center;
@@ -2244,6 +2258,13 @@
   border-radius: 999px;
   background: #f7f9f9;
   color: #233137;
+}
+
+.program-footer__mark-image {
+  width: 62px;
+  height: 62px;
+  display: block;
+  object-fit: contain;
 }
 
 .program-footer__info-block p,
@@ -3621,24 +3642,26 @@
 
 .program-experts__inner {
   display: grid;
-  grid-template-columns: 39.2rem minmax(0, 1fr);
+  grid-template-columns: 50rem minmax(0, 1fr);
   align-items: center;
   gap: 4rem;
-  max-width: 108rem;
+  max-width: 118rem;
   margin: 0 auto;
 }
 
 .program-experts__image {
   overflow: hidden;
   border-radius: 1.2rem;
-  background: #b3bbc9;
+  background: transparent;
+  aspect-ratio: 52 / 64;
 }
 
 .program-experts__image img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   object-fit: cover;
+  object-position: 56% center;
 }
 
 .program-experts__content {
@@ -4361,7 +4384,7 @@
 }
 
 .program-no-surgery__quote-author {
-  margin: 0;
+  margin: 0 0 1.2rem;
   color: #758084;
   font-size: 1.5rem;
   line-height: 1.35;
@@ -6092,6 +6115,11 @@
 @media (max-width: 767px) {
   .program-nav__inner {
     padding: 10px 12px;
+  }
+
+  .program-nav__logo-image {
+    width: 44px;
+    height: 44px;
   }
 
   .program-nav__actions {

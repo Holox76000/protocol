@@ -89,7 +89,7 @@ export default function HeroComparison({
       subject="Man"
       beforeSrc={preview?.beforeSrc ?? defaultBeforeSrc}
       afterSrc={preview?.afterSrc ?? defaultAfterSrc}
-      beforePosition="68% 50%"
+      beforePosition="51% 50%"
       afterPosition="50% 50%"
       beforeScale={1}
       beforeTranslateX="0%"

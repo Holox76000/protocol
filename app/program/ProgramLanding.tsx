@@ -1,8 +1,8 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import TrackedLink from "../tracked-link";
-import heroBeforeImage from "../../2-before.png";
-import heroAfterImage from "../../2-after.png";
+import heroBeforeImage from "../../14-before.png";
+import heroAfterImage from "../../14-after.png";
 import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
 import bodyScanImage from "../../body-scan.png";
 import youGetClarityImage from "../../you-get-clarity.png";
@@ -323,28 +323,13 @@ export default function ProgramLanding({
       <header className="program-nav">
         <div className="program-nav__inner">
           <a href={funnelConfig.landingHref} className="program-nav__logo" aria-label="Protocol home">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <mask id="program-logo-mask">
-                  <rect width="32" height="32" fill="black" />
-                  <circle cx="14" cy="14" r="12" fill="none" stroke="white" strokeWidth="24" />
-                </mask>
-              </defs>
-              <g mask="url(#program-logo-mask)">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M9.11495 19.1086C5.42092 12.6972 5.16924 5.91332 8.55161 3.9569C11.934 1.9993 17.6708 5.61043 21.3649 12.0218C22.8785 14.65 23.8146 17.3407 24.1592 19.7356C25.2647 17.9984 25.9021 15.9571 25.9021 13.7744C25.9021 7.43368 20.5299 2.29395 13.9015 2.29395C7.27441 2.29395 1.90213 7.43368 1.90213 13.7744C1.90213 20.1139 7.27441 25.2536 13.9015 25.2536C14.0039 25.2536 14.1062 25.2524 14.2085 25.2501C12.3715 23.7604 10.5827 21.6554 9.11495 19.1086Z"
-                  fill="#233137"
-                />
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M24.1592 19.7354C22.1023 22.9658 18.4259 25.1485 14.2085 25.2499C16.9946 27.5104 19.8889 28.353 21.9282 27.1733C23.924 26.0195 24.6543 23.1838 24.1592 19.7354Z"
-                  fill="#233137"
-                />
-              </g>
-            </svg>
+            <Image
+              src="/program/static/landing/images/shared/Prtcl.png"
+              alt="Protocol"
+              width={44}
+              height={44}
+              className="program-nav__logo-image"
+            />
           </a>
           <nav className="program-nav__links" aria-label="Primary">
             <a href={`${landingAnchorBase}#why-glowup`}>Why Glow-up</a>
@@ -426,6 +411,8 @@ export default function ProgramLanding({
           ))}
         </div>
       </section>
+      <ResearchImpactSection tabs={RESEARCH_TABS} />
+      <StorySection />
       <ClientTransformationsSection />
       <section className="program-testimonials" aria-label="Client testimonials">
         <div className="program-testimonials__inner">
@@ -449,11 +436,10 @@ export default function ProgramLanding({
       <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
       <NoSurgerySection />
       <NewApproachSection />
-      <ResearchImpactSection tabs={RESEARCH_TABS} />
+      <WhySection />
       <ExpertsSection />
       <GaryLinkovQuoteSection />
       <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} funnel={funnel} />
-      <StorySection />
       <ProtocolSection />
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">
@@ -487,7 +473,6 @@ export default function ProgramLanding({
           </blockquote>
         </div>
       </section>
-      <WhySection />
       <FAQSection />
       <div className="program-sticky-cta">
         <TrackedLink
@@ -517,28 +502,13 @@ export default function ProgramLanding({
         <div className="program-footer__main">
           <div className="program-footer__brand">
             <div className="program-footer__mark" aria-hidden="true">
-              <svg width="44" height="44" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <mask id="program-footer-logo-mask">
-                    <rect width="32" height="32" fill="black" />
-                    <circle cx="14" cy="14" r="12" fill="none" stroke="white" strokeWidth="24" />
-                  </mask>
-                </defs>
-                <g mask="url(#program-footer-logo-mask)">
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M9.11495 19.1086C5.42092 12.6972 5.16924 5.91332 8.55161 3.9569C11.934 1.9993 17.6708 5.61043 21.3649 12.0218C22.8785 14.65 23.8146 17.3407 24.1592 19.7356C25.2647 17.9984 25.9021 15.9571 25.9021 13.7744C25.9021 7.43368 20.5299 2.29395 13.9015 2.29395C7.27441 2.29395 1.90213 7.43368 1.90213 13.7744C1.90213 20.1139 7.27441 25.2536 13.9015 25.2536C14.0039 25.2536 14.1062 25.2524 14.2085 25.2501C12.3715 23.7604 10.5827 21.6554 9.11495 19.1086Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M24.1592 19.7354C22.1023 22.9658 18.4259 25.1485 14.2085 25.2499C16.9946 27.5104 19.8889 28.353 21.9282 27.1733C23.924 26.0195 24.6543 23.1838 24.1592 19.7354Z"
-                    fill="currentColor"
-                  />
-                </g>
-              </svg>
+              <Image
+                src="/program/static/landing/images/shared/Prtcl.png"
+                alt=""
+                width={56}
+                height={56}
+                className="program-footer__mark-image"
+              />
             </div>
             <div className="program-footer__info-block">
               <p className="program-footer__heading">Protocol /</p>

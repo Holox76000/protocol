@@ -6,8 +6,8 @@ export default function ExpertsSection() {
       <div className="program-experts__inner">
         <div className="program-experts__image">
           <Image
-            src="/program/static/landing/images/home/experts-think/doctor.webp"
-            alt="Dr Shim Ching"
+            src="/program/static/landing/images/home/experts-think/dr-ashkenazi.png"
+            alt="Dr Sven Ashkenazi"
             width={520}
             height={640}
           />
@@ -21,11 +21,11 @@ export default function ExpertsSection() {
           </blockquote>
           <div className="program-experts__author">
             <p className="program-experts__name">
-              Dr Shim <span>Ching</span>
+              Dr Sven <span>Ashkenazi</span>
             </p>
             <p className="program-experts__bio">
-              Dr. Ching’s medical education and training placed a strong emphasis on developing the aesthetic
-              expertise needed to adopt the latest innovations.
+              Dr. Ashkenazi is known for combining aesthetic judgment with a modern, evidence-aware view of body
+              transformation and presentation.
             </p>
           </div>
         </div>
