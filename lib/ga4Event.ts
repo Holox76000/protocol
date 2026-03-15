@@ -1,4 +1,4 @@
-export type Ga4EventParams = Record<string, string | number | boolean | null | undefined>;
+export type Ga4EventParams = Record<string, unknown>;
 
 declare global {
   interface Window {

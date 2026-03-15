@@ -15,6 +15,8 @@ import {
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import styles from "./visualization.module.css";
+import introBeforeImage from "../../14-before.png";
+import introAfterImage from "../../14-after.png";
 
 const DEFAULT_PROMPT =
   "Create a realistic athletic transformation preview of this exact person. Preserve identity, face, skin tone, hair, camera angle, and lighting. Improve body composition into a natural muscular physique with broader shoulders, more upper chest, visible arms, a tighter waist, and lower body fat. Keep the result believable, proportional, and non-steroidal.";
@@ -571,11 +573,7 @@ export default function VisualizationExperience({
                       <div className={styles.introVisualInner}>
                         <div className={styles.introVisualPane}>
                           <div className={styles.introVisualFrame}>
-                            <svg className={styles.introVisualSilhouette} width="80" height="120" viewBox="0 0 80 120" fill="none" aria-hidden="true">
-                              <circle cx="40" cy="18" r="12" stroke="currentColor" strokeWidth="1.5" />
-                              <path d="M22 52C22 42.059 30.059 34 40 34C49.941 34 58 42.059 58 52V72C58 74.209 56.209 76 54 76H26C23.791 76 22 74.209 22 72V52Z" stroke="currentColor" strokeWidth="1.5" />
-                              <path d="M26 76V108C26 110.209 27.791 112 30 112H50C52.209 112 54 110.209 54 108V76" stroke="currentColor" strokeWidth="1.5" />
-                            </svg>
+                            <img src={introBeforeImage.src} alt="" className={styles.introVisualImage} />
                           </div>
                           <span className={styles.introVisualLabel}>Your photo</span>
                         </div>
@@ -586,11 +584,7 @@ export default function VisualizationExperience({
                         </div>
                         <div className={`${styles.introVisualPane} ${styles.introVisualPaneResult}`}>
                           <div className={`${styles.introVisualFrame} ${styles.introVisualFrameResult}`}>
-                            <svg className={styles.introVisualSilhouette} width="80" height="120" viewBox="0 0 80 120" fill="none" aria-hidden="true">
-                              <circle cx="40" cy="18" r="12" stroke="currentColor" strokeWidth="1.5" />
-                              <path d="M18 52C18 42.059 27.059 34 40 34C52.941 34 62 42.059 62 52V70C62 72.209 60.209 74 58 74H22C19.791 74 18 72.209 18 70V52Z" stroke="currentColor" strokeWidth="1.5" />
-                              <path d="M24 74V108C24 110.209 25.791 112 28 112H52C54.209 112 56 110.209 56 108V74" stroke="currentColor" strokeWidth="1.5" />
-                            </svg>
+                            <img src={introAfterImage.src} alt="" className={styles.introVisualImage} />
                           </div>
                           <span className={styles.introVisualLabel}>Your preview</span>
                         </div>
