@@ -64,7 +64,13 @@ async function parseApiResponse(response: Response) {
   try {
     return JSON.parse(raw) as ApiResponse;
   } catch {
-    throw new Error(response.ok ? "The visualizer returned an invalid response." : raw);
+    if (response.ok) {
+      throw new Error(`The visualizer returned an invalid response.\n\nStatus: ${response.status}`);
+    }
+
+    return {
+      error: `Visualization request failed.\n\nStatus: ${response.status}\n\nRaw response:\n${raw}`,
+    } satisfies ApiResponse;
   }
 }
 

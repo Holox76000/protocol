@@ -11,7 +11,6 @@ import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import "./program.css";
 import type { ResearchTab } from "./ResearchImpactSection";
 import NewApproachSection from "./NewApproachSection";
-import PricingSection from "./PricingSection";
 import ExpertsSection from "./ExpertsSection";
 import StorySection from "./StorySection";
 import VisualizationSection from "./VisualizationSection";
@@ -48,7 +47,7 @@ const CLIENT_TESTIMONIALS = [
   {
     name: "David K.",
     age: 25,
-    quote: "Best $19 I've ever spent. The body analysis was eye-opening and the 12-week plan was exactly what I needed to stop spinning my wheels.",
+    quote: "The body analysis was eye-opening and the 12-week plan was exactly what I needed to stop spinning my wheels.",
     result: "Complete recomposition in 12 weeks",
   },
 ];
@@ -317,9 +316,6 @@ export default function ProgramLanding({
 
   return (
     <div className="program-page program-page--theme-test">
-      <div className="program-offer-bar">
-        <p>Summer Body Prep Sale — <strong>50% off</strong> your transformation plan. <span className="program-offer-bar__regular">Regular $39</span> — now <strong>$19</strong></p>
-      </div>
       <header className="program-nav">
         <div className="program-nav__inner">
           <a href={funnelConfig.landingHref} className="program-nav__logo" aria-label="Protocol home">
@@ -358,7 +354,7 @@ export default function ProgramLanding({
               See Your Athletic Body <span>Before You Build It.</span>
             </h1>
             <p className="program-hero__subtitle">
-              Upload a photo and preview your transformation. Get your personalized body analysis and 12-week protocol for just $19.
+              Upload a photo and preview your transformation. Get your personalized body analysis and 12-week protocol.
             </p>
             <div className="program-hero__actions">
               <TrackedLink
@@ -433,7 +429,6 @@ export default function ProgramLanding({
         </div>
       </section>
       <VisualizationSection />
-      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
       <NoSurgerySection />
       <NewApproachSection />
       <WhySection />

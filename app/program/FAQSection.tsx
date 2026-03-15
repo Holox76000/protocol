@@ -55,29 +55,6 @@ const FAQ_GROUPS = [
     ],
   },
   {
-    title: "Pricing & Membership",
-    items: [
-      {
-        question: "How much does it cost?",
-        answer: "Protocol currently costs $19 as a one-time payment.",
-      },
-      {
-        question: "What’s included in the analysis?",
-        answer:
-          "You receive a body analysis, a personalized transformation protocol, biometric scores, realistic visualizations, and direct access to our team for clarification and follow-up.",
-      },
-      {
-        question: "Are the recommendations expensive?",
-        answer:
-          "Not necessarily. Some recommendations are free, some are low-cost, and some require more investment. The point is to stop wasting money on random products, useless cardio, and generic plans that do not fit your body.",
-      },
-      {
-        question: "Do I get a refund if I’m not satisfied?",
-        answer: "Yes. You can request a refund within 14 days of receiving your order.",
-      },
-    ],
-  },
-  {
     title: "Mindset",
     items: [
       {
