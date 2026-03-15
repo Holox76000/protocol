@@ -1111,6 +1111,20 @@
   padding: 3.2rem;
 }
 
+.program-login__logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.program-login__logo-image {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+}
+
 .program-login__shell {
   max-width: 144rem;
   margin: 0 auto;
@@ -1345,6 +1359,11 @@
 @media (max-width: 900px) {
   .program-login__hero {
     padding: 1.6rem;
+  }
+
+  .program-login__logo-image {
+    width: 42px;
+    height: 42px;
   }
 
   .program-login__content {

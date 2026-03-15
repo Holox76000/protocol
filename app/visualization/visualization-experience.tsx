@@ -482,24 +482,33 @@ export default function VisualizationExperience({
               {showUploadIntro ? null : isUploadPage ? (
                 <div className={styles.uploadBrandBar}>
                   <div className={styles.uploadBrandLeft}>
-                    <img src="/program/images/shared/menu/logo.svg" alt="Protocol" className={styles.introBrandLogo} />
-                    <span className={styles.introBrandName}>Protocol</span>
+                    <img
+                      src="/program/static/landing/images/shared/Prtcl.png"
+                      alt="Protocol"
+                      className={styles.introBrandLogo}
+                    />
                   </div>
                   <span className={styles.uploadStepBadge}>Step 1 of 3</span>
                 </div>
               ) : isPreviewPage ? (
                 <div className={styles.uploadBrandBar}>
                   <div className={styles.uploadBrandLeft}>
-                    <img src="/program/images/shared/menu/logo.svg" alt="Protocol" className={styles.introBrandLogo} />
-                    <span className={styles.introBrandName}>Protocol</span>
+                    <img
+                      src="/program/static/landing/images/shared/Prtcl.png"
+                      alt="Protocol"
+                      className={styles.introBrandLogo}
+                    />
                   </div>
                   <span className={styles.uploadStepBadge}>Step 2 of 3</span>
                 </div>
               ) : isUnlockPage ? (
                 <div className={styles.uploadBrandBar}>
                   <div className={styles.uploadBrandLeft}>
-                    <img src="/program/images/shared/menu/logo.svg" alt="Protocol" className={styles.introBrandLogo} />
-                    <span className={styles.introBrandName}>Protocol</span>
+                    <img
+                      src="/program/static/landing/images/shared/Prtcl.png"
+                      alt="Protocol"
+                      className={styles.introBrandLogo}
+                    />
                   </div>
                   <span className={styles.uploadStepBadge}>Step 3 of 3</span>
                 </div>
@@ -511,9 +520,11 @@ export default function VisualizationExperience({
                 <>
                   {/* ── Brand bar ── */}
                   <div className={styles.introBrandBar}>
-                    <img src="/program/images/shared/menu/logo.svg" alt="Protocol" className={styles.introBrandLogo} />
-                    <span className={styles.introBrandName}>Protocol</span>
-                    <span className={styles.introBrandDivider} />
+                    <img
+                      src="/program/static/landing/images/shared/Prtcl.png"
+                      alt="Protocol"
+                      className={styles.introBrandLogo}
+                    />
                     <span className={styles.introBrandLabel}>Body Composition Analysis</span>
                   </div>
 

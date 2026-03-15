@@ -791,7 +791,10 @@
   background: rgba(255, 243, 243, 0.94);
   color: #8b1e1e;
   font-size: 13px;
-  text-align: center;
+  line-height: 1.45;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* ==========================================================

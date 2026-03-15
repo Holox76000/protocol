@@ -6,9 +6,23 @@ import { getVisualizationPreviewStorageKey, type VisualizationPreviewPayload } f
 const DB_NAME = "protocol-visualization-preview";
 const STORE_NAME = "previews";
 const DB_VERSION = 1;
+const memoryPreviewStore = new Map<string, VisualizationPreviewPayload>();
+
+function getStorageKey(funnel: FunnelVariant) {
+  return getVisualizationPreviewStorageKey(funnel);
+}
+
+function hasIndexedDbSupport() {
+  return typeof window !== "undefined" && typeof window.indexedDB !== "undefined";
+}
 
 function openDatabase() {
   return new Promise<IDBDatabase>((resolve, reject) => {
+    if (!hasIndexedDbSupport()) {
+      reject(new Error("IndexedDB is unavailable in this browser context."));
+      return;
+    }
+
     const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = () => {
@@ -27,51 +41,93 @@ export async function saveVisualizationPreview(
   funnel: FunnelVariant,
   payload: VisualizationPreviewPayload
 ) {
-  const database = await openDatabase();
+  const storageKey = getStorageKey(funnel);
+  memoryPreviewStore.set(storageKey, payload);
 
-  await new Promise<void>((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, "readwrite");
-    const store = transaction.objectStore(STORE_NAME);
-    store.put(payload, getVisualizationPreviewStorageKey(funnel));
+  if (!hasIndexedDbSupport()) {
+    return;
+  }
 
-    transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error ?? new Error("Could not save preview data."));
-    transaction.onabort = () => reject(transaction.error ?? new Error("Could not save preview data."));
-  });
+  try {
+    const database = await openDatabase();
 
-  database.close();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      store.put(payload, storageKey);
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error ?? new Error("Could not save preview data."));
+      transaction.onabort = () => reject(transaction.error ?? new Error("Could not save preview data."));
+    });
+
+    database.close();
+  } catch (error) {
+    console.warn("[visualizationPreview] falling back to in-memory storage", error);
+  }
 }
 
 export async function loadVisualizationPreview(funnel: FunnelVariant) {
-  const database = await openDatabase();
+  const storageKey = getStorageKey(funnel);
+  const memoryPreview = memoryPreviewStore.get(storageKey) ?? null;
+  if (memoryPreview) {
+    return memoryPreview;
+  }
 
-  const preview = await new Promise<VisualizationPreviewPayload | null>((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.get(getVisualizationPreviewStorageKey(funnel));
+  if (!hasIndexedDbSupport()) {
+    return null;
+  }
 
-    request.onsuccess = () => {
-      resolve((request.result as VisualizationPreviewPayload | undefined) ?? null);
-    };
-    request.onerror = () => reject(request.error ?? new Error("Could not load preview data."));
-  });
+  try {
+    const database = await openDatabase();
 
-  database.close();
-  return preview;
+    const preview = await new Promise<VisualizationPreviewPayload | null>((resolve, reject) => {
+      const transaction = database.transaction(STORE_NAME, "readonly");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(storageKey);
+
+      request.onsuccess = () => {
+        resolve((request.result as VisualizationPreviewPayload | undefined) ?? null);
+      };
+      request.onerror = () => reject(request.error ?? new Error("Could not load preview data."));
+    });
+
+    database.close();
+
+    if (preview) {
+      memoryPreviewStore.set(storageKey, preview);
+    }
+
+    return preview;
+  } catch (error) {
+    console.warn("[visualizationPreview] could not load persisted preview", error);
+    return null;
+  }
 }
 
 export async function clearVisualizationPreview(funnel: FunnelVariant) {
-  const database = await openDatabase();
+  const storageKey = getStorageKey(funnel);
+  memoryPreviewStore.delete(storageKey);
 
-  await new Promise<void>((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, "readwrite");
-    const store = transaction.objectStore(STORE_NAME);
-    store.delete(getVisualizationPreviewStorageKey(funnel));
+  if (!hasIndexedDbSupport()) {
+    return;
+  }
 
-    transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error ?? new Error("Could not clear preview data."));
-    transaction.onabort = () => reject(transaction.error ?? new Error("Could not clear preview data."));
-  });
+  try {
+    const database = await openDatabase();
 
-  database.close();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      store.delete(storageKey);
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error ?? new Error("Could not clear preview data."));
+      transaction.onabort = () => reject(transaction.error ?? new Error("Could not clear preview data."));
+    });
+
+    database.close();
+  } catch (error) {
+    console.warn("[visualizationPreview] could not clear persisted preview", error);
+  }
 }

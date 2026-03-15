@@ -13,6 +13,22 @@ function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
+function formatUnknownError(error: unknown) {
+  if (error instanceof Error) {
+    return [error.message, error.stack].filter(Boolean).join("\n\n");
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  try {
+    return JSON.stringify(error, null, 2);
+  } catch {
+    return String(error);
+  }
+}
+
 function toDataUrl(base64: string, mimeType = "image/png") {
   return `data:${mimeType};base64,${base64}`;
 }
@@ -145,6 +161,8 @@ function extractImageUrl(payload: unknown): string | null {
 }
 
 export async function POST(request: Request) {
+  const requestId = crypto.randomUUID();
+
   try {
     const configuredUrl = process.env.NANOBANANA_API_URL;
     const apiKey = process.env.NANOBANANA_API_KEY;
@@ -226,13 +244,21 @@ export async function POST(request: Request) {
     const responseText = await upstreamResponse.text();
 
     console.log("[api/visualize] upstream response", {
+      requestId,
       status: upstreamResponse.status,
       ok: upstreamResponse.ok,
       responsePreview: responseText.slice(0, 300),
     });
 
     if (!upstreamResponse.ok) {
-      return jsonError(responseText || "Nanobanana returned an error.", upstreamResponse.status);
+      const verboseError = [
+        `Visualization request failed.`,
+        `Request ID: ${requestId}`,
+        `Status: ${upstreamResponse.status}`,
+        responseText || "Nanobanana returned an empty error response.",
+      ].join("\n\n");
+
+      return jsonError(verboseError, upstreamResponse.status);
     }
 
     let parsed: unknown = null;
@@ -247,7 +273,14 @@ export async function POST(request: Request) {
         });
       }
 
-      return jsonError("Nanobanana response could not be parsed.", 502);
+      return jsonError(
+        [
+          "Nanobanana response could not be parsed.",
+          `Request ID: ${requestId}`,
+          responseText.slice(0, 2000),
+        ].join("\n\n"),
+        502
+      );
     }
 
     const imageUrl = extractImageUrl(parsed);
@@ -262,7 +295,10 @@ export async function POST(request: Request) {
         parsed && typeof parsed === "object"
           ? JSON.stringify(parsed).slice(0, 800)
           : responseText.slice(0, 800);
-      return jsonError(`Gemini response did not contain an image. Payload: ${summary}`, 502);
+      return jsonError(
+        [`Gemini response did not contain an image.`, `Request ID: ${requestId}`, `Payload: ${summary}`].join("\n\n"),
+        502
+      );
     }
 
     if (imageUrl.startsWith("data:")) {
@@ -278,7 +314,14 @@ export async function POST(request: Request) {
       previewId: crypto.randomUUID(),
     });
   } catch (error) {
-    console.error("[api/visualize] unhandled error", error);
-    return jsonError(error instanceof Error ? error.message : "The visualizer failed on the server.", 500);
+    const verboseError = [`The visualizer failed on the server.`, `Request ID: ${requestId}`, formatUnknownError(error)].join(
+      "\n\n"
+    );
+
+    console.error("[api/visualize] unhandled error", {
+      requestId,
+      error,
+    });
+    return jsonError(verboseError, 500);
   }
 }
