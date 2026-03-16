@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getMainVisualizationScreenConfig, isMainVisualizationScreen } from "../../../lib/visualizationFlow";
+import { getMainVisualizationScreenConfig, getMainVisualizationScreenHref, isMainVisualizationScreen } from "../../../lib/visualizationFlow";
 import VisualizationExperience from "../visualization-experience";
 
 export const metadata: Metadata = {
@@ -11,6 +11,10 @@ export const metadata: Metadata = {
 export default function VisualizationStepPage({ params }: { params: { step: string } }) {
   if (!isMainVisualizationScreen(params.step)) {
     notFound();
+  }
+
+  if (params.step === "upload") {
+    redirect(getMainVisualizationScreenHref("upload-intro"));
   }
 
   const config = getMainVisualizationScreenConfig(params.step);

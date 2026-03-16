@@ -31,6 +31,10 @@ type ApiResponse =
       error?: string;
     };
 
+function getUploadEntryHref(funnel: FunnelVariant) {
+  return funnel === "main" ? getMainVisualizationScreenHref("upload-intro") : getVisualizationStepHref(funnel, "upload");
+}
+
 function parseMimeTypeFromDataUrl(dataUrl: string) {
   const match = dataUrl.match(/^data:(.+?);base64,/);
   return match?.[1] ?? "image/png";
@@ -283,12 +287,12 @@ export default function VisualizationExperience({
     if (isRestoring) return;
 
     if (step === "preview" && !sourceBlob) {
-      router.replace(getVisualizationStepHref(funnel, "upload"));
+      router.replace(getUploadEntryHref(funnel));
       return;
     }
 
     if (step === "unlock" && !resultBlob) {
-      router.replace(getVisualizationStepHref(funnel, sourceBlob ? "preview" : "upload"));
+      router.replace(sourceBlob ? getVisualizationStepHref(funnel, "preview") : getUploadEntryHref(funnel));
     }
   }, [funnel, isRestoring, resultBlob, router, sourceBlob, step]);
 
@@ -434,7 +438,7 @@ export default function VisualizationExperience({
     setPreviewId(null);
     setSourceImageRatio(null);
     await clearVisualizationPreview(funnel);
-    router.push(getVisualizationStepHref(funnel, "upload"));
+    router.push(getUploadEntryHref(funnel));
   };
 
   const openFilePicker = () => inputRef.current?.click();
@@ -453,7 +457,7 @@ export default function VisualizationExperience({
   const currentStepMeta = FLOW_STEPS[currentStep - 1];
   const showUploadIntro =
     screenMode === "uploadIntro" || (funnel !== "main" && currentStep === 1 && isMobileViewport && !uploadIntroDismissed);
-  const isUploadPage = currentStep === 1 && !showUploadIntro;
+  const isUploadPage = currentStep === 1 && (funnel === "main" || !showUploadIntro);
   const isPreviewPage = currentStep === 2;
   const isUnlockPage = currentStep === 3;
   const showUnlockInfo = screenMode === "unlockInfo" || (funnel !== "main" && showNextStepIntro);
@@ -551,7 +555,7 @@ export default function VisualizationExperience({
                           className={styles.introCtaButton}
                           onClick={() => {
                             if (funnel === "main") {
-                              router.push(getMainVisualizationScreenHref("upload"));
+                              openFilePicker();
                               return;
                             }
                             setUploadIntroDismissed(true);
