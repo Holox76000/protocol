@@ -537,18 +537,6 @@ export default function ProgramLanding({
               <a href="/program/legal/privacy-policy">Privacy Policy</a>
               <a href="/program/legal">Terms of Service</a>
             </div>
-            <div className="program-footer__column">
-              <p className="program-footer__heading">Connect /</p>
-              <a href="https://www.linkedin.com/company/qoves" target="_blank" rel="noreferrer">
-                LinkedIn
-              </a>
-              <a href="https://www.youtube.com/@QOVESStudio" target="_blank" rel="noreferrer">
-                YouTube
-              </a>
-              <a href="https://www.instagram.com/qoves" target="_blank" rel="noreferrer">
-                Instagram
-              </a>
-            </div>
           </nav>
         </div>
       </footer>
