@@ -73,7 +73,7 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
     landingHref: "/",
     visualizationHref: getMainVisualizationScreenHref("upload-intro"),
     checkoutHref: withQuery("/checkout", "main"),
-    landingPrimaryHref: withQuery("/checkout", "main"),
+    landingPrimaryHref: withQuery("/offer", "main"),
     landingPrimaryLabel: "Get My Plan — $19",
     landingSecondaryLabel: "See My Transformation — $19",
     pricingCtaLabel: "Get My Plan — $19",
