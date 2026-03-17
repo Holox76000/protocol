@@ -10,6 +10,15 @@ type HeroComparisonProps = {
   defaultBeforeSrc: string;
   defaultAfterSrc: string;
   previewId?: string;
+  subject?: string;
+  beforePosition?: string;
+  afterPosition?: string;
+  beforeScale?: number;
+  afterScale?: number;
+  beforeTranslateX?: string;
+  afterTranslateX?: string;
+  beforeTranslateY?: string;
+  afterTranslateY?: string;
 };
 
 export default function HeroComparison({
@@ -17,6 +26,15 @@ export default function HeroComparison({
   defaultBeforeSrc,
   defaultAfterSrc,
   previewId,
+  subject = "Man",
+  beforePosition = "51% 50%",
+  afterPosition = "50% 50%",
+  beforeScale = 1,
+  afterScale = 1,
+  beforeTranslateX = "0%",
+  afterTranslateX = "0%",
+  beforeTranslateY = "0%",
+  afterTranslateY = "0%",
 }: HeroComparisonProps) {
   const [preview, setPreview] = useState<{ beforeSrc: string; afterSrc: string } | null>(null);
 
@@ -86,13 +104,17 @@ export default function HeroComparison({
 
   return (
     <BeforeAfterSlider
-      subject="Man"
+      subject={subject}
       beforeSrc={preview?.beforeSrc ?? defaultBeforeSrc}
       afterSrc={preview?.afterSrc ?? defaultAfterSrc}
-      beforePosition="51% 50%"
-      afterPosition="50% 50%"
-      beforeScale={1}
-      beforeTranslateX="0%"
+      beforePosition={beforePosition}
+      afterPosition={afterPosition}
+      beforeScale={beforeScale}
+      afterScale={afterScale}
+      beforeTranslateX={beforeTranslateX}
+      afterTranslateX={afterTranslateX}
+      beforeTranslateY={beforeTranslateY}
+      afterTranslateY={afterTranslateY}
     />
   );
 }

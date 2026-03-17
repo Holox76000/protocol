@@ -355,10 +355,10 @@ export default function ProgramLanding({
           <div className="program-hero__copy">
             <p className="program-hero__eyebrow">For Men Who Are Done Being Skinny-Fat</p>
             <h1 id="program-hero-title" className="program-hero__title">
-              See Your Athletic Body <span>Before You Build It.</span>
+              Escape the Skinny-Fat Trap <span>— For Good.</span>
             </h1>
             <p className="program-hero__subtitle">
-              Upload a photo and preview your transformation. Get your personalized body analysis and 12-week protocol for just $19.
+              Get your personalized body analysis and 12-week protocol for just $19.
             </p>
             <div className="program-hero__actions">
               <TrackedLink

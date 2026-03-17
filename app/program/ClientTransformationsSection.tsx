@@ -22,7 +22,13 @@ import customAfterEighteen from "../../18-after.png";
 import customBeforeFourteen from "../../14-before.png";
 import customAfterFourteen from "../../14-after.png";
 
-const CLIENT_TRANSFORMATIONS = [
+export type ClientTransformationItem = {
+  id: string;
+  beforeSrc: string;
+  afterSrc: string;
+};
+
+const DEFAULT_CLIENT_TRANSFORMATIONS: ClientTransformationItem[] = [
   {
     id: "custom-1",
     beforeSrc: customBeforeOne.src,
@@ -80,7 +86,11 @@ const CLIENT_TRANSFORMATIONS = [
   },
 ];
 
-export default function ClientTransformationsSection() {
+export default function ClientTransformationsSection({
+  items = DEFAULT_CLIENT_TRANSFORMATIONS,
+}: {
+  items?: ClientTransformationItem[];
+}) {
   return (
     <section className="program-social-proof" aria-labelledby="program-social-proof-title">
       <div className="program-social-proof__inner">
@@ -98,7 +108,7 @@ export default function ClientTransformationsSection() {
         </header>
 
         <div className="program-social-proof__grid">
-          {CLIENT_TRANSFORMATIONS.map((item) => (
+          {items.map((item) => (
             <article key={item.id} className="program-social-proof__card">
               <div className="program-social-proof__pair">
                 <div className="program-social-proof__image-wrap">

@@ -1,6 +1,6 @@
 import { getMainVisualizationScreenHref, getVisualizationStepHref } from "./visualizationFlow";
 
-export type FunnelVariant = "main" | "f2" | "v3";
+export type FunnelVariant = "main" | "f2" | "v3" | "woman";
 
 type FunnelConfig = {
   funnel: FunnelVariant;
@@ -65,6 +65,27 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
       visualizationNextLabel: "Continue to questionnaire",
       visualizationNextTitle: "Next step: answer a few questions",
       visualizationNextDescription: "Complete a short questionnaire so we can frame your transformation plan before checkout.",
+    };
+  }
+
+  if (funnel === "woman") {
+    const checkoutHref = withQuery("/checkout", funnel);
+
+    return {
+      funnel,
+      landingHref: "/woman",
+      visualizationHref: withQuery("/woman/offer", funnel),
+      checkoutHref,
+      landingPrimaryHref: withQuery("/woman/offer", funnel),
+      landingPrimaryLabel: "Get My Plan — $19",
+      landingSecondaryLabel: "See My Transformation — $19",
+      pricingCtaLabel: "Get My Plan — $19",
+      transformationCtaLabel: "Start Now — $19",
+      footerCtaLabel: "Get My Plan — $19",
+      visualizationNextHref: checkoutHref,
+      visualizationNextLabel: "Continue to checkout",
+      visualizationNextTitle: "Next step: claim your transformation plan",
+      visualizationNextDescription: "Your personalized women’s body analysis and transformation protocol are ready to unlock.",
     };
   }
 

@@ -8,6 +8,7 @@ function getFunnelLabel(funnel?: string | null) {
   if (!funnel || funnel === "main") return "Main";
   if (funnel === "v2" || funnel === "f2") return "V2";
   if (funnel === "v3") return "V3";
+  if (funnel === "woman") return "Women";
   return funnel.toUpperCase();
 }
 
@@ -17,6 +18,8 @@ export function getGa4PageTitle(pagePath: string) {
   const funnel = getFunnelLabel(params.get("funnel"));
 
   if (pathname === "/") return "Protocol | Landing | Main";
+  if (pathname === "/woman") return "Protocol | Landing | Women";
+  if (pathname === "/woman/offer") return "Protocol | Offer | Women";
   if (pathname === "/program") return "Protocol | Landing | Main";
   if (pathname === "/f2") return "Protocol | Funnel Entry | V2";
   if (pathname === "/v3") return "Protocol | Funnel Entry | V3";

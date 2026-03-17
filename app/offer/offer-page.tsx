@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TrackedLink from "../tracked-link";
 import { getFunnelConfig } from "../../lib/funnels";
+import { trackGa4Event } from "../../lib/ga4Event";
 import styles from "../visualization/visualization.module.css";
 
 const VALUE_ITEMS = [
@@ -67,6 +68,14 @@ export default function OfferPage() {
   const funnelConfig = getFunnelConfig("main");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    trackGa4Event("view_offer", {
+      funnel: "main",
+      offer_variant: "main",
+      page_path: "/offer",
+    });
+  }, []);
 
   return (
     <main className={styles.page}>
