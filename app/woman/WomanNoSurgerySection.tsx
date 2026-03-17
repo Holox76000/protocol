@@ -1,11 +1,13 @@
 import Image from "next/image";
-import caseEightBefore from "../../8-before.png";
-import caseEightAfter from "../../8-after.png";
+import womanOneBeforeImage from "../../woman-1-before.png";
+import womanOneAfterImage from "../../woman-1-after.png";
+import womanTwoBeforeImage from "../../woman-2-before.png";
+import womanTwoAfterImage from "../../woman-2-after.png";
 
 const CASES = [
   {
-    before: "/program/static/landing/images/home/no-surgery/woman-before.webp",
-    after: "/program/static/landing/images/home/no-surgery/woman-after.webp",
+    before: womanOneBeforeImage.src,
+    after: womanOneAfterImage.src,
     duration: "12 Weeks",
     items: [
       {
@@ -23,8 +25,8 @@ const CASES = [
     ],
   },
   {
-    before: caseEightBefore.src,
-    after: caseEightAfter.src,
+    before: womanTwoBeforeImage.src,
+    after: womanTwoAfterImage.src,
     duration: "6 Months",
     items: [
       {

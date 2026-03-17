@@ -8,8 +8,7 @@ import womanOneBeforeImage from "../../woman-1-before.png";
 import womanOneAfterImage from "../../woman-1-after.png";
 import womanTwoBeforeImage from "../../woman-2-before.png";
 import womanTwoAfterImage from "../../woman-2-after.png";
-import caseEightBeforeImage from "../../8-before.png";
-import caseEightAfterImage from "../../8-after.png";
+import womanInterfaceImage from "../../woman-interface.png";
 import { getFunnelConfig } from "../../lib/funnels";
 import "../program/program.css";
 import type { ResearchTab } from "../program/ResearchImpactSection";
@@ -105,11 +104,6 @@ const WOMAN_CLIENT_TRANSFORMATIONS: ClientTransformationItem[] = [
     id: "woman-2",
     beforeSrc: womanTwoBeforeImage.src,
     afterSrc: womanTwoAfterImage.src,
-  },
-  {
-    id: "custom-8",
-    beforeSrc: caseEightBeforeImage.src,
-    afterSrc: caseEightAfterImage.src,
   },
 ];
 
@@ -375,7 +369,7 @@ export default function WomanLanding() {
       <ExpertsSection />
       <GaryLinkovQuoteSection />
       <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} funnel={funnel} />
-      <ProtocolSection />
+      <ProtocolSection interfaceSrc={womanInterfaceImage} />
 
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">

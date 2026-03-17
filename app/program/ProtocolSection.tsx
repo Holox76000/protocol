@@ -8,7 +8,13 @@ const PROTOCOL_FEATURES = [
   "Ask any questions directly to your transformation team via chat",
 ];
 
-export default function ProtocolSection() {
+export default function ProtocolSection({
+  interfaceSrc = interfaceImage,
+}: {
+  interfaceSrc?: string | { src: string };
+}) {
+  const resolvedInterfaceSrc = typeof interfaceSrc === "string" ? interfaceSrc : interfaceSrc.src;
+
   return (
     <section className="program-protocol" aria-labelledby="program-protocol-title">
       <div className="program-protocol__inner">
@@ -27,7 +33,7 @@ export default function ProtocolSection() {
         <div className="program-protocol__canvas">
           <div className="program-protocol__main-frame">
             <Image
-              src={interfaceImage}
+              src={resolvedInterfaceSrc}
               alt="Protocol dashboard"
               fill
               sizes="(max-width: 767px) 100vw, 92vw"
