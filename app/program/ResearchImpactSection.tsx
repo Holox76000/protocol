@@ -15,15 +15,9 @@ export type ResearchTab = {
 
 type ResearchImpactSectionProps = {
   tabs: ResearchTab[];
-  titleHtml?: string;
-  subtitle?: string;
 };
 
-export default function ResearchImpactSection({
-  tabs,
-  titleHtml = "Your Body Composition Impacts <strong>Your Life More Than You Think</strong>",
-  subtitle = "Research consistently shows that men with a lean, athletic build earn more, attract more, and are perceived as more capable. Below is a detailed collection of studies.",
-}: ResearchImpactSectionProps) {
+export default function ResearchImpactSection({ tabs }: ResearchImpactSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const activeTab = useMemo(() => tabs[activeIndex] ?? tabs[0], [tabs, activeIndex]);
@@ -37,12 +31,13 @@ export default function ResearchImpactSection({
       <div className="program-research__inner">
         <header className="program-research__header">
           <p className="program-research__eyebrow">Research</p>
-          <h2
-            id="program-research-title"
-            className="program-research__title"
-            dangerouslySetInnerHTML={{ __html: titleHtml }}
-          />
-          <p className="program-research__subtitle">{subtitle}</p>
+          <h2 id="program-research-title" className="program-research__title">
+            Your Body Composition Impacts <strong>Your Life More Than You Think</strong>
+          </h2>
+          <p className="program-research__subtitle">
+            Research consistently shows that men with a lean, athletic build earn more, attract more, and are
+            perceived as more capable. Below is a detailed collection of studies.
+          </p>
         </header>
 
         <div className="program-research__tabs" aria-label="Research categories">

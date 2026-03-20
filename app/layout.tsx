@@ -2,7 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Cinzel, Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
-import Ga4RouteTracker from "./ga4-route-tracker";
 
 const displayFont = Cinzel({
   subsets: ["latin"],
@@ -25,17 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="font-body text-ink bg-ash">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-8PLVP5JKV0"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-8PLVP5JKV0');`}
-        </Script>
-        <Ga4RouteTracker />
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

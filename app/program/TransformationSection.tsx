@@ -1,6 +1,3 @@
-import type { FunnelVariant } from "../../lib/funnels";
-import TrackedLink from "../tracked-link";
-
 const TRANSFORMATION_STEPS = [
   { number: "1", label: ["Answer Questions", "About Your Body"] },
   { number: "2", label: ["Upload Front & Side", "Photos"] },
@@ -8,17 +5,7 @@ const TRANSFORMATION_STEPS = [
   { number: "4", label: ["Start Your 12-Week", "Recomposition"] },
 ];
 
-export default function TransformationSection({
-  ctaHref,
-  ctaLabel,
-  funnel,
-}: {
-  ctaHref: string;
-  ctaLabel: string;
-  funnel: FunnelVariant;
-}) {
-  const eventName = ctaHref.includes("/checkout?") ? "checkout_clicked" : "landing_cta_clicked";
-
+export default function TransformationSection() {
   return (
     <section className="program-transformation" aria-labelledby="program-transformation-title">
       <div className="program-transformation__inner">
@@ -29,18 +16,8 @@ export default function TransformationSection({
                 Get Your $19 <span>Body Analysis Today</span>
               </h2>
             </div>
-            <TrackedLink
-              href={ctaHref}
-              className="program-transformation__cta"
-              eventName={eventName}
-              eventParams={{
-                funnel,
-                cta_label: ctaLabel,
-                cta_location: "transformation_section",
-                destination: ctaHref,
-              }}
-            >
-              <span>{ctaLabel}</span>
+            <a href="/welcome/checkout" className="program-transformation__cta">
+              <span>Start Your Glow-Up</span>
               <span className="program-transformation__cta-separator" aria-hidden="true" />
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
@@ -51,7 +28,7 @@ export default function TransformationSection({
                   strokeLinejoin="round"
                 />
               </svg>
-            </TrackedLink>
+            </a>
           </div>
           <div className="program-transformation__steps" aria-label="Transformation steps">
             {TRANSFORMATION_STEPS.map((step, index) => (

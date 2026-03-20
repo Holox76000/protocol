@@ -12,6 +12,7 @@ type LeadPayload = {
   segment?: string;
   blocker?: string;
   userAgent?: string;
+  mode?: "create" | "merge";
 };
 
 export async function POST(request: Request) {
@@ -29,14 +30,68 @@ export async function POST(request: Request) {
   };
 
   const createdAt = new Date().toISOString();
-  const { error } = await supabaseAdmin.from("leads").insert({
-    email,
-    payload,
-    created_at: createdAt
-  });
-  if (error) {
-    console.error("[lead] db error", error);
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  if (body.mode === "merge") {
+    const { data: existingRows, error: selectError } = await supabaseAdmin
+      .from("leads")
+      .select("payload")
+      .eq("email", email)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (selectError) {
+      console.error("[lead] db select error", selectError);
+      return NextResponse.json({ ok: false, error: selectError.message }, { status: 500 });
+    }
+
+    const existing = existingRows?.[0]?.payload as LeadPayload | undefined;
+    const mergedPayload: LeadPayload = {
+      ...existing,
+      ...payload,
+      email,
+      answers: {
+        ...(existing?.answers ?? {}),
+        ...(payload.answers ?? {}),
+      },
+      utm: {
+        ...(existing?.utm ?? {}),
+        ...(payload.utm ?? {}),
+      },
+    };
+
+    if (existingRows && existingRows.length > 0) {
+      const { error: updateError } = await supabaseAdmin
+        .from("leads")
+        .update({
+          payload: mergedPayload,
+        })
+        .eq("email", email);
+
+      if (updateError) {
+        console.error("[lead] db update error", updateError);
+        return NextResponse.json({ ok: false, error: updateError.message }, { status: 500 });
+      }
+    } else {
+      const { error: insertError } = await supabaseAdmin.from("leads").insert({
+        email,
+        payload: mergedPayload,
+        created_at: createdAt
+      });
+
+      if (insertError) {
+        console.error("[lead] db insert error", insertError);
+        return NextResponse.json({ ok: false, error: insertError.message }, { status: 500 });
+      }
+    }
+  } else {
+    const { error } = await supabaseAdmin.from("leads").insert({
+      email,
+      payload,
+      created_at: createdAt
+    });
+    if (error) {
+      console.error("[lead] db error", error);
+      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    }
   }
   console.log("[lead]", payload);
 

@@ -1,26 +1,24 @@
 import Image from "next/image";
-import type { FunnelVariant } from "../../lib/funnels";
-import TrackedLink from "../tracked-link";
 
 const PRICING_FEATURES = [
   {
     title: "Complete body composition analysis",
-    description: "Get an in-depth breakdown of your body composition, proportions, and weak points.",
+    description: "Get an in-depth breakdown of your facial structure and features.",
     featured: false,
   },
   {
     title: "Personalized 12-week recomposition protocol",
-    description: "Receive a step-by-step plan on how to improve your body aesthetics.",
+    description: "Receive a step-by-step plan on how to improve your facial aesthetics.",
     featured: true,
   },
   {
     title: "Body metrics scores and progress tracking",
-    description: "Understand your current body metrics and track your progress over time.",
+    description: "Understand your current facial biometric scores and track your progress over time.",
     featured: false,
   },
   {
     title: "Before-and-after visualization of your transformation target",
-    description: "See what your body could accurately look like after your transformation.",
+    description: "See what your face could accurately look like after your glow-up.",
     featured: false,
   },
   {
@@ -123,17 +121,7 @@ function AssuranceIcon({ icon }: { icon: "spark" | "lock" | "shield" }) {
   );
 }
 
-export default function PricingSection({
-  ctaHref,
-  ctaLabel,
-  funnel,
-}: {
-  ctaHref: string;
-  ctaLabel: string;
-  funnel: FunnelVariant;
-}) {
-  const eventName = ctaHref.includes("/checkout?") ? "checkout_clicked" : "landing_cta_clicked";
-
+export default function PricingSection() {
   return (
     <section className="program-pricing" aria-labelledby="program-pricing-title">
       <div className="program-pricing__inner">
@@ -142,7 +130,7 @@ export default function PricingSection({
           <h2 id="program-pricing-title" className="program-pricing__title">
             What personal trainers charge <span>$300/month</span> for is $19
           </h2>
-          <p className="program-pricing__subtitle">Summer Body Prep — one simple payment. No hidden fees.</p>
+          <p className="program-pricing__subtitle">One simple payment. No hidden fees.</p>
         </header>
 
         <div className="program-pricing__panel">
@@ -173,27 +161,16 @@ export default function PricingSection({
               </div>
               <div className="program-pricing__membership-bottom">
                 <p className="program-pricing__price">
-                  <span className="program-pricing__price-old">$39</span>
                   <strong>$19</strong>
                   <span>one-time</span>
                 </p>
                 <div className="program-pricing__divider" />
                 <p className="program-pricing__note">No hidden fees. One-time payment.</p>
-                <TrackedLink
-                  href={ctaHref}
-                  className="program-pricing__cta"
-                  eventName={eventName}
-                  eventParams={{
-                    funnel,
-                    cta_label: ctaLabel,
-                    cta_location: "pricing_section",
-                    destination: ctaHref,
-                  }}
-                >
-                  <span>{ctaLabel}</span>
+                <a href="/welcome/checkout" className="program-pricing__cta">
+                  <span>Get Access</span>
                   <span className="program-pricing__cta-sep" aria-hidden="true" />
                   <ArrowIcon />
-                </TrackedLink>
+                </a>
               </div>
             </div>
 

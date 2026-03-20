@@ -13,7 +13,6 @@ import { getFunnelConfig } from "../../lib/funnels";
 import "../program/program.css";
 import type { ResearchTab } from "../program/ResearchImpactSection";
 import type { ClientTransformationItem } from "../program/ClientTransformationsSection";
-import PricingSection from "../program/PricingSection";
 import ExpertsSection from "../program/ExpertsSection";
 import NewApproachSection from "../program/NewApproachSection";
 import ClientTransformationsSection from "../program/ClientTransformationsSection";
@@ -54,7 +53,7 @@ const CLIENT_TESTIMONIALS = [
     name: "Chloe D.",
     age: 27,
     quote:
-      "Best $19 I’ve spent on my body. The analysis explained exactly what to focus on instead of sending me into another cycle of random workouts.",
+      "The analysis explained exactly what to focus on instead of sending me into another cycle of random workouts.",
     result: "Full-body recomposition in 12 weeks",
   },
 ];
@@ -230,12 +229,6 @@ export default function WomanLanding() {
 
   return (
     <div className="program-page program-page--theme-test">
-      <div className="program-offer-bar">
-        <p>
-          Spring Sculpt Offer — <strong>50% off</strong> your transformation plan.{" "}
-          <span className="program-offer-bar__regular">Regular $39</span> — now <strong>$19</strong>
-        </p>
-      </div>
       <header className="program-nav">
         <div className="program-nav__inner">
           <a href={funnelConfig.landingHref} className="program-nav__logo" aria-label="Protocol women home">
@@ -250,7 +243,6 @@ export default function WomanLanding() {
           <nav className="program-nav__links" aria-label="Primary">
             <a href={`${landingAnchorBase}#why-glowup`}>Why transform</a>
             <a href={`${landingAnchorBase}#how-it-works`}>How it works</a>
-            <a href={funnelConfig.landingPrimaryHref}>Offer</a>
             <a href={`${landingAnchorBase}#faq`}>FAQ</a>
           </nav>
           <div className="program-nav__actions">
@@ -275,7 +267,7 @@ export default function WomanLanding() {
               Stop Looking “Soft” <span>— Get Lean and Toned.</span>
             </h1>
             <p className="program-hero__subtitle">
-              Upload a photo and preview your transformation. Get your personalized body analysis and 12-week protocol for just $19.
+              Get your personalized body analysis and 12-week protocol.
             </p>
             <div className="program-hero__actions">
               <TrackedLink
@@ -296,8 +288,6 @@ export default function WomanLanding() {
               <span className="program-hero__trust-item">25,000+ women analyzed</span>
               <span className="program-hero__trust-dot" aria-hidden="true" />
               <span className="program-hero__trust-item">100% natural</span>
-              <span className="program-hero__trust-dot" aria-hidden="true" />
-              <span className="program-hero__trust-item">14-day money-back guarantee</span>
             </p>
           </div>
         </div>
@@ -362,7 +352,6 @@ export default function WomanLanding() {
       </section>
 
       <WomanVisualizationSection />
-      <PricingSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.pricingCtaLabel} funnel={funnel} />
       <WomanNoSurgerySection />
       <NewApproachSection />
       <WomanWhySection />
@@ -460,7 +449,6 @@ export default function WomanLanding() {
             <div className="program-footer__column">
               <p className="program-footer__heading">Company /</p>
               <a href={funnelConfig.landingHref}>Products</a>
-              <a href={funnelConfig.landingPrimaryHref}>Offer</a>
               <a href="/program/resources">Research</a>
               <a href="/program/contact-us.html">Contact Us</a>
               <a href="/program/for-doctors.html">Protocol for Clinics</a>

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Medical SaaS UI"
-  short_description: "UI medicale premium et conversion"
-  default_prompt: "Use $medical-saas-ui to design a premium, conversion-focused medical or wellness SaaS interface."

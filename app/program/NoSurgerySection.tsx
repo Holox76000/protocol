@@ -1,13 +1,9 @@
 import Image from "next/image";
-import caseFourteenBefore from "../../14-before.png";
-import caseFourteenAfter from "../../14-after.png";
-import caseEightBefore from "../../8-before.png";
-import caseEightAfter from "../../8-after.png";
 
 const NO_SURGERY_CASES = [
   {
-    before: caseFourteenBefore.src,
-    after: caseFourteenAfter.src,
+    before: "/program/static/landing/images/home/no-surgery/man-before.webp",
+    after: "/program/static/landing/images/home/no-surgery/man-after.webp",
     duration: "12 Weeks",
     items: [
       {
@@ -26,23 +22,23 @@ const NO_SURGERY_CASES = [
     ],
   },
   {
-    before: caseEightBefore.src,
-    after: caseEightAfter.src,
+    before: "/program/static/landing/images/home/no-surgery/woman-before.webp",
+    after: "/program/static/landing/images/home/no-surgery/woman-after.webp",
     duration: "6 Months",
     items: [
       {
-        title: "Glute growth protocol",
+        title: "Lifted eye area (non-surgical)",
         description:
-          "Lower-body training and progressive overload designed to build fuller glutes and create a more athletic silhouette.",
+          "Winged eyeliner and L-curl lash extensions for a more cat-like, upturned, and feminine-looking eye area.",
       },
       {
-        title: "Waist tightening strategy",
-        description: "Nutrition and training adjustments to reduce softness around the waist and improve overall proportions.",
+        title: "Thicker and darker eyebrows",
+        description: "to enhance eyebrow density and create a more modelesque appearance.",
       },
       {
-        title: "Leg shaping protocol",
+        title: "Feminized lip aesthetic",
         description:
-          "Targeted lower-body work to build more defined legs and create a balanced, toned look.",
+          "A lip plumper with lipstick applied to reshape the oral commissures upward and enhance cupid’s bow definition.",
       },
     ],
   },
@@ -128,7 +124,7 @@ export default function NoSurgerySection() {
             <div className="program-no-surgery__quote-copy">
               <p className="program-no-surgery__quote-mark" aria-hidden="true">“</p>
               <p className="program-no-surgery__quote-text">
-                Protocol is disruptive and eliminates so much of the bluster in the aesthetics space.
+                Qoves is disruptive and eliminates so much of the bluster in the aesthetics space.
               </p>
               <p className="program-no-surgery__quote-author">Jonathan Zelken, MD</p>
             </div>

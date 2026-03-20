@@ -1,22 +1,19 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import visualizationBeforeImage from "../../7-before.png";
-import visualizationAfterImage from "../../7-after.png";
-import realisticVisualisationImage from "../../realistic-visualisation.png";
-import visualizeYourResultsImage from "../../visualize-your-results.png";
-import withoutSteroidsImage from "../../without-steroids.png";
+import visualizationBeforeImage from "../../1-before.png";
+import visualizationAfterImage from "../../1-after.png";
 
 const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
 
 const VISUALIZATION_CARDS = [
   {
-    image: realisticVisualisationImage,
+    image: "/program/static/landing/images/home/visualization/image-1.webp",
     title: "Realistic Visualisation",
     description:
       "Our technology gives you a realistic preview of what your body looks like after your 12-week transformation.",
   },
   {
-    image: withoutSteroidsImage,
+    image: "/program/static/landing/images/home/visualization/image-2.webp",
     title: "Achievable Without Steroids",
     description: "Every transformation we showcase is 100% natural and achievable.",
   },
@@ -27,7 +24,7 @@ const VISUALIZATION_CARDS = [
       "We account for your specific skinny-fat phenotype, rejecting one-size-fits-all programs.",
   },
   {
-    image: visualizeYourResultsImage,
+    image: "/program/static/landing/images/home/visualization/image-4.webp",
     title: "Visualize Your Results Before You Start",
     description: "It's like seeing the finish line before the race.",
   },

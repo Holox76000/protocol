@@ -1,5 +1,4 @@
 import Image from "next/image";
-import interfaceImage from "../../interface.png";
 
 const PROTOCOL_FEATURES = [
   "Full breakdown of what to train, eat, and supplement — specific to your body",
@@ -8,13 +7,7 @@ const PROTOCOL_FEATURES = [
   "Ask any questions directly to your transformation team via chat",
 ];
 
-export default function ProtocolSection({
-  interfaceSrc = interfaceImage,
-}: {
-  interfaceSrc?: string | { src: string };
-}) {
-  const resolvedInterfaceSrc = typeof interfaceSrc === "string" ? interfaceSrc : interfaceSrc.src;
-
+export default function ProtocolSection() {
   return (
     <section className="program-protocol" aria-labelledby="program-protocol-title">
       <div className="program-protocol__inner">
@@ -33,10 +26,34 @@ export default function ProtocolSection({
         <div className="program-protocol__canvas">
           <div className="program-protocol__main-frame">
             <Image
-              src={resolvedInterfaceSrc}
-              alt="Protocol dashboard"
+              src="/program/static/landing/images/home/transformation-protocol/main-frame.webp"
+              alt="Qoves protocol dashboard"
               fill
               sizes="(max-width: 767px) 100vw, 92vw"
+            />
+          </div>
+          <div className="program-protocol__floating program-protocol__floating--predictions">
+            <Image
+              src="/program/static/landing/images/home/transformation-protocol/predictions.webp"
+              alt="Predictions panel"
+              fill
+              sizes="(max-width: 767px) 44vw, 24vw"
+            />
+          </div>
+          <div className="program-protocol__floating program-protocol__floating--steps">
+            <Image
+              src="/program/static/landing/images/home/transformation-protocol/steps.webp"
+              alt="Steps panel"
+              fill
+              sizes="(max-width: 767px) 44vw, 22vw"
+            />
+          </div>
+          <div className="program-protocol__floating program-protocol__floating--recommended">
+            <Image
+              src="/program/static/landing/images/home/transformation-protocol/recommended.webp"
+              alt="Recommended products panel"
+              fill
+              sizes="(max-width: 767px) 44vw, 22vw"
             />
           </div>
         </div>

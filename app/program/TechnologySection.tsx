@@ -1,6 +1,4 @@
 import Image from "next/image";
-import analysisCardImage from "../../analysis-card.png";
-import technologyCard3Image from "../../technology-card3.png";
 
 const TECHNOLOGY_CARDS = [
   {
@@ -21,16 +19,15 @@ const TECHNOLOGY_CARDS = [
     title: "Evidence-Based Approach",
     description:
       "We use measurable body composition data and peer-reviewed research — not Instagram bro-science.",
-    image: technologyCard3Image,
+    image: "/program/images/home/the-technology/the-science-of-facial-attractiveness.png",
     imagePosition: "center center",
   },
   {
     title: "The Science of Male Physique",
     description:
       "Our database analyzes body composition science across thousands of cases to find what works for your specific body type.",
-    image: analysisCardImage,
-    imagePosition: "center center",
-    cardClassName: "program-tech__card--science-physique",
+    image: "/program/images/home/the-technology/reviewed-by-real-doctors.png",
+    imagePosition: "center top",
   },
 ];
 
@@ -53,7 +50,7 @@ export default function TechnologySection() {
 
         <div className="program-tech__grid">
           {TECHNOLOGY_CARDS.map((card) => (
-            <article key={card.title} className={`program-tech__card ${card.cardClassName ?? ""}`.trim()}>
+            <article key={card.title} className="program-tech__card">
               <div className="program-tech__image">
                 <Image
                   src={card.image}
