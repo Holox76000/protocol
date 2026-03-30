@@ -596,6 +596,12 @@
   }
 }
 
+#faq,
+#faq.FAQ_element__VnT0n,
+.FAQ_element__VnT0n {
+  background: transparent !important;
+}
+
 #faq .FAQ_collapsibles__S8uuo {
   display: block !important;
   background: transparent !important;
@@ -605,19 +611,25 @@
 #faq .FAQ_collapsibles__S8uuo > .qf-root {
   width: 100%;
   min-width: 0;
+  background: transparent !important;
 }
 
 .qf-root {
   display: grid;
-  gap: 14px;
+  gap: 0;
   width: 100%;
+  background: transparent !important;
 }
 
 .qf-group {
   border: 1px solid #d7e1e5;
   border-radius: 20px;
-  background: #fff;
+  background: transparent;
   overflow: hidden;
+}
+
+.qf-group + .qf-group {
+  margin-top: 14px;
 }
 
 .qf-group-button,
@@ -644,33 +656,35 @@
 .qf-group-panel {
   display: none;
   border-top: 1px solid #e5ecef;
-  background: #f9fbfc;
-  padding: 8px 14px 14px;
+  background: transparent;
+  padding: 0;
   width: 100%;
 }
 
 .qf-item {
-  background: #fff;
-  border: 1px solid #e0e8ec;
-  border-radius: 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
 }
 
 .qf-item + .qf-item {
-  margin-top: 8px;
+  margin-top: 0;
+  border-top: 1px solid #e0e8ec;
 }
 
 .qf-item-button {
   font-size: 15px;
   line-height: 1.45;
   font-weight: 500;
-  padding: 14px 16px;
+  padding: 14px 0;
 }
 
 .qf-item-panel {
   display: none;
   border-top: 1px solid #eef3f5;
-  padding: 0 16px 16px;
+  background: transparent;
+  padding: 0 0 16px;
 }
 
 .qf-icon {

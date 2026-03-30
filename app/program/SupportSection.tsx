@@ -1,4 +1,6 @@
 import Image from "next/image";
+import closingNoteImage from "../../closing-note.png";
+import protocolChatImage from "../../protocol-tchat.png";
 
 const SUPPORT_CARDS = [
   {
@@ -6,7 +8,7 @@ const SUPPORT_CARDS = [
     description:
       "You'll have direct access to our team—just open the chat on your dashboard for concerns, questions, or clarification.",
     background: "/program/static/landing/images/home/support-system/bg-1.webp",
-    image: "/program/static/landing/images/home/support-system/image-1.webp",
+    image: protocolChatImage,
     imageFit: "contain" as const,
   },
   {
@@ -14,7 +16,7 @@ const SUPPORT_CARDS = [
     description:
       "You'll get an aesthetic letter detailing your protocol, progress observations, and recommendations, all with scientific context.",
     background: "/program/static/landing/images/home/support-system/bg-2.webp",
-    image: "/program/static/landing/images/home/support-system/image-2.webp",
+    image: closingNoteImage,
     imageFit: "contain" as const,
   },
   {

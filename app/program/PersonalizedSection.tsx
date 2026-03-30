@@ -3,7 +3,7 @@ import Image from "next/image";
 const PERSONALIZED_ITEMS = [
   {
     title: "Body type & fat distribution pattern",
-    description: "Considers unique facial traits and characteristics common to your demographic.",
+    description: "Considers unique body traits, proportions, and patterns common to your demographic.",
     image: "/program/static/landing/images/home/personalized/personalized-1.webp",
   },
   {
@@ -28,7 +28,7 @@ const PERSONALIZED_ITEMS = [
   },
   {
     title: "Genetic predispositions to fat storage and muscle development",
-    description: "Takes into account genetic factors and how they might impact your facial aesthetics.",
+    description: "Takes into account genetic factors and how they might impact your body aesthetics.",
     image: "/program/static/landing/images/home/personalized/personalized-6.webp",
   },
 ];
