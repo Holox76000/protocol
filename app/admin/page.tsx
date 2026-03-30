@@ -1,7 +1,26 @@
 import { getAdminStats } from "../../lib/adminStats";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminPage() {
-  const stats = await getAdminStats();
+  let stats;
+
+  try {
+    stats = await getAdminStats();
+  } catch (error) {
+    console.error(error);
+    stats = {
+      started: 0,
+      steps: Array.from({ length: 9 }, (_, index) => ({
+        label: `Step ${index + 1}`,
+        count: 0
+      })),
+      optinViewed: 0,
+      leadSubmitted: 0,
+      resultViewed: 0
+    };
+  }
 
   return (
     <main className="bg-white text-black min-h-screen">
