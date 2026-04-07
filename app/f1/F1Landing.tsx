@@ -128,12 +128,12 @@ const TIMELINE = [
 ];
 
 const TESTIMONIALS = [
-  { obj: "Does it work for my body type?", quote: "I always assumed I\u2019d be the skinny guy. Turns out my frame had more potential than I thought. 13 weeks in, people started noticing.", name: "Marc, 27", detail: "Ectomorph build", before: "/assets/5-before.png", after: "/assets/5-after.png" },
-  { obj: "How is this different from a fitness program?", quote: "I\u2019ve followed PPL splits, 5x5, online coaching. They build muscle. This builds the right shape for you. Different goal, different results.", name: "David, 34", detail: "Mesomorph build", before: "/assets/2-before.png", after: "/assets/2-after.png" },
-  { obj: "How long until I see a difference?", quote: "3 sessions a week, 50 minutes each. First visible changes around week 7. By week 14 people were asking what I\u2019d changed.", name: "Karim, 38", detail: "3 sessions/week", before: "/assets/14-before.png", after: "/assets/14-after.png" },
+  { obj: "Does it work for my body type?", quote: "I always assumed I\u2019d be the skinny guy. Turns out my frame had more potential than I thought. 13 weeks in, people started noticing.", name: "Ryan, 27", detail: "Ectomorph build", before: "/assets/5-before.png", after: "/assets/5-after.png" },
+  { obj: "How is this different from a fitness program?", quote: "I\u2019ve followed PPL splits, 5x5, online coaching. They build muscle. This builds the right shape for you. Different goal, different results.", name: "Jake, 34", detail: "Mesomorph build", before: "/assets/2-before.png", after: "/assets/2-after.png" },
+  { obj: "How long until I see a difference?", quote: "3 sessions a week, 50 minutes each. First visible changes around week 7. By week 14 people were asking what I\u2019d changed.", name: "Marcus, 38", detail: "3 sessions/week", before: "/assets/14-before.png", after: "/assets/14-after.png" },
   { obj: "Is this based on real science?", quote: "I\u2019m skeptical by default. What convinced me was the analysis. Every proportion benchmarked against published studies. This is not guesswork.", name: "James, 29", detail: "Data analyst", before: "/assets/1-before.png", after: "/assets/1-after.png" },
   { obj: "I\u2019m over 40, is it too late?", quote: "Started at 44. My proportions were easier to shift than I expected. The protocol accounted for my recovery capacity. Best shape I\u2019ve been in.", name: "Robert, 44", detail: "Father of 2", before: "/assets/9-before.png", after: "/assets/9-after.png" },
-  { obj: "I don\u2019t want to look like a bodybuilder", quote: "The protocol factored in who I am. My face, my lifestyle, how I want to come across. The result fits me. It does not look forced.", name: "Lucas, 32", detail: "Creative director", before: "/assets/8-before.png", after: "/assets/8-after.png" },
+  { obj: "I don\u2019t want to look like a bodybuilder", quote: "The protocol factored in who I am. My face, my lifestyle, how I want to come across. The result fits me. It does not look forced.", name: "Tyler, 32", detail: "Creative director", before: "/assets/8-before.png", after: "/assets/8-after.png" },
 ];
 
 const WITHOUT = [
@@ -369,7 +369,7 @@ export default function F1Landing() {
             <div className="f1-proof__author">
               <div className="f1-proof__avatar">T</div>
               <div>
-                <div className="f1-proof__name">Thomas, 31</div>
+                <div className="f1-proof__name">Connor, 31</div>
                 <div className="f1-proof__meta">Office job &middot; Trained 4x/week for 4 years</div>
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function F1Landing() {
             <p className="f1-body">What surprised me was the depth. They measured my entire body. Proportions, ratios, posture, composition. They benchmarked everything against research data. For the first time I could see the gap: <span className="f1-proof-metric">SWR 1.31</span>, target: <span className="f1-proof-metric">1.46</span>.</p>
             <p className="f1-body">Around week 11, the difference became visible to other people, not just to me. My ratio was at <span className="f1-proof-metric">1.41</span>. The body was not bigger. It was shaped differently.</p>
             <div className="f1-proof__slider">
-              <BeforeAfterSlider beforeSrc="/assets/3-before.png" afterSrc="/assets/3-after.png" beforeAlt="Thomas before" afterAlt="Thomas after" subject="Thomas" />
+              <BeforeAfterSlider beforeSrc="/assets/3-before.png" afterSrc="/assets/3-after.png" beforeAlt="Connor before" afterAlt="Connor after" subject="Connor" />
             </div>
           </div>
         </div>

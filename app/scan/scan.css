@@ -415,10 +415,9 @@
 
 /* ── Analysis: text + crop side by side ── */
 .scan-card__analysis {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
-  align-items: start;
   margin-bottom: 2rem;
 }
 
@@ -538,8 +537,14 @@
 }
 
 /* ── Crop in analysis ── */
+.scan-card__crop {
+  display: flex;
+  justify-content: center;
+}
+
 .scan-card__crop .scan-metric__crop-frame {
   width: 100%;
+  max-width: 420px;
   aspect-ratio: 1 / 1;
   border-radius: 0.5rem;
 }
@@ -806,15 +811,6 @@
 
 /* ─── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .scan-card__analysis {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .scan-card__crop {
-    order: -1;
-  }
-
   .scan-card__compare {
     grid-template-columns: 1fr 1fr;
   }

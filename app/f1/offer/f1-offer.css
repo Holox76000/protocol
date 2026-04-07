@@ -653,3 +653,102 @@
     width: 100%;
   }
 }
+
+/* ─── Report Preview Section ─────────────────────────────────────────────── */
+.f1-offer-report__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.f1-offer-report__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding-top: 0.5rem;
+}
+
+.f1-offer-report__copy .f1-body {
+  font-size: 1.55rem;
+  line-height: 1.75;
+  color: #4a5a62;
+}
+
+/* ─── Report Slider ──────────────────────────────────────────────────────── */
+.f1-report-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.f1-report-slider__track {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 24px rgba(37, 50, 57, 0.08);
+  line-height: 0;
+}
+
+.f1-report-slider__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.f1-report-slider__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #d4dde1;
+  background: #fff;
+  color: #253239;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.f1-report-slider__arrow:hover {
+  border-color: #253239;
+  background: #f0f3f4;
+}
+
+.f1-report-slider__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.f1-report-slider__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: none;
+  background: #c8d4d8;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.f1-report-slider__dot--active {
+  background: #253239;
+}
+
+.f1-report-slider__caption {
+  text-align: center;
+  font-size: 1.15rem;
+  color: #8fa5ae;
+  font-style: italic;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .f1-offer-report__inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}

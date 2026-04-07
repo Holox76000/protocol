@@ -14,13 +14,13 @@
   <text x="28" y="94" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">Week 3 check-in. Your waist</text>
   <text x="28" y="112" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">measurement is down 1.8cm.</text>
   <text x="28" y="130" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">Shoulder width holding well.</text>
-  <text x="264" y="138" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:14</text>
+  <text x="282" y="138" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:14</text>
 
   <!-- Outgoing 1 -->
   <rect x="128" y="160" width="280" height="56" rx="12" fill="#dcf8c6"/>
   <text x="144" y="182" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">Felt stronger this week on</text>
   <text x="144" y="200" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">lateral raises. Form feels right.</text>
-  <text x="372" y="208" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:18</text>
+  <text x="398" y="208" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:18</text>
 
   <!-- Incoming 2 -->
   <rect x="12" y="232" width="300" height="90" rx="12" fill="#fff"/>
@@ -28,7 +28,7 @@
   <text x="28" y="272" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">want the load. This week: drop</text>
   <text x="28" y="290" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">incline press weight by 10%,</text>
   <text x="28" y="308" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">add one lateral raise set.</text>
-  <text x="264" y="315" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:21</text>
+  <text x="302" y="315" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:21</text>
 
   <!-- Incoming 3: measurement card -->
   <rect x="12" y="338" width="260" height="110" rx="12" fill="#fff"/>
@@ -37,26 +37,23 @@
   <text x="28" y="388" font-family="system-ui, sans-serif" font-size="12" fill="#555">Shoulder-to-waist ratio: 1.41</text>
   <text x="28" y="406" font-family="system-ui, sans-serif" font-size="12" fill="#555">Target: 1.46 (week 8)</text>
   <text x="28" y="424" font-family="system-ui, sans-serif" font-size="12" fill="#128C7E" font-weight="600">Progress: on track ✓</text>
-  <text x="220" y="440" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:22</text>
+  <text x="262" y="440" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:22</text>
 
   <!-- Outgoing 2 -->
   <rect x="108" y="464" width="300" height="56" rx="12" fill="#dcf8c6"/>
   <text x="124" y="486" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">That ratio thing is surprisingly</text>
   <text x="124" y="504" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">motivating. More tangible.</text>
-  <text x="372" y="512" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:25</text>
+  <text x="398" y="512" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:25</text>
 
   <!-- Incoming 4 -->
   <rect x="12" y="536" width="300" height="72" rx="12" fill="#fff"/>
   <text x="28" y="558" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">It is. Muscle mass doesn&apos;t tell</text>
   <text x="28" y="576" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">you if your shape is improving.</text>
   <text x="28" y="594" font-family="system-ui, sans-serif" font-size="12.5" fill="#303030">The ratio does. See you week 4.</text>
-  <text x="264" y="600" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:27</text>
+  <text x="302" y="600" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e">09:27</text>
 
   <!-- Input bar -->
   <rect x="0" y="628" width="420" height="52" fill="#f0f0f0"/>
   <rect x="12" y="640" width="340" height="28" rx="14" fill="#fff"/>
-  <text x="32" y="659" font-family="system-ui, sans-serif" font-size="12.5" fill="#aaa">Message</text>
-
-  <!-- WhatsApp watermark -->
-  <text x="210" y="670" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#9e9e9e" letter-spacing="0.1em">MOCK — FOR ILLUSTRATION ONLY</text>
+  <text x="32" y="659" font-family="system-ui, sans-serif" font-size="12.5" fill="#aaa"></text>
 </svg>

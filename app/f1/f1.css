@@ -885,6 +885,32 @@
   margin: 0 0 4px;
 }
 
+.f1-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 24px;
+  margin: 12px 0 16px;
+}
+
+.f1-footer__links a {
+  font-size: 1.15rem;
+  color: #7f949b;
+  text-decoration: none;
+}
+
+.f1-footer__links a:hover {
+  color: #253239;
+}
+
+.f1-footer__disclaimer {
+  max-width: 680px;
+  margin: 12px auto 0 !important;
+  font-size: 1.05rem !important;
+  color: #aabbbf !important;
+  line-height: 1.6;
+}
+
 /* ─── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .f1-section {

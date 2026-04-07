@@ -70,45 +70,45 @@ function CtaButton({ label, className }: { label: string; className?: string }) 
 const DELIVERABLES = [
   {
     num: "01",
-    title: "Deep assessment questionnaire",
+    title: "Your body analysis report",
     description:
-      "A long-form questionnaire covering your body, your social context, your lifestyle, your dating situation, and your goals. Not a quiz. An intake form that makes your protocol actually yours.",
+      "A full breakdown of your proportions: shoulder-to-waist ratio, chest-to-waist ratio, torso index, and perception score. Each variable benchmarked against the published research. You get a document that tells you exactly where you stand — and exactly what's holding your score back.",
   },
   {
     num: "02",
-    title: "AI body analysis",
+    title: "Your assessment intake",
     description:
-      "Your proportions, ratios, and structural variables measured against the science of attractiveness — not gym metrics. Shoulders, waist, hips, facial harmony. Every variable that research identifies as a driver of how people perceive you.",
+      "A long-form questionnaire covering your body, lifestyle, social context, and goals. Not a quiz. The answers feed directly into your protocol — so nothing is generic, and nothing is guessed.",
   },
   {
     num: "03",
-    title: "3-month protocol",
+    title: "Your attractiveness dashboard",
     description:
-      "Training built around the variables that move your perception score, not your lift numbers. Exact targets, exact sessions, exact adjustments by week. No guessing what to prioritize.",
+      "Access to your personal Protocol platform. Your proportion scores, your targets, your 12-week training plan — all in one place. Every session built to move your weakest variables. You track your ratios as you progress and see what's actually changing.",
   },
   {
     num: "04",
-    title: "WhatsApp coaching",
+    title: "3 months of WhatsApp coaching access",
     description:
-      "Direct line to your coach throughout the 3 months. Weekly check-ins, ratio tracking, form feedback. You are not left alone with a PDF.",
+      "A direct line to your coach for the full duration. Weekly ratio check-ins, form feedback, protocol adjustments. Not a ticketing system. A person who has your numbers and tracks them.",
   },
 ];
 
 const STEPS = [
   {
     step: "1",
-    title: "Complete your analysis",
-    description: "Upload photos for your AI body analysis. Answer the assessment questionnaire. Takes about 20 minutes.",
+    title: "Day 1 — Upload and answer",
+    description: "You submit your photos and complete the intake questionnaire. Takes about 20 minutes. This is the only input we need to build your protocol.",
   },
   {
     step: "2",
-    title: "Receive your protocol",
-    description: "Within 24 hours you receive your personalized 3-month program with every session, every target, every variable explained.",
+    title: "Day 2 — Your protocol lands",
+    description: "Within 24 hours, your coach sends your body analysis report and your 12-week protocol. You read it once and know exactly what to do for the next 3 months.",
   },
   {
     step: "3",
-    title: "Execute with coaching",
-    description: "Follow the protocol. Check in weekly on WhatsApp. Your coach tracks your ratios and adjusts as you progress.",
+    title: "Weeks 1–12 — You train. We track.",
+    description: "You execute the sessions. Each week you send your measurements on WhatsApp. Your coach checks your ratios, flags what's moving, and adjusts where needed. By week 12, the numbers don't lie.",
   },
 ];
 
@@ -136,7 +136,7 @@ const TESTIMONIALS = [
     obj: "13 weeks. People started noticing.",
     quote:
       "I always assumed I\u2019d be the skinny guy. Turns out my frame had more potential than I thought. 13 weeks in, people started noticing.",
-    name: "Marc, 27",
+    name: "Ryan, 27",
     detail: "Ectomorph build \u00b7 SWR 1.29 \u2192 1.44",
     before: "/assets/5-before.png",
     after: "/assets/5-after.png",
@@ -145,14 +145,88 @@ const TESTIMONIALS = [
     obj: "Different goal. Different result.",
     quote:
       "I\u2019ve followed PPL splits, 5x5, online coaching. They build muscle. This builds the right shape for you. Different goal, different results.",
-    name: "David, 34",
+    name: "Jake, 34",
     detail: "Mesomorph build \u00b7 SWR 1.33 \u2192 1.47",
     before: "/assets/2-before.png",
     after: "/assets/2-after.png",
   },
+  {
+    obj: "I didn\u2019t lose weight. I changed shape.",
+    quote:
+      "Same weight at the end as when I started. But my waist is smaller, my shoulders look wider, and my girlfriend noticed before I told her about the protocol.",
+    name: "Tyler, 32",
+    detail: "Average build \u00b7 SWR 1.31 \u2192 1.45",
+    before: "/assets/1-before.png",
+    after: "/assets/1-after.png",
+  },
+  {
+    obj: "Finally something that explained why.",
+    quote:
+      "I\u2019ve been training for 6 years. Good shape by any standard. But I never understood why certain guys looked more attractive without being bigger. The analysis explained it in 10 minutes.",
+    name: "Connor, 31",
+    detail: "Athletic build \u00b7 SWR 1.27 \u2192 1.46",
+    before: "/assets/3-before.png",
+    after: "/assets/3-after.png",
+  },
+  {
+    obj: "The waist was the variable I was missing.",
+    quote:
+      "I was already lifting heavy, already had broad shoulders. The analysis flagged that my waist wasn\u2019t narrowing. One protocol adjustment changed everything in 8 weeks.",
+    name: "Ethan, 26",
+    detail: "Mesomorph build \u00b7 TI 3.8 \u2192 5.1",
+    before: "/assets/10-before.png",
+    after: "/assets/10-after.png",
+  },
 ];
 
 /* ─── Component ──────────────────────────────────────────────────────────── */
+
+const REPORT_SLIDES = [
+  { src: "/assets/report1.png", alt: "Protocol analysis report — page 1" },
+  { src: "/assets/report2.png", alt: "Protocol analysis report — page 2" },
+  { src: "/assets/report3.png", alt: "Protocol analysis report — page 3" },
+];
+
+function ReportSlider() {
+  const [active, setActive] = useState(0);
+  const prev = () => setActive((i) => (i - 1 + REPORT_SLIDES.length) % REPORT_SLIDES.length);
+  const next = () => setActive((i) => (i + 1) % REPORT_SLIDES.length);
+
+  return (
+    <div className="f1-report-slider">
+      <div className="f1-report-slider__track">
+        <Image
+          src={REPORT_SLIDES[active].src}
+          alt={REPORT_SLIDES[active].alt}
+          width={1568}
+          height={1580}
+          sizes="(max-width: 900px) 100vw, 520px"
+          style={{ width: "100%", height: "auto", display: "block" }}
+          priority={active === 0}
+        />
+      </div>
+      <div className="f1-report-slider__controls">
+        <button className="f1-report-slider__arrow" onClick={prev} aria-label="Previous">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10L13 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+        <div className="f1-report-slider__dots">
+          {REPORT_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              className={`f1-report-slider__dot ${i === active ? "f1-report-slider__dot--active" : ""}`}
+              onClick={() => setActive(i)}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
+        </div>
+        <button className="f1-report-slider__arrow" onClick={next} aria-label="Next">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+      </div>
+      <p className="f1-report-slider__caption">Sample report — actual analysis depends on your photos and profile.</p>
+    </div>
+  );
+}
 
 export default function F1OfferPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -279,6 +353,29 @@ export default function F1OfferPage() {
         </div>
       </section>
 
+      {/* ═══ REPORT PREVIEW ═══ */}
+      <section className="f1-offer-report f1-section">
+        <div className="f1-offer-report__inner">
+          <div className="f1-offer-report__copy">
+            <p className="f1-section__eyebrow">Your analysis</p>
+            <h2 className="f1-section__title f1-section__title--sm">
+              Every variable that drives perception,<br />
+              <span>measured and benchmarked.</span>
+            </h2>
+            <p className="f1-body">
+              Your protocol starts with a complete analysis of your structural variables — shoulder-to-waist ratio, chest-to-waist ratio, taper index, and more. Each one measured from your photos, compared against the research, and given a target specific to your profile.
+            </p>
+            <p className="f1-body">
+              You see exactly where you stand. You see exactly where you need to be. And you see why each variable matters.
+            </p>
+            <p className="f1-body">
+              This is the foundation of your protocol. Without it, training is guesswork.
+            </p>
+          </div>
+          <ReportSlider />
+        </div>
+      </section>
+
       {/* ═══ HOW IT WORKS ═══ */}
       <section className="f1-offer-steps f1-section">
         <div className="f1-offer-steps__inner">
@@ -313,10 +410,10 @@ export default function F1OfferPage() {
             <div className="f1-offer-steps__whatsapp-copy">
               <p className="f1-section__eyebrow" style={{ marginBottom: "16px" }}>WhatsApp coaching</p>
               <p className="f1-body">
-                Not a bot. Not a ticketing system. A direct line to your coach. You send your weekly measurements, they track your ratios, they tell you what to adjust.
+                Not a ticketing system. A direct line to your coach. You send your weekly measurements, they track your ratios, they tell you what to adjust.
               </p>
               <p className="f1-body">
-                <strong>This is what $300/month buys you with a PT.</strong> Here it&apos;s included in the $49.
+                A personal trainer costs $300 per month. Your Attractiveness Protocol includes this level of attention for $49 total.
               </p>
             </div>
           </div>
@@ -418,8 +515,8 @@ export default function F1OfferPage() {
       <section className="f1-offer-final f1-section">
         <div className="f1-offer-final__inner">
           <h2 className="f1-offer-final__title">
-            You know what the variable is.<br />
-            <span>Now find out where you stand.</span>
+            You&apos;ve seen what drives perception.<br />
+            <span>Now change yours.</span>
           </h2>
           <p className="f1-offer-final__sub">
             AI body analysis. 3-month protocol. WhatsApp coaching. $49 one-time.
@@ -435,10 +532,15 @@ export default function F1OfferPage() {
       {/* ═══ FOOTER ═══ */}
       <footer className="f1-footer">
         <p>© {new Date().getFullYear()} Protocol. All rights reserved.</p>
-        <p>
-          <TrackedLink href="/checkout?funnel=f1" eventName="f1_offer_footer_cta" eventParams={{}}>
-            Start your Protocol — $49
-          </TrackedLink>
+        <nav className="f1-footer__links">
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-of-service">Terms of Service</a>
+          <a href="/refund-policy">Refund Policy</a>
+          <a href="/medical-disclaimer">Medical Disclaimer</a>
+          <a href="/contact">Contact</a>
+        </nav>
+        <p className="f1-footer__disclaimer">
+          * Results may vary. Protocol is not a licensed medical provider. The content on this site is for informational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional before beginning any new training or nutrition program. These statements have not been evaluated by the Food and Drug Administration.
         </p>
       </footer>
 
