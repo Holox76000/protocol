@@ -914,6 +914,11 @@
     padding: 24px;
   }
 
+  .f1-close__option--discover {
+    padding: 40px 24px;
+    border-radius: 16px;
+  }
+
   .f1-proof__card {
     padding: 24px;
   }
