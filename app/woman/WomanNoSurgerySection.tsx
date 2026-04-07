@@ -1,13 +1,9 @@
 import Image from "next/image";
-import womanOneBeforeImage from "../../woman-1-before.png";
-import womanOneAfterImage from "../../woman-1-after.png";
-import womanTwoBeforeImage from "../../woman-2-before.png";
-import womanTwoAfterImage from "../../woman-2-after.png";
 
 const CASES = [
   {
-    before: womanOneBeforeImage.src,
-    after: womanOneAfterImage.src,
+    before: "/assets/woman-1-before.png",
+    after: "/assets/woman-1-after.png",
     duration: "12 Weeks",
     items: [
       {
@@ -25,8 +21,8 @@ const CASES = [
     ],
   },
   {
-    before: womanTwoBeforeImage.src,
-    after: womanTwoAfterImage.src,
+    before: "/assets/woman-2-before.png",
+    after: "/assets/woman-2-after.png",
     duration: "6 Months",
     items: [
       {

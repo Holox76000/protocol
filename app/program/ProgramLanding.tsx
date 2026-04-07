@@ -1,12 +1,6 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import TrackedLink from "../tracked-link";
-import heroBeforeImage from "../../14-before.png";
-import heroAfterImage from "../../14-after.png";
-import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
-import bodyScanImage from "../../body-scan.png";
-import youGetClarityImage from "../../you-get-clarity.png";
-import youGainControlImage from "../../you-gain-control.png";
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import "./program.css";
 import type { ResearchTab } from "./ResearchImpactSection";
@@ -67,26 +61,32 @@ const HERO_LOGOS = [
   { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
 ];
 
+const HERO_BEFORE_IMAGE_SRC = "/dev-static/14-before.png";
+const HERO_AFTER_IMAGE_SRC = "/dev-static/14-after.png";
+const BODY_SCAN_IMAGE_SRC = "/dev-static/body-scan.png";
+const YOU_GET_CLARITY_IMAGE_SRC = "/dev-static/you-get-clarity.png";
+const YOU_GAIN_CONTROL_IMAGE_SRC = "/dev-static/you-gain-control.png";
+
 const FACIAL_ANALYSIS_ITEMS = [
   {
     number: "1",
     title: "You learn exactly what's happening with your body.",
     description:
       "Many things you hate about your physique are 100% fixable. Our analysis helps men stop guessing and start acting.",
-    image: bodyScanImage.src,
+    image: BODY_SCAN_IMAGE_SRC,
   },
   {
     number: "2",
     title: "You get clarity on what can actually change — and how fast.",
     description:
       "For example, some belly fat is hormonal and clears up in weeks with the right protocol. Flat chest responds to specific loading patterns most guys never use.",
-    image: youGetClarityImage.src,
+    image: YOU_GET_CLARITY_IMAGE_SRC,
   },
   {
     number: "3",
     title: "You gain control through knowledge.",
     description: "A clear, science-based plan removes the paralysis of cut vs bulk forever.",
-    image: youGainControlImage.src,
+    image: YOU_GAIN_CONTROL_IMAGE_SRC,
   },
 ];
 
@@ -398,8 +398,8 @@ export default function ProgramLanding({
             <HeroComparison
               funnel={funnel}
               previewId={previewId}
-              defaultBeforeSrc={heroBeforeImage.src}
-              defaultAfterSrc={heroAfterImage.src}
+              defaultBeforeSrc={HERO_BEFORE_IMAGE_SRC}
+              defaultAfterSrc={HERO_AFTER_IMAGE_SRC}
             />
           </div>
         </div>

@@ -1,26 +1,4 @@
 import Image from "next/image";
-import customBeforeOne from "../../1-before.png";
-import customAfterOne from "../../1-after.png";
-import customBeforeTwo from "../../2-before.png";
-import customAfterTwo from "../../2-after.png";
-import customBeforeSeventeen from "../../17-before.png";
-import customAfterSeventeen from "../../17-after.png";
-import customBeforeFifteen from "../../15-before.png";
-import customAfterFifteen from "../../15-after.png";
-import customBeforeFive from "../../5-before.png";
-import customAfterFive from "../../5-after.png";
-import customBeforeSix from "../../6-before.png";
-import customAfterSix from "../../6-after.png";
-import customBeforeSeven from "../../7-before.png";
-import customAfterSeven from "../../7-after.png";
-import customBeforeEight from "../../8-before.png";
-import customAfterEight from "../../8-after.png";
-import customBeforeSixteen from "../../16-before.png";
-import customAfterSixteen from "../../16-after.png";
-import customBeforeEighteen from "../../18-before.png";
-import customAfterEighteen from "../../18-after.png";
-import customBeforeFourteen from "../../14-before.png";
-import customAfterFourteen from "../../14-after.png";
 
 export type ClientTransformationItem = {
   id: string;
@@ -29,61 +7,17 @@ export type ClientTransformationItem = {
 };
 
 const DEFAULT_CLIENT_TRANSFORMATIONS: ClientTransformationItem[] = [
-  {
-    id: "custom-1",
-    beforeSrc: customBeforeOne.src,
-    afterSrc: customAfterOne.src,
-  },
-  {
-    id: "custom-2",
-    beforeSrc: customBeforeTwo.src,
-    afterSrc: customAfterTwo.src,
-  },
-  {
-    id: "custom-3",
-    beforeSrc: customBeforeSeventeen.src,
-    afterSrc: customAfterSeventeen.src,
-  },
-  {
-    id: "custom-4",
-    beforeSrc: customBeforeFifteen.src,
-    afterSrc: customAfterFifteen.src,
-  },
-  {
-    id: "custom-5",
-    beforeSrc: customBeforeFive.src,
-    afterSrc: customAfterFive.src,
-  },
-  {
-    id: "custom-6",
-    beforeSrc: customBeforeSix.src,
-    afterSrc: customAfterSix.src,
-  },
-  {
-    id: "custom-7",
-    beforeSrc: customBeforeSeven.src,
-    afterSrc: customAfterSeven.src,
-  },
-  {
-    id: "custom-8",
-    beforeSrc: customBeforeEight.src,
-    afterSrc: customAfterEight.src,
-  },
-  {
-    id: "custom-9",
-    beforeSrc: customBeforeSixteen.src,
-    afterSrc: customAfterSixteen.src,
-  },
-  {
-    id: "custom-10",
-    beforeSrc: customBeforeEighteen.src,
-    afterSrc: customAfterEighteen.src,
-  },
-  {
-    id: "custom-14",
-    beforeSrc: customBeforeFourteen.src,
-    afterSrc: customAfterFourteen.src,
-  },
+  { id: "custom-1", beforeSrc: "/assets/1-before.png", afterSrc: "/assets/1-after.png" },
+  { id: "custom-2", beforeSrc: "/assets/2-before.png", afterSrc: "/assets/2-after.png" },
+  { id: "custom-3", beforeSrc: "/assets/17-before.png", afterSrc: "/assets/17-after.png" },
+  { id: "custom-4", beforeSrc: "/assets/15-before.png", afterSrc: "/assets/15-after.png" },
+  { id: "custom-5", beforeSrc: "/assets/5-before.png", afterSrc: "/assets/5-after.png" },
+  { id: "custom-6", beforeSrc: "/assets/6-before.png", afterSrc: "/assets/6-after.png" },
+  { id: "custom-7", beforeSrc: "/assets/7-before.png", afterSrc: "/assets/7-after.png" },
+  { id: "custom-8", beforeSrc: "/assets/8-before.png", afterSrc: "/assets/8-after.png" },
+  { id: "custom-9", beforeSrc: "/assets/16-before.png", afterSrc: "/assets/16-after.png" },
+  { id: "custom-10", beforeSrc: "/assets/18-before.png", afterSrc: "/assets/18-after.png" },
+  { id: "custom-14", beforeSrc: "/assets/14-before.png", afterSrc: "/assets/14-after.png" },
 ];
 
 export default function ClientTransformationsSection({

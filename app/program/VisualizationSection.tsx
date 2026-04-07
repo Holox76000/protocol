@@ -1,22 +1,17 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import visualizationBeforeImage from "../../7-before.png";
-import visualizationAfterImage from "../../7-after.png";
-import realisticVisualisationImage from "../../realistic-visualisation.png";
-import visualizeYourResultsImage from "../../visualize-your-results.png";
-import withoutSteroidsImage from "../../without-steroids.png";
 
 const BeforeAfterSlider = dynamic(() => import("./BeforeAfterSlider"), { ssr: false });
 
 const VISUALIZATION_CARDS = [
   {
-    image: realisticVisualisationImage,
+    image: "/assets/realistic-visualisation.png",
     title: "Realistic Visualisation",
     description:
       "Our technology gives you a realistic preview of what your body looks like after your 12-week transformation.",
   },
   {
-    image: withoutSteroidsImage,
+    image: "/assets/without-steroids.png",
     title: "Achievable Without Steroids",
     description: "Every transformation we showcase is 100% natural and achievable.",
   },
@@ -27,7 +22,7 @@ const VISUALIZATION_CARDS = [
       "We account for your specific skinny-fat phenotype, rejecting one-size-fits-all programs.",
   },
   {
-    image: visualizeYourResultsImage,
+    image: "/assets/visualize-your-results.png",
     title: "Visualize Your Results Before You Start",
     description: "It's like seeing the finish line before the race.",
   },
@@ -52,8 +47,8 @@ export default function VisualizationSection() {
           <BeforeAfterSlider
             className="program-visualization__slider"
             subject="Future you"
-            beforeSrc={visualizationBeforeImage.src}
-            afterSrc={visualizationAfterImage.src}
+            beforeSrc="/assets/7-before.png"
+            afterSrc="/assets/7-after.png"
             beforePosition="50% 46%"
             afterPosition="50% 46%"
             beforeScale={1}

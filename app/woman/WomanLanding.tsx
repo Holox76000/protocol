@@ -1,14 +1,6 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import TrackedLink from "../tracked-link";
-import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
-import youGetClarityImage from "../../you-get-clarity.png";
-import youGainControlImage from "../../you-gain-control.png";
-import womanOneBeforeImage from "../../woman-1-before.png";
-import womanOneAfterImage from "../../woman-1-after.png";
-import womanTwoBeforeImage from "../../woman-2-before.png";
-import womanTwoAfterImage from "../../woman-2-after.png";
-import womanInterfaceImage from "../../woman-interface.png";
 import { getFunnelConfig } from "../../lib/funnels";
 import "../program/program.css";
 import type { ResearchTab } from "../program/ResearchImpactSection";
@@ -69,40 +61,49 @@ const HERO_LOGOS = [
   { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
 ];
 
+const BODY_FAT_DISTRIBUTION_IMAGE_SRC = "/dev-static/body-fat-distribution-copie.png";
+const YOU_GET_CLARITY_IMAGE_SRC = "/dev-static/you-get-clarity.png";
+const YOU_GAIN_CONTROL_IMAGE_SRC = "/dev-static/you-gain-control.png";
+const WOMAN_ONE_BEFORE_IMAGE_SRC = "/dev-static/woman-1-before.png";
+const WOMAN_ONE_AFTER_IMAGE_SRC = "/dev-static/woman-1-after.png";
+const WOMAN_TWO_BEFORE_IMAGE_SRC = "/dev-static/woman-2-before.png";
+const WOMAN_TWO_AFTER_IMAGE_SRC = "/dev-static/woman-2-after.png";
+const WOMAN_INTERFACE_IMAGE_SRC = "/dev-static/woman-interface.png";
+
 const FACIAL_ANALYSIS_ITEMS = [
   {
     number: "1",
     title: "You learn exactly what is happening with your body.",
     description:
       "Many things that frustrate you about your shape are highly fixable. Our analysis helps women stop guessing and start making precise changes.",
-    image: bodyFatDistributionScoreImage.src,
+    image: BODY_FAT_DISTRIBUTION_IMAGE_SRC,
   },
   {
     number: "2",
     title: "You get clarity on what can actually change — and how fast.",
     description:
       "For example, waist softness, posture, glute shape, and upper-body balance all respond differently. We show you where the highest leverage is for your body.",
-    image: youGetClarityImage.src,
+    image: YOU_GET_CLARITY_IMAGE_SRC,
   },
   {
     number: "3",
     title: "You gain control through knowledge.",
     description:
       "A clear, science-based plan replaces confusion with a practical path that actually fits your body and lifestyle.",
-    image: youGainControlImage.src,
+    image: YOU_GAIN_CONTROL_IMAGE_SRC,
   },
 ];
 
 const WOMAN_CLIENT_TRANSFORMATIONS: ClientTransformationItem[] = [
   {
     id: "woman-1",
-    beforeSrc: womanOneBeforeImage.src,
-    afterSrc: womanOneAfterImage.src,
+    beforeSrc: WOMAN_ONE_BEFORE_IMAGE_SRC,
+    afterSrc: WOMAN_ONE_AFTER_IMAGE_SRC,
   },
   {
     id: "woman-2",
-    beforeSrc: womanTwoBeforeImage.src,
-    afterSrc: womanTwoAfterImage.src,
+    beforeSrc: WOMAN_TWO_BEFORE_IMAGE_SRC,
+    afterSrc: WOMAN_TWO_AFTER_IMAGE_SRC,
   },
 ];
 
@@ -304,8 +305,8 @@ export default function WomanLanding() {
             <HeroComparison
               funnel={funnel}
               subject="Woman"
-              defaultBeforeSrc={womanOneBeforeImage.src}
-              defaultAfterSrc={womanOneAfterImage.src}
+              defaultBeforeSrc={WOMAN_ONE_BEFORE_IMAGE_SRC}
+              defaultAfterSrc={WOMAN_ONE_AFTER_IMAGE_SRC}
               beforePosition="50% 44%"
               afterPosition="50% 44%"
               beforeScale={1.02}
@@ -358,7 +359,7 @@ export default function WomanLanding() {
       <ExpertsSection />
       <GaryLinkovQuoteSection />
       <TransformationSection ctaHref={funnelConfig.landingPrimaryHref} ctaLabel={funnelConfig.transformationCtaLabel} funnel={funnel} />
-      <ProtocolSection interfaceSrc={womanInterfaceImage} />
+      <ProtocolSection interfaceSrc={WOMAN_INTERFACE_IMAGE_SRC} />
 
       <section className="program-analysis" aria-labelledby="program-analysis-title">
         <div className="program-analysis__shell">

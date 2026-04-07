@@ -1,20 +1,9 @@
 import Image from "next/image";
-import bellyCompositionImage from "../../belly-composition.png";
-import bodyFatDistributionImage from "../../body-fat-distribution.png";
-import chestStructureImage from "../../chest-structure.png";
-import coreStrengthIndicatorsImage from "../../core-strength-indicators.png";
-import generalMorphologyImage from "../../general-morphology.png";
-import hormoneImage from "../../hormone.png";
-import muscleSymmetryImage from "../../muscle-symmetry.png";
-import postureFrameImage from "../../posture-frame.png";
-import ribCageImage from "../../rib-cage.png";
-import skinImage from "../../skin.png";
-import upperBodyDevelopmentImage from "../../upper-body-development.png";
 
 const TEST_CATEGORIES = [
   {
     title: "General Morphology",
-    image: generalMorphologyImage.src,
+    image: "/assets/general-morphology.png",
     tests: [
       "Frame width classification",
       "Bone structure profile",
@@ -28,7 +17,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Chest Structure",
-    image: chestStructureImage.src,
+    image: "/assets/chest-structure.png",
     tests: [
       "Upper chest fullness",
       "Lower chest softness",
@@ -46,7 +35,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Shoulder-to-Waist Ratio",
-    image: bodyFatDistributionImage.src,
+    image: "/assets/body-fat-distribution.png",
     tests: [
       "Current V-taper ratio",
       "Deltoid width potential",
@@ -62,7 +51,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Belly Composition",
-    image: bellyCompositionImage.src,
+    image: "/assets/belly-composition.png",
     tests: [
       "Lower belly fat concentration",
       "Upper belly softness",
@@ -76,7 +65,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Posture & Frame",
-    image: postureFrameImage.src,
+    image: "/assets/posture-frame.png",
     tests: [
       "Forward shoulder severity",
       "Pelvic tilt screening",
@@ -90,7 +79,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Body Fat Distribution",
-    image: bodyFatDistributionImage.src,
+    image: "/assets/body-fat-distribution.png",
     tests: [
       "Chest fat storage",
       "Waist fat storage",
@@ -104,7 +93,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Core Strength Indicators",
-    image: coreStrengthIndicatorsImage.src,
+    image: "/assets/core-strength-indicators.png",
     tests: [
       "Bracing control score",
       "Abdominal wall tension",
@@ -118,7 +107,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Hormonal Profile Markers",
-    image: hormoneImage.src,
+    image: "/assets/hormone.png",
     tests: [
       "Low-testosterone visual markers",
       "High-stress recovery markers",
@@ -132,7 +121,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Muscle Symmetry",
-    image: muscleSymmetryImage.src,
+    image: "/assets/muscle-symmetry.png",
     tests: [
       "Left-right shoulder balance",
       "Arm size symmetry",
@@ -146,7 +135,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Upper Body Development",
-    image: upperBodyDevelopmentImage.src,
+    image: "/assets/upper-body-development.png",
     tests: [
       "Deltoid development",
       "Upper chest development",
@@ -160,7 +149,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Lower Chest / Rib Cage",
-    image: ribCageImage.src,
+    image: "/assets/rib-cage.png",
     tests: [
       "Lower chest shape",
       "Rib cage width",
@@ -174,7 +163,7 @@ const TEST_CATEGORIES = [
   },
   {
     title: "Skin & Subcutaneous Fat",
-    image: skinImage.src,
+    image: "/assets/skin.png",
     tests: [
       "Skin tightness baseline",
       "Subcutaneous fat thickness",

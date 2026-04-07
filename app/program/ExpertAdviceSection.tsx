@@ -1,6 +1,4 @@
 import Image from "next/image";
-import beforeSevenImage from "../../7-before.png";
-import afterSevenImage from "../../7-after.png";
 
 const ADVICE_STEPS = [
   { number: "01/", title: "Get your expert body analysis" },
@@ -46,7 +44,7 @@ export default function ExpertAdviceSection() {
               <span className="program-advice__label">Before</span>
               <div className="program-advice__image">
                 <Image
-                  src={beforeSevenImage}
+                  src="/assets/7-before.png"
                   alt="Before Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
@@ -64,7 +62,7 @@ export default function ExpertAdviceSection() {
               <span className="program-advice__label">After</span>
               <div className="program-advice__image">
                 <Image
-                  src={afterSevenImage}
+                  src="/assets/7-after.png"
                   alt="After Protocol plan"
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Protocol | Body Visualizer",
   description: "Upload a photo and generate a realistic body transformation preview.",
 };
+export const dynamic = "force-dynamic";
 
 export default function VisualizationStepPage({ params }: { params: { step: string } }) {
   if (!isMainVisualizationScreen(params.step)) {

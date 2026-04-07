@@ -1,8 +1,8 @@
 import Image from "next/image";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import styles from "./interface.module.css";
-import beforeImage from "../../2-before.png";
-import afterImage from "../../2-after.png";
+const beforeImage = { src: "/assets/2-before.png" };
+const afterImage = { src: "/assets/2-after.png" };
 
 const navItems = [
   { label: "Protocols", active: true, badge: null },
@@ -165,13 +165,13 @@ export default function InterfacePage() {
 
               <div className={styles.thumbRow}>
                 <div className={styles.thumbCard}>
-                  <Image src={beforeImage} alt="Before body preview" fill sizes="160px" />
+                  <Image src={beforeImage.src} alt="Before body preview" fill sizes="160px" />
                 </div>
                 <div className={styles.thumbArrow} aria-hidden="true">
                   →
                 </div>
                 <div className={styles.thumbCard}>
-                  <Image src={afterImage} alt="After body preview" fill sizes="160px" />
+                  <Image src={afterImage.src} alt="After body preview" fill sizes="160px" />
                 </div>
               </div>
 

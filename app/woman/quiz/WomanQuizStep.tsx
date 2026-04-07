@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import bodyTypesImage from "../../../body-types.png";
+const bodyTypesImage = { src: "/assets/body-types.png", width: 1536, height: 1024 };
 import { trackGa4Event } from "../../../lib/ga4Event";
 import styles from "../../visualization/visualization.module.css";
 import { STORAGE_KEY, WOMAN_QUIZ_QUESTIONS } from "./woman-quiz-data";

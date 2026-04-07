@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import bodyFatDistributionScoreImage from "../../body-fat-distribution copie.png";
 
 const SCORE_CARDS = [
   { src: "/program/static/landing/images/home/more-score/card-1.webp", alt: "Skin score", ratio: "687 / 536" },
@@ -27,7 +26,7 @@ export default function MoreScoresSection() {
           <div className="program-more-scores__cards">
             <div className="program-more-scores__main">
               <Image
-                src={bodyFatDistributionScoreImage}
+                src="/assets/body-fat-distribution copie.png"
                 alt="Body fat distribution score improvement over time"
                 fill
                 sizes="(max-width: 767px) 92vw, (max-width: 1099px) 78vw, 58vw"

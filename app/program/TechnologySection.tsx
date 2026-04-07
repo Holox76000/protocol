@@ -1,6 +1,4 @@
 import Image from "next/image";
-import analysisCardImage from "../../analysis-card.png";
-import technologyCard3Image from "../../technology-card3.png";
 
 const TECHNOLOGY_CARDS = [
   {
@@ -21,14 +19,14 @@ const TECHNOLOGY_CARDS = [
     title: "Evidence-Based Approach",
     description:
       "We use measurable body composition data and peer-reviewed research — not Instagram bro-science.",
-    image: technologyCard3Image,
+    image: "/assets/technology-card3.png",
     imagePosition: "center center",
   },
   {
     title: "The Science of Male Physique",
     description:
       "Our database analyzes body composition science across thousands of cases to find what works for your specific body type.",
-    image: analysisCardImage,
+    image: "/assets/analysis-card.png",
     imagePosition: "center center",
     cardClassName: "program-tech__card--science-physique",
   },

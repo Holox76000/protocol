@@ -8,6 +8,7 @@ export const metadata = {
   title: "Protocol | Women Quiz",
   description: "Women’s transformation questionnaire before checkout.",
 };
+export const dynamic = "force-dynamic";
 
 export default function WomanQuizStepPage({ params }: { params: { step: string } }) {
   const step = Number(params.step);

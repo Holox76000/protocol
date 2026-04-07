@@ -2,18 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./upper-body-reel.module.css";
-import manImage from "../../man.png";
-import bodyScanImage from "../../body-scan.png";
-import analysisCardImage from "../../analysis-card.png";
-import visualizeResultsImage from "../../visualize-your-results.png";
-import upperBodyImage from "../../upper-body-development.png";
-import postureImage from "../../posture-frame.png";
-import muscleSymmetryImage from "../../muscle-symmetry.png";
-import ribCageImage from "../../rib-cage.png";
-import coreStrengthImage from "../../core-strength-indicators.png";
-import bodyFatImage from "../../body-fat-distribution.png";
-import youGainControlImage from "../../you-gain-control.png";
-import youGetClarityImage from "../../you-get-clarity.png";
+const manImage = { src: "/assets/man.png" };
+const bodyScanImage = { src: "/assets/body-scan.png" };
+const analysisCardImage = { src: "/assets/analysis-card.png" };
+const visualizeResultsImage = { src: "/assets/visualize-your-results.png" };
+const upperBodyImage = { src: "/assets/upper-body-development.png" };
+const postureImage = { src: "/assets/posture-frame.png" };
+const muscleSymmetryImage = { src: "/assets/muscle-symmetry.png" };
+const ribCageImage = { src: "/assets/rib-cage.png" };
+const coreStrengthImage = { src: "/assets/core-strength-indicators.png" };
+const bodyFatImage = { src: "/assets/body-fat-distribution.png" };
+const youGainControlImage = { src: "/assets/you-gain-control.png" };
+const youGetClarityImage = { src: "/assets/you-get-clarity.png" };
 
 type Scene = {
   id: number;

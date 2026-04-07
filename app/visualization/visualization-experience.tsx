@@ -15,8 +15,8 @@ import {
 import { getFunnelConfig, type FunnelVariant } from "../../lib/funnels";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import styles from "./visualization.module.css";
-import introBeforeImage from "../../14-before.png";
-import introAfterImage from "../../14-after.png";
+const introBeforeImage = { src: "/assets/14-before.png" };
+const introAfterImage = { src: "/assets/14-after.png" };
 
 const DEFAULT_PROMPT =
   "Create a realistic athletic transformation preview of this exact person. Preserve identity, face, skin tone, hair, camera angle, and lighting. Improve body composition into a natural muscular physique with broader shoulders, more upper chest, visible arms, a tighter waist, and lower body fat. Keep the result believable, proportional, and non-steroidal.";

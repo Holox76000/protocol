@@ -1,8 +1,12 @@
 node_modules
 .next
+.perf-archive
 out
 dist
 .env
 
 .DS_Store
 .env.local
+.agents
+skills
+www.qoves.com

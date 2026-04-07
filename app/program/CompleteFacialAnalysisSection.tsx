@@ -1,5 +1,4 @@
 import Image from "next/image";
-import manImage from "../../man.png";
 
 const ANALYSIS_CARDS = [
   {
@@ -72,7 +71,7 @@ export default function CompleteFacialAnalysisSection() {
 
           <div className="program-complete-analysis__portrait">
             <Image
-              src={manImage}
+              src="/assets/man.png"
               alt="Body analysis portrait"
               fill
               sizes="760px"
@@ -103,10 +102,10 @@ export default function CompleteFacialAnalysisSection() {
           <div className="program-complete-analysis__portrait-panel">
             <div className="program-complete-analysis__portrait">
               <Image
-                src={manImage}
+                src="/assets/man.png"
                 alt="Body analysis portrait"
-                width={manImage.width}
-                height={manImage.height}
+                width={1024}
+                height={1024}
                 sizes="(max-width: 767px) 88vw, (max-width: 1280px) 70vw, 760px"
                 className="program-complete-analysis__portrait-image"
               />

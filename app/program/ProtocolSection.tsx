@@ -1,5 +1,4 @@
 import Image from "next/image";
-import interfaceImage from "../../interface.png";
 
 const PROTOCOL_FEATURES = [
   "Full breakdown of what to train, eat, and supplement — specific to your body",
@@ -9,7 +8,7 @@ const PROTOCOL_FEATURES = [
 ];
 
 export default function ProtocolSection({
-  interfaceSrc = interfaceImage,
+  interfaceSrc = "/assets/interface.png",
 }: {
   interfaceSrc?: string | { src: string };
 }) {

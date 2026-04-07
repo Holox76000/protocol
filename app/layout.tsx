@@ -1,20 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Cinzel, Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
 import Ga4RouteTracker from "./ga4-route-tracker";
-
-const displayFont = Cinzel({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-display"
-});
-
-const bodyFont = Source_Sans_3({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body"
-});
 
 export const metadata: Metadata = {
   title: "Protocol | Skinny-Fat Assessment",
@@ -23,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="en">
       <body className="font-body text-ink bg-ash">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-8PLVP5JKV0"

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Protocol | Questionnaire",
   description: "Answer a short transformation questionnaire before continuing to checkout.",
 };
+export const dynamic = "force-dynamic";
 
 export default function V3QuestionStepPage({
   params,
