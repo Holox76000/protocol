@@ -30,15 +30,30 @@ export function getPublicSiteUrl(origin?: string | null) {
   return configuredUrl.replace(/\/$/, "");
 }
 
-export function getCheckoutLineItems(): Stripe.Checkout.SessionCreateParams.LineItem[] {
-  const priceId = process.env.STRIPE_PRICE_ID?.trim();
-  if (priceId) {
+export function getCheckoutLineItems(funnel = "main"): Stripe.Checkout.SessionCreateParams.LineItem[] {
+  if (funnel === "f1") {
+    const f1PriceId = process.env.STRIPE_F1_PRICE_ID?.trim();
+    if (f1PriceId) {
+      return [{ price: f1PriceId, quantity: 1 }];
+    }
     return [
       {
-        price: priceId,
         quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: 4900,
+          product_data: {
+            name: "Attractiveness Protocol — 3-Month Program",
+            description: "AI body analysis, personalized 3-month attractiveness protocol, and WhatsApp coaching support.",
+          },
+        },
       },
     ];
+  }
+
+  const priceId = process.env.STRIPE_PRICE_ID?.trim();
+  if (priceId) {
+    return [{ price: priceId, quantity: 1 }];
   }
 
   return [

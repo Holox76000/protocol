@@ -10,7 +10,9 @@ export default async function CheckoutPage({
 }: {
   searchParams?: { funnel?: string };
 }) {
-  const funnel = searchParams?.funnel?.trim() || "main";
+  const rawFunnel = searchParams?.funnel?.trim() || "main";
+  const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1"]);
+  const funnel = KNOWN_FUNNELS.has(rawFunnel) ? rawFunnel : "main";
   const internalFunnel = funnel === "v2" ? "f2" : funnel;
   const stripe = getStripeServerClient();
 
@@ -46,7 +48,7 @@ export default async function CheckoutPage({
     mode: "payment",
     billing_address_collection: "auto",
     allow_promotion_codes: true,
-    line_items: getCheckoutLineItems(),
+    line_items: getCheckoutLineItems(internalFunnel),
     success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
     cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
     metadata: {

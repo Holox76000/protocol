@@ -48,7 +48,7 @@ function CtaButton({ label, className }: { label: string; className?: string }) 
 
   return (
     <a
-      href="/checkout?funnel=f1"
+      href="/f1/signup"
       onClick={handleClick}
       className={`f1-offer-cta ${className ?? ""} ${loading ? "f1-offer-cta--loading" : ""}`}
       aria-disabled={loading}

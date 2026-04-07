@@ -1,6 +1,6 @@
 import { getMainVisualizationScreenHref, getVisualizationStepHref } from "./visualizationFlow";
 
-export type FunnelVariant = "main" | "f2" | "v3" | "woman";
+export type FunnelVariant = "main" | "f2" | "v3" | "woman" | "f1";
 
 type FunnelConfig = {
   funnel: FunnelVariant;
@@ -26,6 +26,27 @@ function withQuery(path: string, funnel: FunnelVariant) {
 }
 
 export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
+  if (funnel === "f1") {
+    const checkoutHref = withQuery("/checkout", funnel);
+
+    return {
+      funnel,
+      landingHref: "/f1",
+      visualizationHref: "/f1/offer",
+      checkoutHref,
+      landingPrimaryHref: "/f1/offer",
+      landingPrimaryLabel: "Start your Protocol — $49",
+      landingSecondaryLabel: "Start your Protocol",
+      pricingCtaLabel: "Start your Protocol — $49",
+      transformationCtaLabel: "Start your Protocol — $49",
+      footerCtaLabel: "Start your Protocol — $49",
+      visualizationNextHref: checkoutHref,
+      visualizationNextLabel: "Start your Protocol",
+      visualizationNextTitle: "Start your Protocol",
+      visualizationNextDescription: "Your personalized attractiveness protocol is one step away.",
+    };
+  }
+
   if (funnel === "f2") {
     const checkoutHref = withQuery("/checkout", funnel);
 
