@@ -499,6 +499,15 @@ function MeasurementOverlay({
   const chestY = (points.chestLeft.y + points.chestRight.y) / 2;
   const waistY = (points.waistLeft.y + points.waistRight.y) / 2;
 
+  // Inline metric computation for overlay labels
+  const _sw = points.shoulderRight.x - points.shoulderLeft.x;
+  const _cw = points.chestRight.x - points.chestLeft.x;
+  const _ww = points.waistRight.x - points.waistLeft.x;
+  const _vd = Math.abs(((points.waistLeft.y + points.waistRight.y) / 2) - ((points.shoulderLeft.y + points.shoulderRight.y) / 2));
+  const swrVal = _ww > 0 ? (_sw / _ww).toFixed(2) : "—";
+  const cwrVal = _ww > 0 ? (_cw / _ww).toFixed(2) : "—";
+  const tiVal  = _vd > 0 ? ((_sw - _ww) / _vd * 2.5).toFixed(2) : "—";
+
   return (
     <svg
       ref={svgRef}
@@ -527,7 +536,9 @@ function MeasurementOverlay({
         {/* Center line */}
         <line x1={points.shoulderLeft.x} y1={shoulderY} x2={points.shoulderRight.x} y2={shoulderY} className="scan-overlay__line scan-overlay__line--shoulder" />
         {/* Label */}
-        <text x={(points.shoulderLeft.x + points.shoulderRight.x) / 2} y={shoulderY - bh / 2 - 1.5} className="scan-overlay__label">SHOULDERS</text>
+        <text x={(points.shoulderLeft.x + points.shoulderRight.x) / 2} y={shoulderY - bh / 2 - 2.8} className="scan-overlay__label">SHOULDERS</text>
+        {/* Metric value */}
+        <text x={(points.shoulderLeft.x + points.shoulderRight.x) / 2} y={shoulderY - bh / 2 - 1.0} className="scan-overlay__metric-value">SWR {swrVal}</text>
         {/* Left handle */}
         <rect x={points.shoulderLeft.x - 1} y={shoulderY - bh / 2} width={2} height={bh} className="scan-band__handle" />
         <rect x={points.shoulderLeft.x - hitR / 2} y={shoulderY - bh} width={hitR} height={bh * 2} fill="transparent" style={{ cursor: "ew-resize", pointerEvents: "fill" }} onPointerDown={handlePointerDown("shoulder-left")} />
@@ -546,7 +557,8 @@ function MeasurementOverlay({
           onPointerDown={handlePointerDown("chest-band")}
         />
         <line x1={points.chestLeft.x} y1={chestY} x2={points.chestRight.x} y2={chestY} className="scan-overlay__line scan-overlay__line--chest" />
-        <text x={(points.chestLeft.x + points.chestRight.x) / 2} y={chestY - bh / 2 - 1.5} className="scan-overlay__label">CHEST</text>
+        <text x={(points.chestLeft.x + points.chestRight.x) / 2} y={chestY - bh / 2 - 2.8} className="scan-overlay__label">CHEST</text>
+        <text x={(points.chestLeft.x + points.chestRight.x) / 2} y={chestY - bh / 2 - 1.0} className="scan-overlay__metric-value">CWR {cwrVal}</text>
         <rect x={points.chestLeft.x - 1} y={chestY - bh / 2} width={2} height={bh} className="scan-band__handle" />
         <rect x={points.chestLeft.x - hitR / 2} y={chestY - bh} width={hitR} height={bh * 2} fill="transparent" style={{ cursor: "ew-resize", pointerEvents: "fill" }} onPointerDown={handlePointerDown("chest-left")} />
         <rect x={points.chestRight.x - 1} y={chestY - bh / 2} width={2} height={bh} className="scan-band__handle" />
@@ -563,7 +575,8 @@ function MeasurementOverlay({
           onPointerDown={handlePointerDown("waist-band")}
         />
         <line x1={points.waistLeft.x} y1={waistY} x2={points.waistRight.x} y2={waistY} className="scan-overlay__line scan-overlay__line--waist" />
-        <text x={(points.waistLeft.x + points.waistRight.x) / 2} y={waistY + bh / 2 + 3.5} className="scan-overlay__label">WAIST</text>
+        <text x={(points.waistLeft.x + points.waistRight.x) / 2} y={waistY + bh / 2 + 2.8} className="scan-overlay__label">WAIST</text>
+        <text x={(points.waistLeft.x + points.waistRight.x) / 2} y={waistY + bh / 2 + 4.5} className="scan-overlay__metric-value">TI {tiVal}</text>
         <rect x={points.waistLeft.x - 1} y={waistY - bh / 2} width={2} height={bh} className="scan-band__handle" />
         <rect x={points.waistLeft.x - hitR / 2} y={waistY - bh} width={hitR} height={bh * 2} fill="transparent" style={{ cursor: "ew-resize", pointerEvents: "fill" }} onPointerDown={handlePointerDown("waist-left")} />
         <rect x={points.waistRight.x - 1} y={waistY - bh / 2} width={2} height={bh} className="scan-band__handle" />
@@ -614,6 +627,69 @@ const METRIC_CROP_DEFAULTS: Record<keyof Metrics, { cx: number; cy: number; zoom
   pc: { cx: 50, cy: 30, zoom: 1.1, label: "Full proportions" },
 };
 
+/* ─── Export helper ─────────────────────────────────────────────────────── */
+
+async function exportSvgCrop(src: string, viewBox: string, overlayEl: SVGSVGElement | null, filename: string) {
+  let dataUrl = src;
+  try {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    dataUrl = await new Promise<string>((res) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch { /* fallback to original src */ }
+
+  const styles = `
+    .scan-crop-overlay__line { fill: none; stroke-width: 0.5; stroke-linecap: round; }
+    .scan-crop-overlay__line--shoulder { stroke: rgba(120,230,160,0.95); }
+    .scan-crop-overlay__line--chest { stroke: rgba(200,160,250,0.95); }
+    .scan-crop-overlay__line--waist { stroke: rgba(240,190,90,0.95); }
+    .scan-crop-overlay__line--taper { stroke: rgba(120,230,160,0.6); stroke-width: 0.35; }
+    .scan-crop-overlay__line--posture { stroke: rgba(160,180,240,0.85); stroke-width: 0.4; }
+    .scan-crop-overlay__dot { fill: rgba(255,255,255,1); stroke: rgba(120,230,160,1); stroke-width: 0.3; }
+    .scan-crop-overlay__label { font-size: 2.5px; fill: rgba(255,255,255,0.95); text-anchor: middle; font-weight: 700; letter-spacing: 0.4px; }
+    .scan-crop-overlay__metric-value { font-size: 2.2px; font-family: monospace; font-weight: 700; fill: rgba(255,255,255,0.9); text-anchor: middle; }
+  `;
+
+  const overlayInner = overlayEl?.innerHTML ?? "";
+  const [, , visW, visH] = viewBox.split(" ").map(Number);
+  const exportW = 1200;
+  const exportH = Math.round(exportW * (visH / visW));
+
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${exportW}" height="${exportH}" preserveAspectRatio="xMidYMid slice">
+    <defs><style>${styles}</style></defs>
+    <image href="${dataUrl}" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice"/>
+    ${overlayInner}
+  </svg>`;
+
+  const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  const img = document.createElement("img");
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = exportW;
+    canvas.height = exportH;
+    canvas.getContext("2d")!.drawImage(img, 0, 0);
+    URL.revokeObjectURL(svgUrl);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  };
+  img.onerror = () => URL.revokeObjectURL(svgUrl);
+  img.src = svgUrl;
+}
+
 /* ─── Pannable + Zoomable image crop ────────────────────────────────────── */
 
 function PannableCrop({
@@ -623,6 +699,7 @@ function PannableCrop({
   defaultCy,
   defaultZoom,
   children,
+  exportFilename,
 }: {
   src: string;
   alt: string;
@@ -630,11 +707,14 @@ function PannableCrop({
   defaultCy: number;
   defaultZoom: number;
   children?: React.ReactNode;
+  exportFilename?: string;
 }) {
   const [cx, setCx] = useState(defaultCx);
   const [cy, setCy] = useState(defaultCy);
   const [zoom, setZoom] = useState(defaultZoom);
   const frameRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<SVGSVGElement>(null);
+  const viewBoxRef = useRef("");
   const panStart = useRef<{ x: number; y: number; cx: number; cy: number } | null>(null);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -670,6 +750,12 @@ function PannableCrop({
   const vbX = cx - visW / 2;
   const vbY = cy - visH / 2;
   const viewBox = `${vbX} ${vbY} ${visW} ${visH}`;
+  viewBoxRef.current = viewBox;
+
+  const handleExport = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await exportSvgCrop(src, viewBoxRef.current, overlayRef.current, exportFilename ?? "scan-export.png");
+  }, [src, exportFilename]);
 
   return (
     <div
@@ -687,9 +773,16 @@ function PannableCrop({
       </svg>
       {/* Overlay lines use the same viewBox */}
       {children && (
-        <svg viewBox={viewBox} preserveAspectRatio="xMidYMid slice" className="scan-crop-overlay">
+        <svg ref={overlayRef} viewBox={viewBox} preserveAspectRatio="xMidYMid slice" className="scan-crop-overlay">
           {children}
         </svg>
+      )}
+      {exportFilename && (
+        <button className="scan-crop__export-btn" onClick={handleExport} title="Exporter l'image">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       )}
       <div className="scan-crop-zoom-hint">
         <span>{Math.round(zoom * 100)}%</span>
@@ -710,6 +803,14 @@ function CropLines({ metricKey, points }: { metricKey: keyof Metrics; points: Ov
   const pb = points.postureBottom;
   const dotR = 0.6;
 
+  const _sw = sr.x - sl.x;
+  const _cw = cr.x - cl.x;
+  const _ww = wr.x - wl.x;
+  const _vd = Math.abs(((wl.y + wr.y) / 2) - ((sl.y + sr.y) / 2));
+  const swrVal = _ww > 0 ? (_sw / _ww).toFixed(2) : "—";
+  const cwrVal = _ww > 0 ? (_cw / _ww).toFixed(2) : "—";
+  const tiVal  = _vd > 0 ? ((_sw - _ww) / _vd * 2.5).toFixed(2) : "—";
+
   return (
     <>
       {(metricKey === "swr" || metricKey === "pc") && (
@@ -717,7 +818,10 @@ function CropLines({ metricKey, points }: { metricKey: keyof Metrics; points: Ov
           <line x1={sl.x} y1={sl.y} x2={sr.x} y2={sr.y} className="scan-crop-overlay__line scan-crop-overlay__line--shoulder" />
           <circle cx={sl.x} cy={sl.y} r={dotR} className="scan-crop-overlay__dot" />
           <circle cx={sr.x} cy={sr.y} r={dotR} className="scan-crop-overlay__dot" />
-          <text x={(sl.x + sr.x) / 2} y={sl.y - 2} className="scan-crop-overlay__label">SWR</text>
+          {metricKey === "swr" && <>
+            <text x={(sl.x + sr.x) / 2} y={sl.y - 3} className="scan-crop-overlay__label">SWR</text>
+            <text x={(sl.x + sr.x) / 2} y={sl.y - 1.2} className="scan-crop-overlay__metric-value">{swrVal}</text>
+          </>}
         </>
       )}
       {(metricKey === "cwr" || metricKey === "pc") && (
@@ -726,7 +830,10 @@ function CropLines({ metricKey, points }: { metricKey: keyof Metrics; points: Ov
           <line x1={wl.x} y1={wl.y} x2={wr.x} y2={wr.y} className="scan-crop-overlay__line scan-crop-overlay__line--waist" />
           <circle cx={cl.x} cy={cl.y} r={dotR} className="scan-crop-overlay__dot" />
           <circle cx={cr.x} cy={cr.y} r={dotR} className="scan-crop-overlay__dot" />
-          <text x={(cl.x + cr.x) / 2} y={cl.y - 2} className="scan-crop-overlay__label">CHEST</text>
+          {metricKey === "cwr" && <>
+            <text x={(cl.x + cr.x) / 2} y={cl.y - 3} className="scan-crop-overlay__label">CHEST</text>
+            <text x={(cl.x + cr.x) / 2} y={cl.y - 1.2} className="scan-crop-overlay__metric-value">{cwrVal}</text>
+          </>}
         </>
       )}
       {(metricKey === "bf" || metricKey === "pc") && (
@@ -734,7 +841,7 @@ function CropLines({ metricKey, points }: { metricKey: keyof Metrics; points: Ov
           <line x1={wl.x} y1={wl.y} x2={wr.x} y2={wr.y} className="scan-crop-overlay__line scan-crop-overlay__line--waist" />
           <circle cx={wl.x} cy={wl.y} r={dotR} className="scan-crop-overlay__dot" />
           <circle cx={wr.x} cy={wr.y} r={dotR} className="scan-crop-overlay__dot" />
-          <text x={(wl.x + wr.x) / 2} y={wl.y + 4} className="scan-crop-overlay__label">WAIST</text>
+          <text x={(wl.x + wr.x) / 2} y={wl.y + 3.5} className="scan-crop-overlay__label">WAIST</text>
         </>
       )}
       {(metricKey === "pas" || metricKey === "pc") && (
@@ -751,8 +858,24 @@ function CropLines({ metricKey, points }: { metricKey: keyof Metrics; points: Ov
           <circle cx={sr.x} cy={sr.y} r={dotR} className="scan-crop-overlay__dot" />
           <circle cx={wl.x} cy={wl.y} r={dotR} className="scan-crop-overlay__dot" />
           <circle cx={wr.x} cy={wr.y} r={dotR} className="scan-crop-overlay__dot" />
+          {metricKey === "ti" && <>
+            <text x={(sl.x + sr.x) / 2} y={sl.y - 3} className="scan-crop-overlay__label">TI</text>
+            <text x={(sl.x + sr.x) / 2} y={sl.y - 1.2} className="scan-crop-overlay__metric-value">{tiVal}</text>
+          </>}
         </>
       )}
+      {/* ── pc: all annotations, non-overlapping layout ── */}
+      {metricKey === "pc" && <>
+        {/* SWR — above shoulder line, left side */}
+        <text x={sl.x + 1} y={sl.y - 3} className="scan-crop-overlay__label" textAnchor="start">SWR</text>
+        <text x={sl.x + 1} y={sl.y - 1.2} className="scan-crop-overlay__metric-value" textAnchor="start">{swrVal}</text>
+        {/* CWR — above chest line, right side */}
+        <text x={cr.x - 1} y={cl.y - 3} className="scan-crop-overlay__label" textAnchor="end">CWR</text>
+        <text x={cr.x - 1} y={cl.y - 1.2} className="scan-crop-overlay__metric-value" textAnchor="end">{cwrVal}</text>
+        {/* TI — below waist line, centered */}
+        <text x={(wl.x + wr.x) / 2} y={(wl.y + wr.y) / 2 + 9} className="scan-crop-overlay__label">TI</text>
+        <text x={(wl.x + wr.x) / 2} y={(wl.y + wr.y) / 2 + 11} className="scan-crop-overlay__metric-value">{tiVal}</text>
+      </>}
     </>
   );
 }
@@ -767,6 +890,7 @@ function MetricSection({
   beforeSrc,
   afterSrc,
   points,
+  pointsAfter,
 }: {
   metric: Metric;
   metricKey: keyof Metrics;
@@ -775,6 +899,7 @@ function MetricSection({
   beforeSrc: string;
   afterSrc: string;
   points: OverlayPoints;
+  pointsAfter: OverlayPoints;
 }) {
   const info = METRIC_INFO[metricKey];
   const cropDef = METRIC_CROP_DEFAULTS[metricKey];
@@ -833,25 +958,20 @@ function MetricSection({
             <p className="scan-card__rec-target">{info.recommendation}</p>
           </div>
 
-          <div className="scan-card__crop">
-            <PannableCrop src={beforeSrc} alt={cropDef.label} defaultCx={cropDef.cx} defaultCy={cropDef.cy} defaultZoom={cropDef.zoom}>
-              <CropLines metricKey={metricKey} points={points} />
-            </PannableCrop>
-          </div>
         </div>
 
         {/* ── Before / After row ── */}
         <div className="scan-card__compare">
           <div className="scan-card__compare-item">
             <span className="scan-card__compare-label">Before</span>
-            <PannableCrop src={beforeSrc} alt="Before" defaultCx={cropDef.cx} defaultCy={cropDef.cy} defaultZoom={cropDef.zoom}>
+            <PannableCrop src={beforeSrc} alt="Before" defaultCx={cropDef.cx} defaultCy={cropDef.cy} defaultZoom={cropDef.zoom} exportFilename={`scan-${metricKey}-before.png`}>
               <CropLines metricKey={metricKey} points={points} />
             </PannableCrop>
           </div>
           <div className="scan-card__compare-item">
             <span className="scan-card__compare-label">After</span>
-            <PannableCrop src={afterSrc} alt="After" defaultCx={cropDef.cx} defaultCy={cropDef.cy} defaultZoom={cropDef.zoom}>
-              <CropLines metricKey={metricKey} points={points} />
+            <PannableCrop src={afterSrc} alt="After" defaultCx={cropDef.cx} defaultCy={cropDef.cy} defaultZoom={cropDef.zoom} exportFilename={`scan-${metricKey}-after.png`}>
+              <CropLines metricKey={metricKey} points={pointsAfter} />
             </PannableCrop>
           </div>
         </div>
@@ -914,6 +1034,40 @@ export default function ScanReport({
   const [showAfter, setShowAfter] = useState(false);
   const [beforePts, setBeforePts] = useState(overlaysBefore);
   const [afterPts, setAfterPts] = useState(overlaysAfter);
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+
+  const storageKey = `scan-config-${subjectName}`;
+
+  // Load saved config on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const { beforePts: bp, afterPts: ap } = JSON.parse(raw);
+        if (bp) setBeforePts(bp);
+        if (ap) setAfterPts(ap);
+      }
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save on every change (debounced 600ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({ beforePts, afterPts, savedAt: new Date().toISOString() }));
+        setSavedAt(new Date());
+      } catch { /* ignore */ }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [storageKey, beforePts, afterPts]);
+
+  const handleReset = useCallback(() => {
+    setBeforePts(overlaysBefore);
+    setAfterPts(overlaysAfter);
+    localStorage.removeItem(storageKey);
+    setSavedAt(null);
+  }, [overlaysBefore, overlaysAfter, storageKey]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setScanning(true), 300);
@@ -949,6 +1103,19 @@ export default function ScanReport({
             <span className="scan-header__title">AI Body Scan</span>
           </div>
           {extraControls}
+          <div className="scan-header__config">
+            {savedAt && (
+              <span className="scan-config__saved-badge">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Sauvegardé {savedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+            <button className="scan-config__reset-btn" onClick={handleReset} title="Réinitialiser les bandes">
+              Réinit.
+            </button>
+          </div>
           <span className={`scan-toggle ${showAfter ? "scan-toggle--after" : ""}`}>
             <button
               type="button"
@@ -998,7 +1165,8 @@ export default function ScanReport({
           scanned={scanned}
           beforeSrc={beforeImage.src}
           afterSrc={afterImage.src}
-          points={currentOverlays}
+          points={beforePts}
+          pointsAfter={afterPts}
         />
       ))}
 

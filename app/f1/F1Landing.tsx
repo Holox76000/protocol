@@ -168,7 +168,7 @@ export default function F1Landing() {
             <a href="#results">Results</a>
           </nav>
           <div className="program-nav__actions">
-            <TrackedLink href="/quiz/1" className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
+            <TrackedLink href="/f1/offer" className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
               Start attractiveness Protocol
 </TrackedLink>
           </div>
@@ -187,7 +187,7 @@ export default function F1Landing() {
               You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
             </p>
             <div className="program-hero__actions">
-              <TrackedLink href="/quiz/1" className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
+              <TrackedLink href="/f1/offer" className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
                 <span>Start attractiveness Protocol</span>
                 <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
               </TrackedLink>
@@ -195,7 +195,7 @@ export default function F1Landing() {
             <p className="program-hero__trust">
               <span className="program-hero__trust-item">Based on published research</span>
               <span className="program-hero__trust-dot" aria-hidden="true" />
-              <span className="program-hero__trust-item">Free AI body analysis</span>
+              <span className="program-hero__trust-item">Personalized to your body</span>
               <span className="program-hero__trust-dot" aria-hidden="true" />
               <span className="program-hero__trust-item">90-day guarantee</span>
             </p>
@@ -290,10 +290,10 @@ export default function F1Landing() {
 
       {/* ═══ MID CTA ═══ */}
       <div className="f1-mid-cta">
-        <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
+        <TrackedLink href="/f1/offer" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
           Start attractiveness Protocol <ArrowIcon />
         </TrackedLink>
-        <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
       </div>
 
       {/* ═══ REFRAME ═══ */}
@@ -438,10 +438,10 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-pain__cta">
-            <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
+            <TrackedLink href="/f1/offer" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
               Start attractiveness Protocol <ArrowIcon />
             </TrackedLink>
-            <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
+            <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
           </div>
         </div>
       </section>
@@ -480,12 +480,12 @@ export default function F1Landing() {
           <div className="f1-close__option f1-close__option--discover">
             <div className="f1-close__option-label">Option 2. Start attractiveness Protocol</div>
             <p className="f1-close__text">Start the Protocol today. Answer a few questions about your body and context. Get your personalized attractiveness roadmap — the exact variables to train, the exact targets to hit.</p>
-            <TrackedLink href="/quiz/1" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
+            <TrackedLink href="/f1/offer" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
               Start attractiveness Protocol
             </TrackedLink>
           </div>
 
-          <p className="f1-close__meta">Free analysis &middot; No commitment &middot; Based on published research</p>
+          <p className="f1-close__meta">Based on published research &middot; 90-day guarantee</p>
         </div>
       </section>
 

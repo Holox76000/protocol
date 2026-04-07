@@ -92,6 +92,38 @@
   gap: 0.75rem;
 }
 
+.scan-header__config {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.scan-config__saved-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 1.1rem;
+  color: rgba(120, 230, 160, 0.9);
+  white-space: nowrap;
+}
+
+.scan-config__reset-btn {
+  font-size: 1.1rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--scan-border);
+  background: transparent;
+  color: var(--scan-text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.scan-config__reset-btn:hover {
+  border-color: rgba(255, 100, 100, 0.5);
+  color: rgba(255, 100, 100, 0.9);
+}
+
 .scan-header__logo {
   width: 36px;
   height: 36px;
@@ -325,6 +357,16 @@
   text-anchor: middle;
   font-weight: 700;
   letter-spacing: 0.4px;
+}
+
+.scan-overlay__metric-value {
+  font-size: 2.5px;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-weight: 700;
+  fill: rgba(255, 255, 255, 0.85);
+  text-anchor: middle;
+  pointer-events: none;
+  letter-spacing: 0.2px;
 }
 
 /* ─── Scan Card (QOVES-style layout) ────────────────────────────────────── */
@@ -631,6 +673,30 @@
   height: 100%;
 }
 
+.scan-crop__export-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(15, 22, 26, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s, color 0.15s;
+}
+
+.scan-crop__export-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
 .scan-crop-zoom-hint {
   position: absolute;
   bottom: 0.5rem;
@@ -714,6 +780,17 @@
   font-weight: 700;
   letter-spacing: 0.4px;
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7));
+}
+
+.scan-crop-overlay__metric-value {
+  font-size: 2.2px;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-weight: 700;
+  fill: rgba(255, 255, 255, 0.9);
+  text-anchor: middle;
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+  letter-spacing: 0.2px;
 }
 
 /* (old scan-metric styles removed — replaced by scan-card) */
