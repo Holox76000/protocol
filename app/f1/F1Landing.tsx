@@ -169,8 +169,8 @@ export default function F1Landing() {
           </nav>
           <div className="program-nav__actions">
             <TrackedLink href="/quiz/1" className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
-              Discover your potential
-            </TrackedLink>
+              Start attractiveness Protocol
+</TrackedLink>
           </div>
         </div>
       </header>
@@ -188,7 +188,7 @@ export default function F1Landing() {
             </p>
             <div className="program-hero__actions">
               <TrackedLink href="/quiz/1" className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
-                <span>Discover your potential in 60 seconds</span>
+                <span>Start attractiveness Protocol</span>
                 <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
               </TrackedLink>
             </div>
@@ -200,7 +200,8 @@ export default function F1Landing() {
               <span className="program-hero__trust-item">90-day guarantee</span>
             </p>
 
-            <div className="f1-vsl">
+            {/* VSL — hidden for now */}
+            <div className="f1-vsl" style={{ display: "none" }}>
               <button type="button" className="f1-vsl__play" aria-label="Play video"><PlayIcon /></button>
               <span className="f1-vsl__label">Watch: the science breakdown</span>
             </div>
@@ -268,8 +269,8 @@ export default function F1Landing() {
               <p className="f1-body">The workouts work. The diets work. The supplements do what they claim. You will build muscle, lose fat, get stronger.</p>
               <p className="f1-body">The fitness industry optimizes for performance and size. It does not optimize for how people perceive you. That is not a flaw in their method. <strong>It is a different goal.</strong> Nobody told you the difference.</p>
             </div>
-            <div className="f1-listicle__media">
-              <span className="f1-listicle__media-label">Volume vs proportions comparison</span>
+            <div className="f1-listicle__media f1-listicle__media--diagram">
+              <Image src="/assets/fitness_vs_attractiveness_goals_v2.svg" alt="Fitness vs attractiveness goals — two different coordinates" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "contain" }} />
             </div>
           </div>
 
@@ -290,7 +291,7 @@ export default function F1Landing() {
       {/* ═══ MID CTA ═══ */}
       <div className="f1-mid-cta">
         <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
-          Discover your potential in 60 seconds <ArrowIcon />
+          Start attractiveness Protocol <ArrowIcon />
         </TrackedLink>
         <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
       </div>
@@ -438,7 +439,7 @@ export default function F1Landing() {
 
           <div className="f1-pain__cta">
             <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
-              Discover your potential in 60 seconds <ArrowIcon />
+              Start attractiveness Protocol <ArrowIcon />
             </TrackedLink>
             <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
           </div>
@@ -477,10 +478,10 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-close__option f1-close__option--discover">
-            <div className="f1-close__option-label">Option 2. Discover your potential</div>
-            <p className="f1-close__text">Take the AI body scan. In 60 seconds, see your proportions analyzed with the precision of aesthetic medicine. Find out what separates you from your most attractive physique.</p>
+            <div className="f1-close__option-label">Option 2. Start attractiveness Protocol</div>
+            <p className="f1-close__text">Start the Protocol today. Answer a few questions about your body and context. Get your personalized attractiveness roadmap — the exact variables to train, the exact targets to hit.</p>
             <TrackedLink href="/quiz/1" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
-              Discover your potential in 60 seconds
+              Start attractiveness Protocol
             </TrackedLink>
           </div>
 

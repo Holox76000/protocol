@@ -1,0 +1,54 @@
+<svg width="100%" viewBox="0 0 500 625" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowY" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="270deg">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#c8d0d3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrowX" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="0deg">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#c8d0d3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Header -->
+  <text x="250" y="34" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#253239">Two goals. Same plane. Different coordinates.</text>
+  <text x="250" y="54" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">The fitness industry isn't wrong. It's optimizing for a different point.</text>
+
+  <!-- Grid lines horizontal -->
+  <line x1="90" y1="190" x2="470" y2="190" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+  <line x1="90" y1="285" x2="470" y2="285" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+  <line x1="90" y1="380" x2="470" y2="380" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+  <line x1="90" y1="475" x2="470" y2="475" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+
+  <!-- Grid lines vertical -->
+  <line x1="185" y1="95" x2="185" y2="535" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+  <line x1="280" y1="95" x2="280" y2="535" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+  <line x1="375" y1="95" x2="375" y2="535" stroke="#c8d0d3" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.6"/>
+
+  <!-- Axes -->
+  <line x1="90" y1="95" x2="90" y2="535" stroke="#c8d0d3" stroke-width="1" marker-end="url(#arrowY)"/>
+  <line x1="90" y1="535" x2="470" y2="535" stroke="#c8d0d3" stroke-width="1" marker-end="url(#arrowX)"/>
+
+  <!-- Y-axis labels -->
+  <text x="78" y="99" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">high</text>
+  <text x="78" y="539" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">low</text>
+  <text x="78" y="312" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#515255">muscle</text>
+  <text x="78" y="328" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#515255">&amp; strength</text>
+
+  <!-- X-axis labels -->
+  <text x="90" y="552" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">low</text>
+  <text x="470" y="552" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">high</text>
+  <text x="280" y="572" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#515255">perceived attractiveness</text>
+
+  <!-- Fitness goal dot: low attractiveness (left), high muscle (top) -->
+  <circle cx="185" cy="170" r="6" fill="#dde3e6" stroke="#9eb1b8" stroke-width="1"/>
+  <text x="202" y="168" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#253239">The fitness goal</text>
+  <text x="202" y="184" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">Maximum muscle &amp; strength</text>
+
+  <!-- Attractiveness goal dot: high attractiveness (right), medium muscle -->
+  <circle cx="400" cy="320" r="7" fill="#253239" stroke="#3D5A3E" stroke-width="1.5"/>
+  <text x="383" y="316" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#253239">The attractiveness goal</text>
+  <text x="383" y="332" text-anchor="end" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">Proportions &amp; composition</text>
+
+  <!-- Footer -->
+  <line x1="40" y1="592" x2="460" y2="592" stroke="#c8d0d3" stroke-width="0.5" opacity="0.5"/>
+  <text x="250" y="612" text-anchor="middle" font-family="-apple-system,system-ui,'Segoe UI',sans-serif" font-size="11" fill="#7f949b">Both goals are valid. They just live at different coordinates.</text>
+</svg>
