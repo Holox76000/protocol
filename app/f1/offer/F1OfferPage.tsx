@@ -119,7 +119,7 @@ const FAQS = [
   },
   {
     q: "How is this different from a personal trainer?",
-    a: "A personal trainer optimizes for muscle mass and performance. This optimizes for how people perceive you — a different goal, a different measurement, a different program. Most trainers are not trained in aesthetic medicine or attractiveness research.",
+    a: "A personal trainer optimizes for muscle mass and performance. This optimizes for how people perceive you — a different goal, a different measurement, a different protocol. Most trainers are not trained in aesthetic medicine or attractiveness research.",
   },
   {
     q: "What does WhatsApp coaching actually look like?",
@@ -433,7 +433,7 @@ export default function F1OfferPage() {
 
           <div className="f1-offer-price__card">
             <div className="f1-offer-price__anchor">
-              A personal trainer costs $300/month — and gives you a generic program that doesn&apos;t know your body. This is a 3-month engagement built specifically for you, for
+              A personal trainer costs $300/month — and gives you a generic protocol that doesn&apos;t know your body. This is a 3-month engagement built specifically for you, for
             </div>
             <div className="f1-offer-price__amount">$49</div>
             <div className="f1-offer-price__period">one-time payment</div>

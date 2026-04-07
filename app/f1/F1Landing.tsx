@@ -123,7 +123,7 @@ const VERSIONS = [
 const TIMELINE = [
   { marker: "The question", text: "An aesthetic medicine student set out to find what the research actually says about male physical attractiveness. Not trends. Not opinions. Published science across evolutionary psychology, social cognitive science, and aesthetic medicine." },
   { marker: "5 years", text: "Working alongside researchers, scientists, and doctors in aesthetics. Thousands of studies analyzed. A single focus: identifying the variables that drive how people perceive male attractiveness, and how to change them." },
-  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one product, program, or methodology optimizes for what research consistently identifies as the primary driver of male physical attractiveness: your shape, relative to who you are." },
+  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one product, protocol, or methodology optimizes for what research consistently identifies as the primary driver of male physical attractiveness: your shape, relative to who you are." },
   { marker: "The protocol", text: "Protocol is the result. A system that analyzes your body with the precision of aesthetic medicine, factors in your face, your age, and your social context, and gives you a plan built for your life." },
 ];
 
@@ -137,7 +137,7 @@ const TESTIMONIALS = [
 ];
 
 const WITHOUT = [
-  "A program that doesn\u2019t know your proportions or who you are",
+  "A protocol that doesn\u2019t know your proportions or who you are",
   "No way to know if your shape is improving or not",
   "Effort that builds muscle but doesn\u2019t change perception",
   "The variable that affects your salary, your dating, your confidence, left to chance",
@@ -422,7 +422,7 @@ export default function F1Landing() {
               Right now, you&apos;re training without knowing if your body is <span>moving toward its potential</span>.
             </h2>
             <p className="f1-section__subtitle">
-              Every week you spend on a program that wasn&apos;t built for your proportions, your face, or your context is a week where the variable that impacts how people perceive you stays unchanged.
+              Every week you spend on a protocol that wasn&apos;t built for your proportions, your face, or your context is a week where the variable that impacts how people perceive you stays unchanged.
             </p>
           </div>
 
