@@ -275,7 +275,7 @@
   .f1-listicle__item--media-left .f1-listicle__media { order: 1; }
 
   .f1-listicle__media {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 5;
   }
 }
 
