@@ -10,3 +10,8 @@ dist
 .agents
 skills
 www.qoves.com
+
+# Editor swap files
+*.swp
+*.swo
+.env*.swp

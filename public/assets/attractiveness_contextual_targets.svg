@@ -1,0 +1,120 @@
+<svg width="100%" viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg" font-family="'Basis Grotesque', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <!-- ─── Title ─── -->
+  <text x="240" y="48" text-anchor="middle"
+        font-family="Kessler, 'Iowan Old Style', 'Palatino Linotype', serif"
+        font-size="26" font-weight="400" fill="#253239" letter-spacing="-0.4">
+    Same science. Different targets.
+  </text>
+  <text x="240" y="76" text-anchor="middle"
+        font-size="13" font-weight="400" fill="#7f949b">
+    Ideal proportions depend on your face,
+  </text>
+  <text x="240" y="94" text-anchor="middle"
+        font-size="13" font-weight="400" fill="#7f949b">
+    your age, and your context.
+  </text>
+
+  <!-- ─── Profile A: Lawyer ─── -->
+  <g transform="translate(40 130)">
+    <!-- Card background -->
+    <rect x="0" y="0" width="180" height="380" rx="14"
+          fill="#ffffff" stroke="#dfe4e6" stroke-width="1"/>
+
+    <!-- Profile label -->
+    <text x="90" y="36" text-anchor="middle"
+          font-size="13" font-weight="600" fill="#253239" letter-spacing="0.5">
+      PROFILE A
+    </text>
+    <text x="90" y="58" text-anchor="middle"
+          font-size="11" font-weight="400" fill="#7f949b">
+      Office lawyer · 32
+    </text>
+    <text x="90" y="74" text-anchor="middle"
+          font-size="11" font-weight="400" fill="#7f949b">
+      Soft features
+    </text>
+
+    <!-- Torso silhouette: narrower taper -->
+    <polygon points="56,110 124,110 116,260 64,260"
+             fill="#eef2f3" stroke="#9eb1b8" stroke-width="1.2"/>
+    <!-- Shoulder measurement line -->
+    <line x1="50" y1="110" x2="130" y2="110"
+          stroke="#9eb1b8" stroke-width="0.8" stroke-dasharray="3 2"/>
+    <text x="138" y="114" font-size="10" fill="#7f949b">76</text>
+    <!-- Waist measurement line -->
+    <line x1="60" y1="260" x2="120" y2="260"
+          stroke="#9eb1b8" stroke-width="0.8" stroke-dasharray="3 2"/>
+    <text x="128" y="264" font-size="10" fill="#7f949b">48</text>
+
+    <!-- Ratio pill -->
+    <rect x="48" y="290" width="84" height="40" rx="20"
+          fill="#253239"/>
+    <text x="90" y="316" text-anchor="middle"
+          font-family="Kessler, 'Iowan Old Style', 'Palatino Linotype', serif"
+          font-size="18" font-weight="400" fill="#ffffff">
+      1.58 : 1
+    </text>
+
+    <text x="90" y="354" text-anchor="middle"
+          font-size="10" font-weight="500" fill="#7f949b" letter-spacing="0.6">
+      TARGET SHOULDER : WAIST
+    </text>
+  </g>
+
+  <!-- ─── Profile B: Foreman ─── -->
+  <g transform="translate(260 130)">
+    <!-- Card background -->
+    <rect x="0" y="0" width="180" height="380" rx="14"
+          fill="#ffffff" stroke="#dfe4e6" stroke-width="1"/>
+
+    <!-- Profile label -->
+    <text x="90" y="36" text-anchor="middle"
+          font-size="13" font-weight="600" fill="#253239" letter-spacing="0.5">
+      PROFILE B
+    </text>
+    <text x="90" y="58" text-anchor="middle"
+          font-size="11" font-weight="400" fill="#7f949b">
+      Construction foreman · 42
+    </text>
+    <text x="90" y="74" text-anchor="middle"
+          font-size="11" font-weight="400" fill="#7f949b">
+      Strong jaw
+    </text>
+
+    <!-- Torso silhouette: wider, more dramatic taper -->
+    <polygon points="40,110 140,110 124,260 56,260"
+             fill="#eef2f3" stroke="#9eb1b8" stroke-width="1.2"/>
+    <!-- Shoulder measurement line -->
+    <line x1="34" y1="110" x2="146" y2="110"
+          stroke="#9eb1b8" stroke-width="0.8" stroke-dasharray="3 2"/>
+    <text x="154" y="114" font-size="10" fill="#7f949b">100</text>
+    <!-- Waist measurement line -->
+    <line x1="52" y1="260" x2="128" y2="260"
+          stroke="#9eb1b8" stroke-width="0.8" stroke-dasharray="3 2"/>
+    <text x="136" y="264" font-size="10" fill="#7f949b">60</text>
+
+    <!-- Ratio pill -->
+    <rect x="48" y="290" width="84" height="40" rx="20"
+          fill="#253239"/>
+    <text x="90" y="316" text-anchor="middle"
+          font-family="Kessler, 'Iowan Old Style', 'Palatino Linotype', serif"
+          font-size="18" font-weight="400" fill="#ffffff">
+      1.66 : 1
+    </text>
+
+    <text x="90" y="354" text-anchor="middle"
+          font-size="10" font-weight="500" fill="#7f949b" letter-spacing="0.6">
+      TARGET SHOULDER : WAIST
+    </text>
+  </g>
+
+  <!-- ─── Bottom caption ─── -->
+  <text x="240" y="555" text-anchor="middle"
+        font-size="12" font-weight="400" fill="#515255" font-style="italic">
+    The protocol reads all of these variables
+  </text>
+  <text x="240" y="574" text-anchor="middle"
+        font-size="12" font-weight="400" fill="#515255" font-style="italic">
+    before setting your target.
+  </text>
+</svg>

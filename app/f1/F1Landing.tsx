@@ -121,26 +121,26 @@ const VERSIONS = [
 ];
 
 const TIMELINE = [
-  { marker: "The question", text: "An aesthetic medicine student set out to find what the research actually says about male physical attractiveness. Not trends, not opinions \u2014 published science across evolutionary psychology, social cognitive science, and aesthetic medicine." },
-  { marker: "5 years", text: "Working alongside researchers, scientists, and doctors in aesthetics. Thousands of studies analyzed. A single focus: identifying the variables that drive how people perceive male attractiveness \u2014 and how to change them." },
-  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one product, program, or methodology optimizes for what research consistently identifies as the primary driver of male physical attractiveness \u2014 your shape, relative to who you are." },
-  { marker: "The protocol", text: "The Attractiveness Protocol is the result: a system that analyzes your body with the precision of aesthetic medicine, factors in your face, your age, and your social context, and gives you a plan built for your life." },
+  { marker: "The question", text: "An aesthetic medicine student set out to find what the research actually says about male physical attractiveness. Not trends. Not opinions. Published science across evolutionary psychology, social cognitive science, and aesthetic medicine." },
+  { marker: "5 years", text: "Working alongside researchers, scientists, and doctors in aesthetics. Thousands of studies analyzed. A single focus: identifying the variables that drive how people perceive male attractiveness, and how to change them." },
+  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one product, program, or methodology optimizes for what research consistently identifies as the primary driver of male physical attractiveness: your shape, relative to who you are." },
+  { marker: "The protocol", text: "Protocol is the result. A system that analyzes your body with the precision of aesthetic medicine, factors in your face, your age, and your social context, and gives you a plan built for your life." },
 ];
 
 const TESTIMONIALS = [
   { obj: "Does it work for my body type?", quote: "I always assumed I\u2019d be the skinny guy. Turns out my frame had more potential than I thought. 13 weeks in, people started noticing.", name: "Marc, 27", detail: "Ectomorph build", before: "/assets/5-before.png", after: "/assets/5-after.png" },
   { obj: "How is this different from a fitness program?", quote: "I\u2019ve followed PPL splits, 5x5, online coaching. They build muscle. This builds the right shape for you. Different goal, different results.", name: "David, 34", detail: "Mesomorph build", before: "/assets/2-before.png", after: "/assets/2-after.png" },
   { obj: "How long until I see a difference?", quote: "3 sessions a week, 50 minutes each. First visible changes around week 7. By week 14 people were asking what I\u2019d changed.", name: "Karim, 38", detail: "3 sessions/week", before: "/assets/14-before.png", after: "/assets/14-after.png" },
-  { obj: "Is this based on real science?", quote: "I\u2019m skeptical by default. What convinced me was the analysis \u2014 every proportion benchmarked against published studies. This isn\u2019t guesswork.", name: "James, 29", detail: "Data analyst", before: "/assets/1-before.png", after: "/assets/1-after.png" },
+  { obj: "Is this based on real science?", quote: "I\u2019m skeptical by default. What convinced me was the analysis. Every proportion benchmarked against published studies. This is not guesswork.", name: "James, 29", detail: "Data analyst", before: "/assets/1-before.png", after: "/assets/1-after.png" },
   { obj: "I\u2019m over 40, is it too late?", quote: "Started at 44. My proportions were easier to shift than I expected. The protocol accounted for my recovery capacity. Best shape I\u2019ve been in.", name: "Robert, 44", detail: "Father of 2", before: "/assets/9-before.png", after: "/assets/9-after.png" },
-  { obj: "I don\u2019t want to look like a bodybuilder", quote: "The protocol factored in who I am \u2014 my face, my lifestyle, how I want to come across. The result fits me. It doesn\u2019t look forced.", name: "Lucas, 32", detail: "Creative director", before: "/assets/8-before.png", after: "/assets/8-after.png" },
+  { obj: "I don\u2019t want to look like a bodybuilder", quote: "The protocol factored in who I am. My face, my lifestyle, how I want to come across. The result fits me. It does not look forced.", name: "Lucas, 32", detail: "Creative director", before: "/assets/8-before.png", after: "/assets/8-after.png" },
 ];
 
 const WITHOUT = [
   "A program that doesn\u2019t know your proportions or who you are",
   "No way to know if your shape is improving or not",
   "Effort that builds muscle but doesn\u2019t change perception",
-  "The variable that affects your salary, your dating, your confidence \u2014 left to chance",
+  "The variable that affects your salary, your dating, your confidence, left to chance",
 ];
 
 const WITH = [
@@ -184,11 +184,11 @@ export default function F1Landing() {
               Science already knows what makes a man&apos;s body attractive. <span>Here&apos;s what it found.</span>
             </h1>
             <p className="program-hero__subtitle">
-              You&apos;ve been told to train harder, eat less, follow programs. But no one showed you what actually drives male physical attractiveness &mdash; and how close you might already be to it.
+              You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
             </p>
             <div className="program-hero__actions">
               <TrackedLink href="/quiz/1" className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
-                <span>Discover your potential &mdash; 60 seconds</span>
+                <span>Discover your potential in 60 seconds</span>
                 <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
               </TrackedLink>
             </div>
@@ -224,8 +224,8 @@ export default function F1Landing() {
               The #1 Factor Is Your Shape. <span>And It&apos;s the One You Can Change.</span>
             </h2>
           </div>
-          <p className="f1-body">Across hundreds of studies in evolutionary psychology and social cognitive science &mdash; and confirmed by real-world evaluations where women rate male physiques &mdash; the finding is consistent. What drives male physical attractiveness isn&apos;t your face, your height, or what you wear. It&apos;s the shape of your body. Your proportions. How everything fits together.</p>
-          <p className="f1-body">Your face and your height are mostly fixed. <strong>Your shape isn&apos;t. It&apos;s the single most powerful attractiveness variable you can actually engineer.</strong> And most men don&apos;t know it exists.</p>
+          <p className="f1-body">Hundreds of studies in evolutionary psychology and social cognitive science point to the same finding. The same finding shows up in real-world evaluations where women rate male physiques. What drives male physical attractiveness is not your face, your height, or what you wear. It is the shape of your body. The proportions. How everything fits together.</p>
+          <p className="f1-body">Your face and your height are mostly fixed. <strong>Your shape is not. It is the single most powerful attractiveness variable you can actually engineer.</strong> Most men do not know it exists.</p>
         </div>
       </section>
 
@@ -238,26 +238,26 @@ export default function F1Landing() {
               <div className="f1-listicle__num">01</div>
               <h3 className="f1-listicle__title">A full-body analysis with the precision of aesthetic medicine.</h3>
 
-              <p className="f1-body">Most programs put you in a box &mdash; ectomorph, mesomorph, endomorph &mdash; and hand you a cookie-cutter plan. The Attractiveness Protocol does something fundamentally different.</p>
-              <p className="f1-body">It runs a complete scientific analysis of your body with the rigor of an aesthetic medicine assessment. Every proportion, every ratio, every structural element that published research has linked to perceived attractiveness &mdash; measured, benchmarked, mapped.</p>
-              <p className="f1-body">Think of it as the difference between a bathroom mirror and a diagnostic scan. You&apos;ve always had the mirror. <strong>This is what happens when you see the data underneath.</strong></p>
+              <p className="f1-body">Most programs put you in a box. Ectomorph, mesomorph, endomorph. They hand you a cookie-cutter plan. Protocol does something different.</p>
+              <p className="f1-body">It runs a complete scientific analysis of your body with the rigor of an aesthetic medicine assessment. Every proportion, every ratio, every structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
+              <p className="f1-body">Think of it as the difference between a bathroom mirror and a diagnostic scan. You have always had the mirror. <strong>This is what happens when you see the data underneath.</strong></p>
             </div>
             <div className="f1-listicle__media">
-              <span className="f1-listicle__media-label">Body scan visualization</span>
+              <Image src="/assets/scan-protocol.png" alt="Full body scan analysis" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
             </div>
           </div>
 
           <div className="f1-listicle__item f1-listicle__item--media-left">
             <div className="f1-listicle__media">
-              <span className="f1-listicle__media-label">Contextual targets diagram</span>
+              <Image src="/assets/attractiveness_contextual_targets.svg" alt="Contextual attractiveness targets" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
             </div>
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">02</div>
-              <h3 className="f1-listicle__title">According to social psychology, attractiveness isn&apos;t absolute. It&apos;s contextual.</h3>
-              <p className="f1-body">Your ideal physique isn&apos;t a fixed target. It&apos;s determined by your facial structure, your bone frame, your age, and the social environment you operate in. That&apos;s why copying someone else&apos;s physique doesn&apos;t work &mdash; what looks attractive on them may look incoherent on you.</p>
-              <p className="f1-body">An office lawyer with soft features doesn&apos;t need the same physique as a construction foreman with a strong jaw. The lawyer&apos;s target shoulder-to-waist ratio is 1.58. The foreman&apos;s is 1.66. Same science, different targets. That&apos;s what contextual means.</p>
+              <h3 className="f1-listicle__title">According to social psychology, attractiveness is contextual.</h3>
+              <p className="f1-body">Your ideal physique is not a fixed target. It depends on your facial structure, your bone frame, your age, and the social environment you operate in. Copying someone else&apos;s physique does not work. What looks attractive on them may look incoherent on you.</p>
+              <p className="f1-body">An office lawyer with soft features needs a different physique than a construction foreman with a strong jaw. The lawyer&apos;s target shoulder-to-waist ratio is 1.58. The foreman&apos;s is 1.66. Same science. Different targets. That is what contextual means.</p>
               <p className="f1-body">A 25-year-old with a narrow frame and a round face has a different optimal body fat target than a 40-year-old with wide clavicles and angular features. The first needs to stay lean to sharpen his proportions. The second can carry more mass and still read as athletic. One man&apos;s ideal is another man&apos;s mismatch.</p>
-              <p className="f1-body">The Attractiveness Protocol reads all of these variables &mdash; your face, your frame, your age, your context &mdash; before designing your plan. Your training is based on what the science says works for you. Not a generic ideal. Not someone else&apos;s body.</p>
+              <p className="f1-body">Protocol reads all of these variables before designing your plan. Your face, your frame, your age, your context. Your training is based on what the science says works for you.</p>
             </div>
           </div>
 
@@ -266,7 +266,7 @@ export default function F1Landing() {
               <div className="f1-listicle__num">03</div>
               <h3 className="f1-listicle__title">Everything the fitness industry taught you is true. It just won&apos;t make you attractive.</h3>
               <p className="f1-body">The workouts work. The diets work. The supplements do what they claim. You will build muscle, lose fat, get stronger.</p>
-              <p className="f1-body">But the fitness industry optimizes for performance and size &mdash; not for how people perceive you. That&apos;s not a flaw in their method. <strong>It&apos;s a completely different goal.</strong> And no one told you the difference.</p>
+              <p className="f1-body">The fitness industry optimizes for performance and size. It does not optimize for how people perceive you. That is not a flaw in their method. <strong>It is a different goal.</strong> Nobody told you the difference.</p>
             </div>
             <div className="f1-listicle__media">
               <span className="f1-listicle__media-label">Volume vs proportions comparison</span>
@@ -275,13 +275,13 @@ export default function F1Landing() {
 
           <div className="f1-listicle__item f1-listicle__item--media-left">
             <div className="f1-listicle__media">
-              <span className="f1-listicle__media-label">The 3 variables diagram</span>
+              <Image src="/assets/variables_kept_vs_cut_v2.svg" alt="What the protocol keeps vs cuts" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
             </div>
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">04</div>
-              <h3 className="f1-listicle__title">Only a few variables drive perception. We built a protocol around those &mdash; and cut the rest.</h3>
-              <p className="f1-body">Most men work on dozens of things at once. Most of those variables don&apos;t change how people perceive them.</p>
-              <p className="f1-body">The Attractiveness Protocol strips away everything that doesn&apos;t impact perception and focuses your effort only on what does. That&apos;s why it&apos;s faster and simpler. Not because we cut corners &mdash; because we cut everything that has no measurable effect.</p>
+              <h3 className="f1-listicle__title">Only a few variables drive perception. We built a protocol around those.</h3>
+              <p className="f1-body">Most men work on dozens of things at once. Most of those variables do not change how people perceive them.</p>
+              <p className="f1-body">Protocol strips away everything that does not impact perception and focuses your effort only on what does. That is why it is faster and simpler. We did not cut corners. We cut everything that has no measurable effect.</p>
             </div>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function F1Landing() {
       {/* ═══ MID CTA ═══ */}
       <div className="f1-mid-cta">
         <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
-          Discover your potential &mdash; 60 seconds <ArrowIcon />
+          Discover your potential in 60 seconds <ArrowIcon />
         </TrackedLink>
         <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
       </div>
@@ -301,12 +301,12 @@ export default function F1Landing() {
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">The reframe</p>
             <h2 className="f1-section__title f1-section__title--sm">
-              You Put in the Work. <span>Here&apos;s Why It Didn&apos;t Show.</span>
+              You Put in the Work. <span>The Work Was Pointed in the Wrong Direction.</span>
             </h2>
           </div>
           <p className="f1-body">Strict diet. Program from the internet. Training 5 times a week. You did the hard part. You showed up.</p>
-          <p className="f1-body">The problem was never your effort. <strong>The problem is that no one told you what to aim at.</strong> You trained hard, ate clean, stayed consistent &mdash; and your physique still didn&apos;t provoke a reaction. Because the work was pointed in the wrong direction.</p>
-          <p className="f1-body">The research is unambiguous. When women evaluate male physiques, the dominant factor isn&apos;t muscle size or body weight. It&apos;s proportions. A man with the right proportions at 75kg will consistently be perceived as more attractive than a disproportionate man at 90kg.</p>
+          <p className="f1-body">The problem was never your effort. <strong>The problem is that nobody told you what to aim at.</strong> You trained hard, ate clean, stayed consistent. Your physique still did not provoke a reaction. The work was pointed in the wrong direction.</p>
+          <p className="f1-body">The research is unambiguous. When women evaluate male physiques, the dominant factor is not muscle size or body weight. It is proportions. A man with the right proportions at 75kg will consistently be perceived as more attractive than a disproportionate man at 90kg.</p>
 
           <div className="f1-divider" />
 
@@ -343,7 +343,7 @@ export default function F1Landing() {
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">The origin</p>
             <h2 className="f1-section__title f1-section__title--sm">5 Years of Research. <span>One Question.</span></h2>
-            <p className="f1-section__subtitle">What makes a man physically attractive from a social perception standpoint? Not stronger, not bigger &mdash; attractive.</p>
+            <p className="f1-section__subtitle">What makes a man physically attractive from a social perception standpoint? Not stronger. Not bigger. Attractive.</p>
           </div>
           <div className="f1-origin__timeline">
             {TIMELINE.map((s) => (
@@ -373,8 +373,8 @@ export default function F1Landing() {
               </div>
             </div>
             <p className="f1-body">I&apos;d been consistent for four years. Splits, volume, tracking macros, meal prep on Sundays. My lifts were solid. I&apos;d put on muscle. But nothing changed in how people treated me.</p>
-            <p className="f1-body">What surprised me was the depth. They measured my entire body &mdash; proportions, ratios, posture, composition &mdash; and benchmarked everything against research data. For the first time I could see the gap: <span className="f1-proof-metric">SWR 1.31</span>, target: <span className="f1-proof-metric">1.46</span>.</p>
-            <p className="f1-body">Around week 11, the difference became visible &mdash; to other people, not just to me. My ratio was at <span className="f1-proof-metric">1.41</span>. The body wasn&apos;t bigger. It was shaped differently.</p>
+            <p className="f1-body">What surprised me was the depth. They measured my entire body. Proportions, ratios, posture, composition. They benchmarked everything against research data. For the first time I could see the gap: <span className="f1-proof-metric">SWR 1.31</span>, target: <span className="f1-proof-metric">1.46</span>.</p>
+            <p className="f1-body">Around week 11, the difference became visible to other people, not just to me. My ratio was at <span className="f1-proof-metric">1.41</span>. The body was not bigger. It was shaped differently.</p>
             <div className="f1-proof__slider">
               <BeforeAfterSlider beforeSrc="/assets/3-before.png" afterSrc="/assets/3-after.png" beforeAlt="Thomas before" afterAlt="Thomas after" subject="Thomas" />
             </div>
@@ -438,7 +438,7 @@ export default function F1Landing() {
 
           <div className="f1-pain__cta">
             <TrackedLink href="/quiz/1" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
-              Discover your potential &mdash; 60 seconds <ArrowIcon />
+              Discover your potential in 60 seconds <ArrowIcon />
             </TrackedLink>
             <p className="f1-cta-sub">Free AI body analysis &middot; Based on 5 years of published research</p>
           </div>
@@ -466,7 +466,7 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-close__option f1-close__option--leave">
-            <div className="f1-close__option-label">Option 1 &mdash; Leave this page</div>
+            <div className="f1-close__option-label">Option 1. Leave this page</div>
             <p className="f1-close__text">Go back to a program that doesn&apos;t account for your proportions, your face, or your context. Keep putting in the effort without getting what you deserve from it.</p>
             <ul className="f1-close__loss-list">
               <li>Your dating stays below what it could be</li>
@@ -477,10 +477,10 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-close__option f1-close__option--discover">
-            <div className="f1-close__option-label">Option 2 &mdash; Discover your potential</div>
-            <p className="f1-close__text">Take the AI body scan. In 60 seconds, see your proportions analyzed with the precision of aesthetic medicine &mdash; and find out what separates you from your most attractive physique.</p>
+            <div className="f1-close__option-label">Option 2. Discover your potential</div>
+            <p className="f1-close__text">Take the AI body scan. In 60 seconds, see your proportions analyzed with the precision of aesthetic medicine. Find out what separates you from your most attractive physique.</p>
             <TrackedLink href="/quiz/1" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
-              Discover your potential &mdash; 60 seconds
+              Discover your potential in 60 seconds
             </TrackedLink>
           </div>
 
