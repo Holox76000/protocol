@@ -24,7 +24,7 @@ export function getPublicSiteUrl(origin?: string | null) {
     origin;
 
   if (!configuredUrl) {
-    return "http://localhost:3000";
+    return "https://protocol-club.com";
   }
 
   return configuredUrl.replace(/\/$/, "");
