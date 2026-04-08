@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { trackGa4Event } from "../../../lib/ga4Event";
 import TrackedLink from "../../tracked-link";
 import "../../program/program.css";
 import "../f1.css";
@@ -39,12 +40,13 @@ function ShieldIcon() {
 
 /* ─── CTA button with loading state ─────────────────────────────────────── */
 
-function CtaButton({ label, className }: { label: string; className?: string }) {
+function CtaButton({ label, className, location }: { label: string; className?: string; location?: string }) {
   const [loading, setLoading] = useState(false);
 
   const handleClick = useCallback(() => {
     setLoading(true);
-  }, []);
+    trackGa4Event("f1_offer_cta_clicked", { funnel: "f1", cta_location: location ?? "unknown", cta_label: label });
+  }, [label, location]);
 
   return (
     <a
@@ -165,8 +167,8 @@ const TESTIMONIALS = [
       "I\u2019ve been training for 6 years. Good shape by any standard. But I never understood why certain guys looked more attractive without being bigger. The analysis explained it in 10 minutes.",
     name: "Connor, 31",
     detail: "Athletic build \u00b7 SWR 1.27 \u2192 1.46",
-    before: "/assets/3-before.png",
-    after: "/assets/3-after.png",
+    before: "/assets/14-before.png",
+    after: "/assets/14-after.png",
   },
   {
     obj: "The waist was the variable I was missing.",
@@ -174,8 +176,8 @@ const TESTIMONIALS = [
       "I was already lifting heavy, already had broad shoulders. The analysis flagged that my waist wasn\u2019t narrowing. One protocol adjustment changed everything in 8 weeks.",
     name: "Ethan, 26",
     detail: "Mesomorph build \u00b7 TI 3.8 \u2192 5.1",
-    before: "/assets/10-before.png",
-    after: "/assets/10-after.png",
+    before: "/assets/8-before.png",
+    after: "/assets/8-after.png",
   },
 ];
 
@@ -231,6 +233,10 @@ function ReportSlider() {
 export default function F1OfferPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  useEffect(() => {
+    trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
+  }, []);
+
   return (
     <div className="program-page program-page--theme-test f1-page f1-offer-page">
 
@@ -253,7 +259,7 @@ export default function F1OfferPage() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
-            <CtaButton label="Start — $49" className="f1-offer-nav__cta" />
+            <CtaButton label="Start — $49" className="f1-offer-nav__cta" location="nav" />
           </div>
         </div>
       </header>
@@ -268,7 +274,7 @@ export default function F1OfferPage() {
             <p className="f1-offer-hero__subtitle">
               Not your weight. Not your muscle mass. Your proportions, measured against the research. Then a 3-month Protocol to close the gap.
             </p>
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" />
             <p className="f1-offer-hero__sub">90-day guarantee. One-time payment.</p>
           </div>
           <div className="f1-offer-hero__visual">
@@ -306,7 +312,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="deliverables" />
           </div>
         </div>
       </section>
@@ -348,7 +354,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="proof" />
           </div>
         </div>
       </section>
@@ -418,7 +424,7 @@ export default function F1OfferPage() {
             </div>
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="steps" />
           </div>
         </div>
       </section>
@@ -453,7 +459,7 @@ export default function F1OfferPage() {
               ))}
             </ul>
 
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" />
 
             <div className="f1-offer-price__payment-logos">
               <span>Visa</span>
@@ -506,7 +512,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="faq" />
           </div>
         </div>
       </section>
@@ -521,7 +527,7 @@ export default function F1OfferPage() {
           <p className="f1-offer-final__sub">
             AI body analysis. 3-month protocol. WhatsApp coaching. $49 one-time.
           </p>
-          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" />
+          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="final" />
           <div className="f1-offer-final__risk">
             <ShieldIcon />
             <span>90-day guarantee — if your proportions don&apos;t move, full refund</span>

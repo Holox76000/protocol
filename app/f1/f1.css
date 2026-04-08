@@ -819,8 +819,8 @@
 
 .f1-close__option--discover .f1-close__text {
   color: rgba(255, 255, 255, 0.88);
-  font-size: 2rem;
-  line-height: 3rem;
+  font-size: 1.65rem;
+  line-height: 2.5rem;
   margin-bottom: 32px;
 }
 
@@ -947,5 +947,20 @@
 
   .f1-proof__card {
     padding: 24px;
+  }
+
+  .f1-cta {
+    padding: 14px 24px;
+    font-size: 1.5rem;
+  }
+
+  .f1-cta--large {
+    padding: 16px 24px;
+    font-size: 1.6rem;
+  }
+
+  .f1-page .program-hero__cta {
+    padding: 12px 20px;
+    font-size: 1.5rem;
   }
 }
