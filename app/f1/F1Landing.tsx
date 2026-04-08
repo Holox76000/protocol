@@ -320,7 +320,7 @@ export default function F1Landing() {
             {VERSIONS.map((v) => (
               <div key={v.label} className={`f1-version-card ${v.verdict === "yes" ? "f1-version-card--winner" : ""}`}>
                 <div className="f1-version-card__visual">
-                  {"img" in v ? <img src={v.img} alt={v.label} /> : <v.Silhouette />}
+                  <img src={v.img} alt={v.label} />
                 </div>
                 <div className="f1-version-card__body">
                   <div className={`f1-version-card__verdict f1-version-card__verdict--${v.verdict}`}>
