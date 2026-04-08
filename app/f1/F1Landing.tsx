@@ -159,7 +159,7 @@ export default function F1Landing() {
       {/* ═══ NAV ═══ */}
       <header className="program-nav">
         <div className="program-nav__inner">
-          <a href="/" className="program-nav__logo" aria-label="Protocol home">
+          <a href="/f1/offer" className="program-nav__logo" aria-label="See the offer">
             <Image src="/program/static/landing/images/shared/Prtcl.png" alt="Protocol" width={44} height={44} className="program-nav__logo-image" />
           </a>
           <nav className="program-nav__links" aria-label="Primary">
