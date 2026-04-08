@@ -114,10 +114,10 @@ const RESEARCH_TABS: ResearchTab[] = [
 
 
 const VERSIONS = [
-  { label: "Designer clothes", desc: "You notice the clothes. You don\u2019t notice him.", verdict: "no" as const, Silhouette: SilhouetteNeutral },
-  { label: "Perfect grooming", desc: "He looks put-together. He doesn\u2019t look attractive.", verdict: "no" as const, Silhouette: SilhouetteNeutral },
-  { label: "Gym physique", desc: "Impressive in the gym. Not attractive outside of it.", verdict: "no" as const, Silhouette: SilhouetteGymBro },
-  { label: "Right shape", desc: "This is what your potential looks like.", verdict: "yes" as const, Silhouette: SilhouetteHero },
+  { label: "Designer clothes", desc: "You notice the clothes. You don\u2019t notice him.", verdict: "no" as const, img: "/assets/clothes.svg" },
+  { label: "Perfect grooming", desc: "He looks put-together. He doesn\u2019t look attractive.", verdict: "no" as const, img: "/assets/perfect-grooming.svg" },
+  { label: "Gym physique", desc: "Impressive in the gym. Not attractive outside of it.", verdict: "no" as const, img: "/assets/gymbro.svg" },
+  { label: "Right shape", desc: "This is what your potential looks like.", verdict: "yes" as const, img: "/assets/perfect-shape.svg" },
 ];
 
 const TIMELINE = [
@@ -319,7 +319,9 @@ export default function F1Landing() {
           <div className="f1-versions">
             {VERSIONS.map((v) => (
               <div key={v.label} className={`f1-version-card ${v.verdict === "yes" ? "f1-version-card--winner" : ""}`}>
-                <div className="f1-version-card__visual"><v.Silhouette /></div>
+                <div className="f1-version-card__visual">
+                  {"img" in v ? <img src={v.img} alt={v.label} /> : <v.Silhouette />}
+                </div>
                 <div className="f1-version-card__body">
                   <div className={`f1-version-card__verdict f1-version-card__verdict--${v.verdict}`}>
                     {v.verdict === "no" ? "\u2717 Not it" : "\u2713 This is it"}
