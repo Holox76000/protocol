@@ -153,6 +153,7 @@ export default function BeforeAfterSlider({
             className="program-hero__compare-image"
             src={beforeSrc}
             alt={beforeAlt ?? `${subject} before`}
+            loading="lazy"
             draggable={false}
             style={{
               ...getImageStyle({
@@ -174,6 +175,7 @@ export default function BeforeAfterSlider({
             className="program-hero__compare-image"
             src={afterSrc}
             alt={afterAlt ?? `${subject} after`}
+            loading="lazy"
             draggable={false}
             style={{
               ...getImageStyle({
