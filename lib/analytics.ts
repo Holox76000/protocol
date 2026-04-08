@@ -8,12 +8,13 @@ type EventName =
   | "result_viewed"
   | "cta_clicked"
   | "program_landing_viewed"
-  | "program_cta_clicked";
+  | "program_cta_clicked"
+  | "view_offer";
 
 const SESSION_KEY = "sf_quiz_session_id";
 
 type FbqFunction = (
-  command: "trackCustom",
+  command: "track" | "trackCustom",
   eventName: string,
   payload?: EventPayload,
   options?: { eventID?: string }
@@ -33,8 +34,23 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
   const sessionId = getSessionId();
   const eventId = `${sessionId}:${name}:${Date.now()}`;
 
+  const fbq = (window as Window & { fbq?: FbqFunction }).fbq;
+
+  if (name === "view_offer") {
+    try {
+      fbq?.("track", "ViewContent", {
+        content_name: "F1 Offer",
+        content_ids: ["f1-attractiveness-protocol"],
+        content_type: "product",
+        value: 49,
+        currency: "USD",
+      }, { eventID: eventId });
+    } catch {
+      // Ignore Meta Pixel runtime issues in the UI flow.
+    }
+  }
+
   if (name === "cta_clicked") {
-    const fbq = (window as Window & { fbq?: FbqFunction }).fbq;
     try {
       fbq?.("trackCustom", "Vue de page de paiement", payload, { eventID: eventId });
     } catch {

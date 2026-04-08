@@ -42,6 +42,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
+  if (body.event === "view_offer") {
+    await sendMetaEvent({
+      eventName: "ViewContent",
+      eventTime,
+      eventId: body.eventId ?? `${body.sessionId}:view_offer:${eventTime}`,
+      actionSource: "website",
+      eventSourceUrl,
+      userAgent,
+      ipAddress,
+      customData: {
+        content_name: "F1 Offer",
+        content_ids: ["f1-attractiveness-protocol"],
+        content_type: "product",
+        value: 49,
+        currency: "USD",
+      }
+    });
+    console.log("[track] meta sent", { event: "ViewContent", sessionId: body.sessionId });
+  }
+
   if (body.event === "quiz_started") {
     await sendMetaEvent({
       eventName: "StartQuiz",

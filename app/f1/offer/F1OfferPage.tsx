@@ -4,6 +4,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
+import { trackEvent } from "../../../lib/analytics";
 import TrackedLink from "../../tracked-link";
 import "../../program/program.css";
 import "../f1.css";
@@ -235,6 +236,7 @@ export default function F1OfferPage() {
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
+    trackEvent("view_offer", { funnel: "f1", page_path: "/f1/offer" });
   }, []);
 
   return (

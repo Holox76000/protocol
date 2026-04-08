@@ -200,16 +200,6 @@ export default function F1Landing() {
               <span className="program-hero__trust-item">90-day guarantee</span>
             </p>
 
-            <div className="f1-hero-slider">
-              <BeforeAfterSlider
-                beforeSrc="/assets/scan-pc-before.png"
-                afterSrc="/assets/scan-pc-after.png"
-                beforeAlt="Before the protocol"
-                afterAlt="After the protocol"
-                subject="David"
-              />
-            </div>
-
             {/* VSL — hidden for now */}
             <div className="f1-vsl" style={{ display: "none" }}>
               <button type="button" className="f1-vsl__play" aria-label="Play video"><PlayIcon /></button>
