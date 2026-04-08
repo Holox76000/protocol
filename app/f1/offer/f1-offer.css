@@ -752,3 +752,104 @@
     gap: 3rem;
   }
 }
+
+/* ─── Featured before/after testimonial ─────────────────────────────────── */
+.f1-offer-featured-proof {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 56px;
+  align-items: center;
+  margin-bottom: 56px;
+  padding: 48px;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 20px;
+}
+
+.f1-offer-featured-proof__slider {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #b2c1c8;
+  border: 1px solid #dfe4e6;
+}
+
+/* Make the slider fill the wrapper */
+.f1-offer-featured-proof__slider .program-hero__compare-card {
+  height: 100%;
+  border-radius: 0;
+}
+
+.f1-offer-featured-proof__slider .program-hero__compare-media {
+  border-radius: 0;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+.f1-offer-featured-proof__slider .program-hero__compare-labels span {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.f1-offer-featured-proof__quote {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.f1-offer-featured-proof__text {
+  font-family: var(--program-theme-heading-font);
+  font-size: clamp(2.4rem, 2.6vw, 3.2rem);
+  line-height: 1.35;
+  font-style: italic;
+  font-weight: 400;
+  color: #253239;
+  margin: 0;
+  letter-spacing: -0.03rem;
+}
+
+.f1-offer-featured-proof__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 24px;
+  border-top: 1px solid #edf0f1;
+}
+
+.f1-offer-featured-proof__name {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #253239;
+}
+
+.f1-offer-featured-proof__detail {
+  font-size: 1.4rem;
+  color: #7f949b;
+  letter-spacing: 0.02rem;
+}
+
+@media (max-width: 900px) {
+  .f1-offer-featured-proof {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 28px;
+  }
+
+  .f1-offer-featured-proof__slider {
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .f1-offer-featured-proof__text {
+    font-size: 2.2rem;
+  }
+}

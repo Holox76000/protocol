@@ -181,7 +181,7 @@ export default function F1Landing() {
           <div className="program-hero__copy">
             <p className="program-hero__eyebrow">Based on 5 years of research in evolutionary psychology &amp; aesthetic medicine</p>
             <h1 className="program-hero__title">
-              Science already knows what makes a man&apos;s body attractive. <span>Here&apos;s what it found.</span>
+              Science has found what makes a man attractive. <span>It&apos;s not what you think.</span>
             </h1>
             <p className="program-hero__subtitle">
               You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
@@ -199,6 +199,16 @@ export default function F1Landing() {
               <span className="program-hero__trust-dot" aria-hidden="true" />
               <span className="program-hero__trust-item">90-day guarantee</span>
             </p>
+
+            <div className="f1-hero-slider">
+              <BeforeAfterSlider
+                beforeSrc="/assets/scan-pc-before.png"
+                afterSrc="/assets/scan-pc-after.png"
+                beforeAlt="Before the protocol"
+                afterAlt="After the protocol"
+                subject="David"
+              />
+            </div>
 
             {/* VSL — hidden for now */}
             <div className="f1-vsl" style={{ display: "none" }}>
