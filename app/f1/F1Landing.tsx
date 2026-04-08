@@ -181,7 +181,7 @@ export default function F1Landing() {
           <div className="program-hero__copy">
             <p className="program-hero__eyebrow">Based on 5 years of research in evolutionary psychology &amp; aesthetic medicine</p>
             <h1 className="program-hero__title">
-              Science has found what makes a man attractive. <span>It&apos;s not what you think.</span>
+              Science has found what makes a man attractive. <span>Here&apos;s what it found.</span>
             </h1>
             <p className="program-hero__subtitle">
               You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
