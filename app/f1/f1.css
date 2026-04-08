@@ -949,6 +949,11 @@
     padding: 24px;
   }
 
+  .f1-page .program-hero__title {
+    font-size: 34px;
+    line-height: 42px;
+  }
+
   .f1-cta {
     padding: 14px 24px;
     font-size: 1.5rem;
