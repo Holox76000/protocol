@@ -59,8 +59,7 @@ export default function S3Biometrics({ answers, setAnswer, onNext, onBack, savin
     if (!answers.weight_kg) return setError("Please enter your weight.");
     if (answers.weight_kg < 40 || answers.weight_kg > 200) return setError("Weight must be between 40 and 200 kg.");
     if (!answers.weight_trend_6mo) return setError("Please select your weight trend.");
-    if (!answers.waist_circumference_cm) return setError("Please enter your waist circumference.");
-    if (answers.waist_circumference_cm < 50 || answers.waist_circumference_cm > 160) return setError("Waist must be between 50 and 160 cm.");
+    if (answers.waist_circumference_cm && (answers.waist_circumference_cm < 50 || answers.waist_circumference_cm > 160)) return setError("Waist must be between 50 and 160 cm.");
     setError(null);
     onNext();
   };
@@ -174,7 +173,7 @@ export default function S3Biometrics({ answers, setAnswer, onNext, onBack, savin
         </Field>
 
         {/* Waist */}
-        <Field label="What's your waist circumference?" sublabel="Measure around your navel with a tape measure. Standing relaxed, not sucking in." required>
+        <Field label="What's your waist circumference?" sublabel="Measure around your navel with a tape measure. Standing relaxed, not sucking in. Optional — but recommended for a more precise protocol.">
           <div className="flex items-center gap-2 mb-2">
             {(["cm", "in"] as const).map((u) => (
               <button
