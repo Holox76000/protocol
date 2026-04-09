@@ -30,8 +30,9 @@ export default function F1SignupPage() {
 
     // Detect funnel type: if F1Landing set params in sessionStorage → long
     const funnelType = persisted.utm_source && !fromUrl.utm_source ? "long" : "short";
+    const landingPage = funnelType === "long" ? "/f1" : "/f1/offer"; // actual entry page
 
-    let base = `/checkout?funnel=f1&funnel_type=${funnelType}`;
+    let base = `/checkout?funnel=f1&funnel_type=${funnelType}&landing_page=${encodeURIComponent(landingPage)}`;
     if (merged.utm_source) base += `&utm_source=${encodeURIComponent(merged.utm_source)}`;
     if (merged.utm_medium) base += `&utm_medium=${encodeURIComponent(merged.utm_medium)}`;
     if (merged.utm_campaign) base += `&utm_campaign=${encodeURIComponent(merged.utm_campaign)}`;
@@ -97,7 +98,7 @@ export default function F1SignupPage() {
         // Ignore pixel errors — CAPI in /api/lead is the source of truth.
       }
 
-      const checkoutHref = `${checkoutBase}&customer_email=${encodeURIComponent(mail)}&landing_page=/f1`;
+      const checkoutHref = `${checkoutBase}&customer_email=${encodeURIComponent(mail)}`;
       trackGa4Event("signup_submitted", { funnel: "f1", destination: checkoutHref });
 
       window.location.assign(checkoutHref);

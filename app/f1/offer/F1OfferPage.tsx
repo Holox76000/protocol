@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
+import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
 import TrackedLink from "../../tracked-link";
 import "../../program/program.css";
 import "../f1.css";
@@ -41,7 +42,7 @@ function ShieldIcon() {
 
 /* ─── CTA button with loading state ─────────────────────────────────────── */
 
-function CtaButton({ label, className, location }: { label: string; className?: string; location?: string }) {
+function CtaButton({ label, className, location, href }: { label: string; className?: string; location?: string; href: string }) {
   const [loading, setLoading] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -51,7 +52,7 @@ function CtaButton({ label, className, location }: { label: string; className?: 
 
   return (
     <a
-      href="/f1/signup"
+      href={href}
       onClick={handleClick}
       className={`f1-offer-cta ${className ?? ""} ${loading ? "f1-offer-cta--loading" : ""}`}
       aria-disabled={loading}
@@ -233,10 +234,15 @@ function ReportSlider() {
 
 export default function F1OfferPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [signupHref, setSignupHref] = useState("/f1/signup");
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
     trackEvent("view_offer", { funnel: "f1", page_path: "/f1/offer" });
+
+    const utm = getUtmParams();
+    persistUtmParams(utm);
+    setSignupHref(appendUtmToPath("/f1/signup", utm));
   }, []);
 
   return (
@@ -261,7 +267,7 @@ export default function F1OfferPage() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
-            <CtaButton label="Start — $49" className="f1-offer-nav__cta" location="nav" />
+            <CtaButton label="Start — $49" className="f1-offer-nav__cta" location="nav" href={signupHref} />
           </div>
         </div>
       </header>
@@ -276,7 +282,7 @@ export default function F1OfferPage() {
             <p className="f1-offer-hero__subtitle">
               Not your weight. Not your muscle mass. Your proportions, measured against the research. Then a 3-month Protocol to close the gap.
             </p>
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" href={signupHref} />
             <p className="f1-offer-hero__sub">90-day guarantee. One-time payment.</p>
           </div>
           <div className="f1-offer-hero__visual">
@@ -314,7 +320,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="deliverables" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="deliverables" href={signupHref} />
           </div>
         </div>
       </section>
@@ -356,7 +362,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="proof" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="proof" href={signupHref} />
           </div>
         </div>
       </section>
@@ -426,7 +432,7 @@ export default function F1OfferPage() {
             </div>
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="steps" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="steps" href={signupHref} />
           </div>
         </div>
       </section>
@@ -461,7 +467,7 @@ export default function F1OfferPage() {
               ))}
             </ul>
 
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" href={signupHref} />
 
             <div className="f1-offer-price__payment-logos">
               <span>Visa</span>
@@ -514,7 +520,7 @@ export default function F1OfferPage() {
             ))}
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="faq" />
+            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="faq" href={signupHref} />
           </div>
         </div>
       </section>
@@ -529,7 +535,7 @@ export default function F1OfferPage() {
           <p className="f1-offer-final__sub">
             AI body analysis. 3-month protocol. WhatsApp coaching. $49 one-time.
           </p>
-          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="final" />
+          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="final" href={signupHref} />
           <div className="f1-offer-final__risk">
             <ShieldIcon />
             <span>90-day guarantee — if your proportions don&apos;t move, full refund</span>
