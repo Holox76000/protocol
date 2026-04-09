@@ -6,9 +6,11 @@ import { trackGa4Event } from "../../lib/ga4Event";
 export default function CheckoutRedirect({
   redirectUrl,
   funnel,
+  sessionId,
 }: {
   redirectUrl: string;
   funnel: string;
+  sessionId?: string;
 }) {
   useEffect(() => {
     trackGa4Event("checkout_started", {

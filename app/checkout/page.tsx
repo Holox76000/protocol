@@ -44,22 +44,104 @@ export default async function CheckoutPage({
 
   const origin = headers().get("origin");
   const siteUrl = getPublicSiteUrl(origin);
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    billing_address_collection: "auto",
-    allow_promotion_codes: true,
-    line_items: getCheckoutLineItems(internalFunnel),
-    success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
-    cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
-    metadata: {
-      funnel: internalFunnel,
-      source: "app_checkout",
-    },
-  });
 
-  if (!session.url) {
-    throw new Error("Stripe checkout session did not return a redirect URL.");
+  // Collect UTM params and attribution data from the request URL
+  const utmSource = searchParams?.utm_source ?? null;
+  const utmMedium = searchParams?.utm_medium ?? null;
+  const utmCampaign = searchParams?.utm_campaign ?? null;
+  const utmContent = searchParams?.utm_content ?? null;
+  const utmTerm = searchParams?.utm_term ?? null;
+  const utmId = searchParams?.utm_id ?? null;
+  const fbclid = searchParams?.fbclid ?? null;
+  const funnelType = searchParams?.funnel_type ?? "long";
+  const landingPage = searchParams?.landing_page ?? (funnel === "f1" ? "/f1" : "/");
+
+  let session;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      billing_address_collection: "auto",
+      allow_promotion_codes: true,
+      line_items: getCheckoutLineItems(internalFunnel),
+      success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
+      cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
+      metadata: {
+        funnel: internalFunnel,
+        funnel_type: funnelType,
+        source: "app_checkout",
+        landing_page: landingPage,
+        ...(utmSource && { utm_source: utmSource }),
+        ...(utmMedium && { utm_medium: utmMedium }),
+        ...(utmCampaign && { utm_campaign: utmCampaign }),
+        ...(utmContent && { utm_content: utmContent }),
+        ...(utmTerm && { utm_term: utmTerm }),
+        ...(utmId && { utm_id: utmId }),
+        ...(fbclid && { fbclid: fbclid }),
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[checkout] Stripe session creation failed", {
+      error: message,
+      funnel,
+      utmSource,
+      utmCampaign,
+      timestamp: new Date().toISOString(),
+    });
+
+    return (
+      <main className="min-h-screen bg-ash px-6 py-16 text-ink">
+        <div className="mx-auto max-w-2xl rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-500">Payment error</p>
+          <h1 className="mt-4 font-display text-4xl">Something went wrong</h1>
+          <p className="mt-4 text-lg text-ink/70">
+            We couldn&apos;t start your checkout. This is a temporary issue on our end — your card was not charged.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href={`/checkout?funnel=${encodeURIComponent(funnel)}`}
+              className="inline-flex items-center justify-center rounded-full border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-black"
+            >
+              Try again
+            </Link>
+            <Link
+              href={funnel === "f1" ? "/f1/offer" : "/"}
+              className="inline-flex items-center justify-center rounded-full border border-black/20 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-ink/70 transition hover:border-black hover:text-ink"
+            >
+              Back to offer
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
   }
 
-  return <CheckoutRedirect redirectUrl={session.url} funnel={funnel} />;
+  if (!session.url) {
+    console.error("[checkout] Stripe session created but no URL returned", {
+      sessionId: session.id,
+      funnel,
+      timestamp: new Date().toISOString(),
+    });
+    return (
+      <main className="min-h-screen bg-ash px-6 py-16 text-ink">
+        <div className="mx-auto max-w-2xl rounded-[32px] border border-black/10 bg-white p-8 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-500">Payment error</p>
+          <h1 className="mt-4 font-display text-4xl">Something went wrong</h1>
+          <p className="mt-4 text-lg text-ink/70">
+            We couldn&apos;t redirect you to checkout. Please try again — your card was not charged.
+          </p>
+          <div className="mt-8">
+            <Link
+              href={`/checkout?funnel=${encodeURIComponent(funnel)}`}
+              className="inline-flex items-center justify-center rounded-full border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-black"
+            >
+              Try again
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return <CheckoutRedirect redirectUrl={session.url} funnel={funnel} sessionId={session.id} />;
 }
