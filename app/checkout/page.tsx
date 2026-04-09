@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { getCheckoutLineItems, getPublicSiteUrl, getStripeServerClient } from "../../lib/stripe";
-import { sendMetaEvent } from "../../lib/metaCapi";
 import CheckoutRedirect from "./checkout-redirect";
 
 export const runtime = "nodejs";
@@ -142,35 +141,6 @@ export default async function CheckoutPage({
       </main>
     );
   }
-
-  // ✅ InitiateCheckout CAPI — fires server-side after Stripe session is created.
-  // Same session.id is used as eventID in the client-side pixel (CheckoutRedirect)
-  // so Meta can deduplicate the two signals.
-  const userAgent = headers().get("user-agent") ?? undefined;
-  const ipAddress = headers().get("x-forwarded-for")?.split(",")[0]?.trim();
-  const referer = headers().get("referer") ?? undefined;
-  void sendMetaEvent({
-    eventName: "InitiateCheckout",
-    eventTime: Math.floor(Date.now() / 1000),
-    eventId: session.id,
-    actionSource: "website",
-    eventSourceUrl: referer ?? `${siteUrl}/checkout`,
-    userAgent,
-    ipAddress,
-    email: customerEmail,
-    customData: {
-      content_name: "Attractiveness Protocol",
-      content_ids: ["f1-attractiveness-protocol"],
-      value: 49,
-      currency: "USD",
-      num_items: 1,
-      ...(utmSource && { utm_source: utmSource }),
-      ...(utmCampaign && { utm_campaign: utmCampaign }),
-      ...(utmContent && { utm_content: utmContent }),
-    },
-  }).catch((err) => {
-    console.error("[checkout] InitiateCheckout CAPI failed", { error: String(err), sessionId: session.id });
-  });
 
   if (!session.url) {
     console.error("[checkout] Stripe session created but no URL returned", {
