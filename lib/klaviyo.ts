@@ -1,5 +1,5 @@
 const KLAVIYO_API_BASE = "https://a.klaviyo.com/api";
-const KLAVIYO_LIST_ID = "UQbC9Z";
+const KLAVIYO_LIST_ID = "UYABKB";
 
 type KlaviyoItem = {
   ProductID: string;
