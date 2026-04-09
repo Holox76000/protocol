@@ -271,7 +271,7 @@ export default function RegisterPage({
               <p className="mt-2 text-[14px] leading-relaxed text-dim">
                 {registrationToken
                   ? "Almost there — set a password to access your personalized assessment."
-                  : "Already paid? Enter your email and create a password to access your Protocol."}
+                  : "Enter your email and create a password to access your Protocol."}
               </p>
             </div>
 
