@@ -116,7 +116,7 @@ const FAQ_GROUPS = [
       },
       {
         question: "How can I contact Protocol if I need help?",
-        answer: "You can reach us via your member dashboard or at support@protocol-club.com.",
+        answer: "You can reach us via your member dashboard or at contact@protocol-club.com.",
       },
       {
         question: "Will my photos and data stay private?",

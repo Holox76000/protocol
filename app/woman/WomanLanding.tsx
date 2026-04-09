@@ -435,7 +435,7 @@ export default function WomanLanding() {
             </div>
             <div className="program-footer__info-block">
               <p className="program-footer__heading">Protocol /</p>
-              <a href="mailto:support@protocol-club.com">support@protocol-club.com</a>
+              <a href="mailto:contact@protocol-club.com">contact@protocol-club.com</a>
             </div>
             <div className="program-footer__info-block">
               <p className="program-footer__heading">Disclaimer /</p>

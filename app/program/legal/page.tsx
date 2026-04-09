@@ -14,7 +14,7 @@ export default function ProgramLegalPage() {
           <h2>Protocol</h2>
           <p>
             This program is operated under the Protocol brand. For support, billing questions, or access issues,
-            contact <a href="mailto:support@protocol-club.com">support@protocol-club.com</a>.
+            contact <a href="mailto:contact@protocol-club.com">contact@protocol-club.com</a>.
           </p>
         </article>
 

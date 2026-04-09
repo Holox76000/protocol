@@ -41,7 +41,7 @@ export default function ProgramPrivacyPolicyPage() {
         <article className="program-internal__panel">
           <p className="program-internal__section-label">Contact</p>
           <p>
-            For privacy-related questions, email <a href="mailto:support@protocol-club.com">support@protocol-club.com</a>.
+            For privacy-related questions, email <a href="mailto:contact@protocol-club.com">contact@protocol-club.com</a>.
           </p>
         </article>
       </section>

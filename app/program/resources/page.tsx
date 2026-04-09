@@ -17,7 +17,7 @@ const RESOURCE_GROUPS = [
     label: "Support",
     title: "Questions about access or your purchase",
     description:
-      "For help with billing, login access, or product delivery, contact support@protocol-club.com and include the email used for checkout.",
+      "For help with billing, login access, or product delivery, contact contact@protocol-club.com and include the email used for checkout.",
   },
 ];
 
