@@ -32,7 +32,7 @@ function getApiKey(): string | null {
  * Create or update a Klaviyo profile and subscribe them to the main list.
  * Returns the Klaviyo profile ID on success, null on failure.
  */
-async function upsertProfileAndSubscribe(
+export async function upsertProfileAndSubscribe(
   apiKey: string,
   email: string,
   firstName?: string,

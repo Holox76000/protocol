@@ -8,6 +8,7 @@ import {
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
 import { getStripeServerClient } from "../../../../lib/stripe";
+import { upsertProfileAndSubscribe } from "../../../../lib/klaviyo";
 
 export const runtime = "nodejs";
 
@@ -150,6 +151,14 @@ export async function POST(request: Request) {
   });
 
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
+
+  // Add to Klaviyo list (fire-and-forget)
+  const klaviyoKey = process.env.KLAVIYO_PRIVATE_KEY;
+  if (klaviyoKey) {
+    void upsertProfileAndSubscribe(klaviyoKey, email, firstName).catch((err) =>
+      console.error("[register] Klaviyo sync failed", { error: String(err), email })
+    );
+  }
 
   return response;
 }
