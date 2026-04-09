@@ -8,7 +8,19 @@ export const runtime = "nodejs";
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams?: { funnel?: string };
+  searchParams?: {
+    funnel?: string;
+    funnel_type?: string;
+    customer_email?: string;
+    landing_page?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_content?: string;
+    utm_term?: string;
+    utm_id?: string;
+    fbclid?: string;
+  };
 }) {
   const rawFunnel = searchParams?.funnel?.trim() || "main";
   const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1"]);
@@ -55,6 +67,7 @@ export default async function CheckoutPage({
   const fbclid = searchParams?.fbclid ?? null;
   const funnelType = searchParams?.funnel_type ?? "long";
   const landingPage = searchParams?.landing_page ?? (funnel === "f1" ? "/f1" : "/");
+  const customerEmail = searchParams?.customer_email ?? null;
 
   let session;
   try {
@@ -63,6 +76,19 @@ export default async function CheckoutPage({
       billing_address_collection: "auto",
       allow_promotion_codes: true,
       line_items: getCheckoutLineItems(internalFunnel),
+      // Pre-fill customer email so Stripe can send recovery emails on abandonment
+      ...(customerEmail && { customer_email: customerEmail }),
+      // Always create a customer record so Stripe recovery emails work
+      customer_creation: "always",
+      // Enable Stripe's built-in checkout recovery for expired sessions
+      after_expiration: {
+        recovery: {
+          enabled: true,
+          allow_promotion_codes: false,
+        },
+      },
+      // 30-minute window — enough for any normal checkout flow
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
       cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
       metadata: {

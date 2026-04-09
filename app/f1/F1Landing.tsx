@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import TrackedLink from "../tracked-link";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import type { ResearchTab } from "../program/ResearchImpactSection";
+import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
 import "../program/program.css";
 import "./f1.css";
 
@@ -153,13 +155,22 @@ const WITH = [
 /* ─── Component ──────────────────────────────────────────────────────────── */
 
 export default function F1Landing() {
+  const [offerHref, setOfferHref] = useState("/f1/offer");
+
+  useEffect(() => {
+    // Capture UTM params from landing URL, persist to sessionStorage for downstream pages
+    const utm = getUtmParams();
+    persistUtmParams(utm);
+    setOfferHref(appendUtmToPath("/f1/offer", utm));
+  }, []);
+
   return (
     <div className="program-page program-page--theme-test f1-page">
 
       {/* ═══ NAV ═══ */}
       <header className="program-nav">
         <div className="program-nav__inner">
-          <a href="/f1/offer" className="program-nav__logo" aria-label="See the offer">
+          <a href={offerHref} className="program-nav__logo" aria-label="See the offer">
             <Image src="/program/static/landing/images/shared/Prtcl.png" alt="Protocol" width={44} height={44} className="program-nav__logo-image" />
           </a>
           <nav className="program-nav__links" aria-label="Primary">
@@ -168,7 +179,7 @@ export default function F1Landing() {
             <a href="#results">Results</a>
           </nav>
           <div className="program-nav__actions">
-            <TrackedLink href="/f1/offer" className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
+            <TrackedLink href={offerHref} className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
               Start attractiveness Protocol
 </TrackedLink>
           </div>
@@ -187,7 +198,7 @@ export default function F1Landing() {
               You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
             </p>
             <div className="program-hero__actions">
-              <TrackedLink href="/f1/offer" className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
+              <TrackedLink href={offerHref} className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
                 <span>Start attractiveness Protocol</span>
                 <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
               </TrackedLink>
@@ -290,7 +301,7 @@ export default function F1Landing() {
 
       {/* ═══ MID CTA ═══ */}
       <div className="f1-mid-cta">
-        <TrackedLink href="/f1/offer" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
           Start attractiveness Protocol <ArrowIcon />
         </TrackedLink>
         <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
@@ -440,7 +451,7 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-pain__cta">
-            <TrackedLink href="/f1/offer" className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
+            <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "pain" }}>
               Start attractiveness Protocol <ArrowIcon />
             </TrackedLink>
             <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
@@ -482,7 +493,7 @@ export default function F1Landing() {
           <div className="f1-close__option f1-close__option--discover">
             <div className="f1-close__option-label">Option 2. Start attractiveness Protocol</div>
             <p className="f1-close__text">Answer a few questions about your body and context. Get your personalized attractiveness roadmap — the exact variables to train, the exact targets to hit.</p>
-            <TrackedLink href="/f1/offer" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
+            <TrackedLink href={offerHref} className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
               Start attractiveness Protocol
             </TrackedLink>
           </div>

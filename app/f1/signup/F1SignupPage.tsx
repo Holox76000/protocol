@@ -2,17 +2,45 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
+import { trackEvent } from "../../../lib/analytics";
+import {
+  getUtmParams,
+  getPersistedUtmParams,
+  persistUtmParams,
+  appendUtmToPath,
+} from "../../../lib/utm";
 import styles from "../../visualization/visualization.module.css";
 
-const CHECKOUT_HREF = "/checkout?funnel=f1";
 export const F1_SIGNUP_STORAGE_KEY = "f1_signup";
 
 export default function F1SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkoutBase, setCheckoutBase] = useState("/checkout?funnel=f1");
 
   useEffect(() => {
     trackGa4Event("view_signup", { funnel: "f1", page_path: "/f1/signup" });
+
+    // Merge UTM from current URL (short funnel: ad → /f1/signup) with any
+    // already-persisted params (long funnel: persisted from /f1).
+    const fromUrl = getUtmParams();
+    const persisted = getPersistedUtmParams();
+    const merged = { ...persisted, ...fromUrl }; // URL params win
+    if (Object.keys(fromUrl).length > 0) persistUtmParams(fromUrl);
+
+    // Detect funnel type: if F1Landing set params in sessionStorage → long
+    const funnelType = persisted.utm_source && !fromUrl.utm_source ? "long" : "short";
+
+    let base = `/checkout?funnel=f1&funnel_type=${funnelType}`;
+    if (merged.utm_source) base += `&utm_source=${encodeURIComponent(merged.utm_source)}`;
+    if (merged.utm_medium) base += `&utm_medium=${encodeURIComponent(merged.utm_medium)}`;
+    if (merged.utm_campaign) base += `&utm_campaign=${encodeURIComponent(merged.utm_campaign)}`;
+    if (merged.utm_content) base += `&utm_content=${encodeURIComponent(merged.utm_content)}`;
+    if (merged.utm_term) base += `&utm_term=${encodeURIComponent(merged.utm_term)}`;
+    if (merged.utm_id) base += `&utm_id=${encodeURIComponent(merged.utm_id)}`;
+    if (merged.fbclid) base += `&fbclid=${encodeURIComponent(merged.fbclid)}`;
+
+    setCheckoutBase(base);
   }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -30,6 +58,8 @@ export default function F1SignupPage() {
     setIsSubmitting(true);
     setError(null);
 
+    const utm = getPersistedUtmParams();
+
     try {
       const response = await fetch("/api/lead", {
         method: "POST",
@@ -39,6 +69,7 @@ export default function F1SignupPage() {
           answers: { first_name: name, funnel: "f1", source: "f1_signup" },
           segment: "f1_signup",
           completedAt: new Date().toISOString(),
+          utm,
         }),
       });
 
@@ -52,9 +83,24 @@ export default function F1SignupPage() {
         JSON.stringify({ first_name: name, email: mail }),
       );
 
-      trackGa4Event("signup_submitted", { funnel: "f1", destination: CHECKOUT_HREF });
+      // ✅ Lead fires HERE — after server confirmed the submission, not on page view.
+      // Client-side pixel for browser attribution.
+      const sessionId = window.localStorage.getItem("sf_quiz_session_id") ?? `lead-${Date.now()}`;
+      const eventId = `${sessionId}:lead:${Date.now()}`;
+      try {
+        (window as Window & { fbq?: Function }).fbq?.("track", "Lead", {
+          content_name: "Attractiveness Protocol",
+          value: 49,
+          currency: "USD",
+        }, { eventID: eventId });
+      } catch {
+        // Ignore pixel errors — CAPI in /api/lead is the source of truth.
+      }
 
-      window.location.assign(CHECKOUT_HREF);
+      const checkoutHref = `${checkoutBase}&customer_email=${encodeURIComponent(mail)}&landing_page=/f1`;
+      trackGa4Event("signup_submitted", { funnel: "f1", destination: checkoutHref });
+
+      window.location.assign(checkoutHref);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Please try again.");
     } finally {
