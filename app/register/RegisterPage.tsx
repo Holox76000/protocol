@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 
 type Props = {
@@ -27,6 +27,91 @@ const STRENGTH: Record<string, { label: string; bar: string; text: string }> = {
   fair: { label: "Fair", bar: "w-2/3 bg-amber-400", text: "text-amber-600" },
   strong: { label: "Strong", bar: "w-full bg-emerald-500", text: "text-emerald-600" },
 };
+
+const TESTIMONIALS = [
+  { quote: "13 weeks in, people started noticing.", name: "Ryan, 27", metric: "SWR 1.29 → 1.44" },
+  { quote: "Same weight, but my girlfriend noticed the shape change before I told her.", name: "Tyler, 32", metric: "SWR 1.31 → 1.45" },
+  { quote: "I've been training for 6 years. This explained in 10 minutes what I'd been missing.", name: "Connor, 31", metric: "SWR 1.27 → 1.46" },
+];
+
+function MobileTestimonialSlider() {
+  const [active, setActive] = useState(0);
+  const touchStart = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const next = useCallback(() => setActive((i) => (i + 1) % TESTIMONIALS.length), []);
+  const prev = useCallback(() => setActive((i) => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length), []);
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(next, 4500);
+  }, [next]);
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [resetTimer]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart.current === null) return;
+    const delta = touchStart.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) {
+      delta > 0 ? next() : prev();
+      resetTimer();
+    }
+    touchStart.current = null;
+  };
+
+  const t = TESTIMONIALS[active];
+  return (
+    <div className="lg:hidden mb-7">
+      <div
+        className="rounded-xl border border-wire bg-pebble px-5 py-4 select-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Stars + rating */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex gap-0.5">
+            {[0,1,2,3,4].map((i) => (
+              <svg key={i} width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
+                <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
+              </svg>
+            ))}
+          </div>
+          <span className="text-[11px] text-mute">4.9 · 2,400+ members</span>
+        </div>
+
+        {/* Quote */}
+        <p className="text-[13.5px] leading-snug text-void mb-3 min-h-[42px]">
+          &ldquo;{t.quote}&rdquo;
+        </p>
+
+        {/* Name + metric */}
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold text-dim">{t.name}</span>
+          <span className="text-[11px] tabular-nums text-mute">{t.metric}</span>
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center gap-1.5 mt-3">
+          {TESTIMONIALS.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => { setActive(i); resetTimer(); }}
+              className={`h-1.5 rounded-full transition-all duration-200 ${i === active ? "w-4 bg-void" : "w-1.5 bg-wire"}`}
+              aria-label={`Testimonial ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function getStrength(pw: string): keyof typeof STRENGTH | null {
   if (!pw) return null;
@@ -189,6 +274,9 @@ export default function RegisterPage({
                   : "Already paid? Enter your email and create a password to access your Protocol."}
               </p>
             </div>
+
+            {/* Mobile social proof slider */}
+            <MobileTestimonialSlider />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
