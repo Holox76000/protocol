@@ -18,17 +18,30 @@ export default function CheckoutRedirect({
       destination: "stripe",
     });
 
+    // ✅ InitiateCheckout fires here — Stripe session was just created server-side
+    // and the user is about to land on Stripe's hosted page.
+    // eventID = Stripe session ID so CAPI (fired in /checkout server component) deduplicates.
+    try {
+      (window as Window & { fbq?: Function }).fbq?.("track", "InitiateCheckout", {
+        content_name: "Attractiveness Protocol",
+        content_ids: ["f1-attractiveness-protocol"],
+        value: 49,
+        currency: "USD",
+        num_items: 1,
+      }, { eventID: sessionId ?? `initiate-checkout-${Date.now()}` });
+    } catch {
+      // Never block the redirect for tracking errors.
+    }
+
     const timeoutId = window.setTimeout(() => {
-      trackGa4Event("checkout_redirected_to_stripe", {
-        funnel,
-      });
+      trackGa4Event("checkout_redirected_to_stripe", { funnel });
       window.location.assign(redirectUrl);
     }, 180);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [funnel, redirectUrl]);
+  }, [funnel, redirectUrl, sessionId]);
 
   return (
     <main className="min-h-screen bg-ash px-6 py-16 text-ink">
