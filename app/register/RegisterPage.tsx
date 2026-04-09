@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
@@ -107,15 +106,6 @@ export default function RegisterPage({
 
       {/* ── Left panel: dark editorial ── */}
       <div className="hidden lg:flex lg:w-[440px] xl:w-[480px] shrink-0 flex-col justify-between bg-void px-10 py-10">
-        <Link href="/f1/offer" aria-label="Protocol Club">
-          <Image
-            src="/program/static/landing/images/shared/Prtcl.png"
-            alt="Protocol"
-            width={32}
-            height={32}
-            className="opacity-90"
-          />
-        </Link>
 
         <div>
           {registrationToken ? (
@@ -145,15 +135,31 @@ export default function RegisterPage({
           )}
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-5">
+          {/* Rating */}
+          <div className="flex items-center gap-3">
+            <div className="flex gap-0.5">
+              {[0,1,2,3,4].map((i) => (
+                <svg key={i} width="13" height="13" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
+                  <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
+                </svg>
+              ))}
+            </div>
+            <span className="text-[12px] text-white/40">4.9 · 2,400+ members</span>
+          </div>
+
+          {/* Testimonials */}
           {[
-            "Based on 200+ peer-reviewed studies",
-            "Personalized to your face, frame & age",
-            "Protocol delivered within 72 hours",
-          ].map((item) => (
-            <div key={item} className="flex items-center gap-3">
-              <div className="h-px w-4 bg-white/20" />
-              <span className="text-[12px] text-white/30">{item}</span>
+            { quote: "13 weeks in, people started noticing.", name: "Ryan, 27", metric: "SWR 1.29 → 1.44" },
+            { quote: "Same weight, but my girlfriend noticed the shape change before I told her.", name: "Tyler, 32", metric: "SWR 1.31 → 1.45" },
+            { quote: "I've been training for 6 years. This explained in 10 minutes what I'd been missing.", name: "Connor, 31", metric: "SWR 1.27 → 1.46" },
+          ].map((t) => (
+            <div key={t.name} className="border-t border-white/[0.07] pt-4">
+              <p className="text-[13px] leading-snug text-white/65 mb-2.5">&ldquo;{t.quote}&rdquo;</p>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-white/30">{t.name}</span>
+                <span className="text-[11px] tabular-nums text-white/20">{t.metric}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -162,15 +168,7 @@ export default function RegisterPage({
       {/* ── Right panel: form ── */}
       <div className="flex flex-1 flex-col bg-white">
         {/* Mobile header */}
-        <div className="flex items-center justify-between border-b border-wire px-6 py-5 lg:hidden">
-          <Link href="/f1/offer" aria-label="Protocol Club">
-            <Image
-              src="/program/static/landing/images/shared/Prtcl.png"
-              alt="Protocol"
-              width={28}
-              height={28}
-            />
-          </Link>
+        <div className="flex items-center justify-end border-b border-wire px-6 py-5 lg:hidden">
           <Link href="/login" className="text-[12px] text-dim hover:text-void transition-colors">
             Sign in →
           </Link>

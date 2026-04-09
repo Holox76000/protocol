@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
@@ -63,15 +62,6 @@ export default function LoginPage({ next = "/dashboard" }: Props) {
 
       {/* ── Left panel: dark editorial ── */}
       <div className="hidden lg:flex lg:w-[440px] xl:w-[480px] shrink-0 flex-col justify-between bg-void px-10 py-10">
-        <Link href="/f1/offer" aria-label="Protocol Club">
-          <Image
-            src="/program/static/landing/images/shared/Prtcl.png"
-            alt="Protocol"
-            width={32}
-            height={32}
-            className="opacity-90"
-          />
-        </Link>
 
         <div>
           <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30">
@@ -103,16 +93,8 @@ export default function LoginPage({ next = "/dashboard" }: Props) {
 
       {/* ── Right panel: form ── */}
       <div className="flex flex-1 flex-col bg-white">
-        {/* Mobile logo */}
-        <div className="flex items-center justify-between border-b border-wire px-6 py-5 lg:hidden">
-          <Link href="/f1/offer" aria-label="Protocol Club">
-            <Image
-              src="/program/static/landing/images/shared/Prtcl.png"
-              alt="Protocol"
-              width={28}
-              height={28}
-            />
-          </Link>
+        {/* Mobile header */}
+        <div className="flex items-center justify-end border-b border-wire px-6 py-5 lg:hidden">
           <Link href="/register" className="text-[12px] text-dim hover:text-void transition-colors">
             Create account →
           </Link>
