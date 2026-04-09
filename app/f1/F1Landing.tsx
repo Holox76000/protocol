@@ -481,7 +481,7 @@ export default function F1Landing() {
 
           <div className="f1-close__option f1-close__option--discover">
             <div className="f1-close__option-label">Option 2. Start attractiveness Protocol</div>
-            <p className="f1-close__text">Start the Protocol today. Answer a few questions about your body and context. Get your personalized attractiveness roadmap — the exact variables to train, the exact targets to hit.</p>
+            <p className="f1-close__text">Answer a few questions about your body and context. Get your personalized attractiveness roadmap — the exact variables to train, the exact targets to hit.</p>
             <TrackedLink href="/f1/offer" className="f1-cta f1-cta--large f1-cta--inverted" eventName="f1_cta_clicked" eventParams={{ cta_location: "close" }}>
               Start attractiveness Protocol
             </TrackedLink>
