@@ -19,8 +19,8 @@ export default async function Register({
 
   // Peek at registration token to pre-fill form (without consuming it)
   const rawToken = searchParams?.token ?? "";
-  let prefillEmail = "";
-  let prefillFirstName = "";
+  let prefillEmail = searchParams?.email ?? "";
+  let prefillFirstName = searchParams?.firstName ?? "";
 
   if (rawToken) {
     const tokenData = await peekRegistrationToken(rawToken).catch(() => null);
