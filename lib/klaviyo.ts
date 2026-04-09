@@ -110,6 +110,77 @@ async function upsertProfileAndSubscribe(
 }
 
 /**
+ * Send a "Protocol Welcome" event to Klaviyo after a successful Stripe purchase.
+ * Attach the registration URL so Klaviyo flows can send the welcome email.
+ *
+ * Required Klaviyo setup:
+ * 1. Create a flow triggered by metric "Protocol Purchase"
+ * 2. Add an email step using the "registration_url" property in the body
+ *    e.g. "Click here to create your account: {{ event.registration_url }}"
+ */
+export async function sendKlaviyoWelcomeEmail(props: {
+  email: string;
+  firstName?: string;
+  registrationUrl: string;
+}): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  await Promise.allSettled([
+    upsertProfileAndSubscribe(apiKey, props.email, props.firstName),
+    (async () => {
+      const body = {
+        data: {
+          type: "event",
+          attributes: {
+            properties: {
+              registration_url: props.registrationUrl,
+              ...(props.firstName && { first_name: props.firstName }),
+            },
+            metric: {
+              data: {
+                type: "metric",
+                attributes: { name: "Protocol Purchase" },
+              },
+            },
+            profile: {
+              data: {
+                type: "profile",
+                attributes: {
+                  email: props.email,
+                  ...(props.firstName && { first_name: props.firstName }),
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const res = await fetch(`${KLAVIYO_API_BASE}/events/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-02-15",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error("[klaviyo] Protocol Purchase event failed", {
+          status: res.status,
+          body: text,
+          email: props.email,
+        });
+      } else {
+        console.log("[klaviyo] Protocol Purchase event sent", { email: props.email });
+      }
+    })(),
+  ]);
+}
+
+/**
  * Send a "Started Checkout" event to Klaviyo and add the profile to the list.
  * Fires server-side only. Errors are non-fatal — logged but never thrown.
  */
