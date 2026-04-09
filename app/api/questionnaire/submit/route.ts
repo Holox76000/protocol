@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateSession, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { syncKlaviyoQuestionnaire } from "../../../../lib/klaviyo";
 
 type Answers = Record<string, unknown>;
 
@@ -82,11 +83,15 @@ export async function POST(request: NextRequest) {
     .update({ protocol_status: "questionnaire_submitted" })
     .eq("id", user.id);
 
-  // Log red flags (email notification handled in Phase 4)
+  // Log red flags
   if (redFlags.length > 0) {
     console.warn(`[RED FLAGS] user=${user.id} email=${user.email}`, redFlags);
-    // TODO Phase 4: send admin alert email via Klaviyo
   }
+
+  // Sync questionnaire data to Klaviyo (fire-and-forget)
+  void syncKlaviyoQuestionnaire({ email: user.email, answers }).catch((err) =>
+    console.error("[submit] Klaviyo sync failed", { error: String(err) })
+  );
 
   return NextResponse.json({ ok: true });
 }

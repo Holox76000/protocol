@@ -110,6 +110,152 @@ async function upsertProfileAndSubscribe(
 }
 
 /**
+ * Sync all questionnaire answers to the Klaviyo profile as custom properties,
+ * and fire a "Questionnaire Submitted" event.
+ * Called from both /api/questionnaire/submit and /api/questionnaire/finalize.
+ */
+export async function syncKlaviyoQuestionnaire(props: {
+  email: string;
+  answers: Record<string, unknown>;
+}): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  const a = props.answers;
+
+  // Map answers to Klaviyo profile custom properties (PascalCase for readability in Klaviyo)
+  const arr = (v: unknown) => (Array.isArray(v) ? (v as string[]).join(", ") : undefined);
+  const num = (v: unknown) => (typeof v === "number" ? v : undefined);
+  const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+
+  const customProperties: Record<string, unknown> = {
+    // Identity
+    Protocol_Goal: str(a.goal),
+    Protocol_Motivation: str(a.motivation),
+    Protocol_Age: num(a.age),
+    Protocol_City: str(a.city),
+    Protocol_Phone: str(a.phone),
+    Protocol_ProfessionalEnvironment: str(a.professional_environment),
+    Protocol_FacialStructureSelf: str(a.facial_structure_self),
+    Protocol_SocialPerception: arr(a.social_perception),
+    Protocol_TypicalClothing: str(a.typical_clothing),
+    // Biometrics
+    Protocol_HeightCm: num(a.height_cm),
+    Protocol_WeightKg: num(a.weight_kg),
+    Protocol_WeightTrend: str(a.weight_trend_6mo),
+    Protocol_WaistCm: num(a.waist_circumference_cm),
+    // Training
+    Protocol_TrainingExperience: str(a.training_experience),
+    Protocol_SessionsPerWeek: num(a.sessions_per_week),
+    Protocol_SessionDurationMin: num(a.session_duration_minutes),
+    Protocol_TrainingLocation: str(a.training_location),
+    Protocol_PreferredActivities: arr(a.preferred_activities),
+    Protocol_DailyActivityLevel: str(a.daily_activity_level),
+    Protocol_TrainingConsistency: str(a.training_consistency),
+    // Nutrition
+    Protocol_DietaryProfile: str(a.dietary_profile),
+    Protocol_FoodAllergies: arr(a.food_allergies),
+    Protocol_EatingHabits: arr(a.eating_habits),
+    Protocol_MealsPerDay: num(a.meals_per_day),
+    Protocol_MealPrepAvailability: str(a.meal_prep_availability),
+    Protocol_SupplementUse: arr(a.supplement_use),
+    // Health
+    Protocol_Injuries: arr(a.injuries),
+    Protocol_MedicalConditions: arr(a.medical_conditions),
+    Protocol_Medications: arr(a.medications),
+    Protocol_SleepHours: str(a.sleep_hours),
+    Protocol_StressLevel: num(a.stress_level),
+    Protocol_ConcernAreas: arr(a.concern_areas),
+    // Status
+    Protocol_Status: "submitted",
+    Protocol_SubmittedAt: new Date().toISOString(),
+  };
+
+  // Remove undefined values
+  const props_ = Object.fromEntries(
+    Object.entries(customProperties).filter(([, v]) => v !== undefined && v !== "")
+  );
+
+  await Promise.allSettled([
+    // Update profile properties
+    (async () => {
+      const res = await fetch(`${KLAVIYO_API_BASE}/profiles/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-02-15",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "profile",
+            attributes: {
+              email: props.email,
+              properties: props_,
+            },
+          },
+        }),
+      });
+      if (!res.ok && res.status !== 409) {
+        const text = await res.text().catch(() => "");
+        console.error("[klaviyo] questionnaire profile update failed", { status: res.status, body: text });
+      } else {
+        // If 409 (profile exists), patch properties via the duplicate profile ID
+        if (res.status === 409) {
+          const json = (await res.json()) as { errors?: Array<{ meta?: { duplicate_profile_id?: string } }> };
+          const profileId = json.errors?.[0]?.meta?.duplicate_profile_id;
+          if (profileId) {
+            await fetch(`${KLAVIYO_API_BASE}/profiles/${profileId}/`, {
+              method: "PATCH",
+              headers: {
+                Authorization: `Klaviyo-API-Key ${apiKey}`,
+                "Content-Type": "application/json",
+                revision: "2024-02-15",
+              },
+              body: JSON.stringify({
+                data: {
+                  type: "profile",
+                  id: profileId,
+                  attributes: { properties: props_ },
+                },
+              }),
+            });
+          }
+        }
+        console.log("[klaviyo] questionnaire profile synced", { email: props.email });
+      }
+    })(),
+    // Fire "Questionnaire Submitted" event
+    (async () => {
+      const res = await fetch(`${KLAVIYO_API_BASE}/events/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-02-15",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "event",
+            attributes: {
+              metric: { data: { type: "metric", attributes: { name: "Questionnaire Submitted" } } },
+              profile: { data: { type: "profile", attributes: { email: props.email } } },
+              properties: props_,
+            },
+          },
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error("[klaviyo] Questionnaire Submitted event failed", { status: res.status, body: text });
+      } else {
+        console.log("[klaviyo] Questionnaire Submitted event sent", { email: props.email });
+      }
+    })(),
+  ]);
+}
+
+/**
  * Send a "Protocol Welcome" event to Klaviyo after a successful Stripe purchase.
  * Attach the registration URL so Klaviyo flows can send the welcome email.
  *
