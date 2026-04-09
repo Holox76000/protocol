@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { trackKlaviyoStartedCheckout } from "../../../lib/klaviyo";
 
 type LeadPayload = {
   email: string;
@@ -112,7 +113,24 @@ export async function POST(request: Request) {
   });
   console.log("[lead] meta sent", { email });
 
-  // TODO: Send payload to Klaviyo/Mailchimp and persist to database.
+  // Fire-and-forget — never blocks the response to the user
+  void trackKlaviyoStartedCheckout({
+    email,
+    firstName: body.answers?.first_name,
+    value: 49,
+    checkoutUrl: "https://protocol-club.com/checkout?funnel=f1",
+    items: [
+      {
+        ProductID: "f1-attractiveness-protocol",
+        ProductName: "Attractiveness Protocol",
+        Quantity: 1,
+        ItemPrice: 49,
+        RowTotal: 49,
+        ProductURL: "https://protocol-club.com/f1/offer",
+      },
+    ],
+    utm: body.utm as Record<string, string | undefined> | undefined,
+  });
 
   return NextResponse.json({ ok: true });
 }
