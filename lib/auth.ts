@@ -1,5 +1,6 @@
+import "server-only";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { supabaseAdmin } from "./supabase";
 
 // ──────────────────────────────────────────────
