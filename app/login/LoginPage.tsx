@@ -45,8 +45,8 @@ export default function LoginPage({ next = "/dashboard" }: Props) {
   );
 
   return (
-    <main className="min-h-screen bg-ash flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
+    <main className="min-h-screen bg-ash px-4 py-16 flex flex-col items-center justify-center">
+      <div className="w-full max-w-[420px]">
 
         {/* Logo */}
         <div className="mb-10 flex justify-center">
