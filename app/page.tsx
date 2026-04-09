@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
-import ProgramLanding from "./program/ProgramLanding";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Protocol | Get Lean Without Guesswork",
-  description: "Get your personalized body analysis and attractiveness Protocol based on 2000+ academic studies."
-};
-
-export default function HomePage() {
-  return <ProgramLanding funnel="main" />;
+export default function HomePage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string>;
+}) {
+  // Preserve any query params (UTMs, fbclid, etc.) on the redirect
+  const qs = searchParams ? new URLSearchParams(searchParams as Record<string, string>).toString() : "";
+  const destination = qs ? `/f1/offer?${qs}` : "/f1/offer";
+  redirect(destination);
 }
