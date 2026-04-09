@@ -2,11 +2,11 @@ import "server-only";
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
 import { supabaseAdmin } from "./supabase";
+export { SESSION_COOKIE_NAME } from "./auth-constants";
 
 // ──────────────────────────────────────────────
 // Constants
 // ──────────────────────────────────────────────
-export const SESSION_COOKIE_NAME = "prtcl_session";
 const SESSION_DURATION_DAYS = 30;
 const BCRYPT_ROUNDS = 10;
 const REGISTRATION_TOKEN_DURATION_DAYS = 7;
