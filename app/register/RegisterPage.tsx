@@ -82,8 +82,8 @@ export default function RegisterPage({
       : "strong";
 
   return (
-    <main className="min-h-screen bg-ash px-4 py-16 flex flex-col items-center justify-center">
-      <div className="w-full max-w-[420px]">
+    <main className="min-h-screen bg-ash px-6 py-16">
+      <div className="mx-auto max-w-[420px]">
 
         {/* Logo */}
         <div className="mb-10 flex justify-center">
