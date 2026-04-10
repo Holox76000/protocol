@@ -42,7 +42,7 @@ export default function ResearchImpactSection({
             className="program-research__title"
             dangerouslySetInnerHTML={{ __html: titleHtml }}
           />
-          <p className="program-research__subtitle">{subtitle}</p>
+          {subtitle && <p className="program-research__subtitle">{subtitle}</p>}
         </header>
 
         <div className="program-research__tabs" aria-label="Research categories">

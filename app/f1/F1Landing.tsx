@@ -4,6 +4,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import TrackedLink from "../tracked-link";
+import GaryLinkovQuoteSection from "../program/GaryLinkovQuoteSection";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import type { ResearchTab } from "../program/ResearchImpactSection";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
@@ -15,100 +16,222 @@ const ResearchImpactSection = dynamic(() => import("../program/ResearchImpactSec
 /* ─── Body Type Selector ─────────────────────────────────────────────────── */
 
 const BODY_TYPE_IMAGES = [
-  { id: 0, before: "/assets/14-before.png", after: "/assets/14-after.png" },
-  { id: 1, before: "/assets/5-before.png",  after: "/assets/5-after.png"  },
-  { id: 2, before: "/assets/2-before.png",  after: "/assets/2-after.png"  },
-  { id: 3, before: "/assets/1-before.png",  after: "/assets/1-after.png"  },
+  { id: 0, before: "/assets/projection-advertorial-before.svg", after: "/assets/projection-advertorial-after.svg" },
+  { id: 1, before: "/assets/projection-advertorial-before-3.svg", after: "/assets/projection-advertorial-after-3.svg" },
+  { id: 2, before: "/assets/projection-advertorial-before-4.svg", after: "/assets/projection-advertorial-after-4.svg" },
+  { id: 3, before: "/assets/advertorial-projection-before-2.svg", after: "/assets/projection-advertorial-after-2.svg" },
+];
+
+const PROJECTIONS = [
+  {
+    id: 0,
+    situation: "Work presentation",
+    before: "/assets/projection-advertorial-before.svg",
+    after: "/assets/projection-advertorial-after.svg",
+    scene: "You walk in. Someone asks your opinion before you've spoken. The room gave you the role before you said a word.",
+  },
+  {
+    id: 1,
+    situation: "Night out with friends",
+    before: "/assets/projection-advertorial-before-3.svg",
+    after: "/assets/projection-advertorial-after-3.svg",
+    scene: "At the bar, someone approaches you first. Your friends notice. You said nothing about working out. Your body said it for you.",
+  },
+  {
+    id: 2,
+    situation: "Dating app photo",
+    before: "/assets/projection-advertorial-before-4.svg",
+    after: "/assets/projection-advertorial-after-4.svg",
+    scene: "Same photo. Same face. You changed the shape underneath. Your match rate goes up. The algorithm didn\u2019t change. You did.",
+  },
+  {
+    id: 3,
+    situation: "Beach club",
+    before: "/assets/advertorial-projection-before-2.svg",
+    after: "/assets/projection-advertorial-after-2.svg",
+    scene: "You take your shirt off without calculating the angle. The part of your brain that used to plan the early exits \u2014 it\u2019s quiet.",
+  },
+];
+
+const LOADING_STEPS = [
+  "Analyzing your body type…",
+  "Computing your proportions…",
+  "Generating your projection…",
 ];
 
 function BodyTypeSelector({ offerHref }: { offerHref: string }) {
   const [selected, setSelected] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   const current = BODY_TYPE_IMAGES[selected];
 
+  function handleReveal() {
+    setLoading(true);
+    setProgress(0);
+    setLoadingStep(0);
+
+    const totalMs = 3000;
+    const tickMs = 30;
+    let elapsed = 0;
+
+    const interval = setInterval(() => {
+      elapsed += tickMs;
+      const pct = Math.min((elapsed / totalMs) * 100, 100);
+      setProgress(pct);
+      setLoadingStep(Math.floor((pct / 100) * LOADING_STEPS.length));
+      if (elapsed >= totalMs) {
+        clearInterval(interval);
+        setLoading(false);
+        setRevealed(true);
+      }
+    }, tickMs);
+  }
+
   return (
-    <div style={{ marginTop: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-      {!revealed ? (
+    <div id="step-1" style={{ marginTop: 16, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      <div className="f1-steps">
+        <a href="#step-1" className="f1-steps__item f1-steps__item--active">
+          <span className="f1-steps__num">1</span>
+          <span className="f1-steps__label">Assess your body</span>
+        </a>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <a href="#step-2" className={`f1-steps__item ${revealed ? "f1-steps__item--active" : "f1-steps__item--muted"}`}>
+          <span className="f1-steps__num">2</span>
+          <span className="f1-steps__label">Find what&apos;s changeable</span>
+        </a>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <div className="f1-steps__item f1-steps__item--muted">
+          <span className="f1-steps__num">3</span>
+          <span className="f1-steps__label">Decide your commitment</span>
+        </div>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <div className="f1-steps__item f1-steps__item--muted">
+          <span className="f1-steps__num">4</span>
+          <span className="f1-steps__label">Build your system</span>
+        </div>
+      </div>
+      {loading ? (
+        <div className="f1-scan-loader">
+          <img
+            src={current.before}
+            alt=""
+            aria-hidden="true"
+            className="f1-scan-loader__image"
+          />
+          <div className="f1-scan-loader__overlay" />
+          <div className="f1-scan-loader__grid" />
+          <div className="f1-scan-loader__line" />
+          <div className="f1-scan-loader__corners" />
+          <div className="f1-scan-loader__bottom">
+            <div key={loadingStep} className="f1-scan-loader__step">
+              {LOADING_STEPS[Math.min(loadingStep, LOADING_STEPS.length - 1)]}
+            </div>
+            <div className="f1-scan-loader__bar-track">
+              <div className="f1-scan-loader__bar-fill" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        </div>
+      ) : !revealed ? (
         <>
           <p style={{
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 600,
-            letterSpacing: "0.1em",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             color: "#799097",
             margin: 0,
           }}>
-            Which profile is closest to you?
+            Step 1 — Which one is you?
           </p>
-          <div style={{
-            display: "flex",
+          <p style={{
+            fontSize: 12,
+            color: "#9ca3af",
+            margin: "4px 0 0",
+            textAlign: "center",
+          }}>
+            We&apos;ll show you what your body could look like after 90 days.
+          </p>
+          <div className="f1-body-selector" style={{
             gap: 8,
             padding: "10px",
             background: "#f0efec",
             borderRadius: 16,
             width: "100%",
-            maxWidth: 520,
+            maxWidth: 680,
           }}>
             {BODY_TYPE_IMAGES.map((bt, i) => (
-              <button
-                key={bt.id}
-                type="button"
-                onClick={() => setSelected(i)}
-                aria-label={`Profile ${i + 1}`}
-                aria-pressed={selected === i}
-                style={{
-                  position: "relative",
-                  flex: 1,
-                  minWidth: 0,
-                  aspectRatio: "3 / 4",
-                  borderRadius: 10,
-                  overflow: "hidden",
-                  border: selected === i ? "2.5px solid #1a1a1a" : "2.5px solid transparent",
-                  padding: 0,
-                  cursor: "pointer",
-                  background: "#ddd",
-                  transition: "border-color 0.15s ease, transform 0.15s ease",
-                  transform: selected === i ? "scale(1.06)" : "scale(1)",
-                }}
-              >
-                <Image
-                  src={bt.before}
-                  alt={`Profile ${i + 1}`}
-                  fill
-                  sizes="(max-width: 640px) 22vw, 120px"
-                  style={{ objectFit: "cover", objectPosition: "top" }}
-                />
-              </button>
+              <div key={bt.id} style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => setSelected(i)}
+                  aria-label={["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                  aria-pressed={selected === i}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    aspectRatio: "2 / 3",
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    border: selected === i ? "2.5px solid #1a1a1a" : "2.5px solid transparent",
+                    padding: 0,
+                    cursor: "pointer",
+                    background: "#ddd",
+                    transition: "border-color 0.15s ease, transform 0.15s ease",
+                    transform: selected === i ? "scale(1.06)" : "scale(1)",
+                  }}
+                >
+                  <Image
+                    src={bt.before}
+                    alt={["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                    fill
+                    sizes="(max-width: 640px) 22vw, 120px"
+                    style={{ objectFit: "cover", objectPosition: "top" }}
+                  />
+                </button>
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: selected === i ? "#0a0a0a" : "#9ca3af",
+                  transition: "color 0.15s ease",
+                }}>
+                  {["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                </span>
+              </div>
             ))}
           </div>
           <button
             type="button"
-            onClick={() => setRevealed(true)}
+            onClick={handleReveal}
             className="program-hero__cta"
             style={{ marginTop: 8 }}
           >
-            <span>Discover my potential</span>
+            <span>See my projection</span>
             <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
           </button>
         </>
       ) : (
-        <div className="f1-body-reveal" style={{ width: "100%", maxWidth: 520 }}>
+        <div className="f1-body-reveal f1-body-reveal--wide" style={{ width: "min(440px, calc(100vw - 40px))", marginInline: "auto" }}>
           {/* Before / After */}
           <div style={{
             display: "flex",
+            width: "100%",
             gap: 0,
             borderRadius: 16,
             overflow: "hidden",
             position: "relative",
           }}>
             {/* Before */}
-            <div style={{ flex: 1, position: "relative", aspectRatio: "3 / 4" }}>
+            <div style={{ flex: 1, minWidth: 0, position: "relative", aspectRatio: "9 / 16" }}>
               <Image
                 src={current.before}
                 alt="Before"
                 fill
-                sizes="240px"
+                sizes="(max-width: 600px) 50vw, 450px"
                 style={{ objectFit: "cover", objectPosition: "top" }}
               />
               <span style={{
@@ -136,12 +259,12 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
             <div style={{ width: 2, background: "#fff", flexShrink: 0 }} />
 
             {/* After */}
-            <div style={{ flex: 1, position: "relative", aspectRatio: "3 / 4" }}>
+            <div style={{ flex: 1, minWidth: 0, position: "relative", aspectRatio: "9 / 16" }}>
               <Image
                 src={current.after}
                 alt="After"
                 fill
-                sizes="240px"
+                sizes="(max-width: 600px) 50vw, 450px"
                 style={{ objectFit: "cover", objectPosition: "top" }}
               />
               <span style={{
@@ -161,7 +284,7 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
               }}>
-                90 days
+                After
               </span>
             </div>
           </div>
@@ -176,7 +299,7 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
             textAlign: "center",
             lineHeight: 1.2,
           }}>
-            This is what&apos;s possible.
+            This is what your body type looks like after 90 days of Protocol.
           </p>
           <p style={{
             margin: "0 0 20px",
@@ -190,8 +313,8 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
 
           {/* CTAs */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <a href={offerHref} className="program-hero__cta">
-              <span>Start my Protocol</span>
+            <a href="#projections" className="program-hero__cta">
+              <span>See the real-life difference</span>
               <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
             </a>
             <button
@@ -280,11 +403,15 @@ function SilhouetteHero() {
 /* ─── Data ───────────────────────────────────────────────────────────────── */
 
 const RESEARCH_TABS: ResearchTab[] = [
+  { label: "Confidence", items: [
+    { titleHtml: "Higher <strong>self-esteem</strong>", description: "Men who feel good about their body report 2x higher self-esteem scores", source: "Reingen & Kernan (1993). Journal of Consumer Psychology." },
+    { titleHtml: "Less <strong>social anxiety</strong>", description: "Physical appearance satisfaction is one of the strongest predictors of confidence in social settings", source: "Mendelson et al. (2001). Body Image." },
+    { titleHtml: "More <strong>assertiveness</strong>", description: "Men satisfied with their physique report higher levels of assertiveness and social initiative", source: "Davis, C. (1997). Psychology of Sport and Exercise." },
+  ]},
   { label: "Finances", items: [
-    { titleHtml: "Higher <strong>salary</strong>", description: "Lean, muscular men earn 10-15% more", source: "Hamermesh & Biddle (1994). The American Economic Review." },
-    { titleHtml: "More <strong>respect</strong>", description: "Men with athletic builds are perceived as more competent and dominant", source: "Puleo, R. (2006). Journal of Undergraduate Psychological Research." },
-    { titleHtml: "More <strong>dates</strong>", description: "Men with visible muscle and low body fat receive 40% more matches", source: "Parrett, M. (2015). Journal of Economic Psychology." },
-    { titleHtml: "More <strong>confidence</strong>", description: "Men who feel good about their body report 2x higher self-esteem scores", source: "Reingen & Kernan (1993). Journal of Consumer Psychology." },
+    { titleHtml: "Higher <strong>salary</strong>", description: "Lean, muscular men earn 10-15% more than their peers", source: "Hamermesh & Biddle (1994). The American Economic Review." },
+    { titleHtml: "More <strong>promotions</strong>", description: "Attractive people are more likely to be hired and promoted", source: "Morrow et al. (1990). Journal of Management." },
+    { titleHtml: "More <strong>negotiating power</strong>", description: "Attractive people achieve better outcomes in salary negotiations", source: "Parrett, M. (2015). Journal of Economic Psychology." },
   ]},
   { label: "Dating", items: [
     { titleHtml: "More <strong>swipes</strong>", description: "On dating apps, looks matter about 9 times more than biographies", source: "Witmer et al. (2025). Computers in Human Behavior Reports." },
@@ -295,25 +422,6 @@ const RESEARCH_TABS: ResearchTab[] = [
     { titleHtml: "<strong>Funnier</strong>", description: "Attractive people are found funnier on video than in audio", source: "Cowan & Little (2013). Personality and Individual Differences." },
     { titleHtml: "<strong>Smarter</strong>", description: "Attractive people are thought to be more intelligent", source: "Moore et al. (2011). Journal of Evolutionary Psychology." },
     { titleHtml: "<strong>Better</strong>", description: "Attractive people are perceived as more moral and trustworthy", source: "Shinners (2009). UW-L Journal of Undergraduate Research." },
-  ]},
-  { label: "Health", items: [
-    { titleHtml: "Better <strong>treatment</strong>", description: "Doctors miss 3.67x more diagnoses for unattractive patients", source: "Tsiga et al. (2016). European Journal for Person Centered Healthcare." },
-    { titleHtml: "Longer <strong>lives</strong>", description: "Attractive people live longer", source: "Henderson & Anglin (2003). Evolution and Human Behavior." },
-  ]},
-  { label: "Education", items: [
-    { titleHtml: "Higher <strong>grades</strong>", description: "Attractive students get higher grades in-person than online", source: "Hern\u00e1ndez-Juli\u00e1n & Peters (2017). Journal of Human Capital." },
-    { titleHtml: "Better <strong>evaluations</strong>", description: "Attractive professors receive stronger student evaluations", source: "Theyson (2015). Practical Assessment, Research, and Evaluation." },
-  ]},
-  { label: "Law", items: [
-    { titleHtml: "Fewer <strong>arrests</strong>", description: "Attractive people are less likely to get arrested", source: "Beaver et al. (2019). Psychiatry, Psychology and Law." },
-    { titleHtml: "Lighter <strong>sentences</strong>", description: "If convicted, attractive people receive lighter sentences", source: "Mazzella & Feingold (1994). Journal of Applied Social Psychology." },
-  ]},
-  { label: "Influence", items: [
-    { titleHtml: "More <strong>leadership</strong>", description: "Attractive politicians get more votes", source: "Jaeger et al. (2021). Social Psychology." },
-    { titleHtml: "More <strong>promotions</strong>", description: "Attractive people are more likely to get promoted", source: "Morrow et al. (1990). Journal of Management." },
-  ]},
-  { label: "Well-being", items: [
-    { titleHtml: "More <strong>happiness</strong>", description: "Attractive people report being happier", source: "Datta Gupta et al. (2016). Journal of Happiness Studies." },
   ]},
 ];
 
@@ -326,10 +434,10 @@ const VERSIONS = [
 ];
 
 const TIMELINE = [
-  { marker: "The question", text: "An aesthetic medicine student set out to find what the research actually says about male physical attractiveness. Not trends. Not opinions. Published science across evolutionary psychology, social cognitive science, and aesthetic medicine." },
-  { marker: "5 years", text: "Working alongside researchers, scientists, and doctors in aesthetics. Thousands of studies analyzed. A single focus: identifying the variables that drive how people perceive male attractiveness, and how to change them." },
-  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one product, protocol, or methodology optimizes for what research consistently identifies as the primary driver of male physical attractiveness: your shape, relative to who you are." },
-  { marker: "The protocol", text: "Protocol is the result. A system that analyzes your body with the precision of aesthetic medicine, factors in your face, your age, and your social context, and gives you a plan built for your life." },
+  { marker: "The question", text: "What does the research actually say about male physical attractiveness? Published science across evolutionary psychology, social cognitive science, and aesthetic medicine." },
+  { marker: "5 years", text: "Working alongside researchers and doctors in aesthetics. A single focus: the variables that drive how people perceive male attractiveness, and how to change them." },
+  { marker: "The finding", text: "The entire fitness market optimizes for muscle volume. Not one methodology optimizes for what research identifies as the primary driver: your shape, relative to who you are." },
+  { marker: "The protocol", text: "Protocol is the result. A system that analyzes your body, factors in your face, your age, and your social context, and gives you a plan built for your life." },
 ];
 
 const TESTIMONIALS = [
@@ -393,10 +501,10 @@ export default function F1Landing() {
       <section className="program-hero">
         <div className="program-hero__shell">
           <div className="program-hero__copy">
-            <p className="program-hero__eyebrow">Based on 5 years of research in evolutionary psychology &amp; aesthetic medicine</p>
             <h1 className="program-hero__title">
-              Science has found what makes a man attractive. <span>Here&apos;s what it found.</span>
+              4 steps to improve your physical attractiveness
             </h1>
+            <p className="f1-hero__subtitle">Science found the exact formula. Here&apos;s how to use it.</p>
             <BodyTypeSelector offerHref={offerHref} />
             <p className="program-hero__trust">
               <span className="program-hero__trust-item">Based on published research</span>
@@ -415,11 +523,40 @@ export default function F1Landing() {
         </div>
       </section>
 
+      {/* ═══ PROJECTIONS GRID ═══ */}
+      <section id="step-2" className="f1-section f1-projections">
+        <div className="f1-projections__inner">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">Projections</p>
+            <h2 id="projections" className="f1-section__title f1-section__title--sm">
+              Same Man. Different Shape. <span>Different Life.</span>
+            </h2>
+          </div>
+          <div className="f1-projections__grid">
+            {PROJECTIONS.map((p) => (
+              <div key={p.id} className="f1-projections__item">
+                <p className="f1-projections__situation">{p.situation}</p>
+                <div className="f1-projections__row">
+                  <img src={p.before} alt={`${p.situation} — before`} className="f1-projections__img" loading="lazy" />
+                  <img src={p.after} alt={`${p.situation} — after`} className="f1-projections__img" loading="lazy" />
+                </div>
+                <p className="f1-projections__scene">{p.scene}</p>
+              </div>
+            ))}
+          </div>
+          <div className="f1-mid-cta" style={{ marginTop: 16 }}>
+            <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "projections" }}>
+              Start attractiveness Protocol <ArrowIcon />
+            </TrackedLink>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ RESEARCH TABS ═══ */}
       <ResearchImpactSection
         tabs={RESEARCH_TABS}
         titleHtml="Your Body Shape Impacts <strong>Every Part of Your Life</strong>"
-        subtitle="Research consistently shows that men with attractive proportions earn more, attract more, and are perceived as more capable. Below is a collection of peer-reviewed studies."
+        subtitle=""
       />
 
       {/* ═══ SHAPE FRAME ═══ */}
@@ -431,10 +568,17 @@ export default function F1Landing() {
               The #1 Factor Is Your Shape. <span>And It&apos;s the One You Can Change.</span>
             </h2>
           </div>
-          <p className="f1-body">Hundreds of studies in evolutionary psychology and social cognitive science point to the same finding. The same finding shows up in real-world evaluations where women rate male physiques. What drives male physical attractiveness is not your face, your height, or what you wear. It is the shape of your body. The proportions. How everything fits together.</p>
-          <p className="f1-body">Your face and your height are mostly fixed. <strong>Your shape is not. It is the single most powerful attractiveness variable you can actually engineer.</strong> Most men do not know it exists.</p>
+          <p className="f1-body">Your face and your height are mostly fixed. According to hundreds of studies in social cognitive science point to the same finding.</p>
+          <p className="f1-body">Your shape is not. It is the single most powerful attractiveness variable you can actually engineer. Most men do not know it exists.</p>
         </div>
       </section>
+
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "research" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+      </div>
 
       {/* ═══ LISTICLE ═══ */}
       <section className="f1-section">
@@ -443,11 +587,10 @@ export default function F1Landing() {
           <div className="f1-listicle__item f1-listicle__item--media-right">
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">01</div>
-              <h3 className="f1-listicle__title">A full-body analysis with the precision of aesthetic medicine.</h3>
+              <h3 className="f1-listicle__title">A scientific full-body analysis.</h3>
 
-              <p className="f1-body">Most programs put you in a box. Ectomorph, mesomorph, endomorph. They hand you a cookie-cutter plan. Protocol does something different.</p>
-              <p className="f1-body">It runs a complete scientific analysis of your body with the rigor of an aesthetic medicine assessment. Every proportion, every ratio, every structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
-              <p className="f1-body">Think of it as the difference between a bathroom mirror and a diagnostic scan. You have always had the mirror. <strong>This is what happens when you see the data underneath.</strong></p>
+              <p className="f1-body">Most programs put you in a box. Ectomorph, mesomorph, endomorph. They hand you a cookie-cutter plan.</p>
+              <p className="f1-body">Protocol runs a complete scientific analysis of your body. Every proportion and structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
             </div>
             <div className="f1-listicle__media">
               <Image src="/assets/scan-protocol.png" alt="Full body scan analysis" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
@@ -461,10 +604,9 @@ export default function F1Landing() {
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">02</div>
               <h3 className="f1-listicle__title">According to social psychology, attractiveness is contextual.</h3>
-              <p className="f1-body">Your ideal physique is not a fixed target. It depends on your facial structure, your bone frame, your age, and the social environment you operate in. Copying someone else&apos;s physique does not work. What looks attractive on them may look incoherent on you.</p>
-              <p className="f1-body">An office lawyer with soft features needs a different physique than a construction foreman with a strong jaw. The lawyer&apos;s target shoulder-to-waist ratio is 1.58. The foreman&apos;s is 1.66. Same science. Different targets. That is what contextual means.</p>
-              <p className="f1-body">A 25-year-old with a narrow frame and a round face has a different optimal body fat target than a 40-year-old with wide clavicles and angular features. The first needs to stay lean to sharpen his proportions. The second can carry more mass and still read as athletic. One man&apos;s ideal is another man&apos;s mismatch.</p>
-              <p className="f1-body">Protocol reads all of these variables before designing your plan. Your face, your frame, your age, your context. Your training is based on what the science says works for you.</p>
+              <p className="f1-body">Your ideal physique is not a fixed target. It depends on your facial structure, your frame, your age, and the social environment you operate in.</p>
+              <p className="f1-body">An office lawyer with soft features has a different shoulder-to-waist target than a construction foreman with a strong jaw. Same science. Different targets. Copying someone else&apos;s physique does not work.</p>
+              <p className="f1-body">Protocol reads all of these variables before designing your plan.</p>
             </div>
           </div>
 
@@ -495,6 +637,7 @@ export default function F1Landing() {
       </section>
 
       {/* ═══ MID CTA ═══ */}
+
       <div className="f1-mid-cta">
         <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
           Start attractiveness Protocol <ArrowIcon />
@@ -511,9 +654,8 @@ export default function F1Landing() {
               You Put in the Work. <span>The Work Was Pointed in the Wrong Direction.</span>
             </h2>
           </div>
-          <p className="f1-body">Strict diet. Program from the internet. Training 5 times a week. You did the hard part. You showed up.</p>
-          <p className="f1-body">The problem was never your effort. <strong>The problem is that nobody told you what to aim at.</strong> You trained hard, ate clean, stayed consistent. Your physique still did not provoke a reaction. The work was pointed in the wrong direction.</p>
-          <p className="f1-body">The research is unambiguous. When women evaluate male physiques, the dominant factor is not muscle size or body weight. It is proportions. A man with the right proportions at 75kg will consistently be perceived as more attractive than a disproportionate man at 90kg.</p>
+          <p className="f1-body">You trained hard, ate clean, stayed consistent. The problem was never your effort. Nobody told you what to aim at.</p>
+          <p className="f1-body">The research is clear: proportions matter more than muscle size or body weight. A man with the right proportions at 75kg reads as more attractive than a disproportionate man at 90kg.</p>
 
           <div className="f1-divider" />
 
@@ -541,10 +683,15 @@ export default function F1Landing() {
         </div>
       </section>
 
-      {/* ═══ STATEMENT ═══ */}
-      <div className="f1-statement">
-        <p className="f1-statement__text">&ldquo;The body that&apos;s attractive and the body the fitness industry builds are two different bodies.&rdquo;</p>
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "reframe" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
       </div>
+
+      {/* ═══ DR GARY LINKOV QUOTE ═══ */}
+      <GaryLinkovQuoteSection />
 
       {/* ═══ ORIGIN ═══ */}
       <section className="f1-section">
@@ -552,7 +699,7 @@ export default function F1Landing() {
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">The origin</p>
             <h2 className="f1-section__title f1-section__title--sm">5 Years of Research. <span>One Question.</span></h2>
-            <p className="f1-section__subtitle">What makes a man physically attractive from a social perception standpoint? Not stronger. Not bigger. Attractive.</p>
+            <p className="f1-section__subtitle">What makes a man physically attractive from a social perception standpoint?</p>
           </div>
           <div className="f1-origin__timeline">
             {TIMELINE.map((s) => (
@@ -565,6 +712,13 @@ export default function F1Landing() {
         </div>
       </section>
 
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "origin" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+      </div>
+
       {/* ═══ PROOF STORY ═══ */}
       <section className="f1-section f1-proof" id="results">
         <div className="f1-proof__inner">
@@ -574,22 +728,29 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-proof__card">
+            <div className="f1-proof__slider">
+              <BeforeAfterSlider beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" beforeAlt="Marcus before" afterAlt="Marcus after" subject="Marcus" />
+            </div>
             <div className="f1-proof__author">
               <div className="f1-proof__avatar">T</div>
               <div>
-                <div className="f1-proof__name">Connor, 31</div>
+                <div className="f1-proof__name">Marcus, 31</div>
                 <div className="f1-proof__meta">Office job &middot; Trained 4x/week for 4 years</div>
               </div>
             </div>
             <p className="f1-body">I&apos;d been consistent for four years. Splits, volume, tracking macros, meal prep on Sundays. My lifts were solid. I&apos;d put on muscle. But nothing changed in how people treated me.</p>
             <p className="f1-body">What surprised me was the depth. They measured my entire body. Proportions, ratios, posture, composition. They benchmarked everything against research data. For the first time I could see the gap: <span className="f1-proof-metric">SWR 1.31</span>, target: <span className="f1-proof-metric">1.46</span>.</p>
             <p className="f1-body">Around week 11, the difference became visible to other people, not just to me. My ratio was at <span className="f1-proof-metric">1.41</span>. The body was not bigger. It was shaped differently.</p>
-            <div className="f1-proof__slider">
-              <BeforeAfterSlider beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" beforeAlt="Connor before" afterAlt="Connor after" subject="Connor" />
-            </div>
           </div>
         </div>
       </section>
+
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "proof" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+      </div>
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section className="f1-section">
@@ -621,6 +782,13 @@ export default function F1Landing() {
         </div>
       </section>
 
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "testimonials" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+      </div>
+
       {/* ═══ PAIN THRESHOLD ═══ */}
       <section className="f1-section f1-pain">
         <div className="f1-pain__inner">
@@ -629,9 +797,6 @@ export default function F1Landing() {
             <h2 className="f1-section__title f1-section__title--sm">
               Right now, you&apos;re training without knowing if your body is <span>moving toward its potential</span>.
             </h2>
-            <p className="f1-section__subtitle">
-              Every week you spend on a protocol that wasn&apos;t built for your proportions, your face, or your context is a week where the variable that impacts how people perceive you stays unchanged.
-            </p>
           </div>
 
           <div className="f1-pain__grid">
