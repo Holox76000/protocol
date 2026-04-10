@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import {
   hashPassword,
@@ -8,7 +9,8 @@ import {
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
 import { getStripeServerClient } from "../../../../lib/stripe";
-import { upsertProfileAndSubscribe } from "../../../../lib/klaviyo";
+import { addToLeadsList, promoteLeadToCustomer } from "../../../../lib/klaviyo";
+import { sendMetaEvent } from "../../../../lib/metaCapi";
 
 export const runtime = "nodejs";
 
@@ -152,13 +154,36 @@ export async function POST(request: Request) {
 
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
 
-  // Add to Klaviyo list (fire-and-forget)
-  const klaviyoKey = process.env.KLAVIYO_PRIVATE_KEY;
-  if (klaviyoKey) {
-    void upsertProfileAndSubscribe(klaviyoKey, email, firstName).catch((err) =>
-      console.error("[register] Klaviyo sync failed", { error: String(err), email })
+  const referer = request.headers.get("referer") ?? undefined;
+  const createdAt = new Date().toISOString();
+
+  // Run side-effects after response is sent, guaranteed to complete on serverless
+  waitUntil((async () => {
+    // Klaviyo: paid users go straight to customers, unpaid users enter leads
+    if (hasPaid) {
+      await promoteLeadToCustomer(email, firstName).catch((err) =>
+        console.error("[register] Klaviyo promote failed", { error: String(err), email })
+      );
+    } else {
+      await addToLeadsList(email, firstName).catch((err) =>
+        console.error("[register] Klaviyo leads failed", { error: String(err), email })
+      );
+    }
+
+    // Meta CAPI Lead event
+    await sendMetaEvent({
+      eventName: "Lead",
+      eventTime: Math.floor(new Date(createdAt).getTime() / 1000),
+      eventId: `register:${email}:${createdAt}`,
+      actionSource: "website",
+      eventSourceUrl: referer,
+      userAgent,
+      ipAddress: ip,
+      email,
+    }).catch((err) =>
+      console.error("[register] Meta Lead event failed", { error: String(err), email })
     );
-  }
+  })());
 
   return response;
 }

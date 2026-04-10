@@ -30,7 +30,8 @@ export function getGa4PageTitle(pagePath: string) {
   if (pathname === "/interface") return "Protocol | Interface";
   if (pathname === "/login") return "Protocol | Login";
   if (pathname === "/admin") return "Protocol | Admin";
-  if (pathname === "/checkout") return `Protocol | Checkout | ${funnel}`;
+  if (pathname === "/checkout") return "Protocol | Checkout";
+  if (pathname === "/checkout/hosted") return `Protocol | Checkout | ${funnel}`;
   if (pathname === "/checkout/success") return `Protocol | Checkout Success | ${funnel}`;
   if (pathname === "/checkout/cancel") return `Protocol | Checkout Cancel | ${funnel}`;
   if (pathname === "/f2/landing") return "Protocol | Landing | V2";

@@ -19,7 +19,7 @@ export default function CheckoutCancelPage({
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href={`/checkout?funnel=${encodeURIComponent(funnel)}`}
+            href={`/checkout/hosted?funnel=${encodeURIComponent(funnel)}`}
             className="inline-flex items-center justify-center rounded-full border border-black bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-black"
           >
             Try again

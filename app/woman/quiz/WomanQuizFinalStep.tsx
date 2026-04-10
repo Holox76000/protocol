@@ -7,7 +7,7 @@ import styles from "../../visualization/visualization.module.css";
 import { SIGNUP_STORAGE_KEY, STORAGE_KEY, WOMAN_QUIZ_QUESTIONS } from "./woman-quiz-data";
 import { persistWomanQuizLead } from "./persistWomanQuizLead";
 
-const CHECKOUT_HREF = "/checkout?funnel=woman";
+const CHECKOUT_HREF = "/checkout/hosted?funnel=woman";
 
 export default function WomanQuizFinalStep() {
   const router = useRouter();

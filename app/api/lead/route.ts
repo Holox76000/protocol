@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { trackKlaviyoStartedCheckout } from "../../../lib/klaviyo";
@@ -101,20 +102,7 @@ export async function POST(request: Request) {
   const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const eventSourceUrl = request.headers.get("referer") ?? request.headers.get("origin") ?? undefined;
 
-  await sendMetaEvent({
-    eventName: "Lead",
-    eventTime,
-    eventId: `lead:${email}:${createdAt}`,
-    actionSource: "website",
-    eventSourceUrl,
-    userAgent,
-    ipAddress,
-    email
-  });
-  console.log("[lead] meta sent", { email });
-
-  // Fire-and-forget — never blocks the response to the user
-  void trackKlaviyoStartedCheckout({
+  const klaviyoPayload = {
     email,
     firstName: body.answers?.first_name,
     value: 49,
@@ -130,7 +118,28 @@ export async function POST(request: Request) {
       },
     ],
     utm: body.utm as Record<string, string | undefined> | undefined,
-  });
+  };
+
+  // Use waitUntil so both side-effects complete before the serverless function exits.
+  waitUntil((async () => {
+    try {
+      await sendMetaEvent({
+        eventName: "Lead",
+        eventTime,
+        eventId: `lead:${email}:${createdAt}`,
+        actionSource: "website",
+        eventSourceUrl,
+        userAgent,
+        ipAddress,
+        email
+      });
+      console.log("[lead] meta sent", { email });
+    } catch (err) {
+      console.error("[lead] meta event failed", { error: String(err), email });
+    }
+
+    await trackKlaviyoStartedCheckout(klaviyoPayload);
+  })());
 
   return NextResponse.json({ ok: true });
 }

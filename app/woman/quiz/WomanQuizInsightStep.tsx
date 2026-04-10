@@ -6,7 +6,7 @@ import { trackGa4Event } from "../../../lib/ga4Event";
 import styles from "../../visualization/visualization.module.css";
 import { STORAGE_KEY, WOMAN_QUIZ_QUESTIONS } from "./woman-quiz-data";
 
-const CHECKOUT_HREF = "/checkout?funnel=woman";
+const CHECKOUT_HREF = "/checkout/hosted?funnel=woman";
 
 type Insight = {
   label: string;

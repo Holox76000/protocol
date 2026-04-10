@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { validateSession, SESSION_COOKIE_NAME } from "../../lib/auth";
@@ -8,13 +9,21 @@ export const runtime = "nodejs";
 
 const REFINEMENT_WINDOW_MS = 5 * 60 * 60 * 1000; // 5 hours
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams?: Record<string, string>;
+}) {
   const sessionToken = cookies().get(SESSION_COOKIE_NAME)?.value;
 
   if (!sessionToken) redirect("/login?next=/dashboard");
 
   const user = await validateSession(sessionToken);
   if (!user) redirect("/login?next=/dashboard");
+
+  // Redirect unpaid users to the checkout page, unless returning from payment
+  const paymentSuccess = searchParams?.payment === "success";
+  if (!user.has_paid && !paymentSuccess) redirect("/checkout");
 
   let submittedAt: string | null = null;
 
@@ -38,5 +47,9 @@ export default async function Dashboard() {
     }
   }
 
-  return <DashboardPage user={user} submittedAt={submittedAt} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-pebble" />}>
+      <DashboardPage user={user} submittedAt={submittedAt} />
+    </Suspense>
+  );
 }

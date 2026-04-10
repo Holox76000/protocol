@@ -1,28 +1,28 @@
-import CheckoutClient from "./CheckoutClient";
+import { Suspense } from "react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { validateSession, SESSION_COOKIE_NAME } from "../../lib/auth";
+import { CheckoutPage } from "../dashboard/DashboardPage";
 
 export const runtime = "nodejs";
 
-const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1"]);
+export const metadata: Metadata = {
+  title: "Checkout | Protocol",
+};
 
-export default function CheckoutPage({
-  searchParams,
-}: {
-  searchParams?: Record<string, string>;
-}) {
-  const rawFunnel = searchParams?.funnel?.trim() || "main";
-  const funnel = KNOWN_FUNNELS.has(rawFunnel) ? rawFunnel : "main";
+export default async function CheckoutRoute() {
+  const sessionToken = cookies().get(SESSION_COOKIE_NAME)?.value;
+  if (!sessionToken) redirect("/login?next=/checkout");
 
-  // Forward all query params to the API route (UTMs, email, funnel_type, etc.)
-  const params: Record<string, string> = { funnel };
-  const forward = [
-    "funnel_type", "customer_email", "landing_page",
-    "utm_source", "utm_medium", "utm_campaign",
-    "utm_content", "utm_term", "utm_id", "fbclid",
-  ];
-  for (const key of forward) {
-    const val = searchParams?.[key];
-    if (val) params[key] = val;
-  }
+  const user = await validateSession(sessionToken);
+  if (!user) redirect("/login?next=/checkout");
 
-  return <CheckoutClient funnel={funnel} params={params} />;
+  if (user.has_paid) redirect("/dashboard");
+
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <CheckoutPage email={user.email} />
+    </Suspense>
+  );
 }

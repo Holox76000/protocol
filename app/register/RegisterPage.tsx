@@ -73,7 +73,6 @@ function MobileTestimonialSlider() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Stars + rating */}
         <div className="flex items-center gap-2 mb-3">
           <div className="flex gap-0.5">
             {[0,1,2,3,4].map((i) => (
@@ -85,18 +84,15 @@ function MobileTestimonialSlider() {
           <span className="text-[11px] text-mute">4.9 · 2,400+ members</span>
         </div>
 
-        {/* Quote */}
         <p className="text-[13.5px] leading-snug text-void mb-3 min-h-[42px]">
           &ldquo;{t.quote}&rdquo;
         </p>
 
-        {/* Name + metric */}
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-dim">{t.name}</span>
           <span className="text-[11px] tabular-nums text-mute">{t.metric}</span>
         </div>
 
-        {/* Dots */}
         <div className="flex justify-center gap-1.5 mt-3">
           {TESTIMONIALS.map((_, i) => (
             <button
@@ -128,9 +124,7 @@ export default function RegisterPage({
   const [email, setEmail] = useState(prefillEmail);
   const [firstName, setFirstName] = useState(prefillFirstName);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -145,10 +139,6 @@ export default function RegisterPage({
       }
       if (password.length < 8) {
         setError("Password must be at least 8 characters.");
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError("Passwords don't match.");
         return;
       }
 
@@ -180,7 +170,7 @@ export default function RegisterPage({
         setLoading(false);
       }
     },
-    [email, firstName, password, confirmPassword, registrationToken]
+    [email, firstName, password, registrationToken]
   );
 
   const strength = getStrength(password);
@@ -253,7 +243,13 @@ export default function RegisterPage({
       {/* ── Right panel: form ── */}
       <div className="flex flex-1 flex-col bg-white">
         {/* Mobile header */}
-        <div className="flex items-center justify-end border-b border-wire px-6 py-5 lg:hidden">
+        <div className="flex items-center justify-between border-b border-wire px-6 py-5 lg:hidden">
+          <img
+            src="/program/static/landing/images/shared/Prtcl.png"
+            alt="Protocol"
+            width={28}
+            height={28}
+          />
           <Link href="/login" className="text-[12px] text-dim hover:text-void transition-colors">
             Sign in →
           </Link>
@@ -266,13 +262,19 @@ export default function RegisterPage({
             {/* Heading */}
             <div className="mb-8">
               <h1 className="font-display text-[34px] font-normal leading-tight text-void">
-                {registrationToken ? "Set your password." : "Create your account."}
+                {registrationToken ? "Set your password." : "Start your Protocol."}
               </h1>
               <p className="mt-2 text-[14px] leading-relaxed text-dim">
                 {registrationToken
                   ? "Almost there — set a password to access your personalized assessment."
-                  : "Enter your email and create a password to access your Protocol."}
+                  : "Create a free account. Complete your assessment. Receive your personalized program."}
               </p>
+              {!registrationToken && (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-wire bg-pebble px-3 py-1 text-[11px] font-semibold text-mute">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  Step 1 of 2 — free account
+                </p>
+              )}
             </div>
 
             {/* Mobile social proof slider */}
@@ -339,7 +341,6 @@ export default function RegisterPage({
                     <EyeIcon open={showPassword} />
                   </button>
                 </div>
-                {/* Strength meter */}
                 {password.length > 0 && strengthInfo && (
                   <div className="flex items-center gap-3 pt-1">
                     <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-wire">
@@ -352,58 +353,33 @@ export default function RegisterPage({
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
-                  Confirm password
-                </label>
-                <div className="flex items-center rounded-lg border border-wire bg-pebble transition-colors duration-150 focus-within:border-void focus-within:bg-white">
-                  <input
-                    type={showConfirm ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder="Repeat your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[14px] text-void placeholder:text-mute focus:outline-none disabled:opacity-50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm((v) => !v)}
-                    className="shrink-0 px-3.5 text-mute transition-colors hover:text-dim"
-                    tabIndex={-1}
-                    aria-label={showConfirm ? "Hide password" : "Show password"}
-                  >
-                    <EyeIcon open={showConfirm} />
-                  </button>
-                </div>
-                {confirmPassword.length > 0 && (
-                  <p className={`text-[12px] font-medium pt-0.5 ${password === confirmPassword ? "text-emerald-600" : "text-red-500"}`}>
-                    {password === confirmPassword ? "✓ Passwords match" : "✗ Passwords don't match"}
-                  </p>
-                )}
-              </div>
-
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
                   {error}
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-void py-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-white transition-all duration-150 hover:bg-[#1a1a1b] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/25 border-t-white" />
-                    Creating account
-                  </span>
-                ) : (
-                  "Create account"
+              <div className="space-y-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full rounded-lg bg-void py-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-white transition-all duration-150 hover:bg-[#1a1a1b] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+                      Creating account
+                    </span>
+                  ) : (
+                    registrationToken ? "Continue to my Protocol" : "Access my Protocol"
+                  )}
+                </button>
+                {!registrationToken && (
+                  <p className="text-center text-[11.5px] text-mute">
+                    Free to join · $49 to unlock your personalized Protocol
+                  </p>
                 )}
-              </button>
+              </div>
             </form>
 
             {/* Footer */}

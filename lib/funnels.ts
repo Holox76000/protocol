@@ -27,7 +27,7 @@ function withQuery(path: string, funnel: FunnelVariant) {
 
 export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   if (funnel === "f1") {
-    const checkoutHref = withQuery("/checkout", funnel);
+    const checkoutHref = withQuery("/checkout/hosted", funnel);
 
     return {
       funnel,
@@ -48,7 +48,7 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   }
 
   if (funnel === "f2") {
-    const checkoutHref = withQuery("/checkout", funnel);
+    const checkoutHref = withQuery("/checkout/hosted", funnel);
 
     return {
       funnel,
@@ -69,7 +69,7 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   }
 
   if (funnel === "v3") {
-    const checkoutHref = withQuery("/checkout", funnel);
+    const checkoutHref = withQuery("/checkout/hosted", funnel);
 
     return {
       funnel,
@@ -90,7 +90,7 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
   }
 
   if (funnel === "woman") {
-    const checkoutHref = withQuery("/checkout", funnel);
+    const checkoutHref = withQuery("/checkout/hosted", funnel);
 
     return {
       funnel,
@@ -114,14 +114,14 @@ export function getFunnelConfig(funnel: FunnelVariant = "main"): FunnelConfig {
     funnel: "main",
     landingHref: "/",
     visualizationHref: getMainVisualizationScreenHref("upload-intro"),
-    checkoutHref: withQuery("/checkout", "main"),
+    checkoutHref: withQuery("/checkout/hosted", "main"),
     landingPrimaryHref: withQuery("/offer", "main"),
     landingPrimaryLabel: "Get My Plan — $19",
     landingSecondaryLabel: "Get My Plan — $19",
     pricingCtaLabel: "Get My Plan — $19",
     transformationCtaLabel: "Start Now — $19",
     footerCtaLabel: "Get My Plan — $19",
-    visualizationNextHref: withQuery("/checkout", "main"),
+    visualizationNextHref: withQuery("/checkout/hosted", "main"),
     visualizationNextLabel: "Reach my potential",
     visualizationNextTitle: "Next step: reach your potential",
     visualizationNextDescription: "Your preview is ready. Unlock the full body analysis and transformation protocol behind it.",

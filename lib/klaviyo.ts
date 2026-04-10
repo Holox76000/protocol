@@ -1,5 +1,6 @@
 const KLAVIYO_API_BASE = "https://a.klaviyo.com/api";
-const KLAVIYO_LIST_ID = "UYABKB";
+const KLAVIYO_LEADS_LIST_ID = "UQbC9Z";
+const KLAVIYO_CUSTOMERS_LIST_ID = "UYABKB";
 
 type KlaviyoItem = {
   ProductID: string;
@@ -29,13 +30,14 @@ function getApiKey(): string | null {
 }
 
 /**
- * Create or update a Klaviyo profile and subscribe them to the main list.
+ * Create or update a Klaviyo profile and subscribe them to a list.
  * Returns the Klaviyo profile ID on success, null on failure.
  */
 export async function upsertProfileAndSubscribe(
   apiKey: string,
   email: string,
   firstName?: string,
+  listId: string = KLAVIYO_LEADS_LIST_ID,
 ): Promise<string | null> {
   // Step 1: create/update profile
   const profileBody = {
@@ -84,7 +86,7 @@ export async function upsertProfileAndSubscribe(
 
   // Step 2: add profile to list
   try {
-    const res = await fetch(`${KLAVIYO_API_BASE}/lists/${KLAVIYO_LIST_ID}/relationships/profiles/`, {
+    const res = await fetch(`${KLAVIYO_API_BASE}/lists/${listId}/relationships/profiles/`, {
       method: "POST",
       headers: {
         Authorization: `Klaviyo-API-Key ${apiKey}`,
@@ -97,7 +99,7 @@ export async function upsertProfileAndSubscribe(
     });
 
     if (res.ok || res.status === 204) {
-      console.log("[klaviyo] profile added to list", { email, profileId, listId: KLAVIYO_LIST_ID });
+      console.log("[klaviyo] profile added to list", { email, profileId, listId });
     } else {
       const text = await res.text().catch(() => "");
       console.error("[klaviyo] list subscribe failed", { status: res.status, body: text, email });
@@ -273,7 +275,7 @@ export async function sendKlaviyoWelcomeEmail(props: {
   if (!apiKey) return;
 
   await Promise.allSettled([
-    upsertProfileAndSubscribe(apiKey, props.email, props.firstName),
+    upsertProfileAndSubscribe(apiKey, props.email, props.firstName, KLAVIYO_CUSTOMERS_LIST_ID),
     (async () => {
       const body = {
         data: {
@@ -390,4 +392,113 @@ export async function trackKlaviyoStartedCheckout(props: StartedCheckoutProps): 
       }
     })(),
   ]);
+}
+
+/**
+ * Remove a Klaviyo profile from a list.
+ */
+async function removeFromList(apiKey: string, profileId: string, listId: string): Promise<void> {
+  try {
+    const res = await fetch(`${KLAVIYO_API_BASE}/lists/${listId}/relationships/profiles/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Klaviyo-API-Key ${apiKey}`,
+        "Content-Type": "application/json",
+        revision: "2024-02-15",
+      },
+      body: JSON.stringify({ data: [{ type: "profile", id: profileId }] }),
+    });
+    if (!res.ok && res.status !== 204) {
+      const text = await res.text().catch(() => "");
+      console.error("[klaviyo] removeFromList failed", { status: res.status, body: text, profileId, listId });
+    }
+  } catch (err) {
+    console.error("[klaviyo] removeFromList error", { error: String(err), profileId, listId });
+  }
+}
+
+/**
+ * Add a profile to the leads list (UQbC9Z) without touching the customers list.
+ * Call this when a user creates an account before paying.
+ */
+export async function addToLeadsList(email: string, firstName?: string): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  await upsertProfileAndSubscribe(apiKey, email, firstName, KLAVIYO_LEADS_LIST_ID);
+  console.log("[klaviyo] added to leads list", { email });
+}
+
+/**
+ * Fire a "Protocol Purchase" event without a registration URL.
+ * Call this when an already-registered user completes payment.
+ */
+export async function sendKlaviyoPurchaseEvent(email: string, firstName?: string): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  const body = {
+    data: {
+      type: "event",
+      attributes: {
+        properties: {
+          ...(firstName && { first_name: firstName }),
+        },
+        metric: {
+          data: {
+            type: "metric",
+            attributes: { name: "Protocol Purchase" },
+          },
+        },
+        profile: {
+          data: {
+            type: "profile",
+            attributes: {
+              email,
+              ...(firstName && { first_name: firstName }),
+            },
+          },
+        },
+      },
+    },
+  };
+
+  try {
+    const res = await fetch(`${KLAVIYO_API_BASE}/events/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Klaviyo-API-Key ${apiKey}`,
+        "Content-Type": "application/json",
+        revision: "2024-02-15",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[klaviyo] Protocol Purchase event failed", { status: res.status, body: text, email });
+    } else {
+      console.log("[klaviyo] Protocol Purchase event sent", { email });
+    }
+  } catch (err) {
+    console.error("[klaviyo] Protocol Purchase event error", { error: String(err), email });
+  }
+}
+
+/**
+ * Move a profile from leads list (UQbC9Z) to customers list (UYABKB).
+ * Call this when a user completes registration after purchase.
+ */
+export async function promoteLeadToCustomer(email: string, firstName?: string): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  // Add to customers list and get profile ID
+  const profileId = await upsertProfileAndSubscribe(apiKey, email, firstName, KLAVIYO_CUSTOMERS_LIST_ID);
+
+  if (profileId) {
+    // Remove from leads list
+    await removeFromList(apiKey, profileId, KLAVIYO_LEADS_LIST_ID);
+    console.log("[klaviyo] promoted lead to customer", { email, profileId });
+  }
 }

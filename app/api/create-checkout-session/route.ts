@@ -18,6 +18,7 @@ type Body = {
   utm_term?: string;
   utm_id?: string;
   fbclid?: string;
+  embedded?: boolean;
 };
 
 export async function POST(request: Request) {
@@ -34,39 +35,56 @@ export async function POST(request: Request) {
   const funnelType = body.funnel_type ?? "long";
   const landingPage = body.landing_page ?? (funnel === "f1" ? "/f1" : "/");
   const customerEmail = body.customer_email ?? null;
+  const embedded = body.embedded === true;
 
   const origin = request.headers.get("origin");
   const siteUrl = getPublicSiteUrl(origin);
 
+  const sharedMetadata = {
+    funnel: internalFunnel,
+    funnel_type: funnelType,
+    source: "app_checkout",
+    landing_page: landingPage,
+    ...(body.utm_source && { utm_source: body.utm_source }),
+    ...(body.utm_medium && { utm_medium: body.utm_medium }),
+    ...(body.utm_campaign && { utm_campaign: body.utm_campaign }),
+    ...(body.utm_content && { utm_content: body.utm_content }),
+    ...(body.utm_term && { utm_term: body.utm_term }),
+    ...(body.utm_id && { utm_id: body.utm_id }),
+    ...(body.fbclid && { fbclid: body.fbclid }),
+  };
+
   let session;
   try {
-    session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      billing_address_collection: "auto",
-      allow_promotion_codes: true,
-      line_items: getCheckoutLineItems(internalFunnel),
-      ...(customerEmail && { customer_email: customerEmail }),
-      customer_creation: "always",
-      after_expiration: {
-        recovery: { enabled: true, allow_promotion_codes: false },
-      },
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
-      success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
-      cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
-      metadata: {
-        funnel: internalFunnel,
-        funnel_type: funnelType,
-        source: "app_checkout",
-        landing_page: landingPage,
-        ...(body.utm_source && { utm_source: body.utm_source }),
-        ...(body.utm_medium && { utm_medium: body.utm_medium }),
-        ...(body.utm_campaign && { utm_campaign: body.utm_campaign }),
-        ...(body.utm_content && { utm_content: body.utm_content }),
-        ...(body.utm_term && { utm_term: body.utm_term }),
-        ...(body.utm_id && { utm_id: body.utm_id }),
-        ...(body.fbclid && { fbclid: body.fbclid }),
-      },
-    });
+    if (embedded) {
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        ui_mode: "embedded",
+        billing_address_collection: "auto",
+        allow_promotion_codes: true,
+        line_items: getCheckoutLineItems(internalFunnel),
+        ...(customerEmail && { customer_email: customerEmail }),
+        customer_creation: "always",
+        return_url: `${siteUrl}/dashboard?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+        metadata: sharedMetadata,
+      });
+    } else {
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        billing_address_collection: "auto",
+        allow_promotion_codes: true,
+        line_items: getCheckoutLineItems(internalFunnel),
+        ...(customerEmail && { customer_email: customerEmail }),
+        customer_creation: "always",
+        after_expiration: {
+          recovery: { enabled: true, allow_promotion_codes: false },
+        },
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+        success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
+        cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
+        metadata: sharedMetadata,
+      });
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("[create-checkout-session] Stripe error", {
@@ -78,7 +96,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 
-  if (!session.url) {
+  if (embedded) {
+    if (!session.client_secret) {
+      console.error("[create-checkout-session] No client_secret returned", { sessionId: session.id });
+      return NextResponse.json({ error: "Failed to initialize checkout" }, { status: 500 });
+    }
+  } else if (!session.url) {
     console.error("[create-checkout-session] No URL returned", { sessionId: session.id, funnel });
     return NextResponse.json({ error: "No checkout URL returned" }, { status: 500 });
   }
@@ -113,5 +136,8 @@ export async function POST(request: Request) {
     console.error("[create-checkout-session] CAPI failed", { error: String(err), sessionId: session.id });
   });
 
+  if (embedded) {
+    return NextResponse.json({ clientSecret: session.client_secret, sessionId: session.id });
+  }
   return NextResponse.json({ url: session.url, sessionId: session.id });
 }

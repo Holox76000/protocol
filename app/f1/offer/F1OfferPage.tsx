@@ -234,7 +234,7 @@ function ReportSlider() {
 
 export default function F1OfferPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [signupHref, setSignupHref] = useState("/f1/signup");
+  const [signupHref, setSignupHref] = useState("/register");
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
@@ -242,7 +242,7 @@ export default function F1OfferPage() {
 
     const utm = getUtmParams();
     persistUtmParams(utm);
-    setSignupHref(appendUtmToPath("/f1/signup", utm));
+    setSignupHref(appendUtmToPath("/register", utm));
   }, []);
 
   return (
