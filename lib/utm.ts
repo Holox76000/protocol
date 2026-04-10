@@ -37,7 +37,7 @@ export function getUtmParams(): UtmParams {
 
 /**
  * Persist UTM params to sessionStorage so they survive navigation across
- * pages in the same tab (e.g. /f1 → /f1/offer → /f1/signup → /checkout).
+ * pages in the same tab (e.g. /f1 → /f1/offer → /checkout).
  * Only overwrites keys that are present in the new params (merge strategy).
  */
 export function persistUtmParams(params: UtmParams): void {

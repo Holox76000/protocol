@@ -6,6 +6,7 @@ import { getGa4PageTitle } from "../lib/ga4PageTitle";
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
   }
 }
 
@@ -33,6 +34,8 @@ export default function Ga4RouteTracker() {
         page_path: pagePath,
         page_location: `${window.location.origin}${pagePath}`,
       });
+
+      window.fbq?.("track", "PageView");
     };
 
     const originalPushState = window.history.pushState.bind(window.history);
