@@ -207,12 +207,67 @@ const stripeAppearance = {
   theme: "stripe" as const,
   variables: {
     colorPrimary: "#0c0c0d",
-    colorText: "#0c0c0d",
+    colorText: "#111827",
+    colorTextSecondary: "#6b7280",
+    colorTextPlaceholder: "#9ca3af",
     colorDanger: "#ef4444",
+    colorBackground: "#ffffff",
+    colorIconTab: "#6b7280",
+    colorIconTabSelected: "#111827",
     borderRadius: "8px",
-    fontFamily: "inherit",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif",
     fontSizeBase: "14px",
+    fontWeightNormal: "400",
+    fontWeightMedium: "500",
+    fontWeightBold: "600",
     spacingUnit: "4px",
+    spacingGridRow: "18px",
+  },
+  rules: {
+    ".Label": {
+      fontSize: "11px",
+      fontWeight: "500",
+      letterSpacing: "0.06em",
+      textTransform: "uppercase" as const,
+      color: "#9ca3af",
+      marginBottom: "6px",
+    },
+    ".Input": {
+      fontSize: "14px",
+      fontWeight: "400",
+      color: "#111827",
+      borderColor: "#e5e7eb",
+      boxShadow: "none",
+      padding: "10px 12px",
+    },
+    ".Input:focus": {
+      borderColor: "#111827",
+      boxShadow: "none",
+      outline: "none",
+    },
+    ".Input--invalid": {
+      borderColor: "#ef4444",
+      boxShadow: "none",
+    },
+    ".Tab": {
+      borderColor: "#e5e7eb",
+      boxShadow: "none",
+    },
+    ".Tab:hover": {
+      borderColor: "#d1d5db",
+    },
+    ".Tab--selected": {
+      borderColor: "#111827",
+      boxShadow: "none",
+    },
+    ".TabLabel": {
+      fontSize: "13px",
+      fontWeight: "500",
+      color: "#374151",
+    },
+    ".TabIcon": {
+      color: "#6b7280",
+    },
   },
 };
 
