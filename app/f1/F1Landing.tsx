@@ -12,6 +12,209 @@ import "./f1.css";
 
 const ResearchImpactSection = dynamic(() => import("../program/ResearchImpactSection"));
 
+/* ─── Body Type Selector ─────────────────────────────────────────────────── */
+
+const BODY_TYPE_IMAGES = [
+  { id: 0, before: "/assets/14-before.png", after: "/assets/14-after.png" },
+  { id: 1, before: "/assets/5-before.png",  after: "/assets/5-after.png"  },
+  { id: 2, before: "/assets/2-before.png",  after: "/assets/2-after.png"  },
+  { id: 3, before: "/assets/1-before.png",  after: "/assets/1-after.png"  },
+];
+
+function BodyTypeSelector({ offerHref }: { offerHref: string }) {
+  const [selected, setSelected] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+
+  const current = BODY_TYPE_IMAGES[selected];
+
+  return (
+    <div style={{ marginTop: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+      {!revealed ? (
+        <>
+          <p style={{
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "#799097",
+            margin: 0,
+          }}>
+            Which profile is closest to you?
+          </p>
+          <div style={{
+            display: "flex",
+            gap: 8,
+            padding: "10px",
+            background: "#f0efec",
+            borderRadius: 16,
+            width: "100%",
+            maxWidth: 520,
+          }}>
+            {BODY_TYPE_IMAGES.map((bt, i) => (
+              <button
+                key={bt.id}
+                type="button"
+                onClick={() => setSelected(i)}
+                aria-label={`Profile ${i + 1}`}
+                aria-pressed={selected === i}
+                style={{
+                  position: "relative",
+                  flex: 1,
+                  minWidth: 0,
+                  aspectRatio: "3 / 4",
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  border: selected === i ? "2.5px solid #1a1a1a" : "2.5px solid transparent",
+                  padding: 0,
+                  cursor: "pointer",
+                  background: "#ddd",
+                  transition: "border-color 0.15s ease, transform 0.15s ease",
+                  transform: selected === i ? "scale(1.06)" : "scale(1)",
+                }}
+              >
+                <Image
+                  src={bt.before}
+                  alt={`Profile ${i + 1}`}
+                  fill
+                  sizes="(max-width: 640px) 22vw, 120px"
+                  style={{ objectFit: "cover", objectPosition: "top" }}
+                />
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setRevealed(true)}
+            className="program-hero__cta"
+            style={{ marginTop: 8 }}
+          >
+            <span>Discover my potential</span>
+            <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
+          </button>
+        </>
+      ) : (
+        <div className="f1-body-reveal" style={{ width: "100%", maxWidth: 520 }}>
+          {/* Before / After */}
+          <div style={{
+            display: "flex",
+            gap: 0,
+            borderRadius: 16,
+            overflow: "hidden",
+            position: "relative",
+          }}>
+            {/* Before */}
+            <div style={{ flex: 1, position: "relative", aspectRatio: "3 / 4" }}>
+              <Image
+                src={current.before}
+                alt="Before"
+                fill
+                sizes="240px"
+                style={{ objectFit: "cover", objectPosition: "top" }}
+              />
+              <span style={{
+                position: "absolute",
+                bottom: 10,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "rgba(0,0,0,0.52)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                borderRadius: 6,
+                padding: "3px 10px",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}>
+                Before
+              </span>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: 2, background: "#fff", flexShrink: 0 }} />
+
+            {/* After */}
+            <div style={{ flex: 1, position: "relative", aspectRatio: "3 / 4" }}>
+              <Image
+                src={current.after}
+                alt="After"
+                fill
+                sizes="240px"
+                style={{ objectFit: "cover", objectPosition: "top" }}
+              />
+              <span style={{
+                position: "absolute",
+                bottom: 10,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "rgba(15,15,15,0.65)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                borderRadius: 6,
+                padding: "3px 10px",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}>
+                90 days
+              </span>
+            </div>
+          </div>
+
+          {/* Caption */}
+          <p style={{
+            margin: "18px 0 4px",
+            fontSize: 20,
+            fontWeight: 600,
+            color: "#1a1a1a",
+            letterSpacing: "-0.03em",
+            textAlign: "center",
+            lineHeight: 1.2,
+          }}>
+            This is what&apos;s possible.
+          </p>
+          <p style={{
+            margin: "0 0 20px",
+            fontSize: 13,
+            color: "#6b7280",
+            textAlign: "center",
+            lineHeight: 1.5,
+          }}>
+            Your proportions, engineered over 90 days.
+          </p>
+
+          {/* CTAs */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <a href={offerHref} className="program-hero__cta">
+              <span>Start my Protocol</span>
+              <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setRevealed(false)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 12,
+                color: "#9ca3af",
+                padding: "4px 0",
+              }}
+            >
+              ← Choose another profile
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Icons ──────────────────────────────────────────────────────────────── */
 
 function PlayIcon() {
@@ -194,15 +397,7 @@ export default function F1Landing() {
             <h1 className="program-hero__title">
               Science has found what makes a man attractive. <span>Here&apos;s what it found.</span>
             </h1>
-            <p className="program-hero__subtitle">
-              You&apos;ve been told to train harder, eat less, follow programs. Nobody showed you what actually drives male physical attractiveness, or how close you might already be to it.
-            </p>
-            <div className="program-hero__actions">
-              <TrackedLink href={offerHref} className="program-hero__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "hero" }}>
-                <span>Start attractiveness Protocol</span>
-                <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
-              </TrackedLink>
-            </div>
+            <BodyTypeSelector offerHref={offerHref} />
             <p className="program-hero__trust">
               <span className="program-hero__trust-item">Based on published research</span>
               <span className="program-hero__trust-dot" aria-hidden="true" />

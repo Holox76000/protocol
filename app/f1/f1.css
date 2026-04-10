@@ -3,6 +3,23 @@
    Uses program.css design tokens. No new design system.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ─── Body type reveal animation ────────────────────────────────────────── */
+
+@keyframes f1RevealIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.f1-body-reveal {
+  animation: f1RevealIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* ─── Page-level overrides ──────────────────────────────────────────────── */
 
 /* Kill the program-page section gap for the advertorial — it's too much space for long-form */

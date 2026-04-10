@@ -98,6 +98,7 @@
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
 .f1-offer-hero {
   border-bottom: 1px solid #edf0f1;
+  padding-top: 32px;
 }
 
 .f1-offer-hero__inner {
