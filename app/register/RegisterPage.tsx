@@ -67,42 +67,40 @@ function MobileTestimonialSlider() {
 
   const t = TESTIMONIALS[active];
   return (
-    <div className="lg:hidden mb-7">
+    <div className="lg:hidden mb-5">
       <div
-        className="rounded-xl border border-wire bg-pebble px-5 py-4 select-none"
+        className="rounded-lg border border-wire bg-pebble px-4 py-3 select-none"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex gap-0.5">
             {[0,1,2,3,4].map((i) => (
-              <svg key={i} width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
+              <svg key={i} width="10" height="10" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
                 <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
               </svg>
             ))}
           </div>
-          <span className="text-[11px] text-mute">4.9 · 2,400+ members</span>
+          <div className="flex gap-1">
+            {TESTIMONIALS.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => { setActive(i); resetTimer(); }}
+                className={`h-1 rounded-full transition-all duration-200 ${i === active ? "w-3 bg-void" : "w-1 bg-wire"}`}
+                aria-label={`Testimonial ${i + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
-        <p className="text-[13.5px] leading-snug text-void mb-3 min-h-[42px]">
+        <p className="text-[12.5px] leading-snug text-void mb-1.5 min-h-[36px]">
           &ldquo;{t.quote}&rdquo;
         </p>
 
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-dim">{t.name}</span>
           <span className="text-[11px] tabular-nums text-mute">{t.metric}</span>
-        </div>
-
-        <div className="flex justify-center gap-1.5 mt-3">
-          {TESTIMONIALS.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => { setActive(i); resetTimer(); }}
-              className={`h-1.5 rounded-full transition-all duration-200 ${i === active ? "w-4 bg-void" : "w-1.5 bg-wire"}`}
-              aria-label={`Testimonial ${i + 1}`}
-            />
-          ))}
         </div>
       </div>
     </div>
