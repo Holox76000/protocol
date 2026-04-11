@@ -254,7 +254,7 @@ export default function RegisterPage({
         </div>
 
         {/* Scrollable form area */}
-        <div className="flex flex-1 items-start justify-center px-6 py-12 lg:items-center lg:py-0">
+        <div className="flex flex-1 items-start justify-center px-6 py-7 lg:items-center lg:py-0">
           <div className="w-full max-w-[360px]">
 
             {/* Mobile social proof slider — above headline */}
