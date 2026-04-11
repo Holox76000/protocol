@@ -505,40 +505,63 @@
 }
 
 .scan-card__range-track {
-  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
   width: 100%;
-  height: 8px;
-  background: var(--scan-border);
-  border-radius: 4px;
-  overflow: visible;
-}
-
-.scan-card__range-zone {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border-radius: 4px;
-  background: rgba(58, 106, 78, 0.18);
-  border: 1px solid rgba(58, 106, 78, 0.3);
-}
-
-.scan-card__range-marker {
-  position: absolute;
-  top: -5px;
-  width: 3px;
   height: 18px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  transition: left 0.3s ease-out;
 }
 
-.scan-card__range-marker--below,
-.scan-card__range-marker--above {
+.scan-card__seg {
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  transition: height 0.3s ease, background 0.3s ease;
+}
+
+.scan-card__seg--out {
+  background: var(--scan-border);
+}
+
+.scan-card__seg--in-range {
+  background: rgba(58, 106, 78, 0.3);
+}
+
+.scan-card__seg--active {
+  height: 18px;
+}
+
+.scan-card__seg--active-in-range {
+  background: var(--scan-close);
+}
+
+.scan-card__seg--active-below,
+.scan-card__seg--active-above {
   background: var(--scan-deficit);
 }
 
-.scan-card__range-marker--in-range {
-  background: var(--scan-close);
+.scan-card__range-wrap {
+  position: relative;
+}
+
+.scan-card__range-axis {
+  position: relative;
+  height: 16px;
+  margin-top: 5px;
+}
+
+.scan-card__range-axis-label {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--scan-text-faint);
+  white-space: nowrap;
+}
+
+.scan-card__range-axis-label--max {
+  left: auto !important;
+  right: 0;
+  transform: none;
 }
 
 /* ── Crop in analysis ── */

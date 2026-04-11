@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { validateSession, SESSION_COOKIE_NAME } from "../../lib/auth";
-import { CheckoutPage } from "../dashboard/DashboardPage";
+import { CheckoutPage } from "./CheckoutPage";
 
 export const runtime = "nodejs";
 

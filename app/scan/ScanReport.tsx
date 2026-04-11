@@ -1123,9 +1123,33 @@ function MetricSection({
                 <span>Current</span>
                 <span>Recommended: {formatValue(metric.recommended.min, metric.unit)} – {formatValue(metric.recommended.max, metric.unit)}</span>
               </div>
-              <div className="scan-card__range-track">
-                <div className="scan-card__range-zone" style={{ left: `${recLeft}%`, width: `${recRight - recLeft}%` }} />
-                <div className={`scan-card__range-marker scan-card__range-marker--${status}`} style={{ left: scanned ? `${valuePos}%` : "0%" }} />
+              <div className="scan-card__range-wrap">
+                <div className="scan-card__range-track">
+                  {(() => {
+                    const activeIndex = scanned ? Math.min(9, Math.floor(valuePos / 10)) : -1;
+                    return Array.from({ length: 10 }, (_, i) => {
+                      const segCenter = i * 10 + 5;
+                      const inRange = segCenter >= recLeft && segCenter <= recRight;
+                      const isActive = i === activeIndex;
+                      return (
+                        <div
+                          key={i}
+                          className={[
+                            "scan-card__seg",
+                            inRange ? "scan-card__seg--in-range" : "scan-card__seg--out",
+                            isActive ? `scan-card__seg--active scan-card__seg--active-${status}` : "",
+                          ].join(" ")}
+                        />
+                      );
+                    });
+                  })()}
+                </div>
+                <div className="scan-card__range-axis">
+                  <span className="scan-card__range-axis-label" style={{ left: `${recLeft}%` }}>{formatValue(metric.recommended.min, metric.unit)}</span>
+                  <span className="scan-card__range-axis-label" style={{ left: `${(recLeft + recRight) / 2}%` }}>Optimal</span>
+                  <span className="scan-card__range-axis-label" style={{ left: `${recRight}%` }}>{formatValue(metric.recommended.max, metric.unit)}</span>
+                  <span className="scan-card__range-axis-label scan-card__range-axis-label--max">Max</span>
+                </div>
               </div>
             </div>
 

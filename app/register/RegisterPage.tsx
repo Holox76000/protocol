@@ -161,7 +161,7 @@ export default function RegisterPage({
           return;
         }
 
-        window.location.assign("/dashboard");
+        window.location.assign(registrationToken ? "/dashboard" : "/checkout");
       } catch {
         setError("Network error. Please check your connection.");
       } finally {
@@ -218,15 +218,11 @@ export default function RegisterPage({
                 </svg>
               ))}
             </div>
-            <span className="text-[12px] text-white/40">4.9 · 2,400+ members</span>
+            <span className="text-[12px] text-white/40">4.9 · 25,000+ members</span>
           </div>
 
           {/* Testimonials */}
-          {[
-            { quote: "13 weeks in, people started noticing.", name: "Ryan, 27", metric: "SWR 1.29 → 1.44" },
-            { quote: "Same weight, but my girlfriend noticed the shape change before I told her.", name: "Tyler, 32", metric: "SWR 1.31 → 1.45" },
-            { quote: "I've been training for 6 years. This explained in 10 minutes what I'd been missing.", name: "Connor, 31", metric: "SWR 1.27 → 1.46" },
-          ].map((t) => (
+          {TESTIMONIALS.map((t) => (
             <div key={t.name} className="border-t border-white/[0.07] pt-4">
               <p className="text-[13px] leading-snug text-white/65 mb-2.5">&ldquo;{t.quote}&rdquo;</p>
               <div className="flex items-center justify-between">
@@ -268,13 +264,30 @@ export default function RegisterPage({
               <p className="mt-2 text-[14px] leading-relaxed text-dim">
                 {registrationToken
                   ? "Almost there — set a password to access your personalized assessment."
-                  : "Create a free account. Complete your assessment. Receive your personalized program."}
+                  : "Create your account. Complete checkout. Your Protocol starts immediately after."}
               </p>
               {!registrationToken && (
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-wire bg-pebble px-3 py-1 text-[11px] font-semibold text-mute">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  Step 1 of 2 — free account
-                </p>
+                <nav aria-label="Registration steps" className="mt-4">
+                  <ol role="list" className="flex items-center gap-0">
+                    {[
+                      { label: "Account", active: true },
+                      { label: "Payment", active: false },
+                      { label: "Protocol", active: false },
+                    ].map(({ label, active }, i, arr) => (
+                      <li key={label} className="flex items-center" aria-current={active ? "step" : undefined}>
+                        <div className="flex flex-col items-center gap-1">
+                          <div className={`h-2 w-2 rounded-full ${active ? "bg-void" : "bg-wire"}`} />
+                          <span className={`text-[10px] font-semibold ${active ? "text-void" : "text-mute"}`}>
+                            {label}
+                          </span>
+                        </div>
+                        {i < arr.length - 1 && (
+                          <div className="mx-2 mb-3 h-px w-8 bg-wire" aria-hidden="true" />
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
               )}
             </div>
 
@@ -282,10 +295,11 @@ export default function RegisterPage({
             <form onSubmit={handleSubmit} className="space-y-5">
 
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
+                <label htmlFor="firstName" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
                   First name
                 </label>
                 <input
+                  id="firstName"
                   type="text"
                   autoComplete="given-name"
                   autoFocus
@@ -299,10 +313,11 @@ export default function RegisterPage({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
+                <label htmlFor="email" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
                   Email
                 </label>
                 <input
+                  id="email"
                   type="email"
                   autoComplete="email"
                   placeholder="you@example.com"
@@ -315,11 +330,12 @@ export default function RegisterPage({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
+                <label htmlFor="password" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
                   Password
                 </label>
                 <div className="flex items-center rounded-lg border border-wire bg-pebble transition-colors duration-150 focus-within:border-void focus-within:bg-white">
                   <input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     placeholder="8+ characters"
@@ -333,7 +349,6 @@ export default function RegisterPage({
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="shrink-0 px-3.5 text-mute transition-colors hover:text-dim"
-                    tabIndex={-1}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     <EyeIcon open={showPassword} />
@@ -353,7 +368,17 @@ export default function RegisterPage({
 
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
-                  {error}
+                  {/* NOTE: depends on exact error string from /api/auth/register (409 response). If that copy changes, update this condition too. */}
+                  {error.includes("already exists") ? (
+                    <>
+                      An account with this email already exists.{" "}
+                      <Link href="/login" className="font-semibold underline underline-offset-2">
+                        Sign in instead →
+                      </Link>
+                    </>
+                  ) : (
+                    error
+                  )}
                 </div>
               )}
 
@@ -372,6 +397,9 @@ export default function RegisterPage({
                     registrationToken ? "Continue to my Protocol" : "Access my Protocol"
                   )}
                 </button>
+                <p className="text-center text-[11px] text-mute lg:hidden">
+                  Secure · No spam · Cancel anytime
+                </p>
               </div>
             </form>
 
