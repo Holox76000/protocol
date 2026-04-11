@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import TrackedLink from "../tracked-link";
 import GaryLinkovQuoteSection from "../program/GaryLinkovQuoteSection";
+import ExpertAdviceSection from "../program/ExpertAdviceSection";
 import BeforeAfterSlider from "../program/BeforeAfterSlider";
 import type { ResearchTab } from "../program/ResearchImpactSection";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
@@ -584,6 +585,9 @@ export default function F1Landing() {
 
               <p className="f1-body">Most programs put you in a box. Ectomorph, mesomorph, endomorph. They hand you a cookie-cutter plan.</p>
               <p className="f1-body">Protocol runs a complete scientific analysis of your body. Every proportion and structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
+              <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_01" }}>
+                Start attractiveness Protocol <ArrowIcon />
+              </TrackedLink>
             </div>
             <div className="f1-listicle__media">
               <Image src="/assets/scan-protocol.png" alt="Full body scan analysis" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
@@ -600,6 +604,9 @@ export default function F1Landing() {
               <p className="f1-body">Your ideal physique is not a fixed target. It depends on your facial structure, your frame, your age, and the social environment you operate in.</p>
               <p className="f1-body">An office lawyer with soft features has a different shoulder-to-waist target than a construction foreman with a strong jaw. Same science. Different targets. Copying someone else&apos;s physique does not work.</p>
               <p className="f1-body">Protocol reads all of these variables before designing your plan.</p>
+              <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_02" }}>
+                Start attractiveness Protocol <ArrowIcon />
+              </TrackedLink>
             </div>
           </div>
 
@@ -609,6 +616,9 @@ export default function F1Landing() {
               <h3 className="f1-listicle__title">Everything the fitness industry taught you is true. It just won&apos;t make you attractive.</h3>
               <p className="f1-body">The workouts work. The diets work. The supplements do what they claim. You will build muscle, lose fat, get stronger.</p>
               <p className="f1-body">The fitness industry optimizes for performance and size. It does not optimize for how people perceive you. That is not a flaw in their method. <strong>It is a different goal.</strong> Nobody told you the difference.</p>
+              <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_03" }}>
+                Start attractiveness Protocol <ArrowIcon />
+              </TrackedLink>
             </div>
             <div className="f1-listicle__media f1-listicle__media--diagram">
               <Image src="/assets/fitness_vs_attractiveness_goals_v2.svg" alt="Fitness vs attractiveness goals — two different coordinates" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "contain" }} />
@@ -811,6 +821,9 @@ export default function F1Landing() {
           </div>
         </div>
       </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
+      <ExpertAdviceSection />
 
       {/* ═══ GUARANTEE ═══ */}
       <section className="f1-section">
