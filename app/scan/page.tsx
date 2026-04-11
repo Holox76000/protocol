@@ -19,7 +19,7 @@ const SUBJECTS = [
   { id: "16", label: "Subject 16" },
   { id: "17", label: "Subject 17" },
   { id: "18", label: "Subject 18" },
-  { id: "19", label: "Subject 19" },
+  { id: "19", label: "Subject 19", ext: "svg" },
   { id: "woman-1", label: "Woman 1" },
   { id: "woman-2", label: "Woman 2" },
 ];
@@ -49,13 +49,16 @@ const DEFAULT_OVERLAYS = {
 export default function ScanPage() {
   const [subjectId, setSubjectId] = useState("2");
 
+  const subject = SUBJECTS.find((s) => s.id === subjectId);
+  const ext = subject?.ext ?? "png";
+
   const beforeImage = {
-    src: `/assets/${subjectId}-before.png`,
+    src: `/assets/${subjectId}-before.${ext}`,
     alt: `Subject ${subjectId} — current state`,
   };
 
   const afterImage = {
-    src: `/assets/${subjectId}-after.png`,
+    src: `/assets/${subjectId}-after.${ext}`,
     alt: `Subject ${subjectId} — target state`,
   };
 
