@@ -259,13 +259,11 @@ export default function RegisterPage({
         <div className="flex flex-1 items-start justify-center px-6 py-12 lg:items-center lg:py-0">
           <div className="w-full max-w-[360px]">
 
+            {/* Mobile social proof slider — above headline */}
+            <MobileTestimonialSlider />
+
             {/* Heading */}
             <div className="mb-8">
-              <div className="flex items-baseline gap-1.5 mb-4" role="img" aria-label="Rated 4.9 out of 5 based on 847 reviews">
-                <span className="text-[13px] text-void tracking-wide" aria-hidden="true">★★★★★</span>
-                <span className="text-[13px] font-semibold text-void" aria-hidden="true">4.9</span>
-                <span className="text-[13px] text-dim" aria-hidden="true">/5 · 847 reviews</span>
-              </div>
               <h1 className="font-display text-[34px] font-normal leading-tight text-void">
                 {registrationToken ? "Set your password." : "Start your Protocol."}
               </h1>
@@ -281,9 +279,6 @@ export default function RegisterPage({
                 </p>
               )}
             </div>
-
-            {/* Mobile social proof slider */}
-            <MobileTestimonialSlider />
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
