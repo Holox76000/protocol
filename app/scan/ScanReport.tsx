@@ -141,8 +141,8 @@ function FacialProtocolSection({
   const radar = metrics ? metricsToRadar(metrics) : { projected: RADAR_METRIC_KEYS.map(() => 0.7), client: RADAR_METRIC_KEYS.map(() => 0.4) };
   const { projected, client } = radar;
 
-  const featureListLeft  = ["SWR — Shoulder-to-Waist Ratio", "CWR — Chest-to-Waist Ratio", "BF% — Body Fat Estimate"];
-  const featureListRight = ["PAS — Posture Alignment Score", "TI — Taper Index", "PC — Proportion Coherence"];
+  const featureListLeft  = ["Shoulder-to-Waist Ratio", "Chest-to-Waist Ratio", "Body Fat Estimate"];
+  const featureListRight = ["Posture Alignment Score", "Taper Index", "Proportion Coherence"];
 
   return (
     <section className="scan-facial">
