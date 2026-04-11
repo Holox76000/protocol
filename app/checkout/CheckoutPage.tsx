@@ -263,8 +263,8 @@ export function CheckoutPage({ email }: { email: string }) {
       {/* Two-column grid */}
       <div className="flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:pt-14">
 
-        {/* ── Payment form — first on mobile, first on desktop ── */}
-        <div className="order-first lg:order-1 min-w-0 px-6 py-4 lg:py-0 lg:px-0 lg:pt-0 lg:pb-14">
+        {/* ── Payment form — second on mobile, second on desktop ── */}
+        <div className="order-last lg:order-2 min-w-0 px-6 py-4 lg:py-0 lg:px-0 lg:pt-0 lg:pb-14">
           <div className="lg:px-[3vw]">
             <SectionLabel>Secure payment</SectionLabel>
           </div>
@@ -341,8 +341,8 @@ export function CheckoutPage({ email }: { email: string }) {
           </div>
         </div>
 
-        {/* ── Order summary — second on mobile, second on desktop ── */}
-        <div className="order-last lg:order-2 px-6 py-4 lg:px-[9vw] lg:pt-0 lg:pb-14 lg:border-l lg:border-wire">
+        {/* ── Order summary — first on mobile, first on desktop ── */}
+        <div className="order-first lg:order-1 px-6 py-4 lg:px-[9vw] lg:pt-0 lg:pb-14 lg:border-r lg:border-wire">
           <SectionLabel>Your Protocol</SectionLabel>
 
           {/* Card */}
