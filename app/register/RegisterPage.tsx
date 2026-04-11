@@ -374,11 +374,6 @@ export default function RegisterPage({
                     registrationToken ? "Continue to my Protocol" : "Access my Protocol"
                   )}
                 </button>
-                {!registrationToken && (
-                  <p className="text-center text-[11.5px] text-mute">
-                    Free to join · $49 to unlock your personalized Protocol
-                  </p>
-                )}
               </div>
             </form>
 
