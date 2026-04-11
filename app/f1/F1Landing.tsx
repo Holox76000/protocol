@@ -823,7 +823,7 @@ export default function F1Landing() {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <ExpertAdviceSection />
+      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
 
       {/* ═══ GUARANTEE ═══ */}
       <section className="f1-section">
