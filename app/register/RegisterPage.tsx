@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 
 type Props = {
@@ -28,84 +28,6 @@ const STRENGTH: Record<string, { label: string; bar: string; text: string }> = {
   strong: { label: "Strong", bar: "w-full bg-emerald-500", text: "text-emerald-600" },
 };
 
-const TESTIMONIALS = [
-  { quote: "13 weeks in, people started noticing.", name: "Ryan, 27", metric: "SWR 1.29 → 1.44" },
-  { quote: "Same weight, but my girlfriend noticed the shape change before I told her.", name: "Tyler, 32", metric: "SWR 1.31 → 1.45" },
-  { quote: "I've been training for 6 years. This explained in 10 minutes what I'd been missing.", name: "Connor, 31", metric: "SWR 1.27 → 1.46" },
-];
-
-function MobileTestimonialSlider() {
-  const [active, setActive] = useState(0);
-  const touchStart = useRef<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const next = useCallback(() => setActive((i) => (i + 1) % TESTIMONIALS.length), []);
-  const prev = useCallback(() => setActive((i) => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length), []);
-
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(next, 4500);
-  }, [next]);
-
-  useEffect(() => {
-    resetTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [resetTimer]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart.current === null) return;
-    const delta = touchStart.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) {
-      delta > 0 ? next() : prev();
-      resetTimer();
-    }
-    touchStart.current = null;
-  };
-
-  const t = TESTIMONIALS[active];
-  return (
-    <div className="lg:hidden mb-5">
-      <div
-        className="rounded-lg border border-wire bg-pebble px-4 py-3 select-none"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex gap-0.5">
-            {[0,1,2,3,4].map((i) => (
-              <svg key={i} width="10" height="10" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
-                <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
-              </svg>
-            ))}
-          </div>
-          <div className="flex gap-1">
-            {TESTIMONIALS.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => { setActive(i); resetTimer(); }}
-                className={`h-1 rounded-full transition-all duration-200 ${i === active ? "w-3 bg-void" : "w-1 bg-wire"}`}
-                aria-label={`Testimonial ${i + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        <p className="text-[12.5px] leading-snug text-void mb-1.5 min-h-[36px]">
-          &ldquo;{t.quote}&rdquo;
-        </p>
-
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-semibold text-dim">{t.name}</span>
-          <span className="text-[11px] tabular-nums text-mute">{t.metric}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function getStrength(pw: string): keyof typeof STRENGTH | null {
   if (!pw) return null;
@@ -208,53 +130,33 @@ export default function RegisterPage({
           )}
         </div>
 
-        <div className="space-y-5">
-          {/* Rating */}
-          <div className="flex items-center gap-3">
-            <div className="flex gap-0.5">
-              {[0,1,2,3,4].map((i) => (
-                <svg key={i} width="13" height="13" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
-                  <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
-                </svg>
-              ))}
-            </div>
-            <span className="text-[12px] text-white/40">4.9 · 25,000+ members</span>
+        <div className="flex items-center gap-3">
+          <div className="flex gap-0.5">
+            {[0,1,2,3,4].map((i) => (
+              <svg key={i} width="13" height="13" viewBox="0 0 12 12" fill="currentColor" className="text-amber-400" aria-hidden="true">
+                <path d="M6 1l1.4 2.8 3.1.5-2.3 2.2.6 3.1L6 8l-2.8 1.6.6-3.1L1.5 4.3l3.1-.5L6 1z"/>
+              </svg>
+            ))}
           </div>
-
-          {/* Testimonials */}
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="border-t border-white/[0.07] pt-4">
-              <p className="text-[13px] leading-snug text-white/65 mb-2.5">&ldquo;{t.quote}&rdquo;</p>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-white/30">{t.name}</span>
-                <span className="text-[11px] tabular-nums text-white/20">{t.metric}</span>
-              </div>
-            </div>
-          ))}
+          <span className="text-[12px] text-white/40">4.9 · 25,000+ members</span>
         </div>
       </div>
 
       {/* ── Right panel: form ── */}
       <div className="flex flex-1 flex-col bg-white">
         {/* Mobile header */}
-        <div className="flex items-center justify-between border-b border-wire px-6 py-5 lg:hidden">
+        <div className="flex items-center border-b border-wire px-6 py-5 lg:hidden">
           <img
             src="/program/static/landing/images/shared/Prtcl.png"
             alt="Protocol"
             width={28}
             height={28}
           />
-          <Link href="/login" className="text-[12px] text-dim hover:text-void transition-colors">
-            Sign in →
-          </Link>
         </div>
 
         {/* Scrollable form area */}
         <div className="flex flex-1 items-start justify-center px-6 py-7 lg:items-center lg:py-0">
           <div className="w-full max-w-[360px]">
-
-            {/* Mobile social proof slider — above headline */}
-            <MobileTestimonialSlider />
 
             {/* Heading */}
             <div className="mb-8">
