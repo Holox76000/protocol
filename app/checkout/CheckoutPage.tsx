@@ -367,7 +367,7 @@ export function CheckoutPage({ email }: { email: string }) {
               <span>Protocol Access</span>
               <span>$49</span>
             </div>
-            <div className="flex justify-between border-t border-wire pt-2.5 lg:pt-4 text-[15px] font-bold text-void">
+            <div className="flex justify-between border-t border-wire pt-2.5 lg:pt-4 text-[15px] font-semibold text-void">
               <span>Due today</span>
               <span>$49</span>
             </div>
