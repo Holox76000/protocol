@@ -864,7 +864,7 @@
 }
 
 .scan-facial__header {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .scan-facial__title {
@@ -883,7 +883,7 @@
 .scan-facial__divider {
   border: none;
   border-top: 1px solid #e5e7eb;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
 }
 
 /* ── Score ── */
