@@ -49,7 +49,181 @@ type ScanReportProps = {
   subjectAge: number;
   dark?: boolean;
   extraControls?: React.ReactNode;
+  aestheticScore?: number;
 };
+
+/* ─── Facial Protocol Section ───────────────────────────────────────────── */
+
+const RADAR_METRIC_KEYS: (keyof Metrics)[] = ["swr", "cwr", "bf", "pas", "ti", "pc"];
+const RADAR_METRIC_LABELS: Record<keyof Metrics, string> = {
+  swr: "SWR", cwr: "CWR", bf: "BF%", pas: "PAS", ti: "TI", pc: "PC",
+};
+
+function normalizeMetricForRadar(key: keyof Metrics, value: number): number {
+  switch (key) {
+    case "swr": return Math.min(1, Math.max(0, (value - 1.0) / 1.2));
+    case "cwr": return Math.min(1, Math.max(0, (value - 1.0) / 0.8));
+    case "bf":  return Math.min(1, Math.max(0, (40 - value) / 34));
+    case "pas": return Math.min(1, Math.max(0, value / 100));
+    case "ti":  return Math.min(1, Math.max(0, value / 2.0));
+    case "pc":  return Math.min(1, Math.max(0, value / 100));
+    default:    return 0.5;
+  }
+}
+
+function metricsToRadar(metrics: Metrics): { projected: number[]; client: number[] } {
+  const projected = RADAR_METRIC_KEYS.map((key) => {
+    const rec = metrics[key].recommended;
+    return normalizeMetricForRadar(key, (rec.min + rec.max) / 2);
+  });
+  const client = RADAR_METRIC_KEYS.map((key) => normalizeMetricForRadar(key, metrics[key].value));
+  return { projected, client };
+}
+
+function RadarChart({ projected, client }: { projected: number[]; client: number[] }) {
+  const size = 300;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 100;
+  const rLabel = 135;
+  const n = RADAR_METRIC_KEYS.length;
+
+  function getPoint(value: number, i: number, radius: number) {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    return { x: cx + radius * value * Math.cos(angle), y: cy + radius * value * Math.sin(angle) };
+  }
+
+  function buildPolygon(values: number[], radius: number) {
+    return values.map((v, i) => {
+      const p = getPoint(v, i, radius);
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }).join(" ");
+  }
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ overflow: "visible" }} aria-hidden="true">
+      {[0.25, 0.5, 0.75, 1.0].map((level) => (
+        <polygon key={level} points={buildPolygon(Array(n).fill(level), r)} fill="none" stroke="#e5e7eb" strokeWidth="0.8" />
+      ))}
+      {RADAR_METRIC_KEYS.map((_, i) => {
+        const p = getPoint(1, i, r);
+        return <line key={i} x1={cx} y1={cy} x2={p.x.toFixed(1)} y2={p.y.toFixed(1)} stroke="#e5e7eb" strokeWidth="0.8" />;
+      })}
+      <polygon points={buildPolygon(projected, r)} fill="rgba(156,163,175,0.25)" stroke="rgba(156,163,175,0.65)" strokeWidth="1.2" />
+      <polygon points={buildPolygon(client, r)} fill="rgba(107,114,128,0.12)" stroke="rgba(107,114,128,0.45)" strokeWidth="1.2" />
+      {RADAR_METRIC_KEYS.map((key, i) => {
+        const label = RADAR_METRIC_LABELS[key];
+        const p = getPoint(1, i, rLabel);
+        const anchor = p.x < cx - 6 ? "end" : p.x > cx + 6 ? "start" : "middle";
+        return (
+          <text key={key} x={p.x.toFixed(1)} y={p.y.toFixed(1)} textAnchor={anchor} dominantBaseline="middle" fontSize="9" fill="#6b7280" fontFamily="inherit">
+            {label}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+function FacialProtocolSection({
+  subjectName,
+  aestheticScore = 64,
+  beforeImage,
+  afterImage,
+  metrics,
+}: {
+  subjectName: string;
+  aestheticScore?: number;
+  beforeImage: { src: string; alt: string };
+  afterImage: { src: string; alt: string };
+  metrics?: Metrics;
+}) {
+  const radar = metrics ? metricsToRadar(metrics) : { projected: RADAR_METRIC_KEYS.map(() => 0.7), client: RADAR_METRIC_KEYS.map(() => 0.4) };
+  const { projected, client } = radar;
+
+  const featureListLeft  = ["SWR — Shoulder-to-Waist Ratio", "CWR — Chest-to-Waist Ratio", "BF% — Body Fat Estimate"];
+  const featureListRight = ["PAS — Posture Alignment Score", "TI — Taper Index", "PC — Proportion Coherence"];
+
+  return (
+    <section className="scan-facial">
+      <div className="scan-facial__header">
+        <h2 className="scan-facial__title">
+          <span className="scan-facial__title-name">{subjectName}&rsquo;s</span>
+          {" "}
+          <span className="scan-facial__title-word">Protocol</span>
+        </h2>
+      </div>
+
+      <hr className="scan-facial__divider" />
+
+      <div className="scan-facial__score-row">
+        <div className="scan-facial__score-left">
+          <p className="scan-facial__score-label">Aesthetic Score</p>
+          <div className="scan-facial__score-bar">
+            <div className="scan-facial__score-bar-fill" style={{ width: `${aestheticScore}%` }} />
+            {[25, 50, 75, 100].filter((p) => p > aestheticScore).map((pos) => (
+              <div key={pos} className="scan-facial__score-bar-dot" style={{ left: `${pos}%` }} />
+            ))}
+          </div>
+        </div>
+        <div className="scan-facial__score-number">{aestheticScore}</div>
+      </div>
+
+      <hr className="scan-facial__divider" />
+
+      <div className="scan-facial__photos">
+        <div className="scan-facial__photo-item">
+          <div className="scan-facial__photo-frame">
+            <span className="scan-facial__photo-badge">BEFORE</span>
+            <img src={beforeImage.src} alt={beforeImage.alt} className="scan-facial__photo-img" />
+          </div>
+          <p className="scan-facial__photo-caption">
+            To help you achieve your aesthetic potential, we have developed this detailed and comprehensive science-based protocol. By following this evidence-based protocol, you can reach your full aesthetic potential.
+          </p>
+        </div>
+        <div className="scan-facial__photo-item">
+          <div className="scan-facial__photo-frame">
+            <span className="scan-facial__photo-badge">AFTER</span>
+            <img src={afterImage.src} alt={afterImage.alt} className="scan-facial__photo-img" />
+          </div>
+          <p className="scan-facial__photo-caption">
+            This is your Aesthetic Score. It reflects how closely your current features align with your personal aesthetic potential, based on non-surgical factors. It is a measure of potential, <u>not</u> a judgment of attractiveness.
+          </p>
+        </div>
+      </div>
+
+      <div className="scan-facial__potential">
+        <div className="scan-facial__potential-left">
+          <h3 className="scan-facial__potential-title">Projected potential</h3>
+          <p className="scan-facial__potential-desc">
+            This report is organised around <strong>6 key metrics</strong> from your body analysis:
+          </p>
+          <div className="scan-facial__feature-cols">
+            <ul className="scan-facial__feature-list">
+              {featureListLeft.map((f) => <li key={f} className="scan-facial__feature-item">{f}</li>)}
+            </ul>
+            <ul className="scan-facial__feature-list">
+              {featureListRight.map((f) => <li key={f} className="scan-facial__feature-item">{f}</li>)}
+            </ul>
+          </div>
+        </div>
+        <div className="scan-facial__radar-wrap">
+          <RadarChart projected={projected} client={client} />
+          <div className="scan-facial__radar-legend">
+            <div className="scan-facial__legend-item">
+              <div className="scan-facial__legend-swatch scan-facial__legend-swatch--projected" />
+              <span>Projected Potential</span>
+            </div>
+            <div className="scan-facial__legend-item">
+              <div className="scan-facial__legend-swatch scan-facial__legend-swatch--client" />
+              <span>Client Values</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /* ─── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -1028,6 +1202,7 @@ export default function ScanReport({
   subjectAge,
   dark = false,
   extraControls,
+  aestheticScore,
 }: ScanReportProps) {
   const [scanned, setScanned] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -1170,6 +1345,15 @@ export default function ScanReport({
           pointsAfter={afterPts}
         />
       ))}
+
+      {/* ── Facial Protocol Section ── */}
+      <FacialProtocolSection
+        subjectName={subjectName}
+        aestheticScore={aestheticScore}
+        beforeImage={beforeImage}
+        afterImage={afterImage}
+        metrics={computeMetricsFromPoints(beforePts, metricsBefore)}
+      />
 
       {/* ── Footer ── */}
       <footer className="scan-footer">

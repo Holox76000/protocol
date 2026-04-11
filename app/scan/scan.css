@@ -854,3 +854,248 @@
     aspect-ratio: 3 / 4;
   }
 }
+
+/* ─── Facial Protocol Section ───────────────────────────────────────────── */
+
+.scan-facial {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 32px 80px;
+}
+
+.scan-facial__header {
+  margin-bottom: 16px;
+}
+
+.scan-facial__title {
+  font-family: var(--program-theme-heading-font, Georgia, serif);
+  font-size: 3.6rem;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #1a1f1e;
+  margin: 0;
+}
+
+.scan-facial__title-word {
+  color: #9eb1b8;
+}
+
+.scan-facial__divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 0 0 18px;
+}
+
+/* ── Score ── */
+
+.scan-facial__score-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.scan-facial__score-left {
+  flex: 1;
+}
+
+.scan-facial__score-label {
+  font-size: 1.4rem;
+  color: #515255;
+  margin: 0 0 12px;
+}
+
+.scan-facial__score-bar {
+  position: relative;
+  height: 12px;
+  background: #f0f2f3;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.scan-facial__score-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #9eb1b8;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+.scan-facial__score-bar-dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.scan-facial__score-number {
+  font-family: var(--program-theme-heading-font, Georgia, serif);
+  font-size: 6rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #1a1f1e;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* ── Photos ── */
+
+.scan-facial__photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.scan-facial__photo-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e5e7eb;
+  margin-bottom: 14px;
+}
+
+.scan-facial__photo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.scan-facial__photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  display: block;
+}
+
+.scan-facial__photo-caption {
+  font-size: 1.3rem;
+  line-height: 1.8;
+  color: #515255;
+  margin: 0;
+}
+
+/* ── Projected Potential ── */
+
+.scan-facial__potential {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.scan-facial__potential-title {
+  font-family: var(--program-theme-heading-font, Georgia, serif);
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: #1a1f1e;
+  margin: 0 0 12px;
+}
+
+.scan-facial__potential-desc {
+  font-size: 1.4rem;
+  line-height: 1.7;
+  color: #515255;
+  margin: 0 0 20px;
+}
+
+.scan-facial__feature-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.scan-facial__feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scan-facial__feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  color: #515255;
+  padding: 5px 0;
+}
+
+.scan-facial__feature-item::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: #9eb1b8;
+  flex-shrink: 0;
+}
+
+.scan-facial__radar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.scan-facial__radar-legend {
+  display: flex;
+  gap: 24px;
+  font-size: 1.2rem;
+  color: #7f949b;
+}
+
+.scan-facial__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.scan-facial__legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.scan-facial__legend-swatch--projected {
+  background: rgba(156, 163, 175, 0.4);
+  border: 1px solid rgba(156, 163, 175, 0.7);
+}
+
+.scan-facial__legend-swatch--client {
+  background: rgba(107, 114, 128, 0.15);
+  border: 1px solid rgba(107, 114, 128, 0.5);
+}
+
+@media (max-width: 700px) {
+  .scan-facial {
+    padding: 40px 20px 60px;
+  }
+
+  .scan-facial__title {
+    font-size: 2.6rem;
+  }
+
+  .scan-facial__score-number {
+    font-size: 4.4rem;
+  }
+
+  .scan-facial__photos {
+    grid-template-columns: 1fr;
+  }
+
+  .scan-facial__potential {
+    grid-template-columns: 1fr;
+  }
+}

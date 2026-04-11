@@ -49,8 +49,7 @@ const DEFAULT_OVERLAYS = {
 export default function ScanPage() {
   const [subjectId, setSubjectId] = useState("2");
 
-  const subject = SUBJECTS.find((s) => s.id === subjectId);
-  const ext = subject?.ext ?? "png";
+  const ext = "png";
 
   const beforeImage = {
     src: `/assets/${subjectId}-before.${ext}`,
