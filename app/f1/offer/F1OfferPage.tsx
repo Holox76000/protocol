@@ -7,6 +7,7 @@ import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
 import TrackedLink from "../../tracked-link";
+import ExpertAdviceSection from "../../program/ExpertAdviceSection";
 import "../../program/program.css";
 import "../f1.css";
 import "./f1-offer.css";
@@ -436,6 +437,9 @@ export default function F1OfferPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
+      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
 
       {/* ═══ PRICE BLOCK ═══ */}
       <section id="pricing" className="f1-offer-price f1-section">
