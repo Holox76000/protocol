@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 const ADVICE_STEPS = [
-  { number: "01/", title: "Get your expert body analysis" },
-  { number: "02/", title: "Visualize your target physique" },
-  { number: "03/", title: "Get your personalized body protocol" },
-  { number: "04/", title: "Track your progress and transform your body" },
+  { number: "01/", title: "Assess your body" },
+  { number: "02/", title: "Find what's changeable" },
+  { number: "03/", title: "Decide your commitment" },
+  { number: "04/", title: "Build your system" },
 ];
 
 type ExpertAdviceSectionProps = {
