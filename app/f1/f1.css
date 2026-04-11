@@ -1,13 +1,39 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   F1 Advertorial
-   Uses program.css design tokens. No new design system.
+   F1 Advertorial — Design Tokens
    ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Ink */
+  --f1-ink-primary: #0a0a0a;
+  --f1-ink-primary-soft: #1a1a1a;
+  --f1-ink-secondary: #6b7280;
+  --f1-ink-tertiary: #9ca3af;
+  --f1-ink-muted: #d1d5db;
+
+  /* Surface */
+  --f1-surface-warm: #f0efec;
+  --f1-surface-grey: #f3f4f6;
+  --f1-surface-mid: #e5e7eb;
+
+  /* Accent */
+  --f1-accent-label: #799097;
+
+  /* Offer page — brand palette */
+  --f1-brand: #253239;
+  --f1-brand-dark: #1a262d;
+  --f1-brand-border: #edf0f1;
+  --f1-brand-border-mid: #dfe4e6;
+  --f1-brand-muted: #7f949b;
+  --f1-brand-muted-light: #9eb1b8;
+  --f1-brand-secondary: #515255;
+  --f1-brand-surface: #f9fbfb;
+}
 
 /* ─── Hero subtitle ─────────────────────────────────────────────────────── */
 
 .f1-hero__subtitle {
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--f1-ink-secondary);
   margin: 10px 0 0;
   line-height: 1.5;
 }
@@ -26,7 +52,7 @@
 .f1-steps__connector {
   flex: 1;
   height: 1px;
-  background: #d1d5db;
+  background: var(--f1-ink-muted);
   min-width: 12px;
 }
 
@@ -53,8 +79,8 @@ a.f1-steps__item {
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: var(--f1-surface-mid);
+  color: var(--f1-ink-tertiary);
   transition: background 0.15s, color 0.15s;
 }
 
@@ -63,28 +89,28 @@ a.f1-steps__item {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--f1-ink-tertiary);
   text-align: center;
   max-width: 72px;
   line-height: 1.3;
 }
 
 .f1-steps__item--active .f1-steps__num {
-  background: #0a0a0a;
+  background: var(--f1-ink-primary);
   color: #fff;
 }
 
 .f1-steps__item--active .f1-steps__label {
-  color: #0a0a0a;
+  color: var(--f1-ink-primary);
 }
 
 .f1-steps__item--muted .f1-steps__num {
-  background: #f3f4f6;
-  color: #d1d5db;
+  background: var(--f1-surface-grey);
+  color: var(--f1-ink-muted);
 }
 
 .f1-steps__item--muted .f1-steps__label {
-  color: #d1d5db;
+  color: var(--f1-ink-muted);
 }
 
 @media (max-width: 480px) {
@@ -160,7 +186,7 @@ a.f1-steps__item {
   aspect-ratio: 9 / 16;
   border-radius: 16px;
   overflow: hidden;
-  background: #0a0a0a;
+  background: var(--f1-ink-primary);
 }
 
 .f1-scan-loader__image {
@@ -527,7 +553,7 @@ a.f1-steps__item {
 .f1-projections__situation {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #0a0a0a;
+  color: var(--f1-ink-primary);
   margin: 0 0 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -588,7 +614,7 @@ a.f1-steps__item {
 .f1-projections__study-source {
   margin: 0;
   font-size: 1.2rem;
-  color: #9ca3af;
+  color: var(--f1-ink-tertiary);
 }
 
 @media (max-width: 600px) {
@@ -800,9 +826,29 @@ a.f1-steps__item {
   background: #fff;
 }
 
+.f1-version-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.f1-version-card--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .f1-version-card--winner {
   border-color: #253239;
   border-width: 2px;
+}
+
+.f1-version-card--winner.f1-version-card--visible {
+  animation: version-winner-pop 0.5s var(--ease-out-back, cubic-bezier(0.175, 0.885, 0.32, 1.275)) forwards;
+}
+
+@keyframes version-winner-pop {
+  0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .f1-version-card__visual {
@@ -1002,13 +1048,60 @@ a.f1-steps__item {
 .f1-testimonials {
   max-width: 1100px;
   margin: 0 auto;
+  position: relative;
+}
+
+/* Gradient fade — signals more content to the right (desktop only) */
+.f1-testimonials::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 56px;
+  height: calc(100% - 32px);
+  background: linear-gradient(to right, transparent, #fff);
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  /* Sur mobile le peek visuel suffit — le gradient déborde hors du container */
+  .f1-testimonials::after {
+    display: none;
+  }
 }
 
 .f1-testimonial-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 16px;
   margin-top: 32px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 8px;
+  /* Extra right padding so last card doesn't sit flush against edge */
+  padding-right: 32px;
+}
+
+.f1-testimonial-grid::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  /* Casse hors du padding de section (28px de chaque côté) → grid = 100vw */
+  .f1-testimonial-grid {
+    width: 100vw;
+    margin-left: -28px;
+    padding-left: 28px; /* réaligne le premier card avec le reste de la page */
+    padding-right: 0;
+  }
+
+  /* card = 100vw - 28px (padding gauche) - 44px (peek visible + gap) = ~303px sur iPhone 14 */
+  .f1-testimonial-card {
+    flex: 0 0 calc(100vw - 72px);
+  }
 }
 
 .f1-testimonial-card {
@@ -1016,6 +1109,8 @@ a.f1-steps__item {
   border: 1px solid #edf0f1;
   border-radius: 16px;
   padding: 24px;
+  flex: 0 0 320px;
+  scroll-snap-align: start;
 }
 
 .f1-testimonial-card__images {
@@ -1409,7 +1504,6 @@ a.f1-steps__item {
   }
 
   .f1-stat-grid,
-  .f1-testimonial-grid,
   .f1-pain__grid {
     grid-template-columns: 1fr;
   }

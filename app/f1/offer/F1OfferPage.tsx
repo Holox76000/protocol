@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
@@ -38,6 +38,41 @@ function ShieldIcon() {
       <path d="M16 3L5 7.5V15C5 21.075 9.85 26.77 16 28.5C22.15 26.77 27 21.075 27 15V7.5L16 3Z" stroke="#253239" strokeWidth="1.5" fill="none"/>
       <path d="M11 16L14.5 19.5L21 12" stroke="#253239" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
+  );
+}
+
+/* ─── Payment logos ──────────────────────────────────────────────────────── */
+
+function PaymentLogos() {
+  return (
+    <div className="f1-offer-price__payment-logos">
+      {/* Visa */}
+      <svg width="52" height="32" viewBox="0 0 52 32" aria-label="Visa" role="img">
+        <rect width="52" height="32" rx="4" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+        <text x="26" y="22" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="15" fontWeight="700" fill="#1a1f71" letterSpacing="-0.5">VISA</text>
+      </svg>
+      {/* Mastercard */}
+      <svg width="52" height="32" viewBox="0 0 52 32" aria-label="Mastercard" role="img">
+        <rect width="52" height="32" rx="4" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+        <circle cx="20" cy="16" r="9" fill="#EB001B" opacity="0.95"/>
+        <circle cx="32" cy="16" r="9" fill="#F79E1B" opacity="0.85"/>
+      </svg>
+      {/* Amex */}
+      <svg width="52" height="32" viewBox="0 0 52 32" aria-label="American Express" role="img">
+        <rect width="52" height="32" rx="4" fill="#2557D6"/>
+        <text x="26" y="22" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="10" fontWeight="700" fill="#fff" letterSpacing="0.8">AMEX</text>
+      </svg>
+      {/* Apple Pay */}
+      <svg width="64" height="32" viewBox="0 0 64 32" aria-label="Apple Pay" role="img">
+        <rect width="64" height="32" rx="4" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+        <text x="32" y="21" textAnchor="middle" fontFamily="-apple-system, BlinkMacSystemFont, Arial, sans-serif" fontSize="11" fontWeight="500" fill="#000">Apple Pay</text>
+      </svg>
+      {/* Google Pay */}
+      <svg width="64" height="32" viewBox="0 0 64 32" aria-label="Google Pay" role="img">
+        <rect width="64" height="32" rx="4" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+        <text x="32" y="21" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="11" fontWeight="500" fill="#3c4043">G Pay</text>
+      </svg>
+    </div>
   );
 }
 
@@ -77,7 +112,7 @@ const DELIVERABLES = [
     num: "01",
     title: "Your body analysis report",
     description:
-      "A full breakdown of your proportions: shoulder-to-waist ratio, chest-to-waist ratio, torso index, and perception score. Each variable benchmarked against the published research. You get a document that tells you exactly where you stand — and exactly what's holding your score back.",
+      "A full breakdown of your proportions — shoulder-to-waist ratio, chest-to-waist ratio, torso index, and perception score. Each variable benchmarked against the published research. You see exactly where you stand and what's holding your score back.",
   },
   {
     num: "02",
@@ -89,7 +124,7 @@ const DELIVERABLES = [
     num: "03",
     title: "Your attractiveness dashboard",
     description:
-      "Access to your personal Protocol platform. Your proportion scores, your targets, your 12-week training plan — all in one place. Every session built to move your weakest variables. You track your ratios as you progress and see what's actually changing.",
+      "Access to your personal Protocol platform — proportion scores, targets, and your 12-week training plan in one place. Every session built to move your weakest variables. You track your ratios as you progress.",
   },
   {
     num: "04",
@@ -236,6 +271,11 @@ function ReportSlider() {
 export default function F1OfferPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [signupHref, setSignupHref] = useState("/register");
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const scrollTestimonials = useCallback((dir: "left" | "right") => {
+    if (!testimonialsRef.current) return;
+    testimonialsRef.current.scrollBy({ left: dir === "left" ? -340 : 340, behavior: "smooth" });
+  }, []);
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
@@ -284,6 +324,12 @@ export default function F1OfferPage() {
               Not your weight. Not your muscle mass. Your proportions, measured against the research. Then a 3-month Protocol to close the gap.
             </p>
             <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" href={signupHref} />
+            <div className="f1-offer-hero__proof" role="img" aria-label="Note de 4.9 sur 5 basée sur 847 avis">
+              <span className="f1-offer-hero__proof-stars" aria-hidden="true">★★★★★</span>
+              <span className="f1-offer-hero__proof-score" aria-hidden="true">4.9</span>
+              <span className="f1-offer-hero__proof-sep" aria-hidden="true">/5</span>
+              <span className="f1-offer-hero__proof-count" aria-hidden="true">· 847 avis</span>
+            </div>
             <p className="f1-offer-hero__sub">90-day guarantee. One-time payment.</p>
           </div>
           <div className="f1-offer-hero__visual">
@@ -307,16 +353,18 @@ export default function F1OfferPage() {
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">What you receive</p>
             <h2 className="f1-section__title f1-section__title--sm">
-              Four steps.<br />
+              Four deliverables.<br />
               <span>One outcome.</span>
             </h2>
           </div>
-          <div className="f1-offer-deliverables__grid">
+          <div className="f1-offer-deliverables__list">
             {DELIVERABLES.map((d) => (
-              <div key={d.num} className="f1-offer-deliverable-card">
-                <div className="f1-offer-deliverable-card__num">{d.num}</div>
-                <h3 className="f1-offer-deliverable-card__title">{d.title}</h3>
-                <p className="f1-offer-deliverable-card__desc">{d.description}</p>
+              <div key={d.num} className="f1-offer-deliverable-item">
+                <div className="f1-offer-deliverable-item__num">{d.num}</div>
+                <div className="f1-offer-deliverable-item__body">
+                  <h3 className="f1-offer-deliverable-item__title">{d.title}</h3>
+                  <p className="f1-offer-deliverable-item__desc">{d.description}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -338,11 +386,20 @@ export default function F1OfferPage() {
           </div>
 
           <div className="f1-offer-proof__stat">
-            <span className="f1-offer-proof__stat-num">2,400+</span>
+            <span className="f1-offer-proof__stat-num">25,000+</span>
             <span className="f1-offer-proof__stat-label">men analyzed</span>
           </div>
 
-          <div className="f1-testimonial-grid">
+          <div className="f1-testimonials-carousel">
+            <div className="f1-testimonials-carousel__controls">
+              <button className="f1-testimonials-carousel__arrow" onClick={() => scrollTestimonials("left")} aria-label="Previous">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M13 4L7 10L13 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <button className="f1-testimonials-carousel__arrow" onClick={() => scrollTestimonials("right")} aria-label="Next">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+            <div className="f1-testimonial-grid" ref={testimonialsRef}>
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className="f1-testimonial-card">
                 <div className="f1-testimonial-card__images">
@@ -361,12 +418,16 @@ export default function F1OfferPage() {
                 <p className="f1-testimonial-card__detail">{t.detail}</p>
               </div>
             ))}
+            </div>
           </div>
           <div className="f1-offer-section-cta">
             <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="proof" href={signupHref} />
           </div>
         </div>
       </section>
+
+      {/* ═══ EXPERT ADVICE ═══ */}
+      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
 
       {/* ═══ REPORT PREVIEW ═══ */}
       <section className="f1-offer-report f1-section">
@@ -402,12 +463,17 @@ export default function F1OfferPage() {
             </h2>
           </div>
 
-          <div className="f1-offer-steps__grid">
-            {STEPS.map((s) => (
-              <div key={s.step} className="f1-offer-step">
-                <div className="f1-offer-step__num">{s.step}</div>
-                <h3 className="f1-offer-step__title">{s.title}</h3>
-                <p className="f1-offer-step__desc">{s.description}</p>
+          <div className="f1-offer-steps__timeline">
+            {STEPS.map((s, i) => (
+              <div key={s.step} className={`f1-offer-step-item${i === STEPS.length - 1 ? " f1-offer-step-item--last" : ""}`}>
+                <div className="f1-offer-step-item__track">
+                  <div className="f1-offer-step-item__dot" />
+                  <div className="f1-offer-step-item__line" />
+                </div>
+                <div className="f1-offer-step-item__body">
+                  <h3 className="f1-offer-step-item__title">{s.title}</h3>
+                  <p className="f1-offer-step-item__desc">{s.description}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -437,9 +503,6 @@ export default function F1OfferPage() {
           </div>
         </div>
       </section>
-
-      {/* ═══ HOW IT WORKS ═══ */}
-      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
 
       {/* ═══ PRICE BLOCK ═══ */}
       <section id="pricing" className="f1-offer-price f1-section">
@@ -473,13 +536,7 @@ export default function F1OfferPage() {
 
             <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" href={signupHref} />
 
-            <div className="f1-offer-price__payment-logos">
-              <span>Visa</span>
-              <span>Mastercard</span>
-              <span>Amex</span>
-              <span>Apple Pay</span>
-              <span>Google Pay</span>
-            </div>
+            <PaymentLogos />
 
             <div className="f1-offer-price__guarantee">
               <ShieldIcon />
@@ -522,9 +579,6 @@ export default function F1OfferPage() {
                 )}
               </div>
             ))}
-          </div>
-          <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="faq" href={signupHref} />
           </div>
         </div>
       </section>

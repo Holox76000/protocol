@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TrackedLink from "../tracked-link";
 import GaryLinkovQuoteSection from "../program/GaryLinkovQuoteSection";
 import ExpertAdviceSection from "../program/ExpertAdviceSection";
@@ -120,7 +120,7 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
           <div className="f1-scan-loader__line" />
           <div className="f1-scan-loader__corners" />
           <div className="f1-scan-loader__bottom">
-            <div key={loadingStep} className="f1-scan-loader__step">
+            <div key={loadingStep} className="f1-scan-loader__step" aria-live="polite" aria-atomic="true">
               {LOADING_STEPS[Math.min(loadingStep, LOADING_STEPS.length - 1)]}
             </div>
             <div className="f1-scan-loader__bar-track">
@@ -142,7 +142,7 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
           </p>
           <p style={{
             fontSize: 12,
-            color: "#9ca3af",
+            color: "#6b7280",
             margin: "4px 0 0",
             textAlign: "center",
           }}>
@@ -319,8 +319,9 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
                 border: "none",
                 cursor: "pointer",
                 fontSize: 12,
-                color: "#9ca3af",
-                padding: "4px 0",
+                color: "#6b7280",
+                padding: "12px 16px",
+                minHeight: 44,
               }}
             >
               ← Choose another profile
@@ -457,6 +458,53 @@ const WITH = [
   "The shortest path from where you are to your potential",
 ];
 
+/* ─── Versions reveal (process-of-elimination animation) ─────────────────── */
+
+function VersionsReveal() {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          observer.disconnect();
+          VERSIONS.forEach((_, i) => {
+            setTimeout(() => setVisibleCount(i + 1), i * 650);
+          });
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="f1-versions" ref={ref}>
+      {VERSIONS.map((v, i) => (
+        <div
+          key={v.label}
+          className={`f1-version-card${v.verdict === "yes" ? " f1-version-card--winner" : ""}${i < visibleCount ? " f1-version-card--visible" : ""}`}
+        >
+          <div className="f1-version-card__visual">
+            <img src={v.img} alt={v.label} loading="lazy" />
+          </div>
+          <div className="f1-version-card__body">
+            <div className={`f1-version-card__verdict f1-version-card__verdict--${v.verdict}`}>
+              {v.verdict === "no" ? "\u2717 Not it" : "\u2713 This is it"}
+            </div>
+            <div className="f1-version-card__name">{v.label}</div>
+            <p className="f1-version-card__desc">{v.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ─── Component ──────────────────────────────────────────────────────────── */
 
 export default function F1Landing() {
@@ -508,7 +556,8 @@ export default function F1Landing() {
               <span className="program-hero__trust-item">90-day guarantee</span>
             </p>
 
-            {/* VSL — hidden for now */}
+            {/* VSL — planned, not yet ready. Show when video is available.
+                Trigger condition: A/B test or manual flag once video is produced. */}
             <div className="f1-vsl" style={{ display: "none" }}>
               <button type="button" className="f1-vsl__play" aria-label="Play video"><PlayIcon /></button>
               <span className="f1-vsl__label">Watch: the science breakdown</span>
@@ -540,21 +589,24 @@ export default function F1Landing() {
           </div>
           <div className="f1-mid-cta" style={{ marginTop: 16 }}>
             <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "projections" }}>
-              Start attractiveness Protocol <ArrowIcon />
+              Continue to step 3 — Decide your commitment <ArrowIcon />
             </TrackedLink>
+            <p className="f1-cta-sub">Steps 3 and 4 complete on the next page</p>
           </div>
         </div>
       </section>
 
       {/* ═══ RESEARCH TABS ═══ */}
-      <ResearchImpactSection
-        tabs={RESEARCH_TABS}
-        titleHtml="Your Body Shape Impacts <strong>Every Part of Your Life</strong>"
-        subtitle=""
-      />
+      <div id="research">
+        <ResearchImpactSection
+          tabs={RESEARCH_TABS}
+          titleHtml="Your Body Shape Impacts <strong>Every Part of Your Life</strong>"
+          subtitle=""
+        />
+      </div>
 
       {/* ═══ SHAPE FRAME ═══ */}
-      <section className="f1-section f1-shape" id="research">
+      <section className="f1-section f1-shape" id="shape">
         <div className="f1-shape__inner">
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">The research</p>
@@ -667,22 +719,7 @@ export default function F1Landing() {
             <h3 className="f1-section__title f1-section__title--sm">Same Man. Four Approaches. <span>Only One Worked.</span></h3>
           </div>
 
-          <div className="f1-versions">
-            {VERSIONS.map((v) => (
-              <div key={v.label} className={`f1-version-card ${v.verdict === "yes" ? "f1-version-card--winner" : ""}`}>
-                <div className="f1-version-card__visual">
-                  <img src={v.img} alt={v.label} loading="lazy" />
-                </div>
-                <div className="f1-version-card__body">
-                  <div className={`f1-version-card__verdict f1-version-card__verdict--${v.verdict}`}>
-                    {v.verdict === "no" ? "\u2717 Not it" : "\u2713 This is it"}
-                  </div>
-                  <div className="f1-version-card__name">{v.label}</div>
-                  <p className="f1-version-card__desc">{v.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <VersionsReveal />
         </div>
       </section>
 
@@ -735,7 +772,7 @@ export default function F1Landing() {
               <BeforeAfterSlider beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" beforeAlt="Marcus before" afterAlt="Marcus after" subject="Marcus" />
             </div>
             <div className="f1-proof__author">
-              <div className="f1-proof__avatar">T</div>
+              <div className="f1-proof__avatar">M</div>
               <div>
                 <div className="f1-proof__name">Marcus, 31</div>
                 <div className="f1-proof__meta">Office job &middot; Trained 4x/week for 4 years</div>
