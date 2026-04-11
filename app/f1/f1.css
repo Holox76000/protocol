@@ -109,15 +109,15 @@ a.f1-steps__item {
 
 @media (max-width: 600px) {
   .f1-body-selector {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
+    display: flex !important;
+    flex-direction: row !important;
     gap: 6px !important;
     padding: 6px !important;
-    max-width: 280px !important;
+    max-width: 100% !important;
   }
 
   .f1-body-selector > div > button {
-    aspect-ratio: 3 / 4 !important;
+    aspect-ratio: 2 / 3 !important;
   }
 }
 
@@ -1206,6 +1206,11 @@ a.f1-steps__item {
 
 .f1-cta--inverted:hover {
   background: rgba(255, 255, 255, 0.9);
+}
+
+.f1-cta--inline {
+  margin-top: 20px;
+  align-self: flex-start;
 }
 
 .f1-cta-sub {
