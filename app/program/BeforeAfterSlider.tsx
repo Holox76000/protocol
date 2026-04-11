@@ -1,6 +1,7 @@
 "use client";
 
-import type { CSSProperties, KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
+import Image from "next/image";
+import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
 type BeforeAfterSliderProps = {
@@ -20,30 +21,6 @@ type BeforeAfterSliderProps = {
   subject?: string;
 };
 
-function getImageStyle({
-  position,
-  scale,
-  translateX,
-  translateY,
-}: {
-  position: string;
-  scale: number;
-  translateX: string;
-  translateY: string;
-}): CSSProperties {
-  return {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    objectPosition: position,
-    transform: `translate(${translateX}, ${translateY}) scale(${scale})`,
-    transformOrigin: "center center",
-    display: "block",
-    maxWidth: "none",
-    userSelect: "none",
-    pointerEvents: "none",
-  };
-}
 
 function clampPosition(value: number) {
   return Math.min(100, Math.max(0, value));
@@ -149,19 +126,20 @@ export default function BeforeAfterSlider({
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)`, zIndex: 1 }}
           aria-hidden="true"
         >
-          <img
+          <Image
             className="program-hero__compare-image"
             src={beforeSrc}
             alt={beforeAlt ?? `${subject} before`}
-            loading="lazy"
+            fill
+            sizes="(max-width: 768px) 100vw, 640px"
             draggable={false}
             style={{
-              ...getImageStyle({
-                position: beforePosition,
-                scale: beforeScale,
-                translateX: beforeTranslateX,
-                translateY: beforeTranslateY,
-              }),
+              objectFit: "cover",
+              objectPosition: beforePosition,
+              transform: `translate(${beforeTranslateX}, ${beforeTranslateY}) scale(${beforeScale})`,
+              transformOrigin: "center center",
+              userSelect: "none",
+              pointerEvents: "none",
             }}
           />
         </div>
@@ -171,19 +149,20 @@ export default function BeforeAfterSlider({
           style={{ clipPath: `inset(0 0 0 ${position}%)`, zIndex: 0 }}
           aria-hidden="true"
         >
-          <img
+          <Image
             className="program-hero__compare-image"
             src={afterSrc}
             alt={afterAlt ?? `${subject} after`}
-            loading="lazy"
+            fill
+            sizes="(max-width: 768px) 100vw, 640px"
             draggable={false}
             style={{
-              ...getImageStyle({
-                position: afterPosition,
-                scale: afterScale,
-                translateX: afterTranslateX,
-                translateY: afterTranslateY,
-              }),
+              objectFit: "cover",
+              objectPosition: afterPosition,
+              transform: `translate(${afterTranslateX}, ${afterTranslateY}) scale(${afterScale})`,
+              transformOrigin: "center center",
+              userSelect: "none",
+              pointerEvents: "none",
             }}
           />
         </div>
