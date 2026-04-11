@@ -19,7 +19,7 @@ const SUBJECTS = [
   { id: "16", label: "Subject 16" },
   { id: "17", label: "Subject 17" },
   { id: "18", label: "Subject 18" },
-  { id: "19", label: "Subject 19", ext: "svg" },
+  { id: "19", label: "Subject 19" },
   { id: "woman-1", label: "Woman 1" },
   { id: "woman-2", label: "Woman 2" },
 ];
