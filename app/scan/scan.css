@@ -194,6 +194,11 @@
   object-position: 50% 20%;
 }
 
+.scan-photo__image--svg {
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
 .scan-photo__badge {
   position: absolute;
   top: 1.25rem;

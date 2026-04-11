@@ -1143,8 +1143,9 @@ export default function ScanReport({
             alt={currentImage.alt}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="scan-photo__image"
+            className={`scan-photo__image${currentImage.src.endsWith(".svg") ? " scan-photo__image--svg" : ""}`}
             priority
+            unoptimized={currentImage.src.endsWith(".svg")}
           />
           <ScanLine active={scanning} />
           <MeasurementOverlay points={currentOverlays} scanned={scanned} onPointsChange={setCurrentOverlays} />
