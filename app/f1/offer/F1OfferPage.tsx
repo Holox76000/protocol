@@ -317,12 +317,6 @@ export default function F1OfferPage() {
       <section className="f1-offer-hero f1-section">
         <div className="f1-offer-hero__inner">
           <div className="f1-offer-hero__copy">
-            <div className="f1-offer-hero__proof" role="img" aria-label="Rated 4.9 out of 5 based on 847 reviews">
-              <span className="f1-offer-hero__proof-stars" aria-hidden="true">★★★★★</span>
-              <span className="f1-offer-hero__proof-score" aria-hidden="true">4.9</span>
-              <span className="f1-offer-hero__proof-sep" aria-hidden="true">/5</span>
-              <span className="f1-offer-hero__proof-count" aria-hidden="true">· 847 reviews</span>
-            </div>
             <h1 className="f1-offer-hero__title">
               Turn 5 years of research into your Attractiveness Protocol.
             </h1>
@@ -330,6 +324,12 @@ export default function F1OfferPage() {
               Not your weight. Not your muscle mass. Your proportions, measured against the research. Then a 3-month Protocol to close the gap.
             </p>
             <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" href={signupHref} />
+            <div className="f1-offer-hero__proof" role="img" aria-label="Rated 4.9 out of 5 based on 847 reviews">
+              <span className="f1-offer-hero__proof-stars" aria-hidden="true">★★★★★</span>
+              <span className="f1-offer-hero__proof-score" aria-hidden="true">4.9</span>
+              <span className="f1-offer-hero__proof-sep" aria-hidden="true">/5</span>
+              <span className="f1-offer-hero__proof-count" aria-hidden="true">· 847 reviews</span>
+            </div>
             <p className="f1-offer-hero__sub">90-day guarantee. One-time payment.</p>
           </div>
           <div className="f1-offer-hero__visual">
