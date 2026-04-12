@@ -1,9 +1,13 @@
-import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { validateSession, SESSION_COOKIE_NAME } from "../../lib/auth";
-import { CheckoutPage } from "./CheckoutPage";
+
+const CheckoutPage = dynamic(
+  () => import("./CheckoutPage").then((m) => ({ default: m.CheckoutPage })),
+  { ssr: false }
+);
 
 export const runtime = "nodejs";
 
@@ -20,9 +24,5 @@ export default async function CheckoutRoute() {
 
   if (user.has_paid) redirect("/dashboard");
 
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <CheckoutPage email={user.email} />
-    </Suspense>
-  );
+  return <CheckoutPage email={user.email} />;
 }
