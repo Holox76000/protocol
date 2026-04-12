@@ -20,6 +20,7 @@ export type AuthUser = {
   first_name: string;
   has_paid: boolean;
   protocol_status: string;
+  has_password: boolean;
 };
 
 // ──────────────────────────────────────────────
@@ -119,11 +120,14 @@ export async function validateSession(token: string): Promise<AuthUser | null> {
 
   const { data: user } = await supabaseAdmin
     .from("users")
-    .select("id, email, first_name, has_paid, protocol_status")
+    .select("id, email, first_name, has_paid, protocol_status, password_hash")
     .eq("id", session.user_id)
     .maybeSingle();
 
-  return (user as AuthUser) ?? null;
+  if (!user) return null;
+
+  const { password_hash, ...rest } = user as typeof user & { password_hash: string | null };
+  return { ...rest, has_password: !!password_hash } as AuthUser;
 }
 
 export async function deleteSession(token: string): Promise<void> {
@@ -216,6 +220,73 @@ export async function peekRegistrationToken(token: string): Promise<{
     email: data.email as string,
     firstName: (data.first_name as string) ?? null,
   };
+}
+
+// ──────────────────────────────────────────────
+// Magic link tokens
+// ──────────────────────────────────────────────
+const MAGIC_LINK_EXPIRY_MINUTES = 20;
+
+// Separate rate limit for magic link verify: 10 attempts per IP per hour
+const magicLinkRateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const MAGIC_LINK_RATE_LIMIT_MAX = 10;
+const MAGIC_LINK_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+export function checkMagicLinkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = magicLinkRateLimitStore.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    magicLinkRateLimitStore.set(ip, { count: 1, resetAt: now + MAGIC_LINK_RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= MAGIC_LINK_RATE_LIMIT_MAX) return false;
+
+  entry.count++;
+  return true;
+}
+
+export async function createMagicLinkToken(userId: string): Promise<string> {
+  const token = generateRandomToken();
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(
+    Date.now() + MAGIC_LINK_EXPIRY_MINUTES * 60 * 1000
+  ).toISOString();
+
+  // Invalidate any previous unused tokens for this user
+  await supabaseAdmin
+    .from("magic_link_tokens")
+    .update({ used: true })
+    .eq("user_id", userId)
+    .eq("used", false);
+
+  const { error } = await supabaseAdmin.from("magic_link_tokens").insert({
+    user_id: userId,
+    token_hash: tokenHash,
+    expires_at: expiresAt,
+  });
+
+  if (error) throw new Error(`Magic link token creation failed: ${error.message}`);
+
+  return token;
+}
+
+export async function consumeMagicLinkToken(token: string): Promise<{ userId: string } | null> {
+  const tokenHash = hashToken(token);
+
+  const { data, error } = await supabaseAdmin
+    .from("magic_link_tokens")
+    .update({ used: true })
+    .eq("token_hash", tokenHash)
+    .eq("used", false)
+    .gt("expires_at", new Date().toISOString())
+    .select("user_id")
+    .single();
+
+  if (error || !data) return null;
+
+  return { userId: data.user_id as string };
 }
 
 // ──────────────────────────────────────────────

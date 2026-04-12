@@ -331,6 +331,120 @@ function StatusCard({ user, submittedAt }: { user: AuthUser; submittedAt?: strin
   return null;
 }
 
+// ── Set password banner ────────────────────────────────────────────────────────
+
+function SetPasswordBanner() {
+  const [dismissed, setDismissed] = useState(false);
+  const [view, setView] = useState<"banner" | "form" | "done">("banner");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/set-password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        setError(data.error ?? "Something went wrong.");
+        return;
+      }
+
+      setView("done");
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (dismissed || view === "done") {
+    return view === "done" ? (
+      <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700">
+        Password set. You can now log in with email and password.
+      </div>
+    ) : null;
+  }
+
+  return (
+    <div className="mb-6 rounded-xl border border-wire bg-white px-5 py-4 shadow-card">
+      {view === "banner" && (
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[13px] font-semibold text-void">Set a password</p>
+            <p className="mt-0.5 text-[12px] text-dim">
+              Log in without a link next time.
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setView("form")}
+              className="rounded-lg bg-void px-3.5 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#1a1a1b]"
+            >
+              Set password
+            </button>
+            <button
+              type="button"
+              onClick={() => setDismissed(true)}
+              className="text-[11px] text-mute transition-colors hover:text-void"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {view === "form" && (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <p className="text-[13px] font-semibold text-void">Choose a password</p>
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="8+ characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            disabled={loading}
+            autoFocus
+            className="w-full rounded-lg border border-wire bg-pebble px-4 py-2.5 text-[14px] text-void placeholder:text-mute focus:border-void focus:bg-white focus:outline-none disabled:opacity-50"
+          />
+          {error && (
+            <p className="text-[12px] text-red-600">{error}</p>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={loading || password.length < 8}
+              className="rounded-lg bg-void px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#1a1a1b] disabled:opacity-40"
+            >
+              {loading ? "Saving..." : "Save password"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setView("banner"); setPassword(""); setError(null); }}
+              className="text-[12px] text-mute hover:text-void"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage({ user, submittedAt }: Props) {
@@ -385,6 +499,7 @@ export default function DashboardPage({ user, submittedAt }: Props) {
       </header>
 
       <div className="mx-auto max-w-[600px] px-6 py-10">
+        {!user.has_password && <SetPasswordBanner />}
         <div className="mb-8">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">
             Dashboard

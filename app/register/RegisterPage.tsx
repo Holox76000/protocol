@@ -9,33 +9,6 @@ type Props = {
   prefillFirstName?: string;
 };
 
-function EyeIcon({ open }: { open: boolean }) {
-  return open ? (
-    <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M1 9C1 9 4 3 9 3s8 6 8 6-3 6-8 6S1 9 1 9z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <circle cx="9" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
-    </svg>
-  ) : (
-    <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M2 2l14 14M7.4 7.5A2.5 2.5 0 0011.5 11M5 5.3C3.3 6.5 2 8 1 9c1 2.3 4.4 6 8 6a7.8 7.8 0 004-1.1M8 3.1C8.3 3 8.7 3 9 3c3.6 0 7 3.7 8 6a10 10 0 01-1.6 2.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
-const STRENGTH: Record<string, { label: string; bar: string; text: string }> = {
-  weak: { label: "Weak", bar: "w-1/3 bg-red-400", text: "text-red-500" },
-  fair: { label: "Fair", bar: "w-2/3 bg-amber-400", text: "text-amber-600" },
-  strong: { label: "Strong", bar: "w-full bg-emerald-500", text: "text-emerald-600" },
-};
-
-
-function getStrength(pw: string): keyof typeof STRENGTH | null {
-  if (!pw) return null;
-  if (pw.length < 8) return "weak";
-  if (pw.length < 12) return "fair";
-  return "strong";
-}
-
 export default function RegisterPage({
   registrationToken = "",
   prefillEmail = "",
@@ -43,8 +16,6 @@ export default function RegisterPage({
 }: Props) {
   const [email, setEmail] = useState(prefillEmail);
   const [firstName, setFirstName] = useState(prefillFirstName);
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -57,10 +28,6 @@ export default function RegisterPage({
         setError("Email and first name are required.");
         return;
       }
-      if (password.length < 8) {
-        setError("Password must be at least 8 characters.");
-        return;
-      }
 
       setLoading(true);
 
@@ -71,7 +38,6 @@ export default function RegisterPage({
           body: JSON.stringify({
             email: email.trim(),
             first_name: firstName.trim(),
-            password,
             registration_token: registrationToken || undefined,
           }),
         });
@@ -90,11 +56,8 @@ export default function RegisterPage({
         setLoading(false);
       }
     },
-    [email, firstName, password, registrationToken]
+    [email, firstName, registrationToken]
   );
-
-  const strength = getStrength(password);
-  const strengthInfo = strength ? STRENGTH[strength] : null;
 
   return (
     <div className="flex min-h-screen">
@@ -161,11 +124,11 @@ export default function RegisterPage({
             {/* Heading */}
             <div className="mb-8">
               <h1 className="font-display text-[34px] font-normal leading-tight text-void">
-                {registrationToken ? "Set your password." : "Start your Protocol."}
+                {registrationToken ? "Access your Protocol." : "Start your Protocol."}
               </h1>
               <p className="mt-2 text-[14px] leading-relaxed text-dim">
                 {registrationToken
-                  ? "Almost there — set a password to access your personalized assessment."
+                  ? "Almost there — confirm your details to access your personalized assessment."
                   : "Create your account. Complete checkout. Your Protocol starts immediately after."}
               </p>
               {!registrationToken && (
@@ -231,46 +194,8 @@ export default function RegisterPage({
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label htmlFor="password" className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-mute">
-                  Password
-                </label>
-                <div className="flex items-center rounded-lg border border-wire bg-pebble transition-colors duration-150 focus-within:border-void focus-within:bg-white">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder="8+ characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[14px] text-void placeholder:text-mute focus:outline-none disabled:opacity-50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="shrink-0 px-3.5 text-mute transition-colors hover:text-dim"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    <EyeIcon open={showPassword} />
-                  </button>
-                </div>
-                {password.length > 0 && strengthInfo && (
-                  <div className="flex items-center gap-3 pt-1">
-                    <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-wire">
-                      <div className={`h-full rounded-full transition-all duration-300 ${strengthInfo.bar}`} />
-                    </div>
-                    <span className={`shrink-0 text-[11px] font-semibold ${strengthInfo.text}`}>
-                      {strengthInfo.label}
-                    </span>
-                  </div>
-                )}
-              </div>
-
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
-                  {/* NOTE: depends on exact error string from /api/auth/register (409 response). If that copy changes, update this condition too. */}
                   {error.includes("already exists") ? (
                     <>
                       An account with this email already exists.{" "}

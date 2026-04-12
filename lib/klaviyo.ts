@@ -486,6 +486,56 @@ export async function sendKlaviyoPurchaseEvent(email: string, firstName?: string
 }
 
 /**
+ * Send a magic link email via Klaviyo transactional event.
+ * MUST be called synchronously (not in waitUntil) — if it fails, the user
+ * has no way to log in and must be informed immediately.
+ * Throws on failure so the caller can return a 502 to the user.
+ */
+export async function sendMagicLinkEmail(props: {
+  email: string;
+  firstName: string;
+  magicLinkUrl: string;
+}): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error("KLAVIYO_PRIVATE_KEY not set");
+
+  const res = await fetch(`${KLAVIYO_API_BASE}/events/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Klaviyo-API-Key ${apiKey}`,
+      "Content-Type": "application/json",
+      revision: "2024-02-15",
+    },
+    body: JSON.stringify({
+      data: {
+        type: "event",
+        attributes: {
+          metric: { data: { type: "metric", attributes: { name: "Magic Link Requested" } } },
+          profile: {
+            data: {
+              type: "profile",
+              attributes: { email: props.email, first_name: props.firstName },
+            },
+          },
+          properties: {
+            magic_link_url: props.magicLinkUrl,
+            first_name: props.firstName,
+          },
+        },
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error("[klaviyo] sendMagicLinkEmail failed", { status: res.status, body: text, email: props.email });
+    throw new Error(`Klaviyo error ${res.status}`);
+  }
+
+  console.log("[klaviyo] magic link email sent", { email: props.email });
+}
+
+/**
  * Move a profile from leads list (UQbC9Z) to customers list (UYABKB).
  * Call this when a user completes registration after purchase.
  */
