@@ -419,13 +419,50 @@ async function removeFromList(apiKey: string, profileId: string, listId: string)
 
 /**
  * Add a profile to the leads list (UQbC9Z) without touching the customers list.
- * Call this when a user creates an account before paying.
+ * Optionally sets Protocol_CartRecoveryUrl so Klaviyo abandoned cart flows can
+ * include a one-click login link directly to /checkout.
  */
-export async function addToLeadsList(email: string, firstName?: string): Promise<void> {
+export async function addToLeadsList(
+  email: string,
+  firstName?: string,
+  cartRecoveryUrl?: string,
+): Promise<void> {
   const apiKey = getApiKey();
   if (!apiKey) return;
 
-  await upsertProfileAndSubscribe(apiKey, email, firstName, KLAVIYO_LEADS_LIST_ID);
+  const profileId = await upsertProfileAndSubscribe(apiKey, email, firstName, KLAVIYO_LEADS_LIST_ID);
+
+  // If we have a cart recovery URL and a profile ID, set it as a custom property
+  if (cartRecoveryUrl && profileId) {
+    try {
+      const res = await fetch(`${KLAVIYO_API_BASE}/profiles/${profileId}/`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-02-15",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "profile",
+            id: profileId,
+            attributes: {
+              properties: { Protocol_CartRecoveryUrl: cartRecoveryUrl },
+            },
+          },
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error("[klaviyo] set cart recovery url failed", { status: res.status, body: text, email });
+      } else {
+        console.log("[klaviyo] cart recovery url set", { email });
+      }
+    } catch (err) {
+      console.error("[klaviyo] set cart recovery url error", { error: String(err), email });
+    }
+  }
+
   console.log("[klaviyo] added to leads list", { email });
 }
 

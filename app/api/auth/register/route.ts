@@ -4,6 +4,7 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 import {
   createSession,
   consumeRegistrationToken,
+  createCartRecoveryToken,
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
@@ -152,7 +153,18 @@ export async function POST(request: Request) {
         console.error("[register] Klaviyo promote failed", { error: String(err), email })
       );
     } else {
-      await addToLeadsList(email, firstName).catch((err) =>
+      // Generate a cart recovery link so Klaviyo abandoned cart flows can
+      // include a one-click login link directly to /checkout
+      let cartRecoveryUrl: string | undefined;
+      try {
+        const recoveryToken = await createCartRecoveryToken(user.id);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+        cartRecoveryUrl = `${baseUrl}/api/auth/cart-recovery/verify?token=${recoveryToken}`;
+      } catch (err) {
+        console.error("[register] cart recovery token failed", { error: String(err), email });
+      }
+
+      await addToLeadsList(email, firstName, cartRecoveryUrl).catch((err) =>
         console.error("[register] Klaviyo leads failed", { error: String(err), email })
       );
     }

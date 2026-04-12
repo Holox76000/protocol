@@ -290,6 +290,54 @@ export async function consumeMagicLinkToken(token: string): Promise<{ userId: st
 }
 
 // ──────────────────────────────────────────────
+// Cart recovery tokens (multi-use, 7-day TTL)
+// ──────────────────────────────────────────────
+const CART_RECOVERY_TOKEN_DURATION_DAYS = 7;
+
+export async function createCartRecoveryToken(userId: string): Promise<string> {
+  const token = generateRandomToken();
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(
+    Date.now() + CART_RECOVERY_TOKEN_DURATION_DAYS * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  // Replace any existing token for this user
+  await supabaseAdmin
+    .from("cart_recovery_tokens")
+    .delete()
+    .eq("user_id", userId);
+
+  const { error } = await supabaseAdmin.from("cart_recovery_tokens").insert({
+    user_id: userId,
+    token_hash: tokenHash,
+    expires_at: expiresAt,
+  });
+
+  if (error) throw new Error(`Cart recovery token creation failed: ${error.message}`);
+
+  return token;
+}
+
+export async function verifyCartRecoveryToken(token: string): Promise<{ userId: string } | null> {
+  const tokenHash = hashToken(token);
+
+  const { data, error } = await supabaseAdmin
+    .from("cart_recovery_tokens")
+    .select("user_id")
+    .eq("token_hash", tokenHash)
+    .gt("expires_at", new Date().toISOString())
+    .single();
+
+  if (error || !data) return null;
+
+  return { userId: data.user_id as string };
+}
+
+export async function deleteCartRecoveryTokens(userId: string): Promise<void> {
+  await supabaseAdmin.from("cart_recovery_tokens").delete().eq("user_id", userId);
+}
+
+// ──────────────────────────────────────────────
 // Cookie config (used by API routes via NextResponse)
 // ──────────────────────────────────────────────
 export const SESSION_COOKIE_OPTIONS = {
