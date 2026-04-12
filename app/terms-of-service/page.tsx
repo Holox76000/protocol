@@ -144,8 +144,8 @@ export default function TermsOfServicePage() {
               <p className="font-semibold text-void">PAP CONSULTING FZ LLE</p>
               <p>Twin Towers, Fujairah, UAE</p>
               <p className="mt-1">
-                <a href="mailto:support@protocolclub.co" className="text-void underline underline-offset-2">
-                  support@protocolclub.co
+                <a href="mailto:contact@protocol-club.com" className="text-void underline underline-offset-2">
+                  contact@protocol-club.com
                 </a>
               </p>
             </div>

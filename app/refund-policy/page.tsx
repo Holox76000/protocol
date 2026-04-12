@@ -33,8 +33,8 @@ export default function RefundPolicyPage() {
             </h2>
             <p>
               To request a refund within the 90-day window, contact us at{" "}
-              <a href="mailto:support@protocolclub.co" className="text-void underline underline-offset-2">
-                support@protocolclub.co
+              <a href="mailto:contact@protocol-club.com" className="text-void underline underline-offset-2">
+                contact@protocol-club.com
               </a>{" "}
               with the subject line "Refund Request" and include the email address associated with your account. We will process your refund within 5–10 business days.
             </p>
@@ -69,8 +69,8 @@ export default function RefundPolicyPage() {
               <p className="font-semibold text-void">PAP CONSULTING FZ LLE</p>
               <p>Twin Towers, Fujairah, UAE</p>
               <p className="mt-1">
-                <a href="mailto:support@protocolclub.co" className="text-void underline underline-offset-2">
-                  support@protocolclub.co
+                <a href="mailto:contact@protocol-club.com" className="text-void underline underline-offset-2">
+                  contact@protocol-club.com
                 </a>
               </p>
             </div>

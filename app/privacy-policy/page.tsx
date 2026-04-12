@@ -112,8 +112,8 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p className="mt-3">
               To exercise any of these rights, contact us at{" "}
-              <a href="mailto:support@protocolclub.co" className="text-void underline underline-offset-2">
-                support@protocolclub.co
+              <a href="mailto:contact@protocol-club.com" className="text-void underline underline-offset-2">
+                contact@protocol-club.com
               </a>
               .
             </p>
@@ -148,8 +148,8 @@ export default function PrivacyPolicyPage() {
               <p className="font-semibold text-void">PAP CONSULTING FZ LLE</p>
               <p>Twin Towers, Fujairah, UAE</p>
               <p className="mt-1">
-                <a href="mailto:support@protocolclub.co" className="text-void underline underline-offset-2">
-                  support@protocolclub.co
+                <a href="mailto:contact@protocol-club.com" className="text-void underline underline-offset-2">
+                  contact@protocol-club.com
                 </a>
               </p>
             </div>

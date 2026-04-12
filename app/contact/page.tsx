@@ -23,10 +23,10 @@ export default function ContactPage() {
           <div className="rounded-2xl border border-wire bg-pebble px-6 py-6">
             <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">Email</p>
             <a
-              href="mailto:support@protocolclub.co"
+              href="mailto:contact@protocol-club.com"
               className="text-[18px] font-medium text-void underline-offset-3 hover:underline"
             >
-              support@protocolclub.co
+              contact@protocol-club.com
             </a>
             <p className="mt-2 text-[13px] text-dim">
               For account access, billing questions, refunds, and general support.
