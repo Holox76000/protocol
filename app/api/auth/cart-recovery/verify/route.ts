@@ -12,15 +12,17 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token") ?? "";
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? new URL(request.url).origin;
+
   if (!token) {
-    return NextResponse.redirect(new URL("/register", request.url));
+    return NextResponse.redirect(new URL("/register", baseUrl));
   }
 
   const result = await verifyCartRecoveryToken(token);
 
   if (!result) {
     // Link expired — send to register to start over
-    return NextResponse.redirect(new URL("/register?error=link_expired", request.url));
+    return NextResponse.redirect(new URL("/register?error=link_expired", baseUrl));
   }
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
@@ -31,10 +33,10 @@ export async function GET(request: Request) {
     sessionToken = await createSession(result.userId, ip, userAgent);
   } catch (err) {
     console.error("[cart-recovery/verify] session creation failed", { error: String(err), userId: result.userId });
-    return NextResponse.redirect(new URL("/register", request.url));
+    return NextResponse.redirect(new URL("/register", baseUrl));
   }
 
-  const response = NextResponse.redirect(new URL("/checkout", request.url));
+  const response = NextResponse.redirect(new URL("/checkout", baseUrl));
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
 
   return response;
