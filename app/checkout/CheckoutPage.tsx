@@ -190,7 +190,7 @@ function CheckoutForm() {
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
             Processing…
           </span>
-        ) : "Start the protocol"}
+        ) : "Pay $49 · Start the Protocol"}
       </button>
     </form>
   );
@@ -298,10 +298,14 @@ export function CheckoutPage({ email }: { email: string }) {
 
           {/* Trust signals */}
           <div className="mt-7 flex flex-col items-center gap-2.5 lg:px-[3vw]">
-            <p className="text-[11px] text-mute">
-              By paying you agree to our{" "}
+            <p className="text-center text-[11px] text-mute">
+              By completing this purchase you authorize a one-time charge of $49 USD. No recurring charges.{" "}
               <Link href="/terms" className="underline underline-offset-2 transition-colors hover:text-dim">
-                Terms &amp; services
+                Terms
+              </Link>
+              {" · "}
+              <Link href="/refund-policy" className="underline underline-offset-2 transition-colors hover:text-dim">
+                Refund Policy
               </Link>
             </p>
             <div className="flex items-center gap-1.5">
@@ -310,6 +314,13 @@ export function CheckoutPage({ email }: { email: string }) {
                 <path d="M4 7l1.5 1.5L8 5" stroke="#22c55e" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span className="text-[11px] text-mute">Encrypted and secure</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
+                <path d="M6 1L1 3.5v4c0 2.8 2.1 5.3 5 6 2.9-.7 5-3.2 5-6v-4L6 1z" fill="#22c55e" fillOpacity="0.15" stroke="#22c55e" strokeWidth="1.2" strokeLinejoin="round" />
+                <path d="M3.5 7.5l1.5 1.5L9 5.5" stroke="#22c55e" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-[11px] text-mute">90-day money-back guarantee</span>
             </div>
             <div className="flex items-center gap-0.5">
               {[0, 1, 2, 3, 4].map((i) => (

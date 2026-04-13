@@ -148,6 +148,9 @@ function BodyTypeSelector({ offerHref }: { offerHref: string }) {
           }}>
             We&apos;ll show you what your body could look like after 90 days.
           </p>
+          <p style={{ fontSize: 11, color: "#9ca3af", margin: "2px 0 0", textAlign: "center", fontStyle: "italic" }}>
+            Sample projections shown. Individual results depend on effort, genetics, consistency, and adherence to the protocol.
+          </p>
           <div className="f1-body-selector" style={{
             gap: 8,
             padding: "10px",
@@ -819,6 +822,9 @@ export default function F1Landing() {
               </div>
             ))}
           </div>
+          <p style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", marginTop: 16, fontStyle: "italic" }}>
+            Results are not typical. Individual results vary. Testimonials reflect personal experiences and do not guarantee similar outcomes.
+          </p>
         </div>
       </section>
 
