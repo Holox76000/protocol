@@ -7,7 +7,6 @@ import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
 import TrackedLink from "../../tracked-link";
-import ExpertAdviceSection from "../../program/ExpertAdviceSection";
 import "../../program/program.css";
 import "../f1.css";
 import "./f1-offer.css";
@@ -106,6 +105,95 @@ function CtaButton({ label, className, location, href }: { label: string; classN
 }
 
 /* ─── Data ───────────────────────────────────────────────────────────────── */
+
+/* ─── What's Inside data ─────────────────────────────────────────────────── */
+
+const INSIDE_STEPS = [
+  {
+    num: "01",
+    step: "STEP ONE",
+    title: "Upload 3 photos",
+    desc: "Front, side, and back. 60 seconds. Photos stay private.",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="2" y="5" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="11" cy="11.5" r="3" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M8 5L9.5 3H12.5L14 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: "02",
+    step: "STEP TWO",
+    title: "We analyse",
+    desc: "15+ body proportions, goals & lifestyle, reviewed by your coach.",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="11" cy="11" r="3" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M11 3V5M11 17V19M3 11H5M17 11H19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    num: "03",
+    step: "STEP THREE",
+    title: "Get your protocol",
+    desc: "A personalised 12-week plan in your inbox within 24 hours.",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="4" y="2" width="14" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M7 7H15M7 11H15M7 15H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+];
+
+const INSIDE_LEFT = [
+  {
+    label: "BODY SCORE",
+    title: "15+ proportions analysed",
+    desc: "Zone-by-zone breakdown with your strengths and top levers.",
+  },
+  {
+    label: "TRAINING PROTOCOL",
+    title: "Built for your ratios",
+    desc: "Sessions designed to move your weakest variables. Nothing generic.",
+  },
+  {
+    label: "COACH'S LETTER",
+    title: "Your personalised note",
+    desc: "Protocol, progress observations & recommendations with scientific context.",
+  },
+  {
+    label: "LIFESTYLE PROTOCOL",
+    title: "Nutrition & recovery",
+    desc: "Targeted at improving your proportions and physical appearance.",
+  },
+];
+
+const INSIDE_RIGHT = [
+  {
+    label: "ACTION PLAN",
+    title: "Ranked by ROI",
+    desc: "Steps prioritised by impact — not complexity. Start with what matters most.",
+  },
+  {
+    label: "ASSESSMENT INTAKE",
+    title: "Adapted to your goals",
+    desc: "Long-form intake covering your body, lifestyle, and objectives.",
+  },
+  {
+    label: "BEFORE/AFTER SIMULATION",
+    title: "See your potential result",
+    desc: "Visual projection of your progress at 6 weeks and 12 weeks.",
+  },
+  {
+    label: "WHATSAPP COACHING",
+    title: "Ask us anything",
+    desc: "Direct access to your coach for 12 weeks. Responses within 24 hours.",
+  },
+];
 
 const DELIVERABLES = [
   {
@@ -222,9 +310,12 @@ const TESTIMONIALS = [
 /* ─── Component ──────────────────────────────────────────────────────────── */
 
 const REPORT_SLIDES = [
-  { src: "/assets/report1.png", alt: "Protocol analysis report — page 1" },
-  { src: "/assets/report2.png", alt: "Protocol analysis report — page 2" },
-  { src: "/assets/report3.png", alt: "Protocol analysis report — page 3" },
+  { src: "/assets/analysis-screen1.jpeg", alt: "Protocol analysis report — screen 1" },
+  { src: "/assets/analysis-screen2.jpeg", alt: "Protocol analysis report — screen 2" },
+  { src: "/assets/analysis-screen3.jpeg", alt: "Protocol analysis report — screen 3" },
+  { src: "/assets/analysis-screen4.jpeg", alt: "Protocol analysis report — screen 4" },
+  { src: "/assets/analysis-screen5.jpeg", alt: "Protocol analysis report — screen 5" },
+  { src: "/assets/analysis-screen6.jpeg", alt: "Protocol analysis report — screen 6" },
 ];
 
 function ReportSlider() {
@@ -347,6 +438,77 @@ export default function F1OfferPage() {
         </div>
       </section>
 
+      {/* ═══ WHAT'S INSIDE ═══ */}
+      <section className="f1-offer-inside f1-section">
+        <div className="f1-offer-inside__inner">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">What&rsquo;s inside</p>
+            <h2 className="f1-section__title f1-section__title--sm">
+              Here&rsquo;s what you receive.
+            </h2>
+            <p className="f1-offer-inside__sub">A complete breakdown of your physique — and the exact steps to change it.</p>
+          </div>
+
+          {/* 3 step cards */}
+          <div className="f1-offer-inside__steps">
+            {INSIDE_STEPS.map((s) => (
+              <div key={s.num} className="f1-offer-inside-step">
+                <div className="f1-offer-inside-step__top">
+                  <div className="f1-offer-inside-step__icon">{s.icon}</div>
+                  <span className="f1-offer-inside-step__num">{s.num}</span>
+                </div>
+                <p className="f1-offer-inside-step__label">{s.step}</p>
+                <h3 className="f1-offer-inside-step__title">{s.title}</h3>
+                <p className="f1-offer-inside-step__desc">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Bento grid */}
+          <div className="f1-offer-inside__bento">
+            {/* Left column */}
+            <div className="f1-offer-inside__col">
+              {INSIDE_LEFT.map((item) => (
+                <div key={item.label} className="f1-offer-inside-card">
+                  <p className="f1-offer-inside-card__label">{item.label}</p>
+                  <h4 className="f1-offer-inside-card__title">{item.title}</h4>
+                  <p className="f1-offer-inside-card__desc">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Center — photo + score badge */}
+            <div className="f1-offer-inside__center">
+              <div className="f1-offer-inside__photo-wrap">
+                <Image
+                  src="/assets/8-after.png"
+                  alt="Protocol result — physique transformation"
+                  fill
+                  sizes="(max-width: 900px) 80vw, 320px"
+                  style={{ objectFit: "cover", objectPosition: "top" }}
+                />
+                <div className="f1-offer-inside__score-badge">
+                  <span className="f1-offer-inside__score-value">61 <span className="f1-offer-inside__score-arrow">→</span> 84</span>
+                  <span className="f1-offer-inside__score-delta">+23 pts</span>
+                  <span className="f1-offer-inside__score-label">ATTRACTIVENESS SCORE</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div className="f1-offer-inside__col">
+              {INSIDE_RIGHT.map((item) => (
+                <div key={item.label} className="f1-offer-inside-card">
+                  <p className="f1-offer-inside-card__label">{item.label}</p>
+                  <h4 className="f1-offer-inside-card__title">{item.title}</h4>
+                  <p className="f1-offer-inside-card__desc">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ WHAT YOU GET ═══ */}
       <section id="what-you-get" className="f1-offer-deliverables f1-section">
         <div className="f1-offer-deliverables__inner">
@@ -386,7 +548,7 @@ export default function F1OfferPage() {
           </div>
 
           <div className="f1-offer-proof__stat">
-            <span className="f1-offer-proof__stat-num">25,000+</span>
+            <span className="f1-offer-proof__stat-num">2,500+</span>
             <span className="f1-offer-proof__stat-label">men analyzed</span>
           </div>
 
@@ -426,8 +588,44 @@ export default function F1OfferPage() {
         </div>
       </section>
 
-      {/* ═══ EXPERT ADVICE ═══ */}
-      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
+      {/* ═══ METHODOLOGY ═══ */}
+      <section className="f1-offer-method f1-section">
+        <div className="f1-offer-method__inner">
+          <div className="f1-offer-method__images">
+            <div className="f1-offer-method__img-wrap">
+              <Image src="/assets/14-before.png" alt="Before the protocol" fill sizes="(max-width: 900px) 40vw, 260px" style={{ objectFit: "cover", objectPosition: "top" }} />
+              <span className="f1-offer-method__img-label">Before</span>
+            </div>
+            <div className="f1-offer-method__img-wrap">
+              <Image src="/assets/14-after.png" alt="After the protocol" fill sizes="(max-width: 900px) 40vw, 260px" style={{ objectFit: "cover", objectPosition: "top" }} />
+              <span className="f1-offer-method__img-label f1-offer-method__img-label--after">After</span>
+            </div>
+          </div>
+          <div className="f1-offer-method__copy">
+            <p className="f1-section__eyebrow">The methodology</p>
+            <h2 className="f1-section__title f1-section__title--sm">
+              Every result starts with<br />
+              <span>the right measurement.</span>
+            </h2>
+            <ul className="f1-offer-method__list">
+              {[
+                { title: "15+ structural variables", desc: "Measured from your photos — shoulder width, waist circumference, torso index, and more. Not guessed." },
+                { title: "Benchmarked against research", desc: "Each variable compared against published data in aesthetic medicine and evolutionary psychology." },
+                { title: "Protocol built around your gap", desc: "The 12-week plan targets only what's holding your score back. No filler, no generic programming." },
+                { title: "Tracked weekly by your coach", desc: "Your ratios measured every week on WhatsApp. If something's not moving, the protocol adjusts." },
+              ].map((item) => (
+                <li key={item.title} className="f1-offer-method__item">
+                  <span className="f1-offer-method__check"><CheckIcon /></span>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
 
       {/* ═══ REPORT PREVIEW ═══ */}
       <section className="f1-offer-report f1-section">
@@ -500,6 +698,136 @@ export default function F1OfferPage() {
           </div>
           <div className="f1-offer-section-cta">
             <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="steps" href={signupHref} />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ NOT A PDF ═══ */}
+      <section className="f1-offer-notpdf f1-section">
+        <div className="f1-offer-notpdf__inner">
+
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">What you actually receive</p>
+            <h2 className="f1-offer-notpdf__title">
+              Not a PDF. <em>A complete protocol.</em>
+            </h2>
+            <p className="f1-offer-notpdf__sub">
+              Your personal body dashboard — proportions, scores, action plan, 12-week training. Built for your ratios, delivered in 24h.
+            </p>
+          </div>
+
+          <div className="f1-offer-notpdf__mockup">
+
+            {/* Transformation pill */}
+            <div className="f1-offer-notpdf__pill">
+              <span className="f1-offer-notpdf__pill-before">&ldquo;Weak frame, forgettable&rdquo;</span>
+              <span className="f1-offer-notpdf__pill-arrow">→</span>
+              <span className="f1-offer-notpdf__pill-after">&ldquo;Sharp, athletic presence&rdquo;</span>
+            </div>
+
+            {/* App shell */}
+            <div className="f1-offer-notpdf__app">
+
+              {/* App header */}
+              <div className="f1-offer-notpdf__app-hd">
+                <div className="f1-offer-notpdf__app-brand">P</div>
+                <div className="f1-offer-notpdf__app-hd-center">
+                  <span className="f1-offer-notpdf__app-name">Tyler&rsquo;s <em>Protocol</em></span>
+                  <span className="f1-offer-notpdf__app-tagline">Here&rsquo;s the best version of your physique.</span>
+                </div>
+                <div className="f1-offer-notpdf__app-profile">
+                  <span>32 yo · 80 kg · 5&apos;11</span>
+                  <span>Goal: Athletic V-taper</span>
+                </div>
+              </div>
+
+              {/* App body: sidebar | center | scores */}
+              <div className="f1-offer-notpdf__app-body">
+
+                {/* Sidebar nav */}
+                <nav className="f1-offer-notpdf__sidebar">
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M3.5 4.5H9.5M3.5 6.5H9.5M3.5 8.5H7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                    Summary Report
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item f1-offer-notpdf__sidebar-item--active">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1 6.5H12M1 6.5L5 2.5M1 6.5L5 10.5M12 6.5L8 2.5M12 6.5L8 10.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Before / After
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M3.5 4.5H9.5M3.5 6.5H9.5M3.5 8.5H6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                    Body Analysis
+                    <span className="f1-offer-notpdf__sidebar-badge">15+</span>
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.5L5 9.5L11 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Action Plan
+                  </div>
+                  <p className="f1-offer-notpdf__sidebar-section">LIFESTYLE</p>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 1.5L8 5H11.5L8.75 7.25L9.75 11L6.5 9L3.25 11L4.25 7.25L1.5 5H5L6.5 1.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
+                    Daily Protocol
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 7C2 4.8 3.5 3 5.5 2.5C6 4 7 5 8.5 5.5C8.5 7.5 7.2 9.5 5.5 10.5C3.5 9.8 2 8.5 2 7Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/><path d="M8.5 2C9.5 2.5 11 4 11 6C10 6.5 9 6.5 8.5 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>
+                    Nutrition Plan
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 9L4 5L6.5 8L8.5 4L11 9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Workout Plan
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 8C2 5.8 3.8 4 6 4H7C9.2 4 11 5.8 11 8V9H2V8Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/><path d="M4 4V3.5C4 2.7 4.7 2 5.5 2H7.5C8.3 2 9 2.7 9 3.5V4" stroke="currentColor" strokeWidth="1.2"/><path d="M1 9H12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    Sleeping Advices
+                  </div>
+                  <div className="f1-offer-notpdf__sidebar-item">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 1.5V4M6.5 9V11.5M4 3L5.5 4.5M7.5 8.5L9 10M3 5H1.5M11.5 5H10M4 7L2.5 8.5M10.5 3L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/><circle cx="6.5" cy="6.5" r="2" stroke="currentColor" strokeWidth="1.2"/></svg>
+                    Posture Analysis
+                  </div>
+                </nav>
+
+                {/* Before / After center */}
+                <div className="f1-offer-notpdf__center">
+                  <div className="f1-offer-notpdf__ba">
+                    <div className="f1-offer-notpdf__ba-img">
+                      <Image src="/assets/1-before.png" alt="Before" fill sizes="200px" style={{ objectFit: "cover", objectPosition: "top" }} />
+                      <span className="f1-offer-notpdf__ba-label">BEFORE</span>
+                    </div>
+                    <div className="f1-offer-notpdf__ba-img">
+                      <Image src="/assets/1-after.png" alt="After" fill sizes="200px" style={{ objectFit: "cover", objectPosition: "top" }} />
+                      <span className="f1-offer-notpdf__ba-label f1-offer-notpdf__ba-label--after">AFTER</span>
+                    </div>
+                  </div>
+                  <div className="f1-offer-notpdf__center-footer">
+                    <p className="f1-offer-notpdf__center-eyebrow">SHOULDER-WAIST RATIO</p>
+                    <p className="f1-offer-notpdf__center-title">Your Ratios, Decoded.</p>
+                  </div>
+                </div>
+
+                {/* Score cards */}
+                <div className="f1-offer-notpdf__scores">
+                  <div className="f1-offer-notpdf__score-card">
+                    <p className="f1-offer-notpdf__score-eyebrow">ATTRACTIVENESS SCORE</p>
+                    <p className="f1-offer-notpdf__score-val">61</p>
+                    <div className="f1-offer-notpdf__score-bar">
+                      <div className="f1-offer-notpdf__score-bar-fill" style={{ width: "61%" }} />
+                    </div>
+                    <p className="f1-offer-notpdf__score-hint">Under-optimised potential</p>
+                  </div>
+                  <div className="f1-offer-notpdf__score-card f1-offer-notpdf__score-card--dark">
+                    <p className="f1-offer-notpdf__score-eyebrow">REALISTIC POTENTIAL</p>
+                    <p className="f1-offer-notpdf__score-val">84 – 89</p>
+                    <p className="f1-offer-notpdf__score-hint">High with correct execution</p>
+                  </div>
+                  <div className="f1-offer-notpdf__score-card">
+                    <p className="f1-offer-notpdf__score-eyebrow">ARCHETYPE SHIFT</p>
+                    <p className="f1-offer-notpdf__archetype-from">Average build</p>
+                    <p className="f1-offer-notpdf__archetype-to">→ Athletic V-taper</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
       </section>
