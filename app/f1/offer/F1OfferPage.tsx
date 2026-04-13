@@ -716,14 +716,21 @@ export default function F1OfferPage() {
             </p>
           </div>
 
-          <div className="f1-offer-notpdf__mockup">
-
-            {/* Transformation pill */}
-            <div className="f1-offer-notpdf__pill">
-              <span className="f1-offer-notpdf__pill-before">&ldquo;Weak frame, forgettable&rdquo;</span>
-              <span className="f1-offer-notpdf__pill-arrow">→</span>
-              <span className="f1-offer-notpdf__pill-after">&ldquo;Sharp, athletic presence&rdquo;</span>
+          {/* Mobile image replacement */}
+          <div className="f1-offer-notpdf__mobile-img">
+            <div className="f1-offer-notpdf__mobile-scroll">
+              <Image
+                src="/assets/not-a-pdf.png"
+                alt="Protocol dashboard"
+                width={800}
+                height={600}
+                style={{ height: "auto", display: "block", borderRadius: "12px" }}
+              />
             </div>
+            <p className="f1-offer-notpdf__mobile-hint">← Scroll to explore →</p>
+          </div>
+
+          <div className="f1-offer-notpdf__mockup">
 
             {/* App shell */}
             <div className="f1-offer-notpdf__app">
