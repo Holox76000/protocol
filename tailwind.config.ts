@@ -33,6 +33,15 @@ const config: Config = {
         soft: "0 20px 60px rgba(0, 0, 0, 0.16)",
         hard: "0 10px 30px rgba(0, 0, 0, 0.35)",
         card: "0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)",
+      },
+      keyframes: {
+        flash: {
+          "0%": { opacity: "0.8" },
+          "100%": { opacity: "0" },
+        },
+      },
+      animation: {
+        flash: "flash 0.3s ease-out forwards",
       }
     }
   },

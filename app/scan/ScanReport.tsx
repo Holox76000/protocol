@@ -127,10 +127,10 @@ function RadarChart({ projected, client }: { projected: number[]; client: number
 
 function FacialProtocolSection({
   subjectName,
-  aestheticScore = 64,
+  aestheticScore = 63,
   beforeImage,
   afterImage,
-  metrics,
+  metrics: _metrics,
 }: {
   subjectName: string;
   aestheticScore?: number;
@@ -138,89 +138,260 @@ function FacialProtocolSection({
   afterImage: { src: string; alt: string };
   metrics?: Metrics;
 }) {
-  const radar = metrics ? metricsToRadar(metrics) : { projected: RADAR_METRIC_KEYS.map(() => 0.7), client: RADAR_METRIC_KEYS.map(() => 0.4) };
-  const { projected, client } = radar;
+  const [splitPos, setSplitPos] = useState(50);
+  const dragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const featureListLeft  = ["Shoulder-to-Waist Ratio", "Chest-to-Waist Ratio", "Body Fat Estimate"];
-  const featureListRight = ["Posture Alignment Score", "Taper Index", "Proportion Coherence"];
+  const scoreDisplay = aestheticScore;
+
+  function updateSplit(clientX: number) {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setSplitPos(Math.min(92, Math.max(8, pct)));
+  }
+
+  function onMouseDown(e: React.MouseEvent) {
+    dragging.current = true;
+    e.preventDefault();
+  }
+
+  function onMouseMove(e: React.MouseEvent) {
+    if (!dragging.current) return;
+    updateSplit(e.clientX);
+  }
+
+  function onMouseUp() { dragging.current = false; }
+
+  function onTouchMove(e: React.TouchEvent) {
+    if (e.touches[0]) updateSplit(e.touches[0].clientX);
+  }
+
+  // Suppress unused variable warning
+  void subjectName;
 
   return (
     <section className="scan-facial">
+
+
+      {/* ── Header ── */}
       <div className="scan-facial__header">
-        <h2 className="scan-facial__title">
-          <span className="scan-facial__title-name">{subjectName}&rsquo;s</span>
-          {" "}
-          <span className="scan-facial__title-word">Protocol</span>
-        </h2>
-      </div>
-
-      <hr className="scan-facial__divider" />
-
-      <div className="scan-facial__score-row">
-        <div className="scan-facial__score-left">
-          <p className="scan-facial__score-label">Aesthetic Score</p>
-          <div className="scan-facial__score-bar">
-            <div className="scan-facial__score-bar-fill" style={{ width: `${aestheticScore}%` }} />
-            {[25, 50, 75, 100].filter((p) => p > aestheticScore).map((pos) => (
-              <div key={pos} className="scan-facial__score-bar-dot" style={{ left: `${pos}%` }} />
-            ))}
-          </div>
+        <div>
+          <h2 className="scan-facial__title">
+            Connor&rsquo;s <em>Protocol</em>
+          </h2>
+          <p className="scan-facial__subtitle">Here&rsquo;s what the best-looking version of yourself could look like.</p>
         </div>
-        <div className="scan-facial__score-number">{aestheticScore}</div>
-      </div>
-
-      <hr className="scan-facial__divider" />
-
-      <div className="scan-facial__photos">
-        <div className="scan-facial__photo-item">
-          <div className="scan-facial__photo-frame">
-            <span className="scan-facial__photo-badge">BEFORE</span>
-            <img src={beforeImage.src} alt={beforeImage.alt} className="scan-facial__photo-img" />
-          </div>
-          <p className="scan-facial__photo-caption">
-            To help you achieve your aesthetic potential, we have developed this detailed and comprehensive science-based protocol. By following this evidence-based protocol, you can reach your full aesthetic potential.
-          </p>
-        </div>
-        <div className="scan-facial__photo-item">
-          <div className="scan-facial__photo-frame">
-            <span className="scan-facial__photo-badge">AFTER</span>
-            <img src={afterImage.src} alt={afterImage.alt} className="scan-facial__photo-img" />
-          </div>
-          <p className="scan-facial__photo-caption">
-            This is your Aesthetic Score. It reflects how closely your current features align with your personal aesthetic potential, based on non-surgical factors. It is a measure of potential, <u>not</u> a judgment of attractiveness.
-          </p>
+        <div className="scan-facial__meta">
+          <p>30 yo &middot; Caucasian &middot; 5&rsquo;9 / 78kg</p>
+          <p><strong>Goal:</strong> Modern, trendy glow-up</p>
         </div>
       </div>
 
-      <div className="scan-facial__potential">
-        <div className="scan-facial__potential-left">
-          <h3 className="scan-facial__potential-title">Projected potential</h3>
-          <p className="scan-facial__potential-desc">
-            This report is organised around <strong>6 key metrics</strong> from your body analysis:
-          </p>
-          <div className="scan-facial__feature-cols">
-            <ul className="scan-facial__feature-list">
-              {featureListLeft.map((f) => <li key={f} className="scan-facial__feature-item">{f}</li>)}
+      {/* ── Main card ── */}
+      <div className="scan-facial__card">
+        <div className="scan-facial__main-grid">
+
+          {/* Nav sidebar */}
+          <nav className="scan-facial__nav-col">
+            <ul className="scan-facial__nav-list">
+              <li className="scan-facial__nav-item scan-facial__nav-item--active">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 3h9M2 6.5h9M2 10h9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Summary Report
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Before / After
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 1.5l1.3 3H11L8.5 6.8l1 3-3-2-3 2 1-3L2 4.5h3.2z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/></svg>
+                Body Analysis
+                <span className="scan-facial__nav-badge">15+</span>
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.5l3 3 6-6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Action Plan
+              </li>
             </ul>
-            <ul className="scan-facial__feature-list">
-              {featureListRight.map((f) => <li key={f} className="scan-facial__feature-item">{f}</li>)}
+            <p className="scan-facial__nav-section">LIFESTYLE</p>
+            <ul className="scan-facial__nav-list">
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 2v9M2 6.5h9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Daily Protocol
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.5h9M2 3.5h6M2 9.5h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Nutrition Plan
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M4 2c0 2.5 5 2.5 5 5s-5 2.5-5 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Workout Plan
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 9.5C2 7 6.5 5 6.5 2.5M6.5 2.5C6.5 5 11 7 11 9.5M3.5 11h6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Sleeping Advices
+              </li>
+              <li className="scan-facial__nav-item">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 2v9M4 4.5l2.5-2.5 2.5 2.5M4 8.5l2.5 2.5 2.5-2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Posture Analysis
+              </li>
             </ul>
+          </nav>
+
+          {/* Center: split image + scoring label */}
+          <div className="scan-facial__image-col">
+            <div
+              ref={containerRef}
+              className="scan-facial__split"
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseUp}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onMouseUp}
+            >
+              <img src={afterImage.src} alt={afterImage.alt} className="scan-facial__split-img" />
+              <img
+                src={beforeImage.src}
+                alt={beforeImage.alt}
+                className="scan-facial__split-img"
+                style={{ clipPath: `inset(0 ${100 - splitPos}% 0 0)` }}
+              />
+              <div className="scan-facial__split-line" style={{ left: `${splitPos}%` }}>
+                <div
+                  className="scan-facial__split-handle"
+                  onMouseDown={onMouseDown}
+                  onTouchStart={(e) => { e.preventDefault(); dragging.current = true; }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M5 8H1M1 8L3 6M1 8L3 10M11 8H15M15 8L13 6M15 8L13 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <span className="scan-facial__split-badge scan-facial__split-badge--before">BEFORE</span>
+              <span className="scan-facial__split-badge scan-facial__split-badge--after">AFTER</span>
+            </div>
+
+            <div className="scan-facial__scoring-label">
+              <p className="scan-facial__scoring-eyebrow">BODY SCORING</p>
+              <h3 className="scan-facial__scoring-title">Your Attractiveness, Decoded</h3>
+            </div>
           </div>
-        </div>
-        <div className="scan-facial__radar-wrap">
-          <RadarChart projected={projected} client={client} />
-          <div className="scan-facial__radar-legend">
-            <div className="scan-facial__legend-item">
-              <div className="scan-facial__legend-swatch scan-facial__legend-swatch--projected" />
-              <span>Projected Potential</span>
+
+          {/* Right: stats panel */}
+          <div className="scan-facial__stats-col">
+
+            {/* ── Aesthetic Score ── */}
+            <div className="scan-stat-panel scan-stat-panel--score">
+              <p className="scan-stat-panel__eyebrow">AESTHETIC SCORE</p>
+              <div className="scan-stat-gauge">
+                <svg viewBox="0 0 140 80" className="scan-stat-gauge__svg" aria-hidden="true">
+                  <path d="M14,72 A58,58 0 0,1 126,72" fill="none" stroke="var(--scan-border)" strokeWidth="8" strokeLinecap="round"/>
+                  <path
+                    d="M14,72 A58,58 0 0,1 126,72"
+                    fill="none"
+                    stroke="var(--facial-gold)"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray="182"
+                    strokeDashoffset={182 * (1 - (aestheticScore ?? 63) / 100)}
+                    style={{ transition: "stroke-dashoffset 0.8s ease" }}
+                  />
+                </svg>
+                <div className="scan-stat-gauge__value">
+                  <span className="scan-stat-gauge__number">{scoreDisplay}</span>
+                  <span className="scan-stat-gauge__denom">/100</span>
+                </div>
+              </div>
+              <span className="scan-stat-panel__status scan-stat-panel__status--warn">Under-optimized potential</span>
             </div>
-            <div className="scan-facial__legend-item">
-              <div className="scan-facial__legend-swatch scan-facial__legend-swatch--client" />
-              <span>Client Values</span>
+
+            {/* ── Realistic Potential ── */}
+            <div className="scan-stat-panel scan-stat-panel--potential">
+              <p className="scan-stat-panel__eyebrow">REALISTIC POTENTIAL</p>
+              <div className="scan-stat-panel__delta">
+                <span className="scan-stat-panel__delta-value">80–83</span>
+              </div>
+              <div className="scan-stat-range">
+                <div className="scan-stat-range__track">
+                  <div className="scan-stat-range__current" style={{ width: `${scoreDisplay}%` }} />
+                  <div className="scan-stat-range__target" style={{ left: "80%", width: "3%" }} />
+                  <div className="scan-stat-range__dot scan-stat-range__dot--current" style={{ left: `${scoreDisplay}%` }} />
+                  <div className="scan-stat-range__dot scan-stat-range__dot--target" style={{ left: "83%" }} />
+                </div>
+                <div className="scan-stat-range__labels">
+                  <span>{scoreDisplay} now</span>
+                  <span>target</span>
+                </div>
+              </div>
+              <p className="scan-stat-panel__desc">High with correct execution</p>
             </div>
+
+            {/* ── Archetype Shift ── */}
+            <div className="scan-stat-panel scan-stat-panel--archetype">
+              <p className="scan-stat-panel__eyebrow">ARCHETYPE SHIFT</p>
+              <div className="scan-stat-archetype">
+                <div className="scan-stat-archetype__from">
+                  <span className="scan-stat-archetype__tag scan-stat-archetype__tag--from">Current</span>
+                  <p className="scan-stat-archetype__label">Soft Approachable Modern</p>
+                </div>
+                <div className="scan-stat-archetype__arrow" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 3v14M10 17l-4-4M10 17l4-4" stroke="var(--facial-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="scan-stat-archetype__to">
+                  <span className="scan-stat-archetype__tag scan-stat-archetype__tag--to">Target</span>
+                  <p className="scan-stat-archetype__label scan-stat-archetype__label--to">Sharp Modern Masculinity</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
+      {/* ── Floating decorative cards ── */}
+
+      <div className="scan-facial__float scan-facial__float--grooming">
+        <div className="scan-facial__float-header">
+          <span className="scan-facial__float-name">Shoulder-to-Waist</span>
+          <span className="scan-facial__float-critical">CRITICAL</span>
+        </div>
+        <p className="scan-facial__float-score">59<sup>/100</sup></p>
+        <p className="scan-facial__float-desc">Currently limiting V-taper perception</p>
+        <div className="scan-facial__float-bar">
+          <div className="scan-facial__float-bar-fill" style={{ width: "59%" }} />
+        </div>
+      </div>
+
+      <div className="scan-facial__float scan-facial__float--tissue">
+        <div className="scan-facial__float-header">
+          <span className="scan-facial__float-name">Body Fat %</span>
+          <span className="scan-facial__float-critical">CRITICAL</span>
+        </div>
+        <p className="scan-facial__float-score">58<sup>/100</sup></p>
+        <div className="scan-facial__float-bar" style={{ marginBottom: "12px" }}>
+          <div className="scan-facial__float-bar-fill" style={{ width: "58%" }} />
+        </div>
+        <span className="scan-facial__float-priority">PRIORITY 1 &nbsp;&middot;&nbsp; HIGHEST LEVERAGE POINT</span>
+        <p className="scan-facial__float-insight-title">You&rsquo;re at ~22% body fat</p>
+        <p className="scan-facial__float-insight-body">
+          Excess fat is masking your structure. Dropping to 13–15% will <strong>reveal the frame underneath.</strong>
+        </p>
+      </div>
+
+      <div className="scan-facial__float scan-facial__float--lower">
+        <div className="scan-facial__float-header">
+          <span className="scan-facial__float-name">Lat Development</span>
+          <span className="scan-facial__float-critical">CRITICAL</span>
+        </div>
+        <p className="scan-facial__float-desc">Lat width is your #1 leverage point</p>
+        <p className="scan-facial__float-score">52<sup>/100</sup></p>
+        <div className="scan-facial__float-bar">
+          <div className="scan-facial__float-bar-fill" style={{ width: "52%" }} />
+        </div>
+      </div>
+
     </section>
   );
 }

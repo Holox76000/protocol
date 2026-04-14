@@ -7,7 +7,7 @@ const PERSONALIZED_ITEMS = [
     image: "/program/static/landing/images/home/personalized/personalized-1.webp",
   },
   {
-    title: "Training preferences & schedule",
+    title: "Social environment context",
     description: "Takes into account your individual aesthetic style.",
     image: "/program/static/landing/images/home/personalized/personalized-2.webp",
   },
@@ -27,7 +27,7 @@ const PERSONALIZED_ITEMS = [
     image: "/program/static/landing/images/home/personalized/personalized-5.webp",
   },
   {
-    title: "Genetic predispositions to fat storage and muscle development",
+    title: "Genetic predispositions to fat storage",
     description: "Takes into account genetic factors and how they might impact your body aesthetics.",
     image: "/program/static/landing/images/home/personalized/personalized-6.webp",
   },
@@ -38,7 +38,6 @@ export default function PersonalizedSection() {
     <section className="program-personalized" aria-labelledby="program-personalized-title">
       <div className="program-personalized__shell">
         <header className="program-personalized__header">
-          <p className="program-personalized__eyebrow">Personalized</p>
           <h2 id="program-personalized-title" className="program-personalized__title">
             Taking into account your...
           </h2>

@@ -218,28 +218,13 @@ function ProtocolMark() {
 
 export default function AestheticTestsSection() {
   return (
-    <section className="program-tests" aria-labelledby="program-tests-title">
+    <section className="program-tests" aria-labelledby="program-tests-title" style={{ borderTop: "none", paddingTop: "80px" }}>
       <div className="program-tests__shell">
         <header className="program-tests__header">
-          <ProtocolMark />
           <h2 id="program-tests-title" className="program-tests__title">
-            <span>100+</span> Body Composition Tests
+            <span>100+</span> Attractiveness Markers
           </h2>
           <p className="program-tests__subtitle">The following assessments are included in your analysis.</p>
-          <div className="program-tests__meta">
-            <div className="program-tests__meta-item">
-              <span className="program-tests__meta-icon">
-                <MetaIcon kind="home" />
-              </span>
-              <span>From home</span>
-            </div>
-            <div className="program-tests__meta-item">
-              <span className="program-tests__meta-icon">
-                <MetaIcon kind="annual" />
-              </span>
-              <span>Tested 1x a year</span>
-            </div>
-          </div>
         </header>
 
         <div className="program-tests__panel">

@@ -3,7 +3,7 @@
 .scan-page {
   min-height: 100dvh;
   background: #fafaf8;
-  color: var(--program-theme-text);
+  color: var(--scan-text);
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────────────────── */
@@ -881,244 +881,648 @@
 /* ─── Facial Protocol Section ───────────────────────────────────────────── */
 
 .scan-facial {
-  max-width: 900px;
+  --facial-gold: #b8924a; /* gold — unique to this section */
+
+  position: relative;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 60px 32px 80px;
+  padding: 60px 48px 80px;
+  font-family: var(--program-theme-body-font);
 }
 
+/* ── Header ── */
+
 .scan-facial__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
   margin-bottom: 4px;
 }
 
 .scan-facial__title {
-  font-family: var(--program-theme-heading-font, Georgia, serif);
-  font-size: 3.6rem;
+  font-family: var(--program-theme-heading-font);
+  font-size: 2.8rem;
   font-weight: 400;
   line-height: 1.1;
-  color: #1a1f1e;
-  margin: 0;
+  color: var(--scan-text-strong);
+  margin-bottom: 6px;
 }
 
-.scan-facial__title-word {
-  color: #9eb1b8;
+.scan-facial__title em {
+  color: var(--scan-accent);
+  font-style: italic;
 }
 
-.scan-facial__divider {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 0 0 8px;
-}
-
-/* ── Score ── */
-
-.scan-facial__score-row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 28px;
-}
-
-.scan-facial__score-left {
-  flex: 1;
-}
-
-.scan-facial__score-label {
+.scan-facial__subtitle {
   font-size: 1.4rem;
-  color: #515255;
-  margin: 0 0 12px;
+  color: var(--scan-text-soft);
+  line-height: 1.5;
 }
 
-.scan-facial__score-bar {
-  position: relative;
-  height: 12px;
-  background: #f0f2f3;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.scan-facial__score-bar-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: #9eb1b8;
-  border-radius: 6px;
-  transition: width 0.6s ease;
-}
-
-.scan-facial__score-bar-dot {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #d1d5db;
-}
-
-.scan-facial__score-number {
-  font-family: var(--program-theme-heading-font, Georgia, serif);
-  font-size: 6rem;
-  font-weight: 400;
-  line-height: 1;
-  color: #1a1f1e;
-  min-width: 80px;
+.scan-facial__meta {
   text-align: right;
-}
-
-/* ── Photos ── */
-
-.scan-facial__photos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 48px;
-}
-
-.scan-facial__photo-frame {
-  position: relative;
-  aspect-ratio: 3 / 4;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #e5e7eb;
-  margin-bottom: 14px;
-}
-
-.scan-facial__photo-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.55);
-  padding: 3px 8px;
-  border-radius: 4px;
-  z-index: 1;
-}
-
-.scan-facial__photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
-  display: block;
-}
-
-.scan-facial__photo-caption {
   font-size: 1.3rem;
-  line-height: 1.8;
-  color: #515255;
-  margin: 0;
-}
-
-/* ── Projected Potential ── */
-
-.scan-facial__potential {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: start;
-}
-
-.scan-facial__potential-title {
-  font-family: var(--program-theme-heading-font, Georgia, serif);
-  font-size: 2.2rem;
-  font-weight: 400;
-  color: #1a1f1e;
-  margin: 0 0 6px;
-}
-
-.scan-facial__potential-desc {
-  font-size: 1.4rem;
+  color: var(--scan-text-soft);
+  flex-shrink: 0;
   line-height: 1.7;
-  color: #515255;
-  margin: 0 0 20px;
 }
 
-.scan-facial__feature-cols {
+.scan-facial__meta strong {
+  color: var(--scan-text-strong);
+}
+
+/* ── Main card ── */
+
+.scan-facial__card {
+  background: var(--scan-surface);
+  border: 1px solid var(--scan-border);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-facial__main-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 16px;
+  grid-template-columns: 168px 1fr 280px;
+  flex: 1;
+  min-height: 0;
 }
 
-.scan-facial__feature-list {
+/* ── Nav sidebar ── */
+
+.scan-facial__nav-col {
+  border-right: 1px solid var(--scan-border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.scan-facial__nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.scan-facial__feature-item {
+.scan-facial__nav-item {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 1.3rem;
-  color: #515255;
-  padding: 5px 0;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text);
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
-.scan-facial__feature-item::before {
-  content: "";
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  background: #9eb1b8;
-  flex-shrink: 0;
+.scan-facial__nav-item:hover {
+  background: var(--scan-border);
 }
 
-.scan-facial__radar-wrap {
+.scan-facial__nav-item--active {
+  background: var(--scan-border);
+  color: var(--scan-text-strong);
+  font-weight: 500;
+}
+
+.scan-facial__nav-badge {
+  margin-left: auto;
+  background: var(--program-theme-accent-soft);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 1rem;
+  color: var(--scan-text-soft);
+  font-weight: 500;
+}
+
+.scan-facial__nav-section {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  color: var(--scan-text-faint);
+  padding: 14px 10px 4px;
+  text-transform: uppercase;
+}
+
+/* ── Image column ── */
+
+.scan-facial__image-col {
+  border-right: 1px solid var(--scan-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.scan-facial__split {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  cursor: col-resize;
+  user-select: none;
+  overflow: hidden;
+  background: var(--scan-surface);
+}
+
+.scan-facial__split-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+}
+
+.scan-facial__split-line {
+  position: absolute;
+  inset-block: 0;
+  width: 2px;
+  background: var(--scan-surface);
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scan-facial__split-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  background: var(--scan-surface);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--scan-text-strong);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  cursor: col-resize;
+  pointer-events: all;
+}
+
+.scan-facial__split-badge {
+  position: absolute;
+  top: 14px;
+  padding: 4px 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: var(--program-theme-body-font);
+  border-radius: 5px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scan-facial__split-badge--before {
+  left: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+}
+
+.scan-facial__split-badge--after {
+  right: 14px;
+  background: var(--facial-gold);
+  color: white;
+}
+
+.scan-facial__scoring-label {
+  padding: 22px 28px 26px;
+  border-top: 1px solid var(--scan-border);
+}
+
+.scan-facial__scoring-eyebrow {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-family: var(--program-theme-body-font);
+  color: var(--facial-gold);
+  margin-bottom: 5px;
+}
+
+.scan-facial__scoring-title {
+  font-family: var(--program-theme-heading-font);
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--scan-text-strong);
+  line-height: 1.1;
+}
+
+/* ── Stats column ── */
+
+.scan-facial__stats-col {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0;
+  background: var(--scan-surface);
+}
+
+/* ── Stat panels (real interface) ── */
+
+.scan-stat-panel {
+  flex: 1;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--scan-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.scan-stat-panel:last-child {
+  border-bottom: none;
+}
+
+.scan-stat-panel__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text-faint);
+  text-transform: uppercase;
+}
+
+/* Score panel */
+
+.scan-stat-gauge {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
 }
 
-.scan-facial__radar-legend {
+.scan-stat-gauge__svg {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+}
+
+.scan-stat-gauge__value {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 24px;
-  font-size: 1.2rem;
-  color: #7f949b;
+  align-items: baseline;
+  gap: 2px;
 }
 
-.scan-facial__legend-item {
+.scan-stat-gauge__number {
+  font-family: var(--program-theme-heading-font);
+  font-size: 3.6rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--scan-text-strong);
+}
+
+.scan-stat-gauge__denom {
+  font-family: var(--program-theme-body-font);
+  font-size: 1.1rem;
+  color: var(--scan-text-faint);
+  margin-bottom: 2px;
+}
+
+.scan-stat-panel__footer {
   display: flex;
   align-items: center;
-  gap: 7px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.scan-facial__legend-swatch {
-  width: 14px;
-  height: 14px;
+.scan-stat-panel__status {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--program-theme-body-font);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.scan-stat-panel__status--warn {
+  color: #b45309;
+  background: rgba(180, 83, 9, 0.09);
+}
+
+.scan-stat-panel__status--good {
+  color: var(--scan-close);
+  background: rgba(58, 106, 78, 0.09);
+}
+
+.scan-stat-panel__hint {
+  font-size: 1rem;
+  color: var(--scan-text-faint);
+  font-family: var(--program-theme-body-font);
+  text-align: right;
+  line-height: 1.3;
+}
+
+/* Potential panel */
+
+.scan-stat-panel__delta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.scan-stat-panel__delta-value {
+  font-family: var(--program-theme-heading-font);
+  font-size: 3.2rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--facial-gold);
+}
+
+.scan-stat-panel__delta-label {
+  font-size: 1.1rem;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text-soft);
+}
+
+.scan-stat-range {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scan-stat-range__track {
+  position: relative;
+  height: 6px;
+  background: var(--scan-border);
+  border-radius: 3px;
+}
+
+.scan-stat-range__current {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  background: var(--scan-text-faint);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+.scan-stat-range__target {
+  position: absolute;
+  inset-block: 0;
+  background: var(--facial-gold);
+  border-radius: 3px;
+}
+
+.scan-stat-range__dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--scan-surface);
+}
+
+.scan-stat-range__dot--current {
+  background: var(--scan-text-soft);
+}
+
+.scan-stat-range__dot--target {
+  background: var(--facial-gold);
+}
+
+.scan-stat-range__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text-faint);
+}
+
+.scan-stat-panel__desc {
+  font-size: 1.05rem;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text-soft);
+  line-height: 1.5;
+}
+
+/* Archetype panel */
+
+.scan-stat-archetype {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scan-stat-archetype__from,
+.scan-stat-archetype__to {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--scan-border);
+}
+
+.scan-stat-archetype__from {
+  opacity: 0.55;
+}
+
+.scan-stat-archetype__to {
+  border-color: var(--facial-gold);
+  background: rgba(184, 146, 74, 0.05);
+}
+
+.scan-stat-archetype__tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: var(--program-theme-body-font);
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.scan-stat-archetype__tag--from {
+  background: var(--scan-border);
+  color: var(--scan-text-faint);
+}
+
+.scan-stat-archetype__tag--to {
+  background: rgba(184, 146, 74, 0.15);
+  color: var(--facial-gold);
+}
+
+.scan-stat-archetype__label {
+  font-size: 1.15rem;
+  font-family: var(--program-theme-body-font);
+  color: var(--scan-text-strong);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.scan-stat-archetype__label--to {
+  font-weight: 600;
+}
+
+.scan-stat-archetype__arrow {
+  display: flex;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+/* ── Floating cards ── */
+
+.scan-facial__float {
+  position: absolute;
+  background: var(--scan-surface);
+  border: 1px solid var(--scan-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 14px 16px;
+  z-index: 10;
+  width: 220px;
+  font-family: var(--program-theme-body-font);
+}
+
+.scan-facial__float--grooming {
+  top: 520px;
+  left: 40px;
+}
+
+.scan-facial__float--tissue {
+  bottom: 100px;
+  left: -10px;
+  width: 240px;
+}
+
+.scan-facial__float--lower {
+  bottom: 140px;
+  right: 380px;
+  width: 220px;
+}
+
+.scan-facial__float-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.scan-facial__float-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--scan-text-strong);
+}
+
+.scan-facial__float-critical {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--scan-deficit);
+  background: rgba(154, 64, 64, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.scan-facial__float-score {
+  font-family: var(--program-theme-heading-font);
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--scan-text-strong);
+  margin-bottom: 2px;
+}
+
+.scan-facial__float-score sup {
+  font-size: 1.1rem;
+  color: var(--scan-text-faint);
+  font-family: var(--program-theme-body-font);
+}
+
+.scan-facial__float-desc {
+  font-size: 1.1rem;
+  color: var(--scan-text-faint);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.scan-facial__float-bar {
+  height: 3px;
+  background: var(--scan-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.scan-facial__float-bar-fill {
+  height: 100%;
+  background: var(--facial-gold);
   border-radius: 2px;
 }
 
-.scan-facial__legend-swatch--projected {
-  background: rgba(156, 163, 175, 0.4);
-  border: 1px solid rgba(156, 163, 175, 0.7);
+/* Tissue card extras */
+
+.scan-facial__float-priority {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--facial-gold);
+  background: var(--scan-border);
+  padding: 3px 7px;
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
 
-.scan-facial__legend-swatch--client {
-  background: rgba(107, 114, 128, 0.15);
-  border: 1px solid rgba(107, 114, 128, 0.5);
+.scan-facial__float-insight-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--scan-text-strong);
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
-@media (max-width: 700px) {
+.scan-facial__float-insight-body {
+  font-size: 1.05rem;
+  color: var(--scan-text-soft);
+  line-height: 1.6;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 860px) {
   .scan-facial {
     padding: 40px 20px 60px;
   }
 
+  .scan-facial__main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scan-facial__nav-col {
+    display: none;
+  }
+
+  .scan-facial__image-col {
+    border-right: none;
+    border-bottom: 1px solid var(--scan-border);
+  }
+
+  .scan-facial__float {
+    display: none;
+  }
+
   .scan-facial__title {
-    font-size: 2.6rem;
+    font-size: 2.2rem;
   }
 
-  .scan-facial__score-number {
-    font-size: 4.4rem;
+  .scan-facial__header {
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .scan-facial__photos {
-    grid-template-columns: 1fr;
-  }
-
-  .scan-facial__potential {
-    grid-template-columns: 1fr;
+  .scan-facial__meta {
+    text-align: left;
   }
 }
+
