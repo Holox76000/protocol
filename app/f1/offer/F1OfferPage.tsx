@@ -3,6 +3,7 @@
 import Image from "next/image";
 import AestheticTestsSection from "../../program/AestheticTestsSection";
 import PersonalizedSection from "../../program/PersonalizedSection";
+import InformativeSection from "../../program/InformativeSection";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
@@ -441,57 +442,6 @@ export default function F1OfferPage() {
             </h2>
           </header>
 
-          <div className="program-advice__visual-shell">
-            <div className="program-advice__visual">
-              <div className="program-advice__orbit" aria-hidden="true">
-                <svg viewBox="0 0 1000 420" preserveAspectRatio="none">
-                  <path
-                    className="program-advice__orbit-path"
-                    d="M24 8H336C349.255 8 360 18.745 360 32V210H640V32C640 18.745 650.745 8 664 8H976C989.255 8 1000 18.745 1000 32V388C1000 401.255 989.255 412 976 412H664C650.745 412 640 401.255 640 388V210H360V388C360 401.255 349.255 412 336 412H24C10.745 412 0 401.255 0 388V32C0 18.745 10.745 8 24 8Z"
-                  />
-                  <circle className="program-advice__orbit-dot" r="6">
-                    <animateMotion
-                      dur="22.5s"
-                      repeatCount="indefinite"
-                      rotate="auto"
-                      path="M24 8H336C349.255 8 360 18.745 360 32V210H640V32C640 18.745 650.745 8 664 8H976C989.255 8 1000 18.745 1000 32V388C1000 401.255 989.255 412 976 412H664C650.745 412 640 401.255 640 388V210H360V388C360 401.255 349.255 412 336 412H24C10.745 412 0 401.255 0 388V32C0 18.745 10.745 8 24 8Z"
-                    />
-                  </circle>
-                </svg>
-              </div>
-              <article className="program-advice__card">
-                <span className="program-advice__label">Before</span>
-                <div className="program-advice__image">
-                  <Image
-                    src="/assets/14-before.png"
-                    alt="Before Protocol plan"
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
-                    style={{ objectFit: "cover", objectPosition: "center center" }}
-                  />
-                </div>
-              </article>
-              <div className="program-advice__connector" aria-hidden="true">
-                <div className="program-advice__connector-box program-advice__connector-box--top" />
-                <div className="program-advice__connector-line" />
-                <span className="program-advice__connector-dot" />
-                <div className="program-advice__connector-box program-advice__connector-box--bottom" />
-              </div>
-              <article className="program-advice__card">
-                <span className="program-advice__label">After</span>
-                <div className="program-advice__image">
-                  <Image
-                    src="/assets/14-after.png"
-                    alt="After Protocol plan"
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1099px) 42vw, 28vw"
-                    style={{ objectFit: "cover", objectPosition: "center center" }}
-                  />
-                </div>
-              </article>
-            </div>
-          </div>
-
           <div className="program-advice__steps-shell">
             <div className="program-advice__steps">
               {[
@@ -515,6 +465,39 @@ export default function F1OfferPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ PERSONALIZED ═══ */}
+      <PersonalizedSection />
+
+      {/* ═══ INFORMATIVE ═══ */}
+      <InformativeSection />
+
+      {/* ═══ AESTHETIC TESTS ═══ */}
+      <AestheticTestsSection />
+
+      {/* ═══ NOT A PDF ═══ */}
+      <section className="f1-offer-notpdf f1-section">
+        <div className="f1-offer-notpdf__inner">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">What you actually receive</p>
+            <h2 className="f1-offer-notpdf__title">
+              Simply Follow Your Plan<br /><em>See Your Attractiveness Transform</em>
+            </h2>
+            <p className="f1-offer-notpdf__sub">
+              We provide you with a detailed transformation plan, giving you the exact steps to improve your appearance without any surgeries.
+            </p>
+          </div>
+          <div className="f1-offer-notpdf__img-wrap">
+            <Image
+              src="/assets/connor-protocol.png"
+              alt="Connor's Protocol"
+              width={1200}
+              height={900}
+              style={{ width: "100%", height: "auto", display: "block", borderRadius: "16px" }}
+            />
           </div>
         </div>
       </section>
@@ -610,37 +593,29 @@ export default function F1OfferPage() {
         </div>
       </section>
 
-      {/* ═══ PERSONALIZED ═══ */}
-      <PersonalizedSection />
 
-      {/* ═══ AESTHETIC TESTS ═══ */}
-      <AestheticTestsSection />
 
-      {/* ═══ NOT A PDF ═══ */}
-      <section className="f1-offer-notpdf f1-section">
-        <div className="f1-offer-notpdf__inner">
 
-          <div className="f1-section__header">
-            <p className="f1-section__eyebrow">What you actually receive</p>
-            <h2 className="f1-offer-notpdf__title">
-              Simply Follow Your Plan<br /><em>See Your Attractiveness Transform</em>
-            </h2>
-            <p className="f1-offer-notpdf__sub">
-              We provide you with a detailed transformation plan, giving you the exact steps to improve your appearance without any surgeries.
-            </p>
+      {/* ═══ PRESS LOGOS ═══ */}
+      <div className="program-hero__logos" style={{ justifyContent: "center", padding: "48px 24px" }} data-offer-logos>
+        <p className="program-hero__logos-label">As seen in</p>
+        {[
+          { src: "/program/static/landing/images/home/logo/usa-today.webp", alt: "USA Today" },
+          { src: "/program/static/landing/images/home/logo/the-guardian.webp", alt: "The Guardian" },
+          { src: "/program/static/landing/images/home/logo/daily-mail.webp", alt: "Daily Mail" },
+          { src: "/program/static/landing/images/home/logo/business-insider.webp", alt: "Business Insider" },
+          { src: "/program/static/landing/images/home/logo/the-sun.webp", alt: "The Sun" },
+          { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
+          { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
+          { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
+          { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
+          { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
+        ].map((logo) => (
+          <div key={logo.alt} className="program-hero__logo">
+            <Image src={logo.src} alt={logo.alt} width={140} height={44} />
           </div>
-
-          <div className="f1-offer-notpdf__img-wrap">
-            <Image
-              src="/assets/connor-protocol.png"
-              alt="Connor's Protocol"
-              width={1200}
-              height={900}
-              style={{ width: "100%", height: "auto", display: "block", borderRadius: "16px" }}
-            />
-          </div>
-        </div>
-      </section>
+        ))}
+      </div>
 
       {/* ═══ PRICE BLOCK ═══ */}
       <section id="pricing" className="f1-offer-price f1-section">
@@ -651,9 +626,7 @@ export default function F1OfferPage() {
           </div>
 
           <div className="f1-offer-price__card">
-            <div className="f1-offer-price__anchor">
-              A personal trainer costs $300/month — and gives you a generic protocol that doesn&apos;t know your body. This is a 3-month engagement built specifically for you, for
-            </div>
+
             <div className="f1-offer-price__amount">$49</div>
             <div className="f1-offer-price__period">one-time payment</div>
 

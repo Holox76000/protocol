@@ -1653,3 +1653,7 @@
     height: 380px;
   }
 }
+
+[data-offer-logos] .program-hero__logo {
+  display: flex !important;
+}
