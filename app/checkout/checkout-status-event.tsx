@@ -21,7 +21,7 @@ export default function CheckoutStatusEvent({
     if (eventName === "payment_success") {
       trackGa4Event("purchase", {
         transaction_id: sessionId,
-        value: 49,
+        value: 89,
         currency: "USD",
         tax: 0,
         shipping: 0,
@@ -30,7 +30,7 @@ export default function CheckoutStatusEvent({
           {
             item_id: "body-analysis-transformation-protocol",
             item_name: "Body Analysis + Body Transformation Protocol",
-            price: 49,
+            price: 89,
             quantity: 1,
           },
         ],

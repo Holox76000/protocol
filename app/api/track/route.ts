@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         content_name: "F1 Offer",
         content_ids: ["f1-attractiveness-protocol"],
         content_type: "product",
-        value: 49,
+        value: 89,
         currency: "USD",
       }
     });

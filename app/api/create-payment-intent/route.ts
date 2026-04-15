@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   let paymentIntent;
   try {
     paymentIntent = await stripe.paymentIntents.create({
-      amount: 4900, // $49.00
+      amount: 8900, // $89.00
       currency: "usd",
       automatic_payment_methods: { enabled: true },
       ...(customerId && { customer: customerId }),
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     customData: {
       content_name: "Attractiveness Protocol",
       content_ids: ["f1-attractiveness-protocol"],
-      value: 49,
+      value: 89,
       currency: "USD",
       num_items: 1,
     },

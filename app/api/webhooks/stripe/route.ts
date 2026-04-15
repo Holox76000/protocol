@@ -139,7 +139,7 @@ export async function POST(request: Request) {
         eventSourceUrl: "https://protocol-club.com/checkout",
         email: customerEmail,
         customData: {
-          value: typeof session.amount_total === "number" ? session.amount_total / 100 : 49,
+          value: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
           currency: (session.currency ?? "usd").toUpperCase(),
           content_name: "Attractiveness Protocol",
           content_ids: ["f1-attractiveness-protocol"],

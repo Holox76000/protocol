@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     customData: {
       content_name: "Attractiveness Protocol",
       content_ids: ["f1-attractiveness-protocol"],
-      value: 49,
+      value: 89,
       currency: "USD",
       num_items: 1,
       ...(body.utm_source && { utm_source: body.utm_source }),

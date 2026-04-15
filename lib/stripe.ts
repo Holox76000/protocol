@@ -41,7 +41,7 @@ export function getCheckoutLineItems(funnel = "main"): Stripe.Checkout.SessionCr
         quantity: 1,
         price_data: {
           currency: "usd",
-          unit_amount: 4900,
+          unit_amount: 8900,
           product_data: {
             name: "Attractiveness Protocol — 3-Month Program",
             description: "AI body analysis, personalized 3-month attractiveness protocol, and WhatsApp coaching support.",

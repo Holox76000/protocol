@@ -402,7 +402,7 @@ export default function F1OfferPage() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
-            <CtaButton label="Start — $49" className="f1-offer-nav__cta" location="nav" href={signupHref} />
+            <CtaButton label="Start — $89" className="f1-offer-nav__cta" location="nav" href={signupHref} />
           </div>
         </div>
       </header>
@@ -421,7 +421,7 @@ export default function F1OfferPage() {
             style={{ width: "100%", height: "auto", display: "block", borderRadius: "12px" }}
             priority
           />
-          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="hero" href={signupHref} />
+          <CtaButton label="Start your Protocol — $89" className="f1-offer-cta--large" location="hero" href={signupHref} />
           <div className="f1-offer-hero__proof" role="img" aria-label="Rated 4.9 out of 5 based on 847 reviews">
             <span className="f1-offer-hero__proof-stars" aria-hidden="true">★★★★★</span>
             <span className="f1-offer-hero__proof-score" aria-hidden="true">4.9</span>
@@ -591,7 +591,7 @@ export default function F1OfferPage() {
             </div>
           </div>
           <div className="f1-offer-section-cta">
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="proof" href={signupHref} />
+            <CtaButton label="Start your Protocol — $89" className="f1-offer-cta--large" location="proof" href={signupHref} />
           </div>
         </div>
       </section>
@@ -649,7 +649,7 @@ export default function F1OfferPage() {
 
           <div className="f1-offer-price__card">
 
-            <div className="f1-offer-price__amount">$49</div>
+            <div className="f1-offer-price__amount">$89</div>
             <div className="f1-offer-price__period">one-time payment</div>
 
             <ul className="f1-offer-price__includes">
@@ -667,7 +667,7 @@ export default function F1OfferPage() {
               ))}
             </ul>
 
-            <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" href={signupHref} />
+            <CtaButton label="Start your Protocol — $89" className="f1-offer-cta--large f1-offer-cta--full" location="pricing" href={signupHref} />
 
             <PaymentLogos />
 
@@ -724,9 +724,9 @@ export default function F1OfferPage() {
             <span>Now change yours.</span>
           </h2>
           <p className="f1-offer-final__sub">
-            AI body analysis. 3-month protocol. WhatsApp coaching. $49 one-time.
+            AI body analysis. 3-month protocol. WhatsApp coaching. $89 one-time.
           </p>
-          <CtaButton label="Start your Protocol — $49" className="f1-offer-cta--large" location="final" href={signupHref} />
+          <CtaButton label="Start your Protocol — $89" className="f1-offer-cta--large" location="final" href={signupHref} />
           <div className="f1-offer-final__risk">
             <ShieldIcon />
             <span>90-day guarantee — if your proportions don&apos;t move, full refund</span>

@@ -64,7 +64,7 @@ export default function TermsOfServicePage() {
               4. Payment and Billing
             </h2>
             <p>
-              Protocol charges a one-time fee of $49 USD for access to your personalized assessment. Payment is processed securely through Stripe. All fees are charged in USD and are non-refundable except as described in our Refund Policy.
+              Protocol charges a one-time fee of $89 USD for access to your personalized assessment. Payment is processed securely through Stripe. All fees are charged in USD and are non-refundable except as described in our Refund Policy.
             </p>
             <p className="mt-3">
               By completing payment, you authorize PAP CONSULTING FZ LLE to charge your payment method for the agreed amount.

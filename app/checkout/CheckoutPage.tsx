@@ -68,7 +68,7 @@ function ProtocolCard() {
         {/* Lower */}
         <div className="flex items-end justify-between px-6 pb-6">
           <p className="flex items-baseline">
-            <strong className="text-[44px] font-light leading-none text-white">$49</strong>
+            <strong className="text-[44px] font-light leading-none text-white">$89</strong>
             <span className="ml-1.5 text-[13px] font-normal text-white/50">/ one-time</span>
           </p>
           <p className="text-[11px] text-white/40">No Hidden Fees.</p>
@@ -190,7 +190,7 @@ function CheckoutForm() {
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
             Processing…
           </span>
-        ) : "Pay $49 · Start the Protocol"}
+        ) : "Pay $89 · Start the Protocol"}
       </button>
     </form>
   );
@@ -299,7 +299,7 @@ export function CheckoutPage({ email }: { email: string }) {
           {/* Trust signals */}
           <div className="mt-7 flex flex-col items-center gap-2.5 lg:px-[3vw]">
             <p className="text-center text-[11px] text-mute">
-              By completing this purchase you authorize a one-time charge of $49 USD. No recurring charges.{" "}
+              By completing this purchase you authorize a one-time charge of $89 USD. No recurring charges.{" "}
               <Link href="/terms" className="underline underline-offset-2 transition-colors hover:text-dim">
                 Terms
               </Link>
@@ -376,11 +376,11 @@ export function CheckoutPage({ email }: { email: string }) {
             <SectionLabel>What you get</SectionLabel>
             <div className="mb-2 lg:mb-4 flex justify-between text-[13px] text-dim">
               <span>Protocol Access</span>
-              <span>$49</span>
+              <span>$89</span>
             </div>
             <div className="flex justify-between border-t border-wire pt-2.5 lg:pt-4 text-[15px] font-semibold text-void">
               <span>Due today</span>
-              <span>$49</span>
+              <span>$89</span>
             </div>
           </div>
         </div>

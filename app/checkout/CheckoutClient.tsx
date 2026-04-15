@@ -44,7 +44,7 @@ export default function CheckoutClient({ funnel, params }: Props) {
           (window as Window & { fbq?: Function }).fbq?.("track", "InitiateCheckout", {
             content_name: "Attractiveness Protocol",
             content_ids: ["f1-attractiveness-protocol"],
-            value: 49,
+            value: 89,
             currency: "USD",
             num_items: 1,
           }, { eventID: sessionId });

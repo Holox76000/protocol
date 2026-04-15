@@ -42,7 +42,7 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
         content_name: "F1 Offer",
         content_ids: ["f1-attractiveness-protocol"],
         content_type: "product",
-        value: 49,
+        value: 89,
         currency: "USD",
       }, { eventID: eventId });
     } catch {

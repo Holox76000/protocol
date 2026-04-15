@@ -105,7 +105,7 @@ export async function POST(request: Request) {
   const klaviyoPayload = {
     email,
     firstName: body.answers?.first_name,
-    value: 49,
+    value: 89,
     checkoutUrl: "https://protocol-club.com/checkout?funnel=f1",
     items: [
       {
