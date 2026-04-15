@@ -660,7 +660,7 @@ export default function F1OfferPage() {
 
             <ul className="f1-offer-price__includes">
               {[
-                "AI body analysis (proportions, ratios, perception score)",
+                "+100 Body Attractiveness markers analysed",
                 "Deep assessment questionnaire",
                 "Personalized 3-month training protocol",
                 "Ask anything to the experts",
