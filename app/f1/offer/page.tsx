@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import F1OfferPage from "./F1OfferPage";
 
 export const metadata: Metadata = {
-  title: "Protocol Club - Start your upper body glow up",
+  title: "Protocol Club - Start your body glow up",
   description:
     "AI body analysis of your proportions. A 3-month training protocol built for attractiveness, not muscle size. WhatsApp coaching included. $89 one-time.",
 };
