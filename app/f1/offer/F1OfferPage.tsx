@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import AestheticTestsSection from "../../program/AestheticTestsSection";
+import CompleteFacialAnalysisSection from "../../program/CompleteFacialAnalysisSection";
 import PersonalizedSection from "../../program/PersonalizedSection";
 import InformativeSection from "../../program/InformativeSection";
 import dynamic from "next/dynamic";
@@ -487,7 +488,7 @@ export default function F1OfferPage() {
           <div className="program-advice__steps-shell">
             <div className="program-advice__steps">
               {[
-                { number: "01 /", title: "Upload and answer" },
+                { number: "01 /", title: "Upload your photo and answer" },
                 { number: "02 /", title: "Your protocol lands" },
                 { number: "03 /", title: "You execute. We track." },
                 { number: "04 /", title: "Track your progress and\nsee dramatic results" },
@@ -510,6 +511,11 @@ export default function F1OfferPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══ COMPLETE BODY ANALYSIS ═══ */}
+      <div style={{ marginBottom: "80px" }}>
+        <CompleteFacialAnalysisSection />
+      </div>
 
       {/* ═══ PERSONALIZED ═══ */}
       <PersonalizedSection />
