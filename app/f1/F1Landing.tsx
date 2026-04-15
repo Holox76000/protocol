@@ -536,7 +536,7 @@ export default function F1Landing() {
           </nav>
           <div className="program-nav__actions">
             <TrackedLink href={offerHref} className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
-              Start attractiveness Protocol
+              Start my Protocol
 </TrackedLink>
           </div>
         </div>
@@ -592,7 +592,7 @@ export default function F1Landing() {
           </div>
           <div className="f1-mid-cta" style={{ marginTop: 16 }}>
             <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "projections" }}>
-              Continue to step 3 — Decide your commitment <ArrowIcon />
+              Start my Protocol <ArrowIcon />
             </TrackedLink>
             <p className="f1-cta-sub">Steps 3 and 4 complete on the next page</p>
           </div>
@@ -669,7 +669,6 @@ export default function F1Landing() {
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">03</div>
               <h3 className="f1-listicle__title">Everything the fitness industry taught you is true. It just won&apos;t make you attractive.</h3>
-              <p className="f1-body">The workouts work. The diets work. The supplements do what they claim. You will build muscle, lose fat, get stronger.</p>
               <p className="f1-body">The fitness industry optimizes for performance and size. It does not optimize for how people perceive you. That is not a flaw in their method. <strong>It is a different goal.</strong> Nobody told you the difference.</p>
               <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_03" }}>
                 Start attractiveness Protocol <ArrowIcon />
@@ -681,14 +680,13 @@ export default function F1Landing() {
           </div>
 
           <div className="f1-listicle__item f1-listicle__item--media-left">
-            <div className="f1-listicle__media">
-              <Image src="/assets/variables_kept_vs_cut_v2.svg" alt="What the protocol keeps vs cuts" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "cover" }} />
+            <div className="f1-listicle__media" style={{ aspectRatio: "480 / 380" }}>
+              <Image src="/assets/variables_kept_vs_cut_v2.svg" alt="What the protocol keeps vs cuts" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "contain" }} />
             </div>
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">04</div>
-              <h3 className="f1-listicle__title">Only a few variables drive perception. We built a protocol around those.</h3>
+              <h3 className="f1-listicle__title">Attractiveness variables drive perception. These are not the same as fitness industry ones.</h3>
               <p className="f1-body">Most men work on dozens of things at once. Most of those variables do not change how people perceive them.</p>
-              <p className="f1-body">Protocol strips away everything that does not impact perception and focuses your effort only on what does. That is why it is faster and simpler. We did not cut corners. We cut everything that has no measurable effect.</p>
             </div>
           </div>
         </div>
@@ -717,21 +715,23 @@ export default function F1Landing() {
 
           <div className="f1-divider" />
 
-          <div className="f1-section__header">
-            <p className="f1-section__eyebrow">You now vs. your potential</p>
-            <h3 className="f1-section__title f1-section__title--sm">Same Man. Four Approaches. <span>Only One Worked.</span></h3>
+          <div style={{ display: "none" }}>
+            <div className="f1-section__header">
+              <p className="f1-section__eyebrow">You now vs. your potential</p>
+              <h3 className="f1-section__title f1-section__title--sm">Same Man. Four Approaches. <span>Only One Worked.</span></h3>
+            </div>
+
+            <VersionsReveal />
           </div>
 
-          <VersionsReveal />
+          <div className="f1-mid-cta">
+            <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "reframe" }}>
+              Start attractiveness Protocol <ArrowIcon />
+            </TrackedLink>
+            <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+          </div>
         </div>
       </section>
-
-      <div className="f1-mid-cta">
-        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "reframe" }}>
-          Start attractiveness Protocol <ArrowIcon />
-        </TrackedLink>
-        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
-      </div>
 
       {/* ═══ DR GARY LINKOV QUOTE ═══ */}
       <GaryLinkovQuoteSection />
@@ -865,8 +865,6 @@ export default function F1Landing() {
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <ExpertAdviceSection beforeSrc="/assets/14-before.png" afterSrc="/assets/14-after.png" />
 
       {/* ═══ GUARANTEE ═══ */}
       <section className="f1-section">

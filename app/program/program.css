@@ -7982,8 +7982,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 2.4rem;
-  min-height: 11.2rem;
-  padding: 1.6rem 3rem;
+  min-height: auto;
+  padding: 0.6rem 1.6rem;
   list-style: none;
   cursor: pointer;
 }
@@ -8002,10 +8002,10 @@
 
 .program-tests__thumb {
   position: relative;
-  width: 6.4rem;
-  height: 6.4rem;
+  width: 4rem;
+  height: 4rem;
   flex-shrink: 0;
-  border-radius: 0.8rem;
+  border-radius: 0.6rem;
   overflow: hidden;
   background: linear-gradient(180deg, #edf4f4 0%, #b6c8d3 100%);
 }
@@ -8017,8 +8017,8 @@
 .program-tests__row-title {
   margin: 0;
   color: #22343b;
-  font-size: 2rem;
-  line-height: 2.4rem;
+  font-size: 1.4rem;
+  line-height: 1.2;
   font-weight: 500;
 }
 
@@ -8033,8 +8033,8 @@
 .program-tests__count {
   margin: 0;
   color: #6d7e85;
-  font-size: 1.6rem;
-  line-height: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
@@ -8203,20 +8203,19 @@
   }
 
   .program-tests__summary {
-    align-items: flex-start;
+    align-items: center;
     padding: 1.2rem;
   }
 
   .program-tests__row-side {
     gap: 0.8rem;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
+    align-items: center;
   }
 
   .program-tests__count {
-    white-space: normal;
+    white-space: nowrap;
     text-align: right;
-    max-width: 10rem;
   }
 
   .program-tests__content {
@@ -8360,7 +8359,7 @@
 
 @media (max-width: 767px) {
   .program-informative {
-    padding: 0 8px;
+    padding: 0 16px;
   }
 
   .program-informative__title {
@@ -8368,19 +8367,45 @@
     line-height: 1.06;
   }
 
+  .program-informative__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
   .program-informative__item {
-    grid-template-columns: 1fr;
-    align-items: flex-start;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    align-items: center;
+    gap: 1.6rem;
+    background: #fff;
+    border: 1px solid #eef1f1;
+    border-radius: 1.4rem;
+    padding: 1.6rem;
+    margin-bottom: 0;
+  }
+
+  .program-informative__item:not(:last-child) {
+    margin-bottom: 0;
   }
 
   .program-informative__image-wrap {
-    width: 14rem;
-    height: 9.6rem;
+    width: 12rem;
+    height: 8.4rem;
+    border-radius: 0.8rem;
   }
 
-.program-informative__item-description {
-    font-size: 1.4rem;
-    line-height: 1.8rem;
+  .program-informative__item-title {
+    font-size: 1.3rem;
+    line-height: 1.7rem;
+  }
+
+  .program-informative__item-description {
+    font-size: 1.1rem;
+    line-height: 1.5rem;
   }
 }
 
@@ -8465,16 +8490,16 @@
 .program-personalized__item-title {
   margin: 0;
   color: #22343b;
-  font-size: 2rem;
-  line-height: 2.4rem;
+  font-size: 1.4rem;
+  line-height: 1.8rem;
   font-weight: 500;
 }
 
 .program-personalized__item-description {
   margin: 0;
   color: #718087;
-  font-size: 1.8rem;
-  line-height: 2.4rem;
+  font-size: 1.2rem;
+  line-height: 1.7rem;
 }
 
 @media (max-width: 1099px) {
@@ -8516,7 +8541,7 @@
 
 @media (max-width: 767px) {
   .program-personalized {
-    padding: 0 8px;
+    padding: 0 16px;
   }
 
   .program-personalized__title {
@@ -8524,19 +8549,45 @@
     line-height: 1.06;
   }
 
+  .program-personalized__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
   .program-personalized__item {
-    grid-template-columns: 1fr;
-    align-items: flex-start;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    align-items: center;
+    gap: 1.6rem;
+    background: #fff;
+    border: 1px solid #eef1f1;
+    border-radius: 1.4rem;
+    padding: 1.6rem;
+    margin-bottom: 0;
+  }
+
+  .program-personalized__item:not(:last-child) {
+    margin-bottom: 0;
   }
 
   .program-personalized__image-wrap {
-    width: 14rem;
-    height: 9.6rem;
+    width: 12rem;
+    height: 8.4rem;
+    border-radius: 0.8rem;
   }
 
-.program-personalized__item-description {
-    font-size: 1.4rem;
-    line-height: 1.8rem;
+  .program-personalized__item-title {
+    font-size: 1.3rem;
+    line-height: 1.7rem;
+  }
+
+  .program-personalized__item-description {
+    font-size: 1.1rem;
+    line-height: 1.5rem;
   }
 }
 

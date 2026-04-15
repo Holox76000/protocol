@@ -726,8 +726,8 @@
   }
 
   .f1-offer-nav__cta {
-    font-size: 1.3rem !important;
-    padding: 12px 20px !important;
+    font-size: 1.2rem !important;
+    padding: 8px 14px !important;
   }
 }
 
@@ -1656,4 +1656,62 @@
 
 [data-offer-logos] .program-hero__logo {
   display: flex !important;
+}
+
+/* ─── Logos section: desktop flex-wrap, mobile marquee ──────────────────── */
+.f1-offer-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 0;
+  width: 100%;
+}
+
+/* Desktop: standard flex-wrap row */
+.f1-offer-logos__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.f1-offer-logos__track {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+}
+
+/* Override width:100% from program-hero__logo in this flex context */
+.f1-offer-logos__track .program-hero__logo {
+  width: auto !important;
+  min-width: 80px;
+  min-height: auto;
+  padding: 6px 10px;
+  display: flex !important; /* override nth-child hide */
+}
+
+.f1-offer-logos__track .program-hero__logo img {
+  width: auto !important;
+  height: 32px !important;
+  max-width: 110px;
+  max-height: 32px;
+}
+
+/* Mobile: infinite marquee */
+@media (max-width: 767px) {
+  .f1-offer-logos__track {
+    flex-wrap: nowrap;
+    animation: f1-logos-scroll 30s linear infinite;
+  }
+
+  .f1-offer-logos__track .program-hero__logo {
+    flex-shrink: 0;
+    width: auto !important;
+    min-width: 80px;
+  }
+}
+
+@keyframes f1-logos-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }

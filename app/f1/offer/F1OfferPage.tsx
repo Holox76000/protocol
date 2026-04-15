@@ -429,6 +429,48 @@ export default function F1OfferPage() {
             <span className="f1-offer-hero__proof-count" aria-hidden="true">· 847 reviews</span>
           </div>
           <p className="f1-offer-hero__sub">90-day guarantee. One-time payment.</p>
+
+          <div className="f1-offer-logos" data-offer-logos>
+            <p className="program-hero__logos-label">As seen in</p>
+            <div className="f1-offer-logos__viewport">
+              <div className="f1-offer-logos__track">
+                {/* Original set */}
+                {[
+                  { src: "/program/static/landing/images/home/logo/usa-today.webp", alt: "USA Today" },
+                  { src: "/program/static/landing/images/home/logo/the-guardian.webp", alt: "The Guardian" },
+                  { src: "/program/static/landing/images/home/logo/daily-mail.webp", alt: "Daily Mail" },
+                  { src: "/program/static/landing/images/home/logo/business-insider.webp", alt: "Business Insider" },
+                  { src: "/program/static/landing/images/home/logo/the-sun.webp", alt: "The Sun" },
+                  { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
+                  { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
+                  { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
+                  { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
+                  { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
+                ].map((logo) => (
+                  <div key={logo.alt} className="program-hero__logo">
+                    <Image src={logo.src} alt={logo.alt} width={140} height={44} />
+                  </div>
+                ))}
+                {/* Duplicate set for seamless infinite loop */}
+                {[
+                  { src: "/program/static/landing/images/home/logo/usa-today.webp", alt: "USA Today" },
+                  { src: "/program/static/landing/images/home/logo/the-guardian.webp", alt: "The Guardian" },
+                  { src: "/program/static/landing/images/home/logo/daily-mail.webp", alt: "Daily Mail" },
+                  { src: "/program/static/landing/images/home/logo/business-insider.webp", alt: "Business Insider" },
+                  { src: "/program/static/landing/images/home/logo/the-sun.webp", alt: "The Sun" },
+                  { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
+                  { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
+                  { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
+                  { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
+                  { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
+                ].map((logo) => (
+                  <div key={logo.alt + "-2"} className="program-hero__logo" aria-hidden="true">
+                    <Image src={logo.src} alt="" width={140} height={44} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -436,7 +478,7 @@ export default function F1OfferPage() {
       <section className="program-advice" aria-labelledby="offer-advice-title" style={{ borderTop: "none" }}>
         <div className="program-advice__inner">
           <header className="program-advice__header">
-            <p className="program-advice__eyebrow">Expert Advice Enhanced by Technology</p>
+            <p className="program-advice__eyebrow">Expert Advice Enhanced by Science</p>
             <h2 id="offer-advice-title" className="program-advice__title">
               Three steps. <span>Then it runs.</span>
             </h2>
@@ -484,7 +526,7 @@ export default function F1OfferPage() {
           <div className="f1-section__header">
             <p className="f1-section__eyebrow">What you actually receive</p>
             <h2 className="f1-offer-notpdf__title">
-              Simply Follow Your Plan<br /><em>See Your Attractiveness Transform</em>
+              Simply Follow Your Protocol<br /><em>See Your Attractiveness Transform</em>
             </h2>
             <p className="f1-offer-notpdf__sub">
               We provide you with a detailed transformation plan, giving you the exact steps to improve your appearance without any surgeries.
@@ -596,26 +638,6 @@ export default function F1OfferPage() {
 
 
 
-      {/* ═══ PRESS LOGOS ═══ */}
-      <div className="program-hero__logos" style={{ justifyContent: "center", padding: "48px 24px" }} data-offer-logos>
-        <p className="program-hero__logos-label">As seen in</p>
-        {[
-          { src: "/program/static/landing/images/home/logo/usa-today.webp", alt: "USA Today" },
-          { src: "/program/static/landing/images/home/logo/the-guardian.webp", alt: "The Guardian" },
-          { src: "/program/static/landing/images/home/logo/daily-mail.webp", alt: "Daily Mail" },
-          { src: "/program/static/landing/images/home/logo/business-insider.webp", alt: "Business Insider" },
-          { src: "/program/static/landing/images/home/logo/the-sun.webp", alt: "The Sun" },
-          { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
-          { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
-          { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
-          { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
-          { src: "/program/static/landing/images/home/logo/new-york-post.webp", alt: "New York Post" },
-        ].map((logo) => (
-          <div key={logo.alt} className="program-hero__logo">
-            <Image src={logo.src} alt={logo.alt} width={140} height={44} />
-          </div>
-        ))}
-      </div>
 
       {/* ═══ PRICE BLOCK ═══ */}
       <section id="pricing" className="f1-offer-price f1-section">

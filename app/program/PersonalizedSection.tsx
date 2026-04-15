@@ -2,33 +2,33 @@ import Image from "next/image";
 
 const PERSONALIZED_ITEMS = [
   {
-    title: "Body type & fat distribution pattern",
-    description: "Considers unique body traits, proportions, and patterns common to your demographic.",
+    title: "Fat distribution pattern",
+    description: "Shapes your silhouette and perceived proportions.",
     image: "/program/static/landing/images/home/personalized/personalized-1.webp",
   },
   {
-    title: "Social environment context",
-    description: "Takes into account your individual aesthetic style.",
+    title: "Social environment",
+    description: "Your social circle and lifestyle define your attractiveness context.",
     image: "/program/static/landing/images/home/personalized/personalized-2.webp",
   },
   {
     title: "Hormonal baseline & age",
-    description: "Considers how skin, bone, and fat distribution change over time.",
+    description: "Affects muscle retention, fat distribution, and skin quality.",
     image: "/program/static/landing/images/home/personalized/personalized-3.webp",
   },
   {
     title: "Diet, stress, sleep, and habits",
-    description: "Considers diet, climate, stress, sleep, and habits.",
+    description: "Impact body composition and appearance beyond training alone.",
     image: "/program/static/landing/images/home/personalized/personalized-4.webp",
   },
   {
     title: "Physique goals (athletic, lean, muscular)",
-    description: "Adapts to regional and societal ideals.",
+    description: "The same body optimized differently depending on your goal.",
     image: "/program/static/landing/images/home/personalized/personalized-5.webp",
   },
   {
     title: "Genetic predispositions to fat storage",
-    description: "Takes into account genetic factors and how they might impact your body aesthetics.",
+    description: "Determines where fat accumulates first and comes off last.",
     image: "/program/static/landing/images/home/personalized/personalized-6.webp",
   },
 ];

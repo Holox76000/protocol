@@ -92,7 +92,7 @@ const TEST_CATEGORIES = [
     ],
   },
   {
-    title: "Core Strength Indicators",
+    title: "Core Strength",
     image: "/assets/core-strength-indicators.png",
     tests: [
       "Bracing control score",
@@ -106,7 +106,7 @@ const TEST_CATEGORIES = [
     ],
   },
   {
-    title: "Hormonal Profile Markers",
+    title: "Hormonal Profile",
     image: "/assets/hormone.png",
     tests: [
       "Low-testosterone visual markers",
