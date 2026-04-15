@@ -662,7 +662,7 @@ export default function F1OfferPage() {
               {[
                 "+100 Body Attractiveness markers analysed",
                 "Deep assessment questionnaire",
-                "Personalized 3-month training protocol",
+                "Personalized 3-month protocol",
                 "Ask anything to the experts",
                 "Lifetime access to your analysis and protocol",
               ].map((item) => (
