@@ -220,7 +220,7 @@ const DELIVERABLES = [
   },
   {
     num: "04",
-    title: "3 months of WhatsApp coaching access",
+    title: "3 months of expert access",
     description:
       "A direct line to your coach for the full duration. Weekly ratio check-ins, form feedback, protocol adjustments. Not a ticketing system. A person who has your numbers and tracks them.",
   },
@@ -240,7 +240,7 @@ const STEPS = [
   {
     step: "3",
     title: "Weeks 1–12 — You train. We track.",
-    description: "You execute the sessions. Each week you send your measurements on WhatsApp. Your coach checks your ratios, flags what's moving, and adjusts where needed. By week 12, the numbers don't lie.",
+    description: "You execute the sessions. Each week you send your measurements. Your coach checks your ratios, flags what's moving, and adjusts where needed. By week 12, the numbers don't lie.",
   },
 ];
 
@@ -254,8 +254,8 @@ const FAQS = [
     a: "A personal trainer optimizes for muscle mass and performance. This optimizes for how people perceive you — a different goal, a different measurement, a different protocol. Most trainers are not trained in aesthetic medicine or attractiveness research.",
   },
   {
-    q: "What does WhatsApp coaching actually look like?",
-    a: "Weekly check-in messages with ratio measurements, form feedback when you send videos, and protocol adjustments. You have a direct line. Responses within 24 hours on weekdays.",
+    q: "What does expert access actually look like?",
+    a: "Weekly check-in messages with ratio measurements, form feedback when you send videos, and protocol adjustments. You have a direct line to the experts. Responses within 24 hours on weekdays.",
   },
   {
     q: "Is the AI analysis actually accurate?",
@@ -626,7 +626,7 @@ export default function F1OfferPage() {
                 { title: "15+ structural variables", desc: "Measured from your photos — shoulder width, waist circumference, torso index, and more. Not guessed." },
                 { title: "Benchmarked against research", desc: "Each variable compared against published data in aesthetic medicine and evolutionary psychology." },
                 { title: "Protocol built around your gap", desc: "The 12-week plan targets only what's holding your score back. No filler, no generic programming." },
-                { title: "Tracked weekly by your coach", desc: "Your ratios measured every week on WhatsApp. If something's not moving, the protocol adjusts." },
+                { title: "Tracked weekly by your coach", desc: "Your ratios measured every week. If something's not moving, the protocol adjusts." },
               ].map((item) => (
                 <li key={item.title} className="f1-offer-method__item">
                   <span className="f1-offer-method__check"><CheckIcon /></span>
@@ -663,7 +663,7 @@ export default function F1OfferPage() {
                 "AI body analysis (proportions, ratios, perception score)",
                 "Deep assessment questionnaire",
                 "Personalized 3-month training protocol",
-                "WhatsApp coaching for 3 months",
+                "Ask anything to the experts",
                 "Lifetime access to your analysis and protocol",
               ].map((item) => (
                 <li key={item}>
@@ -730,7 +730,7 @@ export default function F1OfferPage() {
             <span>Now change yours.</span>
           </h2>
           <p className="f1-offer-final__sub">
-            AI body analysis. 3-month protocol. WhatsApp coaching. $89 one-time.
+            AI body analysis. 3-month protocol. Ask anything to the experts. $89 one-time.
           </p>
           <CtaButton label="Start your Protocol — $89" className="f1-offer-cta--large" location="final" href={signupHref} />
           <div className="f1-offer-final__risk">
