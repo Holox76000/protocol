@@ -84,7 +84,7 @@ const handler = schedule("*/5 * * * *", async () => {
         You started your questionnaire — which means we already have enough data to build your personalized Attractiveness Protocol.
       </p>
       <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
-        Your protocol covers 15+ body proportions, your attractiveness score, and a science-backed roadmap tailored to your specific build. Not a template. Built for you.
+        Your protocol covers 15+ body proportions, your attractiveness score, and a science-backed roadmap built around your specific goals and body type.
       </p>
       ${btn("Complete my order — $89 →", CHECKOUT_URL)}
       <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
