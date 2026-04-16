@@ -84,10 +84,10 @@ const SECTION_NAMES = [
   "Identity",
   "Social context",
   "Biometrics",
-  "Photos",
   "Training",
   "Nutrition",
   "Health",
+  "Photos",
 ];
 
 export default function QuestionnaireFlow({ user, initialAnswers, initialSection }: Props) {
@@ -209,10 +209,10 @@ export default function QuestionnaireFlow({ user, initialAnswers, initialSection
           {section === 1 && <S1Identity {...sectionProps} isFirst />}
           {section === 2 && <S2Social {...sectionProps} />}
           {section === 3 && <S3Biometrics {...sectionProps} />}
-          {section === 4 && <S4Photos {...sectionProps} />}
-          {section === 5 && <S5Training {...sectionProps} />}
-          {section === 6 && <S6Nutrition {...sectionProps} />}
-          {section === 7 && <S7Health {...sectionProps} />}
+          {section === 4 && <S5Training {...sectionProps} />}
+          {section === 5 && <S6Nutrition {...sectionProps} />}
+          {section === 6 && <S7Health {...sectionProps} />}
+          {section === 7 && <S4Photos {...sectionProps} />}
           {section === 8 && (
             <ReviewScreen
               answers={answers}
