@@ -8,6 +8,12 @@ const EMAIL_1_DELAY_MIN = 10;
 const EMAIL_2_DELAY_HOURS = 4;
 const FROM = "Protocol Club <hello@protocol-club.com>";
 const CART_RECOVERY_TOKEN_DAYS = 7;
+const QUESTIONNAIRE_MAGIC_LINK_DAYS = 7;
+
+// Questionnaire reminder delays (in hours)
+const Q_REMINDER_1_HOURS = 24;   // J+1
+const Q_REMINDER_2_HOURS = 72;   // J+3
+const Q_REMINDER_3_HOURS = 144;  // J+6
 
 const C = {
   bg: "#f9fbfb",
@@ -29,6 +35,18 @@ function getSupabase() {
 
 function hashToken(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+async function getQuestionnaireMagicLinkUrl(sb: ReturnType<typeof getSupabase>, userId: string): Promise<string> {
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(Date.now() + QUESTIONNAIRE_MAGIC_LINK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  // Invalidate any previous unused magic link tokens for this user
+  await sb.from("magic_link_tokens").update({ used: true }).eq("user_id", userId).eq("used", false);
+  await sb.from("magic_link_tokens").insert({ user_id: userId, token_hash: tokenHash, expires_at: expiresAt });
+
+  return `${SITE_URL}/api/auth/magic-link/verify?token=${token}&redirect=/questionnaire`;
 }
 
 async function getCartRecoveryUrl(sb: ReturnType<typeof getSupabase>, userId: string): Promise<string> {
@@ -171,6 +189,95 @@ const handler = schedule("*/5 * * * *", async () => {
       console.error("[abandoned-cart] email2 failed", { email: user.email, error: String(err) });
     }
   }
+
+  // ── Questionnaire reminders: J+1, J+3, J+6 ──
+  // Sent to paid users who haven't completed their assessment yet
+  const qStatuses = ["not_started", "questionnaire_in_progress"];
+
+  const qCutoff1 = new Date(now.getTime() - Q_REMINDER_1_HOURS * 60 * 60 * 1000).toISOString();
+  const qCutoff2 = new Date(now.getTime() - Q_REMINDER_2_HOURS * 60 * 60 * 1000).toISOString();
+  const qCutoff3 = new Date(now.getTime() - Q_REMINDER_3_HOURS * 60 * 60 * 1000).toISOString();
+
+  // Reminder 1: 24h after purchase, no reminder sent yet
+  const { data: qUsers1 } = await sb
+    .from("users")
+    .select("id, email, first_name")
+    .eq("has_paid", true)
+    .in("protocol_status", qStatuses)
+    .is("questionnaire_reminder_1_sent_at", null)
+    .lte("created_at", qCutoff1)
+    .limit(50);
+
+  // Reminder 2: 72h after purchase, reminder 1 already sent
+  const { data: qUsers2 } = await sb
+    .from("users")
+    .select("id, email, first_name")
+    .eq("has_paid", true)
+    .in("protocol_status", qStatuses)
+    .is("questionnaire_reminder_2_sent_at", null)
+    .not("questionnaire_reminder_1_sent_at", "is", null)
+    .lte("created_at", qCutoff2)
+    .limit(50);
+
+  // Reminder 3: 144h after purchase, reminder 2 already sent
+  const { data: qUsers3 } = await sb
+    .from("users")
+    .select("id, email, first_name")
+    .eq("has_paid", true)
+    .in("protocol_status", qStatuses)
+    .is("questionnaire_reminder_3_sent_at", null)
+    .not("questionnaire_reminder_2_sent_at", "is", null)
+    .lte("created_at", qCutoff3)
+    .limit(50);
+
+  const qResults = { r1: { sent: 0, failed: 0 }, r2: { sent: 0, failed: 0 }, r3: { sent: 0, failed: 0 } };
+
+  for (const [users, reminderKey, resultKey] of [
+    [qUsers1 ?? [], "questionnaire_reminder_1_sent_at", "r1"],
+    [qUsers2 ?? [], "questionnaire_reminder_2_sent_at", "r2"],
+    [qUsers3 ?? [], "questionnaire_reminder_3_sent_at", "r3"],
+  ] as [Array<{ id: string; email: string; first_name: string | null }>, string, "r1" | "r2" | "r3"][]) {
+    for (const user of users) {
+      await sb.from("users").update({ [reminderKey]: now.toISOString() }).eq("id", user.id);
+
+      const name = user.first_name ?? "there";
+
+      try {
+        const assessmentUrl = await getQuestionnaireMagicLinkUrl(sb, user.id);
+
+        const content = `
+          <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:#253239;line-height:1.25;letter-spacing:-0.02em;">
+            Your protocol is on hold, ${name}.
+          </h1>
+          <p style="margin:0 0 16px;font-size:15px;color:#515255;line-height:1.65;">
+            You purchased your Attractiveness Protocol but your assessment isn't complete yet.
+          </p>
+          <p style="margin:0 0 32px;font-size:15px;color:#515255;line-height:1.65;">
+            We can't build your protocol until we have your full answers. The more precise your inputs, the more accurate your results. It takes less than 10 minutes to finish.
+          </p>
+          <a href="${assessmentUrl}" style="display:inline-block;background:#253239;color:#ffffff;font-size:14px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;letter-spacing:0.01em;">Complete my assessment →</a>
+          <p style="margin:24px 0 0;font-size:13px;color:#7f949b;line-height:1.6;">
+            Your answers are encrypted and never shared. Photos are deleted after 12 weeks.
+          </p>
+        `;
+
+        await resend.emails.send({
+          from: FROM,
+          to: user.email,
+          subject: `Your protocol is on hold, ${name}`,
+          html: emailShell(content),
+        });
+
+        qResults[resultKey].sent++;
+        console.log(`[abandoned-cart] questionnaire ${reminderKey} sent`, { email: user.email });
+      } catch (err) {
+        qResults[resultKey].failed++;
+        console.error(`[abandoned-cart] questionnaire ${reminderKey} failed`, { email: user.email, error: String(err) });
+      }
+    }
+  }
+
+  console.log("[abandoned-cart] questionnaire reminders done", qResults);
 
   return { statusCode: 200 };
 });

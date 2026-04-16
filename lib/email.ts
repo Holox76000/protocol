@@ -321,3 +321,49 @@ export async function sendAbandonedCartEmail(props: {
   }
   console.log("[resend] abandoned cart email sent", { email: props.email, emailNumber: props.emailNumber });
 }
+
+// ─────────────────────────────────────────────────────────
+// Questionnaire reminder — J+1, J+3, J+6 post-purchase
+// Only sent if questionnaire not yet submitted
+// ─────────────────────────────────────────────────────────
+export async function sendQuestionnaireReminderEmail(props: {
+  email: string;
+  firstName?: string;
+  assessmentUrl: string;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const content = `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your protocol is on hold, ${name}.
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      You purchased your Attractiveness Protocol but your assessment isn't complete yet.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      We can't build your protocol until we have your full answers. The more precise your inputs, the more accurate your results. It takes less than 10 minutes to finish.
+    </p>
+
+    ${btn("Complete my assessment →", props.assessmentUrl)}
+
+    <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Your answers are encrypted and never shared. Photos are deleted after 12 weeks.
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: props.email,
+    subject: `Your protocol is on hold, ${name}`,
+    html: emailShell(content),
+  });
+
+  if (error) {
+    console.error("[resend] sendQuestionnaireReminderEmail failed", { error: error.message, email: props.email });
+    return;
+  }
+  console.log("[resend] questionnaire reminder email sent", { email: props.email });
+}
