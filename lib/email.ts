@@ -227,7 +227,7 @@ export async function sendPurchaseConfirmationEmail(props: {
               <td colspan="2" style="padding:8px 0;"><div style="height:1px;background:${C.border};"></div></td>
             </tr>
             <tr>
-              <td style="font-size:13px;color:${C.subtle};">Full body analysis · Personalized roadmap · 90-day guarantee</td>
+              <td style="font-size:13px;color:${C.subtle};">Full body analysis · Personalized roadmap</td>
             </tr>
           </table>
         </td>
