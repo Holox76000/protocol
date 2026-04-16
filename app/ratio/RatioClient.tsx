@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import type { PoseLandmarker, NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 type Metrics = {
@@ -74,8 +74,17 @@ export default function RatioClient() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const imgRef = useRef<HTMLImageElement>(null);
+  const [detectedLandmarks, setDetectedLandmarks] = useState<NormalizedLandmark[] | null>(null);
+  const [sourceImg, setSourceImg] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Draw skeleton after the canvas is mounted in the DOM (status === "done")
+  useEffect(() => {
+    if (status === "done" && detectedLandmarks && sourceImg) {
+      drawSkeleton(sourceImg, detectedLandmarks);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, detectedLandmarks, sourceImg]);
 
   const analyze = useCallback(async (file: File) => {
     setStatus("loading-model");
@@ -119,9 +128,9 @@ export default function RatioClient() {
         return;
       }
 
-      // Draw skeleton on canvas
-      drawSkeleton(img, result.landmarks[0]);
-
+      // Store landmarks + source image — skeleton drawn in useEffect after canvas mounts
+      setDetectedLandmarks(result.landmarks[0]);
+      setSourceImg(img);
       setMetrics(m);
       setStatus("done");
     } catch (err) {
@@ -378,8 +387,6 @@ export default function RatioClient() {
           </div>
         )}
 
-        {/* Hidden canvas for drawing (used during analysis) */}
-        {status !== "done" && <canvas ref={canvasRef} className="hidden" />}
       </div>
     </main>
   );
