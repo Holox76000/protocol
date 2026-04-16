@@ -82,14 +82,21 @@ export default function RatioClient() {
     setMetrics(null);
     setErrorMsg("");
 
-    const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
-
     try {
       const landmarker = await getPoseLandmarker();
       setStatus("analyzing");
 
-      // Load image into a temp element for inference
+      // createImageBitmap auto-corrects EXIF rotation (handles sideways iPhone photos)
+      const bitmap = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
+      bitmap.close();
+
+      const objectUrl = canvas.toDataURL("image/jpeg", 0.92);
+      setPreview(objectUrl);
+
       const img = new window.Image();
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
