@@ -4,6 +4,7 @@ import { sendMetaEvent } from "../../../../lib/metaCapi";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
 import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from "../../../../lib/email";
+import { promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
 export const runtime = "nodejs";
@@ -123,12 +124,15 @@ export async function POST(request: Request) {
 
             const firstName = (existingUser as { first_name?: string }).first_name ?? undefined;
 
-            void sendPurchaseConfirmationEmail({
-              email: customerEmail,
-              firstName,
-              amount: pi.amount / 100,
-              currency: (pi.currency ?? "usd").toUpperCase(),
-            }).catch(() => {});
+            void Promise.allSettled([
+              promoteLeadToCustomer(customerEmail, firstName),
+              sendPurchaseConfirmationEmail({
+                email: customerEmail,
+                firstName,
+                amount: pi.amount / 100,
+                currency: (pi.currency ?? "usd").toUpperCase(),
+              }),
+            ]);
           }
         } catch (err) {
           console.error("[webhook/stripe] User update failed (pi)", { error: String(err), email: customerEmail });
@@ -216,14 +220,15 @@ export async function POST(request: Request) {
             email: customerEmail,
           });
 
-          void sendPurchaseConfirmationEmail({
-            email: customerEmail,
-            firstName,
-            amount: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
-            currency: (session.currency ?? "usd").toUpperCase(),
-          }).catch((err) => {
-            console.error("[webhook/stripe] Purchase confirmation email failed", { error: String(err), email: customerEmail });
-          });
+          void Promise.allSettled([
+            promoteLeadToCustomer(customerEmail, firstName),
+            sendPurchaseConfirmationEmail({
+              email: customerEmail,
+              firstName,
+              amount: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
+              currency: (session.currency ?? "usd").toUpperCase(),
+            }),
+          ]);
         } else {
           // New customer — create a registration token so they can sign up
           const regToken = await createRegistrationToken({

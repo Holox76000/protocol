@@ -7,6 +7,7 @@ import {
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
+import { addToLeadsList, promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
 
@@ -145,6 +146,16 @@ export async function POST(request: Request) {
 
   // Run side-effects after response is sent, guaranteed to complete on serverless
   waitUntil((async () => {
+    if (hasPaid) {
+      await promoteLeadToCustomer(email, firstName).catch((err) =>
+        console.error("[register] Klaviyo promote failed", { error: String(err), email })
+      );
+    } else {
+      await addToLeadsList(email, firstName).catch((err) =>
+        console.error("[register] Klaviyo leads failed", { error: String(err), email })
+      );
+    }
+
     // Meta CAPI Lead event
     await sendMetaEvent({
       eventName: "Lead",
