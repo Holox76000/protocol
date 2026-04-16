@@ -36,6 +36,7 @@
     "node_modules",
     ".agents",
     "skills",
-    "www.qoves.com"
+    "www.qoves.com",
+    "scripts"
   ]
 }

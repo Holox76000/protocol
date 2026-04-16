@@ -231,21 +231,38 @@ export async function sendPurchaseConfirmationEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Panier abandonné — envoyé quand un user entre son email
-// au checkout mais ne finalise pas
+// Panier abandonné — email 1 (10 min) et email 2 (4h)
+// Déclenché par le cron /api/cron/abandoned-cart
 // ─────────────────────────────────────────────────────────
 export async function sendAbandonedCartEmail(props: {
   email: string;
   firstName?: string;
   checkoutUrl: string;
+  emailNumber: 1 | 2;
 }): Promise<void> {
   const resend = getResend();
   const name = props.firstName ?? "toi";
 
+  const isSecond = props.emailNumber === 2;
+
+  const subject = isSecond
+    ? "Dernière chance de démarrer ton protocole"
+    : "Tu as oublié quelque chose 👀";
+
+  const heading = isSecond
+    ? `${name}, ton protocole t'attend toujours`
+    : `Ton protocole t'attend ${name}`;
+
+  const body = isSecond
+    ? `Il y a quelques heures, tu as commencé ton questionnaire mais n'as pas finalisé ta commande. C'est ta dernière relance — après ça, on ne te dérange plus.`
+    : `Tu as commencé à remplir ton questionnaire mais n'as pas finalisé ta commande. Ton protocole personnalisé est à un clic.`;
+
+  const cta = isSecond ? "Je finalise maintenant →" : "Finaliser ma commande →";
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Tu as oublié quelque chose 👀",
+    subject,
     html: `
 <!DOCTYPE html>
 <html lang="fr">
@@ -257,20 +274,17 @@ export async function sendAbandonedCartEmail(props: {
         <tr><td style="padding:40px 40px 32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Ton protocole t'attend ${name}
+            ${heading}
           </h1>
-          <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Tu as commencé à remplir ton questionnaire mais n'as pas finalisé ta commande.
-          </p>
           <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            Ton protocole personnalisé est à un clic. Reprends où tu t'étais arrêté.
+            ${body}
           </p>
           <a href="${props.checkoutUrl}"
              style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Finaliser ma commande →
+            ${cta}
           </a>
           <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Des questions avant d'acheter ? Réponds directement à cet email.
+            Des questions ? Réponds directement à cet email.
           </p>
         </td></tr>
       </table>
@@ -281,8 +295,8 @@ export async function sendAbandonedCartEmail(props: {
   });
 
   if (error) {
-    console.error("[resend] sendAbandonedCartEmail failed", { error: error.message, email: props.email });
-    return; // non-fatal
+    console.error("[resend] sendAbandonedCartEmail failed", { error: error.message, email: props.email, emailNumber: props.emailNumber });
+    return;
   }
-  console.log("[resend] abandoned cart email sent", { email: props.email });
+  console.log("[resend] abandoned cart email sent", { email: props.email, emailNumber: props.emailNumber });
 }

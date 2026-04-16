@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
-import { sendAbandonedCartEmail } from "../../../lib/email";
 
 type LeadPayload = {
   email: string;
@@ -120,11 +119,6 @@ export async function POST(request: Request) {
       console.error("[lead] meta event failed", { error: String(err), email });
     }
 
-    await sendAbandonedCartEmail({
-      email,
-      firstName: body.answers?.first_name,
-      checkoutUrl: "https://protocol-club.com/f1",
-    });
   })());
 
   return NextResponse.json({ ok: true });
