@@ -239,7 +239,7 @@ export async function POST(request: Request) {
 
           const registrationUrl = `${SITE_URL}/register?token=${regToken}`;
 
-          // Fire-and-forget: welcome email via Klaviyo
+          // Fire-and-forget: welcome email via Resend
           void sendWelcomeEmail({
             email: customerEmail,
             firstName,

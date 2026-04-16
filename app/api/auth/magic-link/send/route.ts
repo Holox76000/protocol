@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       magicLinkUrl,
     });
   } catch (err) {
-    console.error("[magic-link/send] Klaviyo failed", { error: String(err), email });
+    console.error("[magic-link/send] Resend failed", { error: String(err), email });
     return NextResponse.json(
       { error: "Failed to send login link. Please try again or contact support." },
       { status: 502 }

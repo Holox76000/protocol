@@ -65,7 +65,7 @@ export async function POST(
     return NextResponse.json({ error: "Failed to mark as delivered" }, { status: 500 });
   }
 
-  // Fire Klaviyo event (non-fatal)
+  // Send protocol delivered email via Resend (non-fatal)
   void sendProtocolDeliveredEmail({
     email: user.email,
     firstName: user.first_name,
