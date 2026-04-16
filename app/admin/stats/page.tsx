@@ -1,6 +1,8 @@
 import { requireAdmin } from "../../../lib/adminAuth";
 import { supabaseAdmin } from "../../../lib/supabase";
-import StatsClient from "./StatsClient";
+import dynamic from "next/dynamic";
+
+const StatsClient = dynamic(() => import("./StatsClient"), { ssr: false });
 
 export const runtime = "nodejs";
 
