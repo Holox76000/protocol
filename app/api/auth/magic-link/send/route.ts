@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../../lib/supabase";
 import { createMagicLinkToken } from "../../../../../lib/auth";
-import { sendMagicLinkEmail } from "../../../../../lib/klaviyo";
+import { sendMagicLinkEmail } from "../../../../../lib/email";
 
 export const runtime = "nodejs";
 

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME } from "./lib/auth-constants";
 
 // Routes that require authentication
-const PROTECTED_PREFIXES = ["/dashboard", "/questionnaire", "/admin"];
+const PROTECTED_PREFIXES = ["/dashboard", "/questionnaire", "/admin", "/protocol"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -32,5 +32,7 @@ export const config = {
     "/dashboard/:path*",
     "/questionnaire/:path*",
     "/admin/:path*",
+    "/protocol",
+    "/protocol/:path*",
   ],
 };

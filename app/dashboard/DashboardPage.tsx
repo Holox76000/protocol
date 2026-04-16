@@ -320,9 +320,18 @@ function StatusCard({ user, submittedAt }: { user: AuthUser; submittedAt?: strin
             Your Protocol is ready.
           </h2>
           <p className="text-[13.5px] leading-relaxed text-dim mb-5">
-            Your personalized Attractiveness Protocol has been sent to your email.
+            Your personalized Attractiveness Protocol is available below.
           </p>
           <StepBar activeUpTo={2} />
+        </div>
+        <div className="border-t border-wire px-6 py-4">
+          <Link
+            href="/protocol"
+            className="flex w-full items-center justify-between rounded-lg bg-void px-5 py-3 text-[13px] font-semibold text-white transition-all duration-150 hover:bg-[#1a1a1b] active:scale-[0.99]"
+          >
+            <span>View your Protocol</span>
+            <span className="text-white/50">→</span>
+          </Link>
         </div>
       </div>
     );

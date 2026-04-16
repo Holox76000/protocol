@@ -55,6 +55,7 @@ export async function POST(request: Request) {
         funnel,
         customer_email: email ?? "",
         source: "app_checkout",
+        capi_purchase_source: "payment_intent",
         ...utmMetadata,
       },
     });

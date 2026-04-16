@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
-import { sendKlaviyoWelcomeEmail, promoteLeadToCustomer, sendKlaviyoPurchaseEvent } from "../../../../lib/klaviyo";
+import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from "../../../../lib/email";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
 export const runtime = "nodejs";
@@ -37,71 +37,102 @@ export async function POST(request: Request) {
   if (event.type === "payment_intent.succeeded") {
     const pi = event.data.object as Stripe.PaymentIntent;
     const meta = (pi.metadata ?? {}) as Record<string, string>;
-    const customerEmail = meta.customer_email || null;
     const stripeCustomerId =
       typeof pi.customer === "string" ? pi.customer : null;
+
+    // capi_purchase_source tells us which flow created this PaymentIntent:
+    //   "checkout_session" → created by a Stripe Checkout Session, already
+    //                        handled by checkout.session.completed — skip to avoid
+    //                        double-counting in Meta with a different event_id.
+    //   "payment_intent"   → created directly by our embedded checkout flow.
+    //   absent             → external payment (Stripe dashboard, link, etc.) —
+    //                        still process so no purchase is ever silently lost.
+    const capiSource = meta.capi_purchase_source ?? null;
 
     console.log("[webhook/stripe] payment_intent.succeeded", {
       paymentIntentId: pi.id,
       amount: pi.amount,
       funnel: meta.funnel,
-      email: customerEmail,
+      capiSource,
     });
 
-    // Meta CAPI Purchase
-    try {
-      await sendMetaEvent({
-        eventName: "Purchase",
-        eventTime: pi.created ?? Math.floor(Date.now() / 1000),
-        eventId: pi.id,
-        actionSource: "website",
-        eventSourceUrl: "https://protocol-club.com/dashboard",
-        email: customerEmail,
-        customData: {
-          value: pi.amount / 100,
-          currency: (pi.currency ?? "usd").toUpperCase(),
-          content_name: "Attractiveness Protocol",
-          content_ids: ["f1-attractiveness-protocol"],
-          content_type: "product",
-          funnel: meta.funnel ?? null,
-          ...(meta.utm_source && { utm_source: meta.utm_source }),
-          ...(meta.utm_medium && { utm_medium: meta.utm_medium }),
-          ...(meta.utm_campaign && { utm_campaign: meta.utm_campaign }),
-          ...(meta.utm_content && { utm_content: meta.utm_content }),
-          ...(meta.utm_term && { utm_term: meta.utm_term }),
-          ...(meta.fbclid && { fbclid: meta.fbclid }),
-        },
-      });
-    } catch (err) {
-      console.error("[webhook/stripe] Purchase CAPI failed (pi)", { error: String(err), piId: pi.id });
-    }
+    if (capiSource === "checkout_session") {
+      // Fully handled by checkout.session.completed — nothing to do here.
+      console.log("[webhook/stripe] Skipping PI — owned by checkout session", { piId: pi.id });
+    } else {
+      // Direct PaymentIntent or external payment: resolve email then fire CAPI.
+      let customerEmail = meta.customer_email || null;
 
-    if (customerEmail) {
-      try {
-        const { data: existingUser } = await supabaseAdmin
-          .from("users")
-          .select("id, first_name")
-          .eq("email", customerEmail.toLowerCase())
-          .maybeSingle();
-
-        if (existingUser) {
-          await supabaseAdmin
-            .from("users")
-            .update({
-              has_paid: true,
-              ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
-            })
-            .eq("id", existingUser.id);
-
-          const firstName = (existingUser as { first_name?: string }).first_name ?? undefined;
-
-          void Promise.allSettled([
-            promoteLeadToCustomer(customerEmail, firstName),
-            sendKlaviyoPurchaseEvent(customerEmail, firstName),
-          ]).catch(() => {});
+      // For external payments (no customer_email in metadata), fall back to the
+      // Stripe Customer object so the purchase is never lost.
+      if (!customerEmail && stripeCustomerId) {
+        try {
+          const customer = await stripe.customers.retrieve(stripeCustomerId);
+          if (customer && !("deleted" in customer)) {
+            customerEmail = customer.email ?? null;
+          }
+        } catch (err) {
+          console.error("[webhook/stripe] Customer retrieve failed (pi)", { error: String(err), piId: pi.id });
         }
+      }
+
+      // Meta CAPI Purchase
+      try {
+        await sendMetaEvent({
+          eventName: "Purchase",
+          eventTime: pi.created ?? Math.floor(Date.now() / 1000),
+          eventId: pi.id,
+          actionSource: "website",
+          eventSourceUrl: "https://protocol-club.com/dashboard",
+          email: customerEmail,
+          customData: {
+            value: pi.amount / 100,
+            currency: (pi.currency ?? "usd").toUpperCase(),
+            content_name: "Attractiveness Protocol",
+            content_ids: ["f1-attractiveness-protocol"],
+            content_type: "product",
+            funnel: meta.funnel ?? null,
+            ...(meta.utm_source && { utm_source: meta.utm_source }),
+            ...(meta.utm_medium && { utm_medium: meta.utm_medium }),
+            ...(meta.utm_campaign && { utm_campaign: meta.utm_campaign }),
+            ...(meta.utm_content && { utm_content: meta.utm_content }),
+            ...(meta.utm_term && { utm_term: meta.utm_term }),
+            ...(meta.fbclid && { fbclid: meta.fbclid }),
+          },
+        });
       } catch (err) {
-        console.error("[webhook/stripe] User update failed (pi)", { error: String(err), email: customerEmail });
+        console.error("[webhook/stripe] Purchase CAPI failed (pi)", { error: String(err), piId: pi.id });
+      }
+
+      if (customerEmail) {
+        try {
+          const { data: existingUser } = await supabaseAdmin
+            .from("users")
+            .select("id, first_name")
+            .eq("email", customerEmail.toLowerCase())
+            .maybeSingle();
+
+          if (existingUser) {
+            await supabaseAdmin
+              .from("users")
+              .update({
+                has_paid: true,
+                ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
+              })
+              .eq("id", existingUser.id);
+
+            const firstName = (existingUser as { first_name?: string }).first_name ?? undefined;
+
+            void sendPurchaseConfirmationEmail({
+              email: customerEmail,
+              firstName,
+              amount: pi.amount / 100,
+              currency: (pi.currency ?? "usd").toUpperCase(),
+            }).catch(() => {});
+          }
+        } catch (err) {
+          console.error("[webhook/stripe] User update failed (pi)", { error: String(err), email: customerEmail });
+        }
       }
     }
   }
@@ -185,12 +216,13 @@ export async function POST(request: Request) {
             email: customerEmail,
           });
 
-          // Move from leads → customers and fire purchase event
-          void Promise.allSettled([
-            promoteLeadToCustomer(customerEmail, firstName),
-            sendKlaviyoPurchaseEvent(customerEmail, firstName),
-          ]).then(() => {
-            console.log("[webhook/stripe] Klaviyo updated for existing user", { email: customerEmail });
+          void sendPurchaseConfirmationEmail({
+            email: customerEmail,
+            firstName,
+            amount: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
+            currency: (session.currency ?? "usd").toUpperCase(),
+          }).catch((err) => {
+            console.error("[webhook/stripe] Purchase confirmation email failed", { error: String(err), email: customerEmail });
           });
         } else {
           // New customer — create a registration token so they can sign up
@@ -203,12 +235,12 @@ export async function POST(request: Request) {
           const registrationUrl = `${SITE_URL}/register?token=${regToken}`;
 
           // Fire-and-forget: welcome email via Klaviyo
-          void sendKlaviyoWelcomeEmail({
+          void sendWelcomeEmail({
             email: customerEmail,
             firstName,
             registrationUrl,
           }).catch((err) => {
-            console.error("[webhook/stripe] Klaviyo welcome email failed", {
+            console.error("[webhook/stripe] Welcome email failed", {
               error: String(err),
               email: customerEmail,
             });

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
-import { trackKlaviyoStartedCheckout } from "../../../lib/klaviyo";
+import { sendAbandonedCartEmail } from "../../../lib/email";
 
 type LeadPayload = {
   email: string;
@@ -102,24 +102,6 @@ export async function POST(request: Request) {
   const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const eventSourceUrl = request.headers.get("referer") ?? request.headers.get("origin") ?? undefined;
 
-  const klaviyoPayload = {
-    email,
-    firstName: body.answers?.first_name,
-    value: 89,
-    checkoutUrl: "https://protocol-club.com/checkout?funnel=f1",
-    items: [
-      {
-        ProductID: "f1-attractiveness-protocol",
-        ProductName: "Attractiveness Protocol",
-        Quantity: 1,
-        ItemPrice: 49,
-        RowTotal: 49,
-        ProductURL: "https://protocol-club.com/f1/offer",
-      },
-    ],
-    utm: body.utm as Record<string, string | undefined> | undefined,
-  };
-
   // Use waitUntil so both side-effects complete before the serverless function exits.
   waitUntil((async () => {
     try {
@@ -138,7 +120,11 @@ export async function POST(request: Request) {
       console.error("[lead] meta event failed", { error: String(err), email });
     }
 
-    await trackKlaviyoStartedCheckout(klaviyoPayload);
+    await sendAbandonedCartEmail({
+      email,
+      firstName: body.answers?.first_name,
+      checkoutUrl: "https://protocol-club.com/f1",
+    });
   })());
 
   return NextResponse.json({ ok: true });

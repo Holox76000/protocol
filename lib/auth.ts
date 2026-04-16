@@ -21,6 +21,7 @@ export type AuthUser = {
   has_paid: boolean;
   protocol_status: string;
   has_password: boolean;
+  is_admin: boolean;
 };
 
 // ──────────────────────────────────────────────
@@ -120,7 +121,7 @@ export async function validateSession(token: string): Promise<AuthUser | null> {
 
   const { data: user } = await supabaseAdmin
     .from("users")
-    .select("id, email, first_name, has_paid, protocol_status, password_hash")
+    .select("id, email, first_name, has_paid, protocol_status, password_hash, is_admin")
     .eq("id", session.user_id)
     .maybeSingle();
 

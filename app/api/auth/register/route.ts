@@ -4,12 +4,10 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 import {
   createSession,
   consumeRegistrationToken,
-  createCartRecoveryToken,
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
 import { getStripeServerClient } from "../../../../lib/stripe";
-import { addToLeadsList, promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
 
 export const runtime = "nodejs";
@@ -147,28 +145,6 @@ export async function POST(request: Request) {
 
   // Run side-effects after response is sent, guaranteed to complete on serverless
   waitUntil((async () => {
-    // Klaviyo: paid users go straight to customers, unpaid users enter leads
-    if (hasPaid) {
-      await promoteLeadToCustomer(email, firstName).catch((err) =>
-        console.error("[register] Klaviyo promote failed", { error: String(err), email })
-      );
-    } else {
-      // Generate a cart recovery link so Klaviyo abandoned cart flows can
-      // include a one-click login link directly to /checkout
-      let cartRecoveryUrl: string | undefined;
-      try {
-        const recoveryToken = await createCartRecoveryToken(user.id);
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "";
-        cartRecoveryUrl = `${baseUrl}/api/auth/cart-recovery/verify?token=${recoveryToken}`;
-      } catch (err) {
-        console.error("[register] cart recovery token failed", { error: String(err), email });
-      }
-
-      await addToLeadsList(email, firstName, cartRecoveryUrl).catch((err) =>
-        console.error("[register] Klaviyo leads failed", { error: String(err), email })
-      );
-    }
-
     // Meta CAPI Lead event
     await sendMetaEvent({
       eventName: "Lead",

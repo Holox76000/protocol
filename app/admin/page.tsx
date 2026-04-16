@@ -1,67 +1,46 @@
-import { getAdminStats } from "../../lib/adminStats";
+import { requireAdmin } from "../../lib/adminAuth";
+import { supabaseAdmin } from "../../lib/supabase";
+import OrderListClient from "./OrderListClient";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const runtime = "nodejs";
 
 export default async function AdminPage() {
-  let stats;
+  await requireAdmin(); // layout already guards, belt-and-suspenders
 
-  try {
-    stats = await getAdminStats();
-  } catch (error) {
-    console.error(error);
-    stats = {
-      started: 0,
-      steps: Array.from({ length: 9 }, (_, index) => ({
-        label: `Step ${index + 1}`,
-        count: 0
-      })),
-      optinViewed: 0,
-      leadSubmitted: 0,
-      resultViewed: 0
+  const { data } = await supabaseAdmin
+    .from("users")
+    .select(`
+      id, email, first_name, protocol_status, created_at,
+      questionnaire_responses(submitted_at)
+    `)
+    .eq("has_paid", true)
+    .order("created_at", { ascending: false });
+
+  const orders = (data ?? []).map((u) => {
+    const qr = Array.isArray(u.questionnaire_responses)
+      ? u.questionnaire_responses[0]
+      : u.questionnaire_responses;
+    return {
+      id: u.id as string,
+      email: u.email as string,
+      first_name: u.first_name as string,
+      protocol_status: u.protocol_status as string,
+      created_at: u.created_at as string,
+      submitted_at: (qr as { submitted_at?: string } | null)?.submitted_at ?? null,
     };
-  }
+  });
 
   return (
-    <main className="bg-white text-black min-h-screen">
-      <div className="mx-auto max-w-5xl px-6 py-16">
-        <h1 className="text-3xl font-display font-semibold uppercase tracking-[0.2em]">
-          Quiz Analytics
-        </h1>
-        <p className="mt-4 text-sm text-black/60">
-          Local database snapshot. Counts are unique sessions per step/event.
-        </p>
-
-        <div className="mt-10 grid gap-4 md:grid-cols-4">
-          <div className="card-raise rounded-2xl border border-black/20 bg-white p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/60">Started</p>
-            <p className="mt-3 text-3xl font-display font-semibold text-black">{stats.started}</p>
-          </div>
-          <div className="card-raise rounded-2xl border border-black/20 bg-white p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/60">Opt-In Viewed</p>
-            <p className="mt-3 text-3xl font-display font-semibold text-black">{stats.optinViewed}</p>
-          </div>
-          <div className="card-raise rounded-2xl border border-black/20 bg-white p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/60">Lead Submitted</p>
-            <p className="mt-3 text-3xl font-display font-semibold text-black">{stats.leadSubmitted}</p>
-          </div>
-          <div className="card-raise rounded-2xl border border-black/20 bg-white p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-black/60">Result Viewed</p>
-            <p className="mt-3 text-3xl font-display font-semibold text-black">{stats.resultViewed}</p>
-          </div>
+    <main className="min-h-screen bg-ash px-6 py-10">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">Admin</p>
+          <h1 className="mt-1 font-display text-3xl text-void">Orders</h1>
+          <p className="mt-1 text-[13px] text-dim">
+            {orders.length} paid client{orders.length !== 1 ? "s" : ""}
+          </p>
         </div>
-
-        <div className="mt-12">
-          <h2 className="text-xl font-display font-semibold uppercase tracking-[0.2em]">Step Funnel</h2>
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {stats.steps.map((step) => (
-              <div key={step.label} className="rounded-2xl border border-black/15 bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-black/60">{step.label}</p>
-                <p className="mt-2 text-2xl font-display font-semibold text-black">{step.count}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <OrderListClient orders={orders} />
       </div>
     </main>
   );

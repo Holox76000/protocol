@@ -573,6 +573,66 @@ export async function sendMagicLinkEmail(props: {
 }
 
 /**
+ * Fire a "Protocol Delivered" event on the client's Klaviyo profile.
+ * Set up a Klaviyo flow triggered by this metric to send the delivery email,
+ * using {{ event.dashboard_url }} to link directly to /protocol.
+ */
+export async function sendKlaviyoProtocolDeliveredEmail(
+  email: string,
+  firstName?: string,
+  dashboardUrl: string = "https://protocol-club.com/protocol"
+): Promise<void> {
+  const apiKey = getApiKey();
+  if (!apiKey) return;
+
+  try {
+    const res = await fetch(`${KLAVIYO_API_BASE}/events/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Klaviyo-API-Key ${apiKey}`,
+        "Content-Type": "application/json",
+        revision: "2024-02-15",
+      },
+      body: JSON.stringify({
+        data: {
+          type: "event",
+          attributes: {
+            properties: {
+              dashboard_url: dashboardUrl,
+              ...(firstName && { first_name: firstName }),
+            },
+            metric: {
+              data: {
+                type: "metric",
+                attributes: { name: "Protocol Delivered" },
+              },
+            },
+            profile: {
+              data: {
+                type: "profile",
+                attributes: {
+                  email,
+                  ...(firstName && { first_name: firstName }),
+                },
+              },
+            },
+          },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[klaviyo] Protocol Delivered event failed", { status: res.status, body: text, email });
+    } else {
+      console.log("[klaviyo] Protocol Delivered event sent", { email });
+    }
+  } catch (err) {
+    console.error("[klaviyo] Protocol Delivered event error", { error: String(err), email });
+  }
+}
+
+/**
  * Move a profile from leads list (UQbC9Z) to customers list (UYABKB).
  * Call this when a user completes registration after purchase.
  */

@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     funnel: internalFunnel,
     funnel_type: funnelType,
     source: "app_checkout",
+    capi_purchase_source: "checkout_session",
     landing_page: landingPage,
     ...(body.utm_source && { utm_source: body.utm_source }),
     ...(body.utm_medium && { utm_medium: body.utm_medium }),
