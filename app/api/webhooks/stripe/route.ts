@@ -133,6 +133,45 @@ export async function POST(request: Request) {
                 currency: (pi.currency ?? "usd").toUpperCase(),
               }),
             ]);
+          } else {
+            // New customer — no account yet: create a registration token and send welcome email
+            let firstName: string | undefined;
+
+            // Try to pull the name from the Stripe Customer object if available
+            if (stripeCustomerId) {
+              try {
+                const customer = await stripe.customers.retrieve(stripeCustomerId);
+                if (customer && !("deleted" in customer) && customer.name) {
+                  firstName = customer.name.trim().split(" ")[0];
+                }
+              } catch {
+                // Non-fatal — firstName stays undefined
+              }
+            }
+
+            const regToken = await createRegistrationToken({
+              email: customerEmail,
+              firstName,
+              stripeCustomerId: stripeCustomerId ?? undefined,
+            });
+
+            const registrationUrl = `${SITE_URL}/register?token=${regToken}`;
+
+            void sendWelcomeEmail({
+              email: customerEmail,
+              firstName,
+              registrationUrl,
+            }).catch((err) => {
+              console.error("[webhook/stripe] Welcome email failed (pi/new user)", {
+                error: String(err),
+                email: customerEmail,
+              });
+            });
+
+            console.log("[webhook/stripe] New user via PI — registration token created, welcome email queued", {
+              email: customerEmail,
+              registrationUrl,
+            });
           }
         } catch (err) {
           console.error("[webhook/stripe] User update failed (pi)", { error: String(err), email: customerEmail });
