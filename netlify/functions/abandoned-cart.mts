@@ -1,11 +1,13 @@
 import { schedule } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import crypto from "node:crypto";
 
-const CHECKOUT_URL = "https://protocol-club.com/f1";
+const SITE_URL = "https://protocol-club.com";
 const EMAIL_1_DELAY_MIN = 10;
 const EMAIL_2_DELAY_HOURS = 4;
 const FROM = "Protocol Club <hello@protocol-club.com>";
+const CART_RECOVERY_TOKEN_DAYS = 7;
 
 const C = {
   bg: "#f9fbfb",
@@ -25,6 +27,22 @@ function getSupabase() {
   );
 }
 
+function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+async function getCartRecoveryUrl(sb: ReturnType<typeof getSupabase>, userId: string): Promise<string> {
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(Date.now() + CART_RECOVERY_TOKEN_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  // Replace any existing token
+  await sb.from("cart_recovery_tokens").delete().eq("user_id", userId);
+  await sb.from("cart_recovery_tokens").insert({ user_id: userId, token_hash: tokenHash, expires_at: expiresAt });
+
+  return `${SITE_URL}/api/auth/cart-recovery/verify?token=${token}`;
+}
+
 function emailShell(content: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -42,7 +60,7 @@ function emailShell(content: string): string {
         <tr><td style="padding:24px 0 0;">
           <p style="margin:0;font-size:12px;color:${C.subtle};line-height:1.6;">
             Protocol Club · Questions? Reply to this email.<br>
-            <a href="https://protocol-club.com" style="color:${C.subtle};text-decoration:underline;">protocol-club.com</a>
+            <a href="${SITE_URL}" style="color:${C.subtle};text-decoration:underline;">protocol-club.com</a>
           </p>
         </td></tr>
       </table>
@@ -76,6 +94,8 @@ const handler = schedule("*/5 * * * *", async () => {
     await sb.from("users").update({ cart_email_1_sent_at: now.toISOString() }).eq("id", user.id);
 
     const name = user.first_name ?? "there";
+    const checkoutUrl = await getCartRecoveryUrl(sb, user.id);
+
     const content = `
       <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
         Your body analysis is waiting, ${name}.
@@ -86,7 +106,7 @@ const handler = schedule("*/5 * * * *", async () => {
       <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
         Your protocol covers 15+ body proportions, your attractiveness score, and a science-backed roadmap built around your specific goals and body type.
       </p>
-      ${btn("Complete my order — $89 →", CHECKOUT_URL)}
+      ${btn("Complete my order — $89 →", checkoutUrl)}
       <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
         90-day money-back guarantee. No conditions.
       </p>
@@ -121,6 +141,8 @@ const handler = schedule("*/5 * * * *", async () => {
     await sb.from("users").update({ cart_email_2_sent_at: now.toISOString() }).eq("id", user.id);
 
     const name = user.first_name ?? "there";
+    const checkoutUrl = await getCartRecoveryUrl(sb, user.id);
+
     const content = `
       <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
         Still thinking about it, ${name}?
@@ -131,7 +153,7 @@ const handler = schedule("*/5 * * * *", async () => {
       <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
         Most guys who complete it see exactly what's holding their score back within the first read. It's not guesswork — it's your data.
       </p>
-      ${btn("Get my protocol — $89 →", CHECKOUT_URL)}
+      ${btn("Get my protocol — $89 →", checkoutUrl)}
       <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
         90-day money-back guarantee. No conditions. This is our last email.
       </p>
