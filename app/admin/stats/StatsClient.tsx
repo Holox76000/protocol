@@ -76,75 +76,12 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
           <KpiCard label="Last 7 days" value={kpis.last7Orders} sub={`${kpis.last7Leads} leads`} />
         </div>
 
-        {/* Cumulative growth */}
+        {/* Daily activity — bar chart */}
         <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
-            Cumulative growth
-          </p>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="gLead" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={LEAD_COLOR} stopOpacity={0.15} />
-                  <stop offset="95%" stopColor={LEAD_COLOR} stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gOrder" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={ORDER_COLOR} stopOpacity={0.2} />
-                  <stop offset="95%" stopColor={ORDER_COLOR} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#edf0f1" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickFormatter={formatDate}
-                tick={{ fontSize: 11, fill: "#7f949b" }}
-                axisLine={false}
-                tickLine={false}
-                interval="preserveStartEnd"
-              />
-              <YAxis
-                tick={{ fontSize: 11, fill: "#7f949b" }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-              />
-              <Tooltip
-                contentStyle={{ borderRadius: 10, border: "1px solid #edf0f1", fontSize: 12 }}
-                labelFormatter={(label) => formatDate(String(label))}
-              />
-              <Legend
-                iconType="circle"
-                iconSize={8}
-                wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
-              />
-              <Area
-                type="monotone"
-                dataKey="cumLeads"
-                name="Leads"
-                stroke={LEAD_COLOR}
-                strokeWidth={2}
-                fill="url(#gLead)"
-                dot={false}
-              />
-              <Area
-                type="monotone"
-                dataKey="cumOrders"
-                name="Orders"
-                stroke={ORDER_COLOR}
-                strokeWidth={2}
-                fill="url(#gOrder)"
-                dot={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Daily activity */}
-        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
             Daily activity
           </p>
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart
               data={showDailyBar ? chartData : chartData.slice(-30)}
               margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
@@ -178,6 +115,49 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
               <Bar dataKey="leads" name="Leads" fill={LEAD_COLOR} radius={[3, 3, 0, 0]} />
               <Bar dataKey="orders" name="Orders" fill={ORDER_COLOR} radius={[3, 3, 0, 0]} />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Cumulative — area chart (secondary) */}
+        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
+            Cumulative total
+          </p>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gLead" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={LEAD_COLOR} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={LEAD_COLOR} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gOrder" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={ORDER_COLOR} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={ORDER_COLOR} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#edf0f1" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={formatDate}
+                tick={{ fontSize: 11, fill: "#7f949b" }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: "#7f949b" }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+              />
+              <Tooltip
+                contentStyle={{ borderRadius: 10, border: "1px solid #edf0f1", fontSize: 12 }}
+                labelFormatter={(label) => formatDate(String(label))}
+              />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
+              <Area type="monotone" dataKey="cumLeads" name="Leads" stroke={LEAD_COLOR} strokeWidth={2} fill="url(#gLead)" dot={false} />
+              <Area type="monotone" dataKey="cumOrders" name="Orders" stroke={ORDER_COLOR} strokeWidth={2} fill="url(#gOrder)" dot={false} />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
 
