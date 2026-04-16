@@ -186,27 +186,32 @@ export default function RatioClient() {
     }
 
     // All detected landmarks as dots
-    const keyLandmarks: { idx: number; label: string; color: string }[] = [
-      { idx: 0,  label: "nose",       color: "#f59e0b" },
-      { idx: 11, label: "L.shoulder", color: "#3b82f6" },
-      { idx: 12, label: "R.shoulder", color: "#ef4444" },
-      { idx: 13, label: "L.elbow",    color: "#3b82f6" },
-      { idx: 14, label: "R.elbow",    color: "#ef4444" },
-      { idx: 15, label: "L.wrist",    color: "#3b82f6" },
-      { idx: 16, label: "R.wrist",    color: "#ef4444" },
-      { idx: 23, label: "L.hip",      color: "#3b82f6" },
-      { idx: 24, label: "R.hip",      color: "#ef4444" },
-      { idx: 25, label: "L.knee",     color: "#3b82f6" },
-      { idx: 26, label: "R.knee",     color: "#ef4444" },
-      { idx: 27, label: "L.ankle",    color: "#3b82f6" },
-      { idx: 28, label: "R.ankle",    color: "#ef4444" },
+    // Paired landmarks: L is on the viewer's right side of image (person faces camera)
+    // Label direction: L.* → label to the right of dot, R.* → label to the left
+    const keyLandmarks: { idx: number; label: string; color: string; side: "L" | "R" | "C" }[] = [
+      { idx: 0,  label: "nose",       color: "#f59e0b", side: "C" },
+      { idx: 11, label: "L.shoulder", color: "#3b82f6", side: "L" },
+      { idx: 12, label: "R.shoulder", color: "#ef4444", side: "R" },
+      { idx: 13, label: "L.elbow",    color: "#3b82f6", side: "L" },
+      { idx: 14, label: "R.elbow",    color: "#ef4444", side: "R" },
+      { idx: 15, label: "L.wrist",    color: "#3b82f6", side: "L" },
+      { idx: 16, label: "R.wrist",    color: "#ef4444", side: "R" },
+      { idx: 23, label: "L.hip",      color: "#3b82f6", side: "L" },
+      { idx: 24, label: "R.hip",      color: "#ef4444", side: "R" },
+      { idx: 25, label: "L.knee",     color: "#3b82f6", side: "L" },
+      { idx: 26, label: "R.knee",     color: "#ef4444", side: "R" },
+      { idx: 27, label: "L.ankle",    color: "#3b82f6", side: "L" },
+      { idx: 28, label: "R.ankle",    color: "#ef4444", side: "R" },
     ];
 
-    const fontSize = Math.max(18, W * 0.022);
+    const fontSize = Math.max(16, W * 0.019);
     ctx.font = `bold ${fontSize}px sans-serif`;
     ctx.textBaseline = "middle";
 
-    for (const { idx, label, color } of keyLandmarks) {
+    // Track used label positions to offset overlapping labels
+    const usedPositions: { x: number; y: number }[] = [];
+
+    for (const { idx, label, color, side } of keyLandmarks) {
       const p = landmarks[idx];
       if (!p) continue;
       const x = p.x * W;
@@ -224,11 +229,25 @@ export default function RatioClient() {
       ctx.fillStyle = color;
       ctx.fill();
 
-      // Label
-      const textX = x + dotR + 6;
-      const textY = y;
-      ctx.fillStyle = "rgba(0,0,0,0.75)";
-      ctx.fillText(label, textX + 1, textY + 1); // shadow
+      // Label position: R.* labels go left of dot, L.* and C go right
+      const textW = ctx.measureText(label).width;
+      let textX = side === "R" ? x - dotR - 8 - textW : x + dotR + 8;
+      let textY = y;
+
+      // Nudge vertically if too close to an existing label
+      for (const pos of usedPositions) {
+        const dx = Math.abs(textX - pos.x);
+        const dy = Math.abs(textY - pos.y);
+        if (dx < textW + 10 && dy < fontSize + 4) {
+          textY = pos.y + fontSize + 6;
+        }
+      }
+      usedPositions.push({ x: textX, y: textY });
+
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.8)";
+      ctx.fillText(label, textX + 1, textY + 1);
+      // Text
       ctx.fillStyle = "#ffffff";
       ctx.fillText(label, textX, textY);
     }
