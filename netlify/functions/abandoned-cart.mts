@@ -17,7 +17,7 @@ function getSupabase() {
 
 function buildEmailHtml(name: string, heading: string, body: string, cta: string, url: string) {
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -28,7 +28,7 @@ function buildEmailHtml(name: string, heading: string, body: string, cta: string
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">${heading}</h1>
           <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">${body}</p>
           <a href="${url}" style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">${cta}</a>
-          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">Des questions ? Réponds directement à cet email.</p>
+          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">Any questions? Reply directly to this email.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -60,12 +60,12 @@ const handler = schedule("*/5 * * * *", async () => {
       await resend.emails.send({
         from: FROM,
         to: user.email,
-        subject: "Tu as oublié quelque chose 👀",
+        subject: "You left something behind 👀",
         html: buildEmailHtml(
-          user.first_name ?? "toi",
-          `Ton protocole t'attend ${user.first_name ?? ""}`.trim(),
-          "Tu as commencé à remplir ton questionnaire mais n'as pas finalisé ta commande. Ton protocole personnalisé est à un clic.",
-          "Finaliser ma commande →",
+          user.first_name ?? "there",
+          `Your protocol is waiting for you`,
+          "You started filling out your questionnaire but didn't complete your order. Your personalized protocol is one click away.",
+          "Complete my order →",
           CHECKOUT_URL
         ),
       });
@@ -94,12 +94,12 @@ const handler = schedule("*/5 * * * *", async () => {
       await resend.emails.send({
         from: FROM,
         to: user.email,
-        subject: "Dernière chance de démarrer ton protocole",
+        subject: "Last chance to start your protocol",
         html: buildEmailHtml(
-          user.first_name ?? "toi",
-          `${user.first_name ?? "Hey"}, ton protocole t'attend toujours`,
-          "Il y a quelques heures, tu as commencé ton questionnaire mais n'as pas finalisé ta commande. C'est ta dernière relance — après ça, on ne te dérange plus.",
-          "Je finalise maintenant →",
+          user.first_name ?? "there",
+          `${user.first_name ?? "Hey"}, your protocol is still waiting`,
+          "A few hours ago, you started your questionnaire but didn't complete your order. This is our last follow-up — we won't bother you after this.",
+          "Complete my order now →",
           CHECKOUT_URL
         ),
       });

@@ -9,7 +9,7 @@ function getResend(): Resend {
 }
 
 // ─────────────────────────────────────────────────────────
-// Welcome email — envoyé après achat pour créer son compte
+// Welcome email — sent after purchase to create account
 // ─────────────────────────────────────────────────────────
 export async function sendWelcomeEmail(props: {
   email: string;
@@ -17,15 +17,15 @@ export async function sendWelcomeEmail(props: {
   registrationUrl: string;
 }): Promise<void> {
   const resend = getResend();
-  const name = props.firstName ?? "toi";
+  const name = props.firstName ?? "there";
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Crée ton accès Protocol Club",
+    subject: "Create your Protocol Club account",
     html: `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -34,20 +34,20 @@ export async function sendWelcomeEmail(props: {
         <tr><td style="padding:40px 40px 32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Bienvenue ${name} 👋
+            Welcome ${name} 👋
           </h1>
           <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Ton paiement est confirmé. Il ne te reste plus qu'à créer ton accès pour consulter ton protocole.
+            Your payment is confirmed. All that's left is to create your account to access your protocol.
           </p>
           <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            Clique sur le bouton ci-dessous pour choisir ton mot de passe et accéder à ton espace.
+            Click the button below to set your password and access your dashboard.
           </p>
           <a href="${props.registrationUrl}"
              style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Créer mon accès →
+            Create my account →
           </a>
           <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Ce lien est valable 7 jours. Si tu as des questions, réponds directement à cet email.
+            This link is valid for 7 days. If you have any questions, reply directly to this email.
           </p>
         </td></tr>
       </table>
@@ -62,7 +62,7 @@ export async function sendWelcomeEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Magic link — connexion sans mot de passe
+// Magic link — passwordless login
 // ─────────────────────────────────────────────────────────
 export async function sendMagicLinkEmail(props: {
   email: string;
@@ -74,10 +74,10 @@ export async function sendMagicLinkEmail(props: {
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Ton lien de connexion Protocol Club",
+    subject: "Your Protocol Club login link",
     html: `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -86,18 +86,18 @@ export async function sendMagicLinkEmail(props: {
         <tr><td style="padding:40px 40px 32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Ton lien de connexion
+            Your login link
           </h1>
           <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Salut ${props.firstName}, voici ton lien pour te connecter à ton espace Protocol Club.
+            Hey ${props.firstName}, here's your link to sign in to your Protocol Club dashboard.
           </p>
           <a href="${props.magicLinkUrl}"
              style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Me connecter →
+            Sign in →
           </a>
           <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Ce lien expire dans 20 minutes et ne peut être utilisé qu'une seule fois.<br>
-            Si tu n'as pas demandé ce lien, ignore cet email.
+            This link expires in 20 minutes and can only be used once.<br>
+            If you didn't request this, you can safely ignore this email.
           </p>
         </td></tr>
       </table>
@@ -112,7 +112,7 @@ export async function sendMagicLinkEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Protocol livré — notifie le client que son protocole est prêt
+// Protocol delivered — notifies the client their protocol is ready
 // ─────────────────────────────────────────────────────────
 export async function sendProtocolDeliveredEmail(props: {
   email: string;
@@ -120,15 +120,15 @@ export async function sendProtocolDeliveredEmail(props: {
   dashboardUrl: string;
 }): Promise<void> {
   const resend = getResend();
-  const name = props.firstName ?? "toi";
+  const name = props.firstName ?? "there";
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Ton protocole est prêt 🎯",
+    subject: "Your protocol is ready 🎯",
     html: `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -137,20 +137,20 @@ export async function sendProtocolDeliveredEmail(props: {
         <tr><td style="padding:40px 40px 32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Ton protocole est disponible ${name} 🎯
+            Your protocol is ready, ${name} 🎯
           </h1>
           <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Ton protocole personnalisé vient d'être finalisé. Il est maintenant accessible dans ton espace membre.
+            Your personalized protocol has been finalized and is now available in your dashboard.
           </p>
           <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            Connecte-toi pour le consulter et commencer dès aujourd'hui.
+            Sign in to view it and get started today.
           </p>
           <a href="${props.dashboardUrl}"
              style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Voir mon protocole →
+            View my protocol →
           </a>
           <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Des questions ? Réponds directement à cet email.
+            Any questions? Reply directly to this email.
           </p>
         </td></tr>
       </table>
@@ -165,7 +165,7 @@ export async function sendProtocolDeliveredEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Confirmation d'achat — envoyé immédiatement après paiement
+// Purchase confirmation — sent immediately after payment
 // ─────────────────────────────────────────────────────────
 export async function sendPurchaseConfirmationEmail(props: {
   email: string;
@@ -174,16 +174,16 @@ export async function sendPurchaseConfirmationEmail(props: {
   currency: string;
 }): Promise<void> {
   const resend = getResend();
-  const name = props.firstName ?? "toi";
+  const name = props.firstName ?? "there";
   const formattedAmount = `${props.amount.toFixed(2)} ${props.currency}`;
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Confirmation de ta commande Protocol Club",
+    subject: "Your Protocol Club order is confirmed",
     html: `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -192,16 +192,16 @@ export async function sendPurchaseConfirmationEmail(props: {
         <tr><td style="padding:40px 40px 32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
           <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Commande confirmée ✓
+            Order confirmed ✓
           </h1>
           <p style="margin:0 0 24px;font-size:15px;color:#bbb;line-height:1.6;">
-            Merci ${name}, ton paiement a bien été reçu.
+            Thanks ${name}, your payment has been received.
           </p>
           <table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1a1a;border-radius:8px;margin:0 0 28px;">
             <tr><td style="padding:20px 24px;">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="font-size:14px;color:#888;">Produit</td>
+                  <td style="font-size:14px;color:#888;">Product</td>
                   <td align="right" style="font-size:14px;color:#888;">Total</td>
                 </tr>
                 <tr><td colspan="2" style="padding:8px 0;border-bottom:1px solid #2a2a2a;"></td></tr>
@@ -213,10 +213,10 @@ export async function sendPurchaseConfirmationEmail(props: {
             </td></tr>
           </table>
           <p style="margin:0 0 8px;font-size:15px;color:#bbb;line-height:1.6;">
-            On prépare ton protocole personnalisé. Tu recevras un email dès qu'il est prêt.
+            We're now building your personalized protocol. You'll receive an email as soon as it's ready.
           </p>
           <p style="margin:0;font-size:13px;color:#555;line-height:1.5;">
-            Des questions ? Réponds directement à cet email.
+            Any questions? Reply directly to this email.
           </p>
         </td></tr>
       </table>
@@ -231,8 +231,8 @@ export async function sendPurchaseConfirmationEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Panier abandonné — email 1 (10 min) et email 2 (4h)
-// Déclenché par le cron /api/cron/abandoned-cart
+// Abandoned cart — email 1 (10 min) and email 2 (4h)
+// Triggered by the cron /api/cron/abandoned-cart
 // ─────────────────────────────────────────────────────────
 export async function sendAbandonedCartEmail(props: {
   email: string;
@@ -241,23 +241,22 @@ export async function sendAbandonedCartEmail(props: {
   emailNumber: 1 | 2;
 }): Promise<void> {
   const resend = getResend();
-  const name = props.firstName ?? "toi";
-
+  const name = props.firstName ?? "there";
   const isSecond = props.emailNumber === 2;
 
   const subject = isSecond
-    ? "Dernière chance de démarrer ton protocole"
-    : "Tu as oublié quelque chose 👀";
+    ? "Last chance to start your protocol"
+    : "You left something behind 👀";
 
   const heading = isSecond
-    ? `${name}, ton protocole t'attend toujours`
-    : `Ton protocole t'attend ${name}`;
+    ? `${name}, your protocol is still waiting`
+    : `Your protocol is waiting for you`;
 
   const body = isSecond
-    ? `Il y a quelques heures, tu as commencé ton questionnaire mais n'as pas finalisé ta commande. C'est ta dernière relance — après ça, on ne te dérange plus.`
-    : `Tu as commencé à remplir ton questionnaire mais n'as pas finalisé ta commande. Ton protocole personnalisé est à un clic.`;
+    ? `A few hours ago, you started your questionnaire but didn't complete your order. This is our last follow-up — we won't bother you after this.`
+    : `You started filling out your questionnaire but didn't complete your order. Your personalized protocol is one click away.`;
 
-  const cta = isSecond ? "Je finalise maintenant →" : "Finaliser ma commande →";
+  const cta = isSecond ? "Complete my order now →" : "Complete my order →";
 
   const { error } = await resend.emails.send({
     from: FROM,
@@ -265,7 +264,7 @@ export async function sendAbandonedCartEmail(props: {
     subject,
     html: `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
@@ -284,7 +283,7 @@ export async function sendAbandonedCartEmail(props: {
             ${cta}
           </a>
           <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Des questions ? Réponds directement à cet email.
+            Any questions? Reply directly to this email.
           </p>
         </td></tr>
       </table>
