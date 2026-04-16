@@ -143,37 +143,109 @@ export default function RatioClient() {
 
     const W = img.naturalWidth;
     const H = img.naturalHeight;
+    const lineW = Math.max(3, W * 0.004);
+    const dotR  = Math.max(6, W * 0.009);
 
-    // Connections to draw
-    const connections = [
-      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
-      [11, 23], [12, 24], [23, 24], [23, 25], [24, 26],
-      [25, 27], [26, 28],
+    // Color-coded connections by body region
+    const connectionGroups: { pairs: [number, number][]; color: string }[] = [
+      // Torso
+      { pairs: [[11, 12], [11, 23], [12, 24], [23, 24]], color: "rgba(37,50,57,0.9)" },
+      // Left arm
+      { pairs: [[11, 13], [13, 15]], color: "rgba(59,130,246,0.9)" },
+      // Right arm
+      { pairs: [[12, 14], [14, 16]], color: "rgba(239,68,68,0.9)" },
+      // Left leg
+      { pairs: [[23, 25], [25, 27]], color: "rgba(59,130,246,0.9)" },
+      // Right leg
+      { pairs: [[24, 26], [26, 28]], color: "rgba(239,68,68,0.9)" },
     ];
 
-    ctx.strokeStyle = "rgba(37,50,57,0.85)";
-    ctx.lineWidth = Math.max(2, W * 0.004);
+    ctx.lineWidth = lineW;
+    ctx.lineCap = "round";
 
-    for (const [a, b] of connections) {
-      const p1 = landmarks[a];
-      const p2 = landmarks[b];
-      if (!p1 || !p2) continue;
+    for (const group of connectionGroups) {
+      ctx.strokeStyle = group.color;
+      for (const [a, b] of group.pairs) {
+        const p1 = landmarks[a];
+        const p2 = landmarks[b];
+        if (!p1 || !p2) continue;
+        ctx.beginPath();
+        ctx.moveTo(p1.x * W, p1.y * H);
+        ctx.lineTo(p2.x * W, p2.y * H);
+        ctx.stroke();
+      }
+    }
+
+    // All detected landmarks as dots
+    const keyLandmarks: { idx: number; label: string; color: string }[] = [
+      { idx: 0,  label: "nose",       color: "#f59e0b" },
+      { idx: 11, label: "L.shoulder", color: "#3b82f6" },
+      { idx: 12, label: "R.shoulder", color: "#ef4444" },
+      { idx: 13, label: "L.elbow",    color: "#3b82f6" },
+      { idx: 14, label: "R.elbow",    color: "#ef4444" },
+      { idx: 15, label: "L.wrist",    color: "#3b82f6" },
+      { idx: 16, label: "R.wrist",    color: "#ef4444" },
+      { idx: 23, label: "L.hip",      color: "#3b82f6" },
+      { idx: 24, label: "R.hip",      color: "#ef4444" },
+      { idx: 25, label: "L.knee",     color: "#3b82f6" },
+      { idx: 26, label: "R.knee",     color: "#ef4444" },
+      { idx: 27, label: "L.ankle",    color: "#3b82f6" },
+      { idx: 28, label: "R.ankle",    color: "#ef4444" },
+    ];
+
+    const fontSize = Math.max(18, W * 0.022);
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.textBaseline = "middle";
+
+    for (const { idx, label, color } of keyLandmarks) {
+      const p = landmarks[idx];
+      if (!p) continue;
+      const x = p.x * W;
+      const y = p.y * H;
+
+      // Outer white ring
       ctx.beginPath();
-      ctx.moveTo(p1.x * W, p1.y * H);
-      ctx.lineTo(p2.x * W, p2.y * H);
+      ctx.arc(x, y, dotR + 2, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fill();
+
+      // Colored dot
+      ctx.beginPath();
+      ctx.arc(x, y, dotR, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Label
+      const textX = x + dotR + 6;
+      const textY = y;
+      ctx.fillStyle = "rgba(0,0,0,0.75)";
+      ctx.fillText(label, textX + 1, textY + 1); // shadow
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(label, textX, textY);
+    }
+
+    // Highlight shoulder & hip lines for ratio visualization
+    const lSh = landmarks[11], rSh = landmarks[12];
+    const lHip = landmarks[23], rHip = landmarks[24];
+
+    if (lSh && rSh) {
+      ctx.strokeStyle = "rgba(255,255,255,0.6)";
+      ctx.lineWidth = lineW * 0.5;
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath();
+      ctx.moveTo(lSh.x * W, lSh.y * H);
+      ctx.lineTo(rSh.x * W, rSh.y * H);
       ctx.stroke();
     }
 
-    // Key points
-    const keyPoints = [11, 12, 23, 24, 27, 28];
-    for (const idx of keyPoints) {
-      const p = landmarks[idx];
-      if (!p) continue;
+    if (lHip && rHip) {
       ctx.beginPath();
-      ctx.arc(p.x * W, p.y * H, Math.max(4, W * 0.008), 0, 2 * Math.PI);
-      ctx.fillStyle = "#253239";
-      ctx.fill();
+      ctx.moveTo(lHip.x * W, lHip.y * H);
+      ctx.lineTo(rHip.x * W, rHip.y * H);
+      ctx.stroke();
     }
+
+    ctx.setLineDash([]);
   }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
