@@ -2,14 +2,72 @@ import { Resend } from "resend";
 
 const FROM = "Protocol Club <hello@protocol-club.com>";
 
+// Brand colors matching /f1/offer
+const C = {
+  bg: "#f9fbfb",
+  card: "#ffffff",
+  brand: "#253239",
+  brandHover: "#1a262d",
+  text: "#253239",
+  muted: "#515255",
+  subtle: "#7f949b",
+  border: "#edf0f1",
+  borderMid: "#dfe4e6",
+};
+
 function getResend(): Resend {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY not set");
   return new Resend(key);
 }
 
+function emailShell(content: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background:${C.bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${C.bg};padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" style="max-width:540px;">
+
+        <!-- Header -->
+        <tr><td style="padding:0 0 24px;">
+          <p style="margin:0;font-size:12px;font-weight:600;color:${C.subtle};letter-spacing:0.1em;text-transform:uppercase;">Protocol Club</p>
+        </td></tr>
+
+        <!-- Card -->
+        <tr><td style="background:${C.card};border-radius:16px;border:1px solid ${C.border};box-shadow:0 4px 24px rgba(37,50,57,0.06);padding:40px;">
+          ${content}
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:24px 0 0;">
+          <p style="margin:0;font-size:12px;color:${C.subtle};line-height:1.6;">
+            Protocol Club · Questions? Reply to this email.<br>
+            <a href="https://protocol-club.com" style="color:${C.subtle};text-decoration:underline;">protocol-club.com</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function btn(text: string, url: string): string {
+  return `<a href="${url}" style="display:inline-block;background:${C.brand};color:#ffffff;font-size:14px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;letter-spacing:0.01em;">${text}</a>`;
+}
+
+function divider(): string {
+  return `<tr><td style="padding:24px 0;"><div style="height:1px;background:${C.border};"></div></td></tr>`;
+}
+
 // ─────────────────────────────────────────────────────────
-// Welcome email — sent after purchase to create account
+// Welcome — sent post-purchase for new users
 // ─────────────────────────────────────────────────────────
 export async function sendWelcomeEmail(props: {
   email: string;
@@ -19,42 +77,32 @@ export async function sendWelcomeEmail(props: {
   const resend = getResend();
   const name = props.firstName ?? "there";
 
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Payment confirmed.<br>Your protocol is next.
+    </h1>
+    <p style="margin:16px 0 0;font-size:14px;font-weight:600;color:${C.subtle};letter-spacing:0.06em;text-transform:uppercase;">Step 1 of 2</p>
+
+    <p style="margin:24px 0;font-size:15px;color:${C.muted};line-height:1.65;">
+      Hey ${name} — your order is in. We're now building your personalized Attractiveness Protocol based on your body analysis.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      First, create your account to access your dashboard when it's ready.
+    </p>
+
+    ${btn("Create my account →", props.registrationUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      This link expires in 7 days. You'll receive a second email when your protocol is ready to view.
+    </p>
+  `;
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Create your Protocol Club account",
-    html: `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
-          <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Welcome ${name} 👋
-          </h1>
-          <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Your payment is confirmed. All that's left is to create your account to access your protocol.
-          </p>
-          <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            Click the button below to set your password and access your dashboard.
-          </p>
-          <a href="${props.registrationUrl}"
-             style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Create my account →
-          </a>
-          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            This link is valid for 7 days. If you have any questions, reply directly to this email.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+    subject: "Your order is confirmed — create your account",
+    html: emailShell(content),
   });
 
   if (error) throw new Error(`[resend] sendWelcomeEmail failed: ${error.message}`);
@@ -71,40 +119,28 @@ export async function sendMagicLinkEmail(props: {
 }): Promise<void> {
   const resend = getResend();
 
+  const content = `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your login link
+    </h1>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Hey ${props.firstName} — click below to sign in to your Protocol Club dashboard. No password needed.
+    </p>
+
+    ${btn("Sign in to my dashboard →", props.magicLinkUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      This link expires in 20 minutes and can only be used once.<br>
+      Didn't request this? You can safely ignore this email.
+    </p>
+  `;
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
     subject: "Your Protocol Club login link",
-    html: `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
-          <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Your login link
-          </h1>
-          <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Hey ${props.firstName}, here's your link to sign in to your Protocol Club dashboard.
-          </p>
-          <a href="${props.magicLinkUrl}"
-             style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            Sign in →
-          </a>
-          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            This link expires in 20 minutes and can only be used once.<br>
-            If you didn't request this, you can safely ignore this email.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+    html: emailShell(content),
   });
 
   if (error) throw new Error(`[resend] sendMagicLinkEmail failed: ${error.message}`);
@@ -112,7 +148,7 @@ export async function sendMagicLinkEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Protocol delivered — notifies the client their protocol is ready
+// Protocol delivered
 // ─────────────────────────────────────────────────────────
 export async function sendProtocolDeliveredEmail(props: {
   email: string;
@@ -122,42 +158,31 @@ export async function sendProtocolDeliveredEmail(props: {
   const resend = getResend();
   const name = props.firstName ?? "there";
 
+  const content = `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your protocol is ready, ${name}.
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Your personalized Attractiveness Protocol has been finalized by our specialist + AI review team.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      It includes your full body analysis, your attractiveness score, and a science-backed roadmap tailored to your specific proportions and goals.
+    </p>
+
+    ${btn("View my protocol →", props.dashboardUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Questions about your protocol? Reply directly to this email.
+    </p>
+  `;
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
-    subject: "Your protocol is ready 🎯",
-    html: `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
-          <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Your protocol is ready, ${name} 🎯
-          </h1>
-          <p style="margin:0 0 16px;font-size:15px;color:#bbb;line-height:1.6;">
-            Your personalized protocol has been finalized and is now available in your dashboard.
-          </p>
-          <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            Sign in to view it and get started today.
-          </p>
-          <a href="${props.dashboardUrl}"
-             style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            View my protocol →
-          </a>
-          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Any questions? Reply directly to this email.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+    subject: "Your Attractiveness Protocol is ready 🎯",
+    html: emailShell(content),
   });
 
   if (error) throw new Error(`[resend] sendProtocolDeliveredEmail failed: ${error.message}`);
@@ -165,7 +190,7 @@ export async function sendProtocolDeliveredEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
-// Purchase confirmation — sent immediately after payment
+// Purchase confirmation — for existing users (no registration needed)
 // ─────────────────────────────────────────────────────────
 export async function sendPurchaseConfirmationEmail(props: {
   email: string;
@@ -175,55 +200,53 @@ export async function sendPurchaseConfirmationEmail(props: {
 }): Promise<void> {
   const resend = getResend();
   const name = props.firstName ?? "there";
-  const formattedAmount = `${props.amount.toFixed(2)} ${props.currency}`;
+  const formattedAmount = `$${props.amount.toFixed(2)}`;
+
+  const content = `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Order confirmed, ${name}.
+    </h1>
+
+    <p style="margin:0 0 24px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Your payment has been received. Our specialist + AI review team will now build your personalized Attractiveness Protocol based on your body analysis.
+    </p>
+
+    <!-- Order summary -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:${C.bg};border-radius:10px;border:1px solid ${C.border};margin:0 0 32px;">
+      <tr>
+        <td style="padding:16px 20px;font-size:13px;font-weight:600;color:${C.subtle};letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid ${C.border};">Order summary</td>
+      </tr>
+      <tr>
+        <td style="padding:16px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="font-size:15px;color:${C.text};">Attractiveness Protocol</td>
+              <td align="right" style="font-size:15px;font-weight:600;color:${C.brand};">${formattedAmount}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding:8px 0;"><div style="height:1px;background:${C.border};"></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:13px;color:${C.subtle};">Full body analysis · Personalized roadmap · 90-day guarantee</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0 0 8px;font-size:15px;color:${C.muted};line-height:1.65;">
+      We'll notify you by email as soon as your protocol is ready to view in your dashboard.
+    </p>
+    <p style="margin:0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Questions? Reply directly to this email.
+    </p>
+  `;
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
     subject: "Your Protocol Club order is confirmed",
-    html: `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
-          <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            Order confirmed ✓
-          </h1>
-          <p style="margin:0 0 24px;font-size:15px;color:#bbb;line-height:1.6;">
-            Thanks ${name}, your payment has been received.
-          </p>
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1a1a;border-radius:8px;margin:0 0 28px;">
-            <tr><td style="padding:20px 24px;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="font-size:14px;color:#888;">Product</td>
-                  <td align="right" style="font-size:14px;color:#888;">Total</td>
-                </tr>
-                <tr><td colspan="2" style="padding:8px 0;border-bottom:1px solid #2a2a2a;"></td></tr>
-                <tr>
-                  <td style="padding-top:12px;font-size:15px;color:#fff;">Attractiveness Protocol</td>
-                  <td align="right" style="padding-top:12px;font-size:15px;color:#fff;font-weight:600;">${formattedAmount}</td>
-                </tr>
-              </table>
-            </td></tr>
-          </table>
-          <p style="margin:0 0 8px;font-size:15px;color:#bbb;line-height:1.6;">
-            We're now building your personalized protocol. You'll receive an email as soon as it's ready.
-          </p>
-          <p style="margin:0;font-size:13px;color:#555;line-height:1.5;">
-            Any questions? Reply directly to this email.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+    html: emailShell(content),
   });
 
   if (error) throw new Error(`[resend] sendPurchaseConfirmationEmail failed: ${error.message}`);
@@ -232,7 +255,6 @@ export async function sendPurchaseConfirmationEmail(props: {
 
 // ─────────────────────────────────────────────────────────
 // Abandoned cart — email 1 (10 min) and email 2 (4h)
-// Triggered by the cron /api/cron/abandoned-cart
 // ─────────────────────────────────────────────────────────
 export async function sendAbandonedCartEmail(props: {
   email: string;
@@ -245,52 +267,52 @@ export async function sendAbandonedCartEmail(props: {
   const isSecond = props.emailNumber === 2;
 
   const subject = isSecond
-    ? "Last chance to start your protocol"
-    : "You left something behind 👀";
+    ? "Still thinking about it?"
+    : "Your body analysis is waiting";
 
-  const heading = isSecond
-    ? `${name}, your protocol is still waiting`
-    : `Your protocol is waiting for you`;
+  const content = isSecond ? `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Still thinking about it, ${name}?
+    </h1>
 
-  const body = isSecond
-    ? `A few hours ago, you started your questionnaire but didn't complete your order. This is our last follow-up — we won't bother you after this.`
-    : `You started filling out your questionnaire but didn't complete your order. Your personalized protocol is one click away.`;
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      A few hours ago you started your questionnaire. We've analyzed 100+ attractiveness markers for your profile — but your protocol hasn't been built yet.
+    </p>
 
-  const cta = isSecond ? "Complete my order now →" : "Complete my order →";
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Most guys who complete it see exactly what's holding their score back within the first read. It's not guesswork — it's your data.
+    </p>
+
+    ${btn("Get my protocol — $89 →", props.checkoutUrl)}
+
+    <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      90-day money-back guarantee. No conditions. This is our last email.
+    </p>
+  ` : `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your body analysis is waiting, ${name}.
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      You started your questionnaire — which means we already have enough data to build your personalized Attractiveness Protocol.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Your protocol covers 15+ body proportions, your attractiveness score, and a science-backed roadmap tailored to your specific build. Not a template. Built for you.
+    </p>
+
+    ${btn("Complete my order — $89 →", props.checkoutUrl)}
+
+    <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      90-day money-back guarantee. No conditions.
+    </p>
+  `;
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: props.email,
     subject,
-    html: `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:520px;background:#111;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;">
-          <p style="margin:0 0 8px;font-size:13px;color:#888;letter-spacing:0.08em;text-transform:uppercase;">Protocol Club</p>
-          <h1 style="margin:0 0 24px;font-size:24px;font-weight:700;color:#fff;line-height:1.3;">
-            ${heading}
-          </h1>
-          <p style="margin:0 0 32px;font-size:15px;color:#bbb;line-height:1.6;">
-            ${body}
-          </p>
-          <a href="${props.checkoutUrl}"
-             style="display:inline-block;background:#fff;color:#000;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-            ${cta}
-          </a>
-          <p style="margin:32px 0 0;font-size:13px;color:#555;line-height:1.5;">
-            Any questions? Reply directly to this email.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+    html: emailShell(content),
   });
 
   if (error) {
