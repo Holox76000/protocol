@@ -21,10 +21,13 @@ export default function CheckoutClient({ funnel, params }: Props) {
 
     async function createSession() {
       try {
+        // Include the GA4 client_id so the Stripe webhook can stitch the
+        // server-side purchase event to the user's browsing session.
+        const gaCookie = document.cookie.match(/(?:^|;\s*)_ga=([^;]+)/)?.[1] ?? undefined;
         const res = await fetch("/api/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(params),
+          body: JSON.stringify({ ...params, ...(gaCookie && { ga_client_id: gaCookie }) }),
         });
 
         if (cancelled) return;

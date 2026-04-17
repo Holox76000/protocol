@@ -19,6 +19,7 @@ type Body = {
   utm_id?: string;
   fbclid?: string;
   embedded?: boolean;
+  ga_client_id?: string;
 };
 
 export async function POST(request: Request) {
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
     ...(body.utm_term && { utm_term: body.utm_term }),
     ...(body.utm_id && { utm_id: body.utm_id }),
     ...(body.fbclid && { fbclid: body.fbclid }),
+    ...(body.ga_client_id && { ga_client_id: body.ga_client_id }),
   };
 
   let session;

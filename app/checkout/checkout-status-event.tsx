@@ -13,29 +13,12 @@ export default function CheckoutStatusEvent({
   sessionId?: string;
 }) {
   useEffect(() => {
+    // payment_success / payment_failed: funnel confirmation event only.
+    // The authoritative `purchase` event is sent server-side by the Stripe webhook.
     trackGa4Event(eventName, {
       funnel,
       transaction_id: sessionId,
     });
-
-    if (eventName === "payment_success") {
-      trackGa4Event("purchase", {
-        transaction_id: sessionId,
-        value: 89,
-        currency: "USD",
-        tax: 0,
-        shipping: 0,
-        funnel,
-        items: [
-          {
-            item_id: "body-analysis-transformation-protocol",
-            item_name: "Body Analysis + Body Transformation Protocol",
-            price: 89,
-            quantity: 1,
-          },
-        ],
-      });
-    }
   }, [eventName, funnel, sessionId]);
 
   return null;

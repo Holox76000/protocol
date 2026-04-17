@@ -1,19 +1,24 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { sendGA4Event } from "../../../lib/ga4";
-import { extractGa4ClientId } from "../../../lib/ga4";
+import { sendGA4Event, extractGa4ClientId } from "../../../lib/ga4";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  let body: { eventName?: string; params?: Record<string, unknown>; pagePath?: string; pageTitle?: string };
+  let body: {
+    eventName?: string;
+    params?: Record<string, unknown>;
+    pagePath?: string;
+    pageTitle?: string;
+    userId?: string;
+  };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { eventName, params = {}, pagePath, pageTitle } = body;
+  const { eventName, params = {}, pagePath, pageTitle, userId } = body;
 
   if (process.env.NODE_ENV !== "production") {
     return NextResponse.json({ ok: true, skipped: "dev" });
@@ -23,25 +28,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing eventName" }, { status: 400 });
   }
 
-  // Extract the real GA4 client_id from the _ga cookie set by prior gtag sessions,
-  // or fall back to generating one from a stable identifier.
+  // Extract real client IP and User-Agent for GA4 geo/device attribution
+  const ipOverride = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined;
+  const userAgent = request.headers.get("user-agent") ?? undefined;
+
+  // Extract GA4 client_id from the _ga cookie
   const cookieStore = await cookies();
   const gaCookie = cookieStore.get("_ga")?.value ?? null;
   const clientId = extractGa4ClientId(gaCookie) ?? generateClientId(request);
+
+  // Resolve user_id: prefer explicit body field, fall back to prtcl_uid cookie
+  const uidCookie = cookieStore.get("prtcl_uid")?.value ?? null;
+  const resolvedUserId = (typeof userId === "string" && userId) ? userId : (uidCookie ?? undefined);
 
   const eventParams: Record<string, unknown> = { ...params };
   if (pagePath) eventParams.page_path = pagePath;
   if (pageTitle) eventParams.page_title = pageTitle;
   if (pagePath) eventParams.page_location = `https://protocol-club.com${pagePath}`;
 
-  await sendGA4Event({ eventName, params: eventParams, clientId });
+  await sendGA4Event({
+    eventName,
+    params: eventParams,
+    clientId,
+    userId: resolvedUserId,
+    ipOverride,
+    userAgent,
+  });
 
   return NextResponse.json({ ok: true });
 }
 
 /**
  * Generate a stable fallback client_id from the request IP + user-agent.
- * This is used only when no _ga cookie is present (first visit, blocked cookies).
+ * Used only when no _ga cookie is present (first visit, blocked cookies).
  * Format matches GA4's client_id pattern: <int>.<int>
  */
 function generateClientId(request: Request): string {

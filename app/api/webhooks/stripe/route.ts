@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
-import { sendGA4Purchase } from "../../../../lib/ga4";
+import { sendGA4Purchase, extractGa4ClientId } from "../../../../lib/ga4";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
 import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from "../../../../lib/email";
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
           value: pi.amount / 100,
           currency: pi.currency ?? "usd",
           eventTime: pi.created ?? Math.floor(Date.now() / 1000),
-          clientId: stripeCustomerId ?? undefined,
+          clientId: extractGa4ClientId(meta.ga_client_id) ?? undefined,
         });
       } catch (err) {
         console.error("[webhook/stripe] GA4 Purchase failed (pi)", { error: String(err), piId: pi.id });
@@ -257,7 +257,7 @@ export async function POST(request: Request) {
         value: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
         currency: session.currency ?? "usd",
         eventTime: session.created ?? Math.floor(Date.now() / 1000),
-        clientId: stripeCustomerId ?? undefined,
+        clientId: extractGa4ClientId(meta.ga_client_id) ?? undefined,
       });
     } catch (err) {
       console.error("[webhook/stripe] GA4 Purchase failed", { error: String(err), sessionId: session.id });

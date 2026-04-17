@@ -44,6 +44,13 @@ export async function GET(request: Request) {
   const safePath = redirect.startsWith("/") ? redirect : "/dashboard";
   const response = NextResponse.redirect(new URL(safePath, request.url));
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
+  response.cookies.set("prtcl_uid", result.userId, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60,
+    path: "/",
+  });
 
   return response;
 }

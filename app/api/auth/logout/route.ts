@@ -20,6 +20,13 @@ export async function POST(request: NextRequest) {
     maxAge: 0,
     path: "/",
   });
+  response.cookies.set("prtcl_uid", "", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 
   return response;
 }

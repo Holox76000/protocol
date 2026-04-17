@@ -140,6 +140,13 @@ export async function POST(request: Request) {
   });
 
   response.cookies.set(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
+  response.cookies.set("prtcl_uid", user.id, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60,
+    path: "/",
+  });
 
   const referer = request.headers.get("referer") ?? undefined;
   const createdAt = new Date().toISOString();

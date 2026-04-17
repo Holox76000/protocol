@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { getGa4PageTitle } from "../lib/ga4PageTitle";
+import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../lib/utm";
 
 declare global {
   interface Window {
@@ -11,6 +12,27 @@ declare global {
 
 function getCurrentPagePath() {
   return `${window.location.pathname}${window.location.search}`;
+}
+
+function getOrCreateSessionId(): string {
+  try {
+    const existing = window.sessionStorage.getItem("prtcl_ga4_sid");
+    if (existing) return existing;
+    const newId = String(Date.now());
+    window.sessionStorage.setItem("prtcl_ga4_sid", newId);
+    return newId;
+  } catch {
+    return String(Date.now());
+  }
+}
+
+function getPrtclUserId(): string | null {
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)prtcl_uid=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
 }
 
 export default function Ga4RouteTracker() {
@@ -23,12 +45,27 @@ export default function Ga4RouteTracker() {
       if (previousUrlRef.current === pagePath) return;
       previousUrlRef.current = pagePath;
 
+      // Capture UTMs from current URL and merge into sessionStorage
+      persistUtmParams(getUtmParams());
+
       const pageTitle = getGa4PageTitle(pagePath);
+      const sessionId = getOrCreateSessionId();
+      const userId = getPrtclUserId();
+      const utm = getPersistedUtmParams();
 
       // Send pageview via Measurement Protocol (server-side)
       navigator.sendBeacon(
         "/api/ga4-event",
-        JSON.stringify({ eventName: "page_view", pagePath, pageTitle }),
+        JSON.stringify({
+          eventName: "page_view",
+          pagePath,
+          pageTitle,
+          params: {
+            session_id: sessionId,
+            ...(Object.keys(utm).length > 0 && utm),
+          },
+          ...(userId && { userId }),
+        }),
       );
 
       // Meta Pixel pageview (stays client-side)
