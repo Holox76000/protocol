@@ -211,19 +211,11 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
         </div>
 
         {/* Daily bar chart */}
-        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
             Daily activity {chartData.length > 30 ? "(last 30 days)" : ""}
           </p>
           <BarChartSvg data={chartData} />
-        </div>
-
-        {/* Cumulative area chart */}
-        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
-            Cumulative total
-          </p>
-          <AreaChartSvg data={chartData} />
         </div>
 
       </div>
