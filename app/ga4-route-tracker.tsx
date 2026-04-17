@@ -5,12 +5,9 @@ import { getGa4PageTitle } from "../lib/ga4PageTitle";
 
 declare global {
   interface Window {
-    gtag?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
   }
 }
-
-const GA_MEASUREMENT_ID = "G-8PLVP5JKV0";
 
 function getCurrentPagePath() {
   return `${window.location.pathname}${window.location.search}`;
@@ -23,18 +20,18 @@ export default function Ga4RouteTracker() {
     const trackPageView = () => {
       const pagePath = getCurrentPagePath();
 
-      if (previousUrlRef.current === pagePath) {
-        return;
-      }
-
+      if (previousUrlRef.current === pagePath) return;
       previousUrlRef.current = pagePath;
 
-      window.gtag?.("config", GA_MEASUREMENT_ID, {
-        page_title: getGa4PageTitle(pagePath),
-        page_path: pagePath,
-        page_location: `${window.location.origin}${pagePath}`,
-      });
+      const pageTitle = getGa4PageTitle(pagePath);
 
+      // Send pageview via Measurement Protocol (server-side)
+      navigator.sendBeacon(
+        "/api/ga4-event",
+        JSON.stringify({ eventName: "page_view", pagePath, pageTitle }),
+      );
+
+      // Meta Pixel pageview (stays client-side)
       window.fbq?.("track", "PageView");
     };
 
