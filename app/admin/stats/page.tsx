@@ -9,16 +9,22 @@ export const runtime = "nodejs";
 export default async function StatsPage() {
   await requireAdmin();
 
-  // Fetch all users with date + paid status
+  const EXCLUDED_EMAILS = ["patrypierreandre", "sofiane.lekfif"];
+
+  // Fetch all users with date + paid status (exclude internal accounts)
   const { data: users } = await supabaseAdmin
     .from("users")
-    .select("created_at, has_paid")
+    .select("created_at, has_paid, email")
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[0]}%`)
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[1]}%`)
     .order("created_at", { ascending: true });
 
-  // Fetch leads
+  // Fetch leads (exclude internal accounts)
   const { data: leads } = await supabaseAdmin
     .from("leads")
-    .select("created_at")
+    .select("created_at, email")
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[0]}%`)
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[1]}%`)
     .order("created_at", { ascending: true });
 
   // Build daily series starting from first event

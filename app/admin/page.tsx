@@ -33,12 +33,20 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-ash px-6 py-10">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">Admin</p>
-          <h1 className="mt-1 font-display text-3xl text-void">Orders</h1>
-          <p className="mt-1 text-[13px] text-dim">
-            {orders.length} paid client{orders.length !== 1 ? "s" : ""}
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">Admin</p>
+            <h1 className="mt-1 font-display text-3xl text-void">Orders</h1>
+            <p className="mt-1 text-[13px] text-dim">
+              {orders.length} paid client{orders.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <a
+            href="/admin/stats"
+            className="mt-1 text-[12px] font-semibold text-mute hover:text-void transition-colors"
+          >
+            Stats →
+          </a>
         </div>
         <OrderListClient orders={orders} />
       </div>
