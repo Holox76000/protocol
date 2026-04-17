@@ -16,6 +16,10 @@ export function extractGa4ClientId(gaCookie: string | null | undefined): string 
   return null;
 }
 
+function isLocal() {
+  return process.env.NODE_ENV !== "production";
+}
+
 async function sendToGA4MP(
   clientId: string,
   eventName: string,
@@ -24,6 +28,11 @@ async function sendToGA4MP(
 ): Promise<void> {
   const measurementId = process.env.GA4_MEASUREMENT_ID;
   const apiSecret = process.env.GA4_API_SECRET;
+
+  if (isLocal()) {
+    console.log("[ga4] dev — skipping", eventName, eventParams);
+    return;
+  }
 
   if (!measurementId || !apiSecret) {
     console.warn("[ga4] Missing GA4_MEASUREMENT_ID or GA4_API_SECRET — skipping");

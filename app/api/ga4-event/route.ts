@@ -15,6 +15,10 @@ export async function POST(request: Request) {
 
   const { eventName, params = {}, pagePath, pageTitle } = body;
 
+  if (process.env.NODE_ENV !== "production") {
+    return NextResponse.json({ ok: true, skipped: "dev" });
+  }
+
   if (!eventName || typeof eventName !== "string") {
     return NextResponse.json({ error: "Missing eventName" }, { status: 400 });
   }
