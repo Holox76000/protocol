@@ -30,11 +30,12 @@ function sanitize(text: string): string {
 
 // ── Block types ──────────────────────────────────────────────────────────────
 type Block =
-  | { type: "h2";     text: string }
-  | { type: "h3";     text: string }
-  | { type: "bullet"; runs: Run[] }
-  | { type: "para";   runs: Run[] }
-  | { type: "table";  headers: string[]; rows: string[][] };
+  | { type: "h2";       text: string }
+  | { type: "h3";       text: string }
+  | { type: "bullet";   runs: Run[] }
+  | { type: "checkbox"; checked: boolean; runs: Run[] }
+  | { type: "para";     runs: Run[] }
+  | { type: "table";    headers: string[]; rows: string[][] };
 
 type Run = { text: string; bold: boolean };
 
@@ -118,6 +119,12 @@ function parseBlocks(markdown: string): Block[] {
     if (line.startsWith("### ")) { flushPara(); blocks.push({ type: "h3", text: line.slice(4) }); continue; }
     if (line.startsWith("## "))  { flushPara(); blocks.push({ type: "h2", text: line.slice(3) }); continue; }
     if (line.startsWith("# "))   { flushPara(); blocks.push({ type: "h2", text: line.slice(2) }); continue; }
+    if (line.startsWith("- [ ] ") || line.startsWith("- [x] ") || line.startsWith("- [X] ")) {
+      flushPara();
+      const checked = line[3] !== " ";
+      blocks.push({ type: "checkbox", checked, runs: parseRuns(line.slice(6)) });
+      continue;
+    }
     if (line.startsWith("- ") || line.startsWith("* ")) {
       flushPara();
       blocks.push({ type: "bullet", runs: parseRuns(line.slice(2)) });
@@ -194,9 +201,10 @@ function estimateBlockH(block: Block): number {
     case "h2":    return 46;  // 14pt + marginTop 20 + marginBottom 6 + border
     case "h3":    return 30;  // 8pt + marginTop 14 + marginBottom 4 + tracking
     case "table": return 28 + block.rows.length * 22 + 16;
-    case "bullet": {
+    case "bullet":
+    case "checkbox": {
       const chars = block.runs.reduce((s, r) => s + r.text.length, 0);
-      return Math.max(1, Math.ceil(chars / CHARS_PER_LINE)) * 20 + 4;
+      return Math.max(1, Math.ceil(chars / CHARS_PER_LINE)) * 20 + 5;
     }
     case "para": {
       const chars = block.runs.reduce((s, r) => s + r.text.length, 0);
@@ -283,6 +291,25 @@ export function ProseSection({ content }: { content: string }) {
 
         if (block.type === "table") {
           return <TableBlock key={i} headers={block.headers} rows={block.rows} />;
+        }
+
+        if (block.type === "checkbox") {
+          return (
+            <View key={i} style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 4 }}>
+              <View style={{
+                width: 9,
+                height: 9,
+                borderWidth: block.checked ? 0 : 1.5,
+                borderColor: C.mute,
+                backgroundColor: block.checked ? C.accent : "transparent",
+                borderRadius: 2,
+                marginRight: 8,
+                marginTop: 2,
+                flexShrink: 0,
+              }} />
+              <Runs runs={block.runs} style={{ fontFamily: F.sans, fontSize: 11, color: C.void, lineHeight: 1.6, flex: 1 }} />
+            </View>
+          );
         }
 
         if (block.type === "bullet") {

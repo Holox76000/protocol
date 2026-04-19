@@ -447,7 +447,9 @@ Each marker must be specific to this client's starting PAS score and correction 
   ];
 }
 
-// ── Action Plan: multi-part generation ──────────────────────────────────────
+// ── Action Plan: cheat-sheet generation ─────────────────────────────────────
+// Format: tables + checklists + numbered rules — scannable in under a minute.
+// No prose paragraphs. Every section must be skimmable at a glance.
 
 const ACTION_PLAN_PARTS: Array<{
   title:        string;
@@ -455,34 +457,34 @@ const ACTION_PLAN_PARTS: Array<{
   maxTokens:    number;
 }> = [
   {
-    title: "## Where You Stand",
-    instructions: "Write 2–3 sentences: honest assessment of current state vs. potential. Reference the score and key metrics. Be direct and specific to this client's numbers.",
-    maxTokens: 400,
+    title: "## Metrics Snapshot",
+    instructions: "Output ONLY a markdown table: Metric | Value | Optimal Range | Status. Include all 6 metrics (SWR, CWR, BF%, PAS, TI, PC). Status = one word: Good / High / Low / Below. Then ONE sentence — honest one-line verdict on the overall picture. No other text.",
+    maxTokens: 260,
   },
   {
-    title: "## The 3 Highest-Leverage Changes",
-    instructions: "The 3 interventions — from nutrition, training, sleep, or daily habits — that will move the score most for this specific person. For each: what, why (metric impact), and how to start this week.",
-    maxTokens: 1200,
+    title: "## Top 3 Levers",
+    instructions: "Output ONLY a markdown table: # | Area | Action | Expected Impact. 3 rows only. Area = Nutrition / Training / Sleep / Habits. Action = one concrete sentence specific to their numbers. Impact = metric name + realistic projection (e.g. 'BF% −4pt in 60 days'). No other text.",
+    maxTokens: 360,
   },
   {
-    title: "## 30-Day Sprint",
-    instructions: "A concrete 30-day focus. One primary objective, 3 weekly milestones, and a measurable success metric.",
-    maxTokens: 900,
+    title: "## Daily Non-Negotiables",
+    instructions: "Output ONLY a task list using - [ ] format. 6–8 items. Each item one line, completely specific to this client's numbers and protocol (e.g. '- [ ] Hit 185g protein — target is 1.8 × 103 kg lean mass'). Start directly with the first - [ ] line, zero intro text.",
+    maxTokens: 320,
   },
   {
-    title: "## 90-Day Roadmap",
-    instructions: "Month-by-month progression targets for key metrics (BF%, training volume, posture score). Realistic for their age and starting point.",
-    maxTokens: 900,
+    title: "## Weekly Schedule",
+    instructions: "Output ONLY a markdown table: Day | Session | Nutrition Focus. 7 rows (Mon–Sun). Pull from the workout and nutrition plans already generated. Cell content max 8 words. No other text.",
+    maxTokens: 460,
   },
   {
-    title: "## What to Ignore (For Now)",
-    instructions: "2–3 things that are low-leverage for this person at this stage. Helps focus attention.",
-    maxTokens: 400,
+    title: "## 90-Day Targets",
+    instructions: "Output ONLY a markdown table: Metric | Current | Month 1 | Month 3. Rows: BF%, Body weight, SWR, PC Score. Realistic projections based on starting point and age. Numbers only in cells. No other text.",
+    maxTokens: 280,
   },
   {
-    title: "## First 7 Days",
-    instructions: "Day-by-day implementation guide for the first week. Specific enough to start immediately.",
-    maxTokens: 1200,
+    title: "## The Rules",
+    instructions: "Output ONLY a numbered list: 5 rules, one sentence each. Tied to this client's biggest risks and weak metrics — no generic advice. Start directly with '1.' with zero intro text.",
+    maxTokens: 300,
   },
 ];
 
@@ -500,7 +502,7 @@ async function generateActionPlanMultiPart(
   const enrichedCtx = `${ctx}\n\n${sectionBlock ? `## Protocol Sections (summaries)\n${sectionBlock}` : ""}`;
 
   return generateMultiPart(
-    `You are an elite transformation coach writing a prioritized action plan for ${name}.`,
+    `You are writing a transformation cheat sheet for ${name}. Output structured markdown only: tables, task lists (- [ ] format), numbered rules. Zero prose paragraphs. Every section must be scannable in under 10 seconds.`,
     enrichedCtx,
     ACTION_PLAN_PARTS,
   );

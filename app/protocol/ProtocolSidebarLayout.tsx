@@ -464,6 +464,30 @@ export default function ProtocolSidebarLayout({
                     ? "For best results, generate all other sections first."
                     : undefined
                 }
+                renderContent={(content) => (
+                  <>
+                    <style suppressHydrationWarning>{`
+                      .ap-prose .task-list-item {
+                        display: flex !important;
+                        align-items: flex-start;
+                        gap: 8px;
+                        padding-left: 0 !important;
+                      }
+                      .ap-prose .task-list-item::before { display: none !important; }
+                      .ap-prose .task-list-item input[type="checkbox"] {
+                        margin-top: 3px;
+                        width: 14px;
+                        height: 14px;
+                        accent-color: #4a7a5e;
+                        cursor: default;
+                        flex-shrink: 0;
+                      }
+                    `}</style>
+                    <div className={`${PROSE_CLASSES} ap-prose`}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                    </div>
+                  </>
+                )}
               />
             )}
             {active === "nutrition-plan" && (
