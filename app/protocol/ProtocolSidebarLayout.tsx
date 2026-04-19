@@ -531,7 +531,7 @@ export default function ProtocolSidebarLayout({
           )}
 
           {/* ── Next step footer ──────────────────────────────────────────── */}
-          {!isPending && <NextStepFooter active={active} onNavigate={navigateTo} />}
+          {!isPending && active !== "summary" && <NextStepFooter active={active} onNavigate={navigateTo} />}
         </main>
       </div>
     </div>
