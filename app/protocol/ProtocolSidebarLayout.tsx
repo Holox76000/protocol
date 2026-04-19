@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
-import { OC } from "../admin/orders/[userId]/PhotoCalibrator";
+import { OC } from "../../lib/overlayColors";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import MetricsPanel from "./MetricsPanel";

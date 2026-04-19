@@ -6,7 +6,7 @@ import {
   getAgeRanges,
 } from "../../lib/attractivenessScore";
 import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
-import { OC } from "../admin/orders/[userId]/PhotoCalibrator";
+import { OC } from "../../lib/overlayColors";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
