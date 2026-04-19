@@ -1,3 +1,4 @@
+import React from "react";
 import { Page, View, Text } from "@react-pdf/renderer";
 import { C, F, PAGE } from "../pdfTheme";
 

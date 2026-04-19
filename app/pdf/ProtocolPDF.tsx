@@ -1,3 +1,4 @@
+import React from "react";
 import { Document, renderToBuffer } from "@react-pdf/renderer";
 import { registerFonts } from "./pdfFonts";
 import { CoverPage } from "./sections/CoverPage";

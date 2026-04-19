@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text } from "@react-pdf/renderer";
 import type { CalibrationMetrics } from "../../../app/admin/orders/[userId]/PhotoCalibrator";
 import { getAgeRanges } from "../../../lib/attractivenessScore";

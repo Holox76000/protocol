@@ -22,8 +22,8 @@ export function registerFonts() {
     Font.register({
       family: "LibreBaskerville",
       fonts: [
-        { src: `${CDN}/libre-baskerville@1.0.0/files/libre-baskerville-latin-400-normal.woff2`, fontWeight: 400 },
-        { src: `${CDN}/libre-baskerville@1.0.0/files/libre-baskerville-latin-400-italic.woff2`, fontWeight: 400, fontStyle: "italic" },
+        { src: `${CDN}/libre-baskerville@5.0.5/files/libre-baskerville-latin-400-normal.woff2`, fontWeight: 400 },
+        { src: `${CDN}/libre-baskerville@5.0.5/files/libre-baskerville-latin-400-italic.woff2`, fontWeight: 400, fontStyle: "italic" },
       ],
     });
   } catch {

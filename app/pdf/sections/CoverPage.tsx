@@ -1,3 +1,4 @@
+import React from "react";
 import { Page, View, Text, Image, Svg, Circle, G, Line } from "@react-pdf/renderer";
 import { C, F, PAGE } from "../pdfTheme";
 
@@ -14,8 +15,11 @@ function ScoreRing({ score, label }: { score: number; label: string }) {
   const sw  = 5;
   const cx  = 56;
   const cy  = 56;
-  const C2  = 2 * Math.PI * R;
-  const arc = C2 * (score / 100);
+  const C2     = 2 * Math.PI * R;
+  // Clamp so neither segment of strokeDasharray is 0 — PDFKit rejects 0-length dashes.
+  const clampedScore = Math.max(1, Math.min(99, score));
+  const arc    = C2 * (clampedScore / 100);
+  const gap    = C2 - arc;
 
   return (
     <Svg width={112} height={112} viewBox="0 0 112 112">
@@ -28,7 +32,7 @@ function ScoreRing({ score, label }: { score: number; label: string }) {
         stroke={C.accent}
         strokeWidth={sw}
         strokeLinecap="round"
-        strokeDasharray={`${arc.toFixed(1)} ${(C2 - arc).toFixed(1)}`}
+        strokeDasharray={`${arc.toFixed(2)} ${gap.toFixed(2)}`}
         transform={`rotate(-90 ${cx} ${cy})`}
       />
       {/* Score text */}
