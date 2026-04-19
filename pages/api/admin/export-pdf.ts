@@ -33,6 +33,7 @@ async function fetchPhotoDataUri(signedUrl: string | null): Promise<string | nul
     if (!res.ok) return null;
     const buffer = Buffer.from(await res.arrayBuffer());
     const resized = await sharp(buffer)
+      .rotate()  // auto-apply EXIF orientation before any other op
       .resize({ width: 800, withoutEnlargement: true })
       .jpeg({ quality: 85 })
       .toBuffer();
