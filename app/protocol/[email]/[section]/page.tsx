@@ -22,7 +22,7 @@ const PROTOCOL_CONTENT_COLS: Record<string, string[]> = {
   "action-plan":         ["action_plan_content", "nutrition_plan_content", "workout_plan_content", "sleeping_advices_content"],
   "nutrition-plan":      ["nutrition_plan_content"],
   "supplement-protocol": ["supplement_protocol_content"],
-  "workout-plan":        ["workout_plan_content"],
+  "workout-plan":        ["workout_plan_content", "metrics"],
   "sleeping-advices":    ["sleeping_advices_content"],
   "posture-analysis":    ["posture_analysis_content"],
 };

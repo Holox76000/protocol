@@ -36,7 +36,7 @@ type NavEntry = NavGroup | NavItem;
 const NAV: NavEntry[] = [
   { id: "summary",             label: "Summary Report",      icon: "≡"  },
   { id: "body-analysis",       label: "Body Analysis",       icon: "◎"  },
-  { group: "Lifestyle" },
+  { group: "Protocol" },
   { id: "nutrition-plan",      label: "Nutrition Plan",      icon: "≡"  },
   { id: "workout-plan",        label: "Workout Plan",        icon: "›"  },
   { id: "sleeping-advices",    label: "Sleeping Advices",    icon: "◇"  },
@@ -451,7 +451,7 @@ export default function ProtocolSidebarLayout({
           <ReportSectionPage
             firstName={firstName}
             sectionLabel={SECTION_LABELS[active]}
-            categoryLabel={LIFESTYLE_IDS.has(active) ? "Lifestyle" : "Protocol"}
+            categoryLabel="Protocol"
             email={isAdmin ? email : undefined}
           >
             {active === "action-plan" && (
@@ -487,7 +487,7 @@ export default function ProtocolSidebarLayout({
                       }
                     `}</style>
                     <div className={`${PROSE_CLASSES} ap-prose`}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>{content}</ReactMarkdown>
                     </div>
                   </>
                 )}
@@ -514,60 +514,133 @@ export default function ProtocolSidebarLayout({
                 onContent={sectionStateMap["supplement-protocol"].setContent}
               />
             )}
-            {active === "workout-plan" && metrics && sessionsPerWeek && (() => {
-              const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
+            {active === "workout-plan" && (() => {
+              const pps = metrics && sessionsPerWeek
+                ? (100 - Math.round(computeAttractivenessScore(metrics, age).score)) / (sessionsPerWeek * 12)
+                : null;
               const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
-              const score   = Math.round(computeAttractivenessScore(metrics, age).score);
-              const needed  = 100 - score;
-              const total   = sessionsPerWeek * 12;
-              const pps     = needed / total;
               return (
-                <div style={{
-                  background: "#1c2a30", borderRadius: 14, padding: "16px 20px",
-                  marginBottom: 20, display: "flex", alignItems: "center", gap: 20,
-                }}>
-                  {/* Left: points per session */}
-                  <div style={{ minWidth: 110 }}>
-                    <div style={{ fontFamily: fontM, fontSize: 9, color: "#4a7a5e", letterSpacing: "0.15em", textTransform: "uppercase" as const, marginBottom: 6 }}>
-                      Par séance
+                <GeneratedSection
+                  sectionKey="workout-plan"
+                  userId={userId}
+                  label="Workout Plan"
+                  description={`A structured training program for ${firstName} based on their experience, session availability, equipment, and physique targets.`}
+                  content={sectionStateMap["workout-plan"].content}
+                  onContent={sectionStateMap["workout-plan"].setContent}
+                  renderContent={(content) => {
+                    const currentScore = metrics
+                      ? Math.round(computeAttractivenessScore(metrics, age).score)
+                      : null;
+                    const weeklyGain = currentScore !== null && pps !== null && sessionsPerWeek
+                      ? pps * sessionsPerWeek
+                      : null;
+                    const scores = currentScore !== null && weeklyGain !== null
+                      ? Array.from({ length: 12 }, (_, i) =>
+                          Math.min(100, currentScore + weeklyGain * (i + 1))
+                        )
+                      : null;
+                    const range = currentScore !== null ? Math.max(1, 100 - currentScore) : 1;
+
+                    const MONTH_LABELS: Record<number, string> = { 0: "Start", 3: "M1", 7: "M2", 11: "M3" };
+                    const BAR_COLORS = (i: number, score: number) =>
+                      score >= 99.5 ? "#4a7a5e"
+                      : i < 4  ? "#253239"
+                      : i < 8  ? "#2d4a3e"
+                      : "#3a6652";
+
+                    return (
+                    <>
+                      {scores && currentScore !== null && (
+                        <div style={{ marginBottom: 24 }}>
+                          {/* Y-axis labels + chart */}
+                          <div style={{ display: "flex", alignItems: "stretch", gap: 8 }}>
+                            {/* Y-axis */}
+                            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: 20, flexShrink: 0 }}>
+                              <span style={{ fontFamily: fontM, fontSize: 9, color: "#4a7a5e", fontWeight: 600 }}>100</span>
+                              <span style={{ fontFamily: fontM, fontSize: 9, color: "#799097" }}>{currentScore}</span>
+                            </div>
+                            {/* SVG bars */}
+                            <svg
+                              width="100%"
+                              viewBox="0 0 520 92"
+                              style={{ display: "block", flex: 1 }}
+                            >
+                              {/* Baseline */}
+                              <line x1={0} y1={76} x2={520} y2={76} stroke="#edf0f1" strokeWidth={1} />
+                              {/* Bars */}
+                              {scores.map((score, i) => {
+                                const BW = (520 - 3 * 11) / 12;
+                                const bx = i * (BW + 3);
+                                const bh = Math.max(2, ((score - currentScore) / range) * 64);
+                                const by = 76 - bh;
+                                return (
+                                  <rect key={i} x={bx} y={by} width={BW} height={bh} fill={BAR_COLORS(i, score)} rx={2} />
+                                );
+                              })}
+                              {/* Score at last bar */}
+                              {(() => {
+                                const BW = (520 - 3 * 11) / 12;
+                                const lastScore = scores[11];
+                                const bh = Math.max(2, ((lastScore - currentScore) / range) * 64);
+                                const cx = 11 * (BW + 3) + BW / 2;
+                                return (
+                                  <text x={cx} y={76 - bh - 4} textAnchor="middle" fontSize={9} fill="#4a7a5e" fontFamily={fontM} fontWeight="600">
+                                    {Math.round(lastScore)}
+                                  </text>
+                                );
+                              })()}
+                              {/* Month labels */}
+                              {scores.map((_, i) => {
+                                const label = MONTH_LABELS[i];
+                                if (!label) return null;
+                                const BW = (520 - 3 * 11) / 12;
+                                const cx = i * (BW + 3) + BW / 2;
+                                return (
+                                  <text key={i} x={cx} y={88} textAnchor="middle" fontSize={9} fill="#799097" fontFamily={fontM}>
+                                    {label}
+                                  </text>
+                                );
+                              })}
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    <div className={PROSE_CLASSES}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ...MARKDOWN_COMPONENTS,
+                          h3: ({ children }) => {
+                            const text = String(children ?? "");
+                            const isSession = /^session\s/i.test(text.trim());
+                            return (
+                              <h3 style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                                {isSession && pps !== null && (
+                                  <span style={{
+                                    fontFamily: fontM, fontSize: 9, fontWeight: 600,
+                                    color: "#4a7a5e", background: "rgba(74,122,94,0.10)",
+                                    borderRadius: 4, padding: "2px 8px",
+                                    textTransform: "none", letterSpacing: "0.04em",
+                                    alignSelf: "flex-start",
+                                  }}>
+                                    +{pps.toFixed(2)} attractiveness points / session
+                                  </span>
+                                )}
+                                <span>{children}</span>
+                              </h3>
+                            );
+                          },
+                        }}
+                      >
+                        {content}
+                      </ReactMarkdown>
                     </div>
-                    <div style={{ fontFamily: fontS, fontSize: 34, fontWeight: 700, color: "#fff", lineHeight: 1 }}>
-                      +{pps.toFixed(2)}
-                    </div>
-                    <div style={{ fontFamily: fontS, fontSize: 11, color: "#799097", marginTop: 4 }}>
-                      pts attractivité
-                    </div>
-                  </div>
-                  {/* Divider */}
-                  <div style={{ width: 1, height: 52, background: "#2a3d44", flexShrink: 0 }} />
-                  {/* Right: progress bar + stats */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#2a3d44", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${score}%`, background: "linear-gradient(90deg,#4a7a5e,#6aaa8e)", borderRadius: 3 }} />
-                      </div>
-                      <span style={{ fontFamily: fontM, fontSize: 9, color: "#4a7a5e", minWidth: 36, textAlign: "right" as const }}>
-                        {score}/100
-                      </span>
-                    </div>
-                    <div style={{ fontFamily: fontS, fontSize: 11, color: "#4a5c63" }}>
-                      {needed} pts restants · {sessionsPerWeek}×/sem · 12 semaines · {total} séances
-                    </div>
-                  </div>
-                </div>
+                    </>
+                    );
+                  }}
+                />
               );
             })()}
-
-            {active === "workout-plan" && (
-              <GeneratedSection
-                sectionKey="workout-plan"
-                userId={userId}
-                label="Workout Plan"
-                description={`A structured training program for ${firstName} based on their experience, session availability, equipment, and physique targets.`}
-                content={sectionStateMap["workout-plan"].content}
-                onContent={sectionStateMap["workout-plan"].setContent}
-              />
-            )}
             {active === "sleeping-advices" && (
               <GeneratedSection
                 sectionKey="sleeping-advices"
@@ -806,7 +879,7 @@ function ReportSectionPage({
         {/* Hero */}
         <div className="rsp-hero">
           <div style={{ fontFamily: fontS, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "#799097", marginBottom: 14 }}>
-            Protocol · {categoryLabel}
+            {categoryLabel}
           </div>
           <h1 className="rsp-h1">
             {word1}
@@ -852,7 +925,7 @@ function FoodChoicesCards({ content }: { content: string }) {
   if (categories.length === 0) {
     return (
       <div className={PROSE_CLASSES}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>{content}</ReactMarkdown>
       </div>
     );
   }
@@ -918,7 +991,7 @@ function renderNutritionContent(content: string): React.ReactNode {
         }
         return (
           <div key={i} className={PROSE_CLASSES}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{section}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>{section}</ReactMarkdown>
           </div>
         );
       })}
@@ -1089,6 +1162,18 @@ function PdfDownloadButton({ email, firstName }: { email: string; firstName: str
 }
 
 // ── Generated section (AI content) ──────────────────────────────────────────
+
+// Shared ReactMarkdown component overrides — applied to all prose sections.
+// Wraps <table> in a scroll container so wide tables don't overflow on mobile.
+const MARKDOWN_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>["components"] = {
+  table: ({ children, ...props }) => (
+    <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginTop: 4, marginBottom: 4 }}>
+      <table style={{ minWidth: "520px", width: "100%", borderCollapse: "collapse" }} {...props}>
+        {children}
+      </table>
+    </div>
+  ),
+};
 
 const PROSE_CLASSES = `max-w-none
   [&>*+*]:mt-5
@@ -1274,7 +1359,7 @@ function GeneratedSection({
         {previewMode ? (
           renderContent ? renderContent(editDraft) : (
             <div className={PROSE_CLASSES}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{editDraft}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>{editDraft}</ReactMarkdown>
             </div>
           )
         ) : (
@@ -1336,7 +1421,7 @@ function GeneratedSection({
         </div>
         {renderContent ? renderContent(content) : (
           <div className={PROSE_CLASSES}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>{content}</ReactMarkdown>
           </div>
         )}
         {error && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{error}</p>}

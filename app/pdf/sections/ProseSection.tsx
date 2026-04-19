@@ -245,7 +245,7 @@ function computeBreaks(blocks: Block[]): Set<number> {
 }
 
 // ── ProseSection ─────────────────────────────────────────────────────────────
-export function ProseSection({ content }: { content: string }) {
+export function ProseSection({ content, sessionPps }: { content: string; sessionPps?: number }) {
   const blocks = parseBlocks(sanitize(content));
   const breaksBefore = computeBreaks(blocks);
 
@@ -274,18 +274,20 @@ export function ProseSection({ content }: { content: string }) {
         }
 
         if (block.type === "h3") {
+          const isSession = sessionPps !== undefined && /^session\s/i.test(block.text.trim());
           return (
-            <Text key={i} style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: C.mute,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-              marginTop: 14,
-              marginBottom: 4,
-            }}>
-              {block.text}
-            </Text>
+            <View key={i} style={{ flexDirection: "column", marginTop: 14, marginBottom: 4 }}>
+              {isSession && (
+                <View style={{ backgroundColor: "#1a3329", borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, alignSelf: "flex-start", marginBottom: 6 }}>
+                  <Text style={{ fontFamily: F.mono, fontSize: 7, color: C.accent }}>
+                    +{sessionPps!.toFixed(2)} attractiveness points / session
+                  </Text>
+                </View>
+              )}
+              <Text style={{ fontFamily: F.mono, fontSize: 8, color: C.mute, letterSpacing: 1.5, textTransform: "uppercase" }}>
+                {block.text}
+              </Text>
+            </View>
           );
         }
 

@@ -8,7 +8,7 @@ import { MetricsGrid } from "./sections/MetricsGrid";
 import { ProseSection } from "./sections/ProseSection";
 import { BeforeAfterSection } from "./sections/BeforeAfterSection";
 import { AnnotatedPhotoSection } from "./sections/AnnotatedPhotoSection";
-import { WorkoutScoreWidget } from "./sections/WorkoutScoreWidget";
+import { WorkoutProgressChart } from "./sections/WorkoutProgressChart";
 import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
 import { computeAttractivenessScore } from "../../lib/attractivenessScore";
 
@@ -25,11 +25,11 @@ type SectionId =
 const SECTION_META: Record<SectionId, { label: string; category: string }> = {
   "summary":             { label: "Summary Report",      category: "Overview"  },
   "body-analysis":       { label: "Body Analysis",       category: "Body"      },
-  "nutrition-plan":      { label: "Nutrition Plan",      category: "Lifestyle" },
-  "workout-plan":        { label: "Workout Plan",        category: "Lifestyle" },
-  "sleeping-advices":    { label: "Sleeping Advices",    category: "Lifestyle" },
-  "posture-analysis":    { label: "Posture Analysis",    category: "Lifestyle" },
-  "supplement-protocol": { label: "Supplement Protocol", category: "Lifestyle" },
+  "nutrition-plan":      { label: "Nutrition Plan",      category: "Protocol" },
+  "workout-plan":        { label: "Workout Plan",        category: "Protocol" },
+  "sleeping-advices":    { label: "Sleeping Advices",    category: "Protocol" },
+  "posture-analysis":    { label: "Posture Analysis",    category: "Protocol" },
+  "supplement-protocol": { label: "Supplement Protocol", category: "Protocol" },
   "action-plan":         { label: "Action Plan",         category: "Protocol"  },
 };
 
@@ -189,12 +189,19 @@ export function ProtocolPDF({
               />
               <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
                 {id === "workout-plan" && metrics && sessionsPerWeek && (
-                  <WorkoutScoreWidget
-                    score={Math.round(score)}
+                  <WorkoutProgressChart
+                    currentScore={Math.round(score)}
                     sessionsPerWeek={sessionsPerWeek}
+                    pps={(100 - Math.round(score)) / (sessionsPerWeek * 12)}
                   />
                 )}
-                <ProseSection content={content} />
+                <ProseSection
+                  content={content}
+                  sessionPps={id === "workout-plan" && metrics && sessionsPerWeek
+                    ? (100 - Math.round(score)) / (sessionsPerWeek * 12)
+                    : undefined
+                  }
+                />
               </SectionPage>
             </React.Fragment>
           );
