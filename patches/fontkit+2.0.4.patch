@@ -1,0 +1,17 @@
+diff --git a/node_modules/fontkit/dist/module.mjs b/node_modules/fontkit/dist/module.mjs
+index fde88fc..6145053 100644
+--- a/node_modules/fontkit/dist/module.mjs
++++ b/node_modules/fontkit/dist/module.mjs
+@@ -12174,7 +12174,11 @@ class $4abbb6a5dbdc441a$export$2e2bcd8739ae039 extends (0, $5cc7476da92df375$exp
+             let view = new DataView(buffer.buffer);
+             for (let component of glyf.components){
+                 gid = this.includeGlyph(component.glyphID);
+-                view.setUint16(component.pos, gid);
++                // fontkit bug: component.pos is an absolute stream offset but buffer
++                // starts at curOffset — guard to prevent DataView out-of-bounds crash.
++                if (component.pos + 2 <= view.byteLength) {
++                    view.setUint16(component.pos, gid);
++                }
+             }
+         } else if (glyf && this.font._variationProcessor) // If this is a TrueType variation glyph, re-encode the path
+         buffer = this.glyphEncoder.encodeSimple(glyph.path, glyf.instructions);

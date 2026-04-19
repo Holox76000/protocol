@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const [protocolResult, qrResult] = await Promise.all([
     supabaseAdmin
       .from("protocols")
-      .select("content, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, calibration_metrics, calibration_points")
+      .select("summary, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, metrics")
       .eq("user_id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -101,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const photoDataUri   = await fetchPhotoDataUri(signedUrl);
 
   // Metrics
-  const rawMetrics = (protocol?.calibration_metrics as CalibrationMetrics | null) ?? null;
+  const rawMetrics = (protocol?.metrics as CalibrationMetrics | null) ?? null;
 
   // Delivered date
   const deliveredAt   = (protocol?.delivered_at as string | null) ?? null;
@@ -121,7 +121,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       photoDataUri,
       metrics: rawMetrics,
       age,
-      summary:                   (protocol?.content as string | null) ?? null,
+      summary:                   (protocol?.summary as string | null) ?? null,
       nutritionPlanContent:      (protocol?.nutrition_plan_content as string | null) ?? null,
       workoutPlanContent:        (protocol?.workout_plan_content as string | null) ?? null,
       sleepingAdvicesContent:    (protocol?.sleeping_advices_content as string | null) ?? null,

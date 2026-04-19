@@ -6,6 +6,37 @@ import { C, F } from "../pdfTheme";
 // Handles: ## headings, ### subheadings, **bold**, - bullets, paragraphs.
 // No external parser — avoids bundle bloat in a Node.js route.
 
+// Replace Unicode characters that fall outside fontsource Latin subset coverage.
+// Fontsource "latin" covers U+0000–U+024F; General Punctuation (U+2000–U+206F)
+// is NOT included — em/en dashes, smart quotes, ellipsis etc. cause fontkit to
+// crash with "Offset outside DataView bounds" when embedding the glyph subset.
+function sanitize(text: string): string {
+  return (
+    text
+      // Decompose accented/composite chars (é → e + ́) then strip combining marks.
+      // fontkit's TrueType composite-glyph encoder crashes with "Offset outside
+      // DataView bounds" on certain accented characters (e.g. é U+00E9) when the
+      // glyph is stored as a TrueType composite in the Inter latin subset font.
+      .normalize("NFD")
+      .replace(/[\u0300-\u036F]/g, "")   // strip combining diacritical marks
+      // Punctuation outside Basic Latin / Latin-1 Supplement
+      .replace(/\u2014/g, "--")           // em dash
+      .replace(/\u2013/g, "-")            // en dash
+      .replace(/\u2026/g, "...")          // ellipsis
+      .replace(/[\u201C\u201D]/g, '"')    // smart double quotes
+      .replace(/[\u2018\u2019]/g, "'")    // smart single quotes
+      .replace(/\u00A0/g, " ")            // non-breaking space
+      .replace(/\u00B0/g, " deg")         // degree sign °
+      .replace(/\u00D7/g, "x")            // multiplication sign ×
+      .replace(/\u00B1/g, "+/-")          // plus-minus ±
+      .replace(/\u2022/g, "-")            // bullet •
+      .replace(/\u2192/g, "->")           // →
+      .replace(/\u2190/g, "<-")           // ←
+      .replace(/[\u2000-\u206F]/g, " ")   // remaining General Punctuation
+      .replace(/[\u2200-\u22FF]/g, "")    // Math operators
+  );
+}
+
 type Block =
   | { type: "h2";    text: string }
   | { type: "h3";    text: string }
@@ -58,7 +89,7 @@ function parseBlocks(markdown: string): Block[] {
 }
 
 export function ProseSection({ content }: { content: string }) {
-  const blocks = parseBlocks(content);
+  const blocks = parseBlocks(sanitize(content));
 
   return (
     <View>
