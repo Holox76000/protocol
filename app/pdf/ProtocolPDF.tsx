@@ -8,6 +8,7 @@ import { MetricsGrid } from "./sections/MetricsGrid";
 import { ProseSection } from "./sections/ProseSection";
 import { BeforeAfterSection } from "./sections/BeforeAfterSection";
 import { AnnotatedPhotoSection } from "./sections/AnnotatedPhotoSection";
+import { WorkoutScoreWidget } from "./sections/WorkoutScoreWidget";
 import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
 import { computeAttractivenessScore } from "../../lib/attractivenessScore";
 
@@ -57,6 +58,7 @@ export type ProtocolPDFProps = {
   postureAnalysisContent:     string | null;
   supplementProtocolContent:  string | null;
   actionPlanContent:          string | null;
+  sessionsPerWeek?:           number;
 };
 
 export function ProtocolPDF({
@@ -74,6 +76,7 @@ export function ProtocolPDF({
   postureAnalysisContent,
   supplementProtocolContent,
   actionPlanContent,
+  sessionsPerWeek,
 }: ProtocolPDFProps) {
   registerFonts();
 
@@ -185,6 +188,12 @@ export function ProtocolPDF({
                 sectionIndex={idx}
               />
               <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
+                {id === "workout-plan" && metrics && sessionsPerWeek && (
+                  <WorkoutScoreWidget
+                    score={Math.round(score)}
+                    sessionsPerWeek={sessionsPerWeek}
+                  />
+                )}
                 <ProseSection content={content} />
               </SectionPage>
             </React.Fragment>

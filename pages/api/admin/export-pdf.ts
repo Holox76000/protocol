@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .maybeSingle(),
     supabaseAdmin
       .from("questionnaire_responses")
-      .select("age, photo_front_path")
+      .select("age, photo_front_path, sessions_per_week")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -118,8 +118,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ? new Date(deliveredAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : null;
 
-  // Age
-  const age = ((qr?.age as number | null) ?? undefined);
+  // Age + sessions
+  const age             = (qr?.age               as number | null) ?? undefined;
+  const sessionsPerWeek = (qr?.sessions_per_week as number | null) ?? undefined;
 
   // Render PDF
   let buffer: Buffer;
@@ -139,6 +140,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       postureAnalysisContent:    (protocol?.posture_analysis_content as string | null) ?? null,
       supplementProtocolContent: (protocol?.supplement_protocol_content as string | null) ?? null,
       actionPlanContent:         (protocol?.action_plan_content as string | null) ?? null,
+      sessionsPerWeek,
     });
   } catch (err) {
     console.error("[export-pdf] renderToBuffer failed:", err);

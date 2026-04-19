@@ -8,6 +8,7 @@ import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]
 import { OC } from "../../lib/overlayColors";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { computeAttractivenessScore } from "../../lib/attractivenessScore";
 import MetricsPanel from "./MetricsPanel";
 import CalibrationReport from "./CalibrationReport";
 import ProtocolView from "./ProtocolView";
@@ -83,6 +84,7 @@ type Props = {
   heightCm?:              number;
   age?:                   number;
   weightKg?:              number;
+  sessionsPerWeek?:       number;
   isAdmin?:               boolean;
   initialSection:         SectionId;
   initialBeforeUrl:       string | null;
@@ -110,6 +112,7 @@ export default function ProtocolSidebarLayout({
   heightCm,
   age,
   weightKg,
+  sessionsPerWeek,
   isAdmin = true,
   initialSection,
   initialBeforeUrl,
@@ -511,6 +514,50 @@ export default function ProtocolSidebarLayout({
                 onContent={sectionStateMap["supplement-protocol"].setContent}
               />
             )}
+            {active === "workout-plan" && metrics && sessionsPerWeek && (() => {
+              const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
+              const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+              const score   = Math.round(computeAttractivenessScore(metrics, age).score);
+              const needed  = 100 - score;
+              const total   = sessionsPerWeek * 12;
+              const pps     = needed / total;
+              return (
+                <div style={{
+                  background: "#1c2a30", borderRadius: 14, padding: "16px 20px",
+                  marginBottom: 20, display: "flex", alignItems: "center", gap: 20,
+                }}>
+                  {/* Left: points per session */}
+                  <div style={{ minWidth: 110 }}>
+                    <div style={{ fontFamily: fontM, fontSize: 9, color: "#4a7a5e", letterSpacing: "0.15em", textTransform: "uppercase" as const, marginBottom: 6 }}>
+                      Par séance
+                    </div>
+                    <div style={{ fontFamily: fontS, fontSize: 34, fontWeight: 700, color: "#fff", lineHeight: 1 }}>
+                      +{pps.toFixed(2)}
+                    </div>
+                    <div style={{ fontFamily: fontS, fontSize: 11, color: "#799097", marginTop: 4 }}>
+                      pts attractivité
+                    </div>
+                  </div>
+                  {/* Divider */}
+                  <div style={{ width: 1, height: 52, background: "#2a3d44", flexShrink: 0 }} />
+                  {/* Right: progress bar + stats */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#2a3d44", overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${score}%`, background: "linear-gradient(90deg,#4a7a5e,#6aaa8e)", borderRadius: 3 }} />
+                      </div>
+                      <span style={{ fontFamily: fontM, fontSize: 9, color: "#4a7a5e", minWidth: 36, textAlign: "right" as const }}>
+                        {score}/100
+                      </span>
+                    </div>
+                    <div style={{ fontFamily: fontS, fontSize: 11, color: "#4a5c63" }}>
+                      {needed} pts restants · {sessionsPerWeek}×/sem · 12 semaines · {total} séances
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {active === "workout-plan" && (
               <GeneratedSection
                 sectionKey="workout-plan"

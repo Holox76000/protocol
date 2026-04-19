@@ -67,13 +67,17 @@ export default async function ProtocolSectionPage({
     .from("protocols").select(protocolCols).eq("user_id", userData.id).maybeSingle()
     .then(r => r.data as Row);
 
-  const fetchQr = needsPhotos
-    ? supabaseAdmin
-        .from("questionnaire_responses")
-        .select("photo_front_path, photo_side_path, height_cm, age, weight_kg")
-        .eq("user_id", userData.id).maybeSingle()
-        .then(r => r.data as Row)
-    : Promise.resolve(null as Row);
+  // Always fetch basic QR fields (sessions_per_week, age needed across sections).
+  // Add photo paths only for photo sections to avoid unnecessary DB payload.
+  const qrCols = needsPhotos
+    ? "photo_front_path, photo_side_path, height_cm, age, weight_kg, sessions_per_week"
+    : "height_cm, age, weight_kg, sessions_per_week";
+
+  const fetchQr = supabaseAdmin
+    .from("questionnaire_responses")
+    .select(qrCols)
+    .eq("user_id", userData.id).maybeSingle()
+    .then(r => r.data as Row);
 
   const [p, qr] = await Promise.all([fetchProtocol, fetchQr]);
 
@@ -91,9 +95,10 @@ export default async function ProtocolSectionPage({
 
   const photoFrontPath = (qr?.photo_front_path as string | null) ?? null;
   const photoSidePath  = (qr?.photo_side_path  as string | null) ?? null;
-  const heightCm       = (qr?.height_cm        as number | null) ?? undefined;
-  const age            = (qr?.age              as number | null) ?? undefined;
-  const weightKg       = (qr?.weight_kg        as number | null) ?? undefined;
+  const heightCm        = (qr?.height_cm         as number | null) ?? undefined;
+  const age             = (qr?.age               as number | null) ?? undefined;
+  const weightKg        = (qr?.weight_kg         as number | null) ?? undefined;
+  const sessionsPerWeek = (qr?.sessions_per_week as number | null) ?? undefined;
 
   // Signed URLs only for photo sections (3 network calls otherwise skipped).
   const [photoFront, photoSide, initialAfterUrl] = needsPhotos
@@ -119,6 +124,7 @@ export default async function ProtocolSectionPage({
       heightCm={heightCm}
       age={age}
       weightKg={weightKg}
+      sessionsPerWeek={sessionsPerWeek}
       isAdmin={true}
       initialBeforeUrl={photoFront}
       initialAfterUrl={initialAfterUrl}

@@ -270,25 +270,22 @@ function workoutParts(ctx: string, name: string): Array<{ title: string; instruc
       maxTokens:    300,
     },
     {
-      title:        "## Weekly Training Plan",
-      instructions: `Generate the full weekly training plan as a markdown table. One row per exercise. Use EXACTLY this format:
+      title:        "## Sessions",
+      instructions: `For each unique training session in the plan (skip rest days), output a dedicated subsection:
 
-| Day | Session | Exercise | Sets × Reps | Load | Rest |
-|-----|---------|----------|-------------|------|------|
-| Monday | Push A | Bench Press | 4×8 | 70% 1RM | 90s |
-| Monday | Push A | Overhead Press | 3×10 | 65% 1RM | 60s |
-| Tuesday | REST | — | — | — | — |
+### {Session Name}  (e.g. Push A, Pull B, Lower Body, Cardio)
+Then a markdown table with columns: Exercise | Sets x Reps | Load | Rest | Focus
+- One row per exercise
+- Load: % 1RM for compounds, RPE scale, BW, or — as appropriate
+- Focus: one word (strength / hypertrophy / mobility / cardio / activation)
+- Prioritize exercises targeting weak metrics (SWR = shoulder width, CWR = chest/shoulder width, TI = waist taper)
+- Account for injuries, equipment, and training location
 
-Rules:
-- Cover all 7 days of the week, including rest days (REST row with dashes)
-- One row per exercise, not per session
-- Load column: use % 1RM for compound lifts, "RPE 7", "light", "bodyweight", or "BW" as appropriate. Leave blank (—) if not applicable (cardio, stretching)
-- Sets × Reps: use standard notation (4×8, 3×12, etc.) or time-based (3×45s)
-- Rest: in seconds or minutes (90s, 2min)
-- Prioritize exercises that directly address weak metrics (SWR, CWR, TI)
-- Account for injuries, equipment availability, and training location
-- Include cardio sessions as rows with duration and intensity in the Reps column`,
-      maxTokens:    2500,
+After all session tables, output:
+
+### Weekly Schedule
+A compact 7-row table: Day | Session (include rest days as "Rest").`,
+      maxTokens:    2800,
     },
     {
       title:        "## 3-Month Progression",
