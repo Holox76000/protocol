@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,13 +35,13 @@ type NavEntry = NavGroup | NavItem;
 const NAV: NavEntry[] = [
   { id: "summary",             label: "Summary Report",      icon: "≡"  },
   { id: "body-analysis",       label: "Body Analysis",       icon: "◎"  },
-  { id: "action-plan",         label: "Action Plan",         icon: "✓"  },
   { group: "Lifestyle" },
   { id: "nutrition-plan",      label: "Nutrition Plan",      icon: "≡"  },
-  { id: "supplement-protocol", label: "Supplement Protocol", icon: "◈"  },
   { id: "workout-plan",        label: "Workout Plan",        icon: "›"  },
   { id: "sleeping-advices",    label: "Sleeping Advices",    icon: "◇"  },
   { id: "posture-analysis",    label: "Posture Analysis",    icon: "↕"  },
+  { id: "supplement-protocol", label: "Supplement Protocol", icon: "◈"  },
+  { id: "action-plan",         label: "Action Plan",         icon: "✓"  },
 ];
 
 const SECTION_LABELS: Record<SectionId, string> = {
@@ -58,6 +58,12 @@ const SECTION_LABELS: Record<SectionId, string> = {
 const LIFESTYLE_IDS = new Set<SectionId>([
   "nutrition-plan", "supplement-protocol", "workout-plan", "sleeping-advices",
 ]);
+
+// Ordered journey — drives the "Next step" footer
+const SECTION_ORDER: SectionId[] = [
+  "summary", "body-analysis", "nutrition-plan", "workout-plan",
+  "sleeping-advices", "posture-analysis", "supplement-protocol", "action-plan",
+];
 
 function isNavItem(e: NavEntry): e is NavItem {
   return "id" in e;
@@ -117,6 +123,7 @@ export default function ProtocolSidebarLayout({
   postureAnalysisContent:    initialPostureAnalysis,
 }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [active, setActive]         = useState<SectionId>(initialSection);
   const [navOpen, setNavOpen]       = useState(false);
   const [summary, setSummary]       = useState<string | null>(initialSummary);
@@ -131,9 +138,16 @@ export default function ProtocolSidebarLayout({
   const [actionPlanContent,         setActionPlanContent]         = useState<string | null>(initialActionPlan);
   const [postureAnalysisContent,    setPostureAnalysisContent]    = useState<string | null>(initialPostureAnalysis);
 
+  // Sync active section with URL when navigation completes
+  useEffect(() => {
+    setActive(initialSection);
+  }, [initialSection]);
+
   const navigateTo = useCallback((id: SectionId) => {
-    setActive(id);
-    router.push(`/protocol/${encodeURIComponent(email)}/${id}`);
+    setActive(id); // optimistic update for immediate sidebar highlight
+    startTransition(() => {
+      router.push(`/protocol/${encodeURIComponent(email)}/${id}`);
+    });
   }, [router, email]);
 
   const sectionStateMap: Record<string, { content: string | null; setContent: (v: string | null) => void }> = {
@@ -388,7 +402,9 @@ export default function ProtocolSidebarLayout({
             </div>
           )}
 
-          {active === "summary" && metrics ? (
+          {isPending ? (
+            <ContentSkeleton />
+          ) : active === "summary" && metrics ? (
             <SummaryReport
               firstName={firstName}
               age={age}
@@ -513,6 +529,9 @@ export default function ProtocolSidebarLayout({
             )}
           </ReportSectionPage>
           )}
+
+          {/* ── Next step footer ──────────────────────────────────────────── */}
+          {!isPending && <NextStepFooter active={active} onNavigate={navigateTo} />}
         </main>
       </div>
     </div>
@@ -522,6 +541,106 @@ export default function ProtocolSidebarLayout({
 function EmptyState({ message = "No content available." }: { message?: string }) {
   return (
     <p className="text-[13px] text-mute">{message}</p>
+  );
+}
+
+function ContentSkeleton() {
+  const R = 23;
+  const C = 2 * Math.PI * R;
+  const arcLen = C * 0.3;
+  const gapLen = C - arcLen;
+  return (
+    <div style={{ flex: 1, background: "#f6f5f2", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "calc(100vh - 48px)" }}>
+      <style suppressHydrationWarning>{`
+        @keyframes _csk_spin { to { transform: rotate(360deg); } }
+        @keyframes _csk_rise { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
+      `}</style>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, animation: "_csk_rise 0.45s cubic-bezier(0.16,1,0.3,1) both" }}>
+        <div style={{ position: "relative", width: 56, height: 56 }}>
+          <svg width="56" height="56" viewBox="0 0 56 56" style={{ position: "absolute", inset: 0 }} aria-hidden="true">
+            <circle cx="28" cy="28" r={R} fill="none" stroke="#dedad3" strokeWidth="1" />
+            {Array.from({ length: 8 }).map((_, i) => {
+              const angle = (i * 45 * Math.PI) / 180;
+              return (
+                <line key={i}
+                  x1={28 + (R - 2) * Math.sin(angle)} y1={28 - (R - 2) * Math.cos(angle)}
+                  x2={28 + R * Math.sin(angle)}       y2={28 - R * Math.cos(angle)}
+                  stroke="#cbc8c1" strokeWidth="0.9" strokeLinecap="round"
+                />
+              );
+            })}
+          </svg>
+          <svg width="56" height="56" viewBox="0 0 56 56"
+            style={{ position: "absolute", inset: 0, animation: "_csk_spin 1.7s linear infinite", transformOrigin: "center" }}
+            aria-hidden="true"
+          >
+            <circle cx="28" cy="28" r={R} fill="none" stroke="#4a7a5e" strokeWidth="1.25" strokeLinecap="round"
+              strokeDasharray={`${arcLen.toFixed(1)} ${gapLen.toFixed(1)}`} transform="rotate(-90 28 28)"
+            />
+          </svg>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#4a7a5e" }} />
+          </div>
+        </div>
+        <p style={{ margin: 0, fontFamily: '"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif', fontSize: 10, fontWeight: 400, letterSpacing: "0.22em", textTransform: "uppercase", color: "#a8a5a0" }}>
+          Preparing protocol
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Next step footer ─────────────────────────────────────────────────────────
+
+function NextStepFooter({ active, onNavigate }: { active: SectionId; onNavigate: (id: SectionId) => void }) {
+  const currentIdx = SECTION_ORDER.indexOf(active);
+  const nextId     = currentIdx >= 0 && currentIdx < SECTION_ORDER.length - 1
+    ? SECTION_ORDER[currentIdx + 1]
+    : null;
+
+  if (!nextId) return null;
+
+  const nextLabel = SECTION_LABELS[nextId];
+  const isLast    = currentIdx === SECTION_ORDER.length - 2;
+
+  return (
+    <div style={{
+      borderTop: "1px solid #edf0f1",
+      background: "#fff",
+      padding: "28px 40px 32px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 16,
+    }}>
+      <div>
+        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#a8a5a0", fontFamily: '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace', marginBottom: 5 }}>
+          {isLast ? "Final step" : "Next step"}
+        </p>
+        <p style={{ margin: 0, fontSize: 17, fontWeight: 500, color: "#253239", fontFamily: '"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif', fontStyle: "italic" }}>
+          {nextLabel}
+        </p>
+      </div>
+      <button
+        onClick={() => onNavigate(nextId)}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 10,
+          padding: "12px 22px",
+          background: "#253239", color: "#fff",
+          border: 0, borderRadius: 10,
+          fontSize: 12, fontWeight: 600,
+          cursor: "pointer",
+          fontFamily: '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif',
+          letterSpacing: "0.02em",
+          flexShrink: 0,
+        }}
+      >
+        Continue
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    </div>
   );
 }
 
