@@ -81,12 +81,21 @@ interface PromptParams {
 // ── STEP 1: Analysis prompt ───────────────────────────────────────────────
 // Asks Gemini to look at the photo and identify weaknesses using the research.
 
+// Amplify the visual transformation targets by 25% vs. the conservative scoring ceiling.
+// Capped at 0.97 — still physiologically grounded, but shows the upper bound.
+const VISUAL_BOOST = 1.25;
+function visualGainMult(age: number): number {
+  return Math.min(0.97, muscleGainMultiplier(age) * VISUAL_BOOST);
+}
+
 function buildAnalysisPrompt(p: PromptParams): string {
   const { age, metrics, heightCm, weightKg, waistCm } = p;
   const ageRanges = getAgeRanges(age);
-  const gainMult  = muscleGainMultiplier(age);
+  const gainMult  = visualGainMult(age);
 
-  const bfTarget  = bfRealisticTarget(metrics.bf, age);
+  // Drop BF% 1pt lower than the conservative floor — visible leanness is the #1 visual driver
+  const bfFloor  = age <= 35 ? 9 : age <= 45 ? 11 : age <= 55 ? 13 : 15;
+  const bfTarget = Math.max(bfRealisticTarget(metrics.bf, age) - 1, bfFloor);
   const [bfMin, bfMax]  = ageRanges.bf;
   const [swrMin]        = ageRanges.swr;
   const [cwrMin]        = ageRanges.cwr;
@@ -167,7 +176,7 @@ Be precise, clinical, and direct. This analysis will feed directly into image ge
 
 function buildGenerationPrompt(p: PromptParams, analysis: string): string {
   const { age } = p;
-  const gainMult = muscleGainMultiplier(age);
+  const gainMult = visualGainMult(age);
 
   const socialCtx = socialContextBlock({
     professional_environment: p.professionalEnvironment,
@@ -176,10 +185,10 @@ function buildGenerationPrompt(p: PromptParams, analysis: string): string {
     social_perception: p.socialPerception,
   });
 
-  return `Create a realistic "after" transformation photo of this exact person.
+  return `Create a realistic "after" transformation photo of this exact person. Show the upper end of what natural training achieves — not the average result, the best realistic result.
 
 ${ageContextLine(age)}
-${gainMult < 0.4 ? "IMPORTANT: This person's age limits transformation potential — keep all changes subtle and realistic. No dramatic muscle gains." : ""}
+${gainMult < 0.4 ? "IMPORTANT: This person's age limits transformation potential — keep changes conservative and realistic. No dramatic muscle gains." : ""}
 
 ${socialCtx}
 
@@ -194,11 +203,12 @@ ${analysis}
 ## Absolute Rules
 — Preserve identity exactly: same face structure, skin tone, ethnicity, hair color, hair style, eye color. This must be recognizably the same person.
 — Same camera angle and background as the original photo.
-— Lighting: use clean, even front-facing light that maximises the visibility of body composition details — muscle separation, shoulder roundness, chest definition, waist leanness, and facial bone structure. If the original lighting is flat, dim, or creates shadows that hide these details, upgrade it. The lighting should look like a professional fitness photo studio: soft but directional, with slight shadow depth to reveal muscle contours and the V-taper silhouette. Never flat, never blown out.
-— The result must look like a real photograph — not a digital render, not a different person.
-— All changes must be proportional to what is physiologically achievable at age ${age} through natural training.
-— Do NOT make the person look like a generic fitness model. Every change must be grounded in the specific weaknesses identified in the analysis above.
-— The transformation is the realistic maximum achievable, not a fantasy physique.`;
+— Lighting: use professional fitness studio lighting — soft but directional, with slight shadow depth that reveals muscle separation, shoulder roundness, chest definition, waist leanness, and facial bone structure. Upgrade flat or dim original lighting. Never flat, never blown out.
+— Maximise the V-taper silhouette: shoulder width and waist narrowness should be as visually prominent as the physique allows. This is the single most impactful change — lean into it.
+— Face leanness: show the jawline and cheekbone definition at the leanest realistic level for this person's body fat target. The face should look noticeably leaner and sharper.
+— The result must look like a real photograph, not a digital render or a different person.
+— All changes must be within physiological limits for age ${age} through natural training — but show the ceiling, not the average.
+— Ground every change in the specific weaknesses from the analysis above. Do not produce a generic fitness model.`;
 }
 
 // ── Gemini API helpers ────────────────────────────────────────────────────
