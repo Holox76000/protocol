@@ -592,6 +592,38 @@ function ContentSkeleton() {
 
 // ── Next step footer ─────────────────────────────────────────────────────────
 
+const NEXT_STEP_COPY: Record<SectionId, { headline: string; lines: string[] }> = {
+  "summary": {
+    headline: "Your Body Analysis",
+    lines: ["Measurements decoded.", "Every ratio, every asymmetry — mapped with precision."],
+  },
+  "body-analysis": {
+    headline: "Your Nutrition Plan",
+    lines: ["Calories calculated. Macros dialled.", "Food choices aligned to your exact physique goals."],
+  },
+  "nutrition-plan": {
+    headline: "Your Workout Plan",
+    lines: ["Structured. Progressive. Built for your body.", "The exact sessions that will change your composition."],
+  },
+  "workout-plan": {
+    headline: "Your Sleeping Protocol",
+    lines: ["Recovery is where transformation happens.", "Optimised routines for deep sleep and hormonal reset."],
+  },
+  "sleeping-advices": {
+    headline: "Your Posture Analysis",
+    lines: ["Alignment assessed. Deviations identified.", "A 12-week correction plan, personalised to your scan."],
+  },
+  "posture-analysis": {
+    headline: "Your Supplement Protocol",
+    lines: ["Evidence-based. Precisely dosed.", "The exact stack to accelerate your results — nothing superfluous."],
+  },
+  "supplement-protocol": {
+    headline: "Your Action Plan",
+    lines: ["Three priorities. Eighty-four days.", "Your training, nutrition and recovery — short, specific, measurable."],
+  },
+  "action-plan": { headline: "", lines: [] },
+};
+
 function NextStepFooter({ active, onNavigate }: { active: SectionId; onNavigate: (id: SectionId) => void }) {
   const currentIdx = SECTION_ORDER.indexOf(active);
   const nextId     = currentIdx >= 0 && currentIdx < SECTION_ORDER.length - 1
@@ -600,46 +632,50 @@ function NextStepFooter({ active, onNavigate }: { active: SectionId; onNavigate:
 
   if (!nextId) return null;
 
-  const nextLabel = SECTION_LABELS[nextId];
-  const isLast    = currentIdx === SECTION_ORDER.length - 2;
+  const copy   = NEXT_STEP_COPY[active];
+  const isLast = currentIdx === SECTION_ORDER.length - 2;
+
+  const fontD = '"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif';
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+  const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
 
   return (
-    <div style={{
-      borderTop: "1px solid #edf0f1",
-      background: "#fff",
-      padding: "28px 40px 32px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 16,
-    }}>
-      <div>
-        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#a8a5a0", fontFamily: '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace', marginBottom: 5 }}>
-          {isLast ? "Final step" : "Next step"}
-        </p>
-        <p style={{ margin: 0, fontSize: 17, fontWeight: 500, color: "#253239", fontFamily: '"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif', fontStyle: "italic" }}>
-          {nextLabel}
-        </p>
+    <div style={{ borderTop: "1px solid #edf0f1", background: "#fff", padding: "36px 40px 40px" }}>
+      <style suppressHydrationWarning>{`
+        @media (max-width: 640px) { .nsf-inner { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; } .nsf-wrap { padding: 28px 20px 32px !important; } }
+      `}</style>
+      <div className="nsf-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32 }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ margin: "0 0 10px", fontFamily: fontM, fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#a8a5a0" }}>
+            {isLast ? "Final step" : "Next"} · {copy.headline}
+          </p>
+          {copy.lines.map((line, i) => (
+            <p key={i} style={{ margin: i === 0 ? "0 0 3px" : 0, fontFamily: fontD, fontSize: i === 0 ? 20 : 15, fontWeight: 400, fontStyle: "italic", color: i === 0 ? "#253239" : "#799097", lineHeight: 1.35 }}>
+              {line}
+            </p>
+          ))}
+        </div>
+        <button
+          onClick={() => onNavigate(nextId)}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "13px 24px",
+            background: "#253239", color: "#fff",
+            border: 0, borderRadius: 10,
+            fontSize: 12, fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: fontS,
+            letterSpacing: "0.03em",
+            flexShrink: 0,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Continue
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
-      <button
-        onClick={() => onNavigate(nextId)}
-        style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          padding: "12px 22px",
-          background: "#253239", color: "#fff",
-          border: 0, borderRadius: 10,
-          fontSize: 12, fontWeight: 600,
-          cursor: "pointer",
-          fontFamily: '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif',
-          letterSpacing: "0.02em",
-          flexShrink: 0,
-        }}
-      >
-        Continue
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
     </div>
   );
 }
