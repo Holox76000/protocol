@@ -578,7 +578,7 @@ function SetPasswordBanner() {
 
 export default function DashboardPage({ user, submittedAt }: Props) {
   const searchParams = useSearchParams();
-  const paymentSuccess = searchParams.get("payment") === "success";
+  const paymentSuccess = searchParams?.get("payment") === "success";
 
   const showCheckout = !user.has_paid && !paymentSuccess;
   const showPaymentSuccess = !user.has_paid && paymentSuccess;
