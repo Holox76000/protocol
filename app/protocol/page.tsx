@@ -41,6 +41,12 @@ export default async function ProtocolPage() {
       .select("photo_front_path, photo_side_path, height_cm")
       .eq("user_id", user.id)
       .maybeSingle(),
+    // Track first protocol view for NPS trigger (WHERE clause makes it idempotent)
+    supabaseAdmin
+      .from("users")
+      .update({ protocol_viewed_at: new Date().toISOString() })
+      .eq("id", user.id)
+      .is("protocol_viewed_at", null),
   ]);
 
   if (!protocolResult.data?.content?.trim()) redirect("/dashboard");
