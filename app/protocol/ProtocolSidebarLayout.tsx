@@ -728,6 +728,7 @@ function ReportSectionPage({
           <span style={{ color: "#9eb1b8", margin: "0 8px" }}>/</span>
           <span style={{ color: "#253239" }}>{sectionLabel}</span>
         </div>
+        {email && <PdfDownloadButton email={email} firstName={firstName} />}
       </div>
 
       <div className="rsp-content">
@@ -956,6 +957,63 @@ function PosturePhotosPanel({
         )}
       </div>
     </div>
+  );
+}
+
+// ── PDF download button ──────────────────────────────────────────────────────
+
+function PdfDownloadButton({ email, firstName }: { email: string; firstName: string }) {
+  const [downloading, setDownloading] = useState(false);
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const res = await fetch("/api/admin/export-pdf", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json() as { error?: string };
+        console.error("[PDF] export failed:", data.error);
+        return;
+      }
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `protocol-${firstName.toLowerCase()}-${new Date().getFullYear()}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("[PDF] download error:", err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={downloading}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 6,
+        fontFamily: fontM, fontSize: 10, fontWeight: 600,
+        letterSpacing: "0.10em", textTransform: "uppercase",
+        color: downloading ? "#799097" : "#253239",
+        background: "none", border: "1px solid #dde3e5",
+        borderRadius: 7, padding: "6px 14px",
+        cursor: downloading ? "not-allowed" : "pointer",
+        opacity: downloading ? 0.6 : 1,
+        transition: "opacity 0.15s",
+      }}
+    >
+      {downloading
+        ? <><span style={{ display: "inline-block", width: 9, height: 9, border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Exporting…</>
+        : "↓ PDF"
+      }
+    </button>
   );
 }
 
