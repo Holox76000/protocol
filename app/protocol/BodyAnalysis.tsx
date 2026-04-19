@@ -126,7 +126,7 @@ export default function BodyAnalysis({
   const miniMetrics = [
     { code: "SWR", label: "Shoulder-to-Waist", val: metrics.swr.toFixed(2), f: swrF },
     { code: "CWR", label: "Chest-to-Waist",    val: metrics.cwr.toFixed(2), f: cwrF },
-    { code: "BF%", label: "Body Fat",          val: `${metrics.bf}%`,        f: bfF  },
+    { code: "BF%", label: "Body Fat",          val: `${+metrics.bf.toFixed(2)}%`, f: bfF  },
     { code: "TI",  label: "Taper Index",       val: metrics.ti.toFixed(2),   f: tiF  },
     { code: "PAS", label: "Posture Alignment", val: `${metrics.pas}/100`,     f: pasF },
     { code: "PC",  label: "Prop. Coherence",   val: `${metrics.pc}/100`,      f: pcF  },
@@ -266,11 +266,10 @@ export default function BodyAnalysis({
         .ba-metric-text cite { font-style: normal; color: #253239; }
 
         /* ── Scan image ── */
-        .ba-scan { position: relative; aspect-ratio: 3/4; background: #1a1410;
+        .ba-scan { position: relative; background: #1a1410;
           border-radius: 10px; overflow: hidden;
           box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08); }
-        .ba-scan-img { position: absolute; inset: 0; width: 100%; height: 100%;
-          object-fit: cover; object-position: top; }
+        .ba-scan-img { display: block; width: 100%; height: auto; }
         .ba-scan-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
         .ba-scan-tag { position: absolute; font-family: ${fontM}; font-size: 12px; font-weight: 600;
           letter-spacing: 0.04em; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);
@@ -547,7 +546,7 @@ export default function BodyAnalysis({
               <h3 className="ba-metric-name">Body Fat Percentage</h3>
             </div>
             <div className="ba-metric-right">
-              <span className="ba-metric-value">{metrics.bf}<span className="ba-unit">%</span></span>
+              <span className="ba-metric-value">{+metrics.bf.toFixed(2)}<span className="ba-unit">%</span></span>
               <span className={`ba-flag ${FLAG_CLS[bfF]}`}>{FLAG_LABEL[bfF]}</span>
             </div>
           </header>
@@ -799,18 +798,23 @@ export default function BodyAnalysis({
 
         {/* ── Footer CTA ── */}
         <div className="ba-foot">
-          <div>
-            <p style={{ fontFamily: fontS, fontSize: 11, fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase", color: "#799097", margin: "0 0 8px" }}>Next</p>
-            <h4>Your 12-week action plan is ready.</h4>
-            <p>Protocol compiled from the priority levers in this report. Personalised training, nutrition, and recovery — aligned to your specific structural gaps.</p>
-          </div>
           <div className="ba-foot-actions">
-            <button
-              className="ba-btn ba-btn--primary"
-              onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: "action-plan" }))}
-            >
-              Open Action Plan →
-            </button>
+            {([
+              ["nutrition-plan",      "Nutrition Plan"],
+              ["workout-plan",        "Workout Plan"],
+              ["sleeping-advices",    "Sleeping Advices"],
+              ["posture-analysis",    "Posture Analysis"],
+              ["supplement-protocol", "Supplement Protocol"],
+              ["action-plan",         "Action Plan"],
+            ] as const).map(([id, label]) => (
+              <button
+                key={id}
+                className="ba-btn ba-btn--ghost"
+                onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: id }))}
+              >
+                {label} →
+              </button>
+            ))}
           </div>
         </div>
 

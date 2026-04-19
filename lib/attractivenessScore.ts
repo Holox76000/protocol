@@ -132,7 +132,7 @@ export function muscleGainMultiplier(age: number): number {
 export function bfRealisticTarget(currentBf: number, age: number): number {
   const floor   = age <= 25 ? 10 : age <= 35 ? 11 : age <= 45 ? 13 : age <= 55 ? 15 : age <= 65 ? 17 : 19;
   const maxDrop = age <= 25 ? 12 : age <= 35 ?  9 : age <= 45 ?  7 : age <= 55 ?  5 : age <= 65 ?  3 :  2;
-  return Math.max(currentBf - maxDrop, floor);
+  return Math.round(Math.max(currentBf - maxDrop, floor) * 100) / 100;
 }
 
 /** Best realistic metric score (0–10) achievable at a given age (using age-adjusted ranges). */

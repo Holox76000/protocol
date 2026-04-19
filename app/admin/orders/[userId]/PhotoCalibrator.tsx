@@ -515,12 +515,12 @@ export default function PhotoCalibrator({ userId, photoUrl, initialPoints, onSav
 
       {/* ── Photo + overlay ── */}
       {photoUrl ? (
-        <div className="relative w-full overflow-hidden rounded-xl bg-[#0d0d0d]" style={{ aspectRatio: "3/4" }}>
+        <div className="relative w-full overflow-hidden rounded-xl bg-[#0d0d0d]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photoUrl}
             alt="Front photo"
-            className="absolute inset-0 h-full w-full object-cover object-top"
+            className="block w-full h-auto"
             draggable={false}
           />
           <OverlaySvg points={points} onPointsChange={setPoints} />

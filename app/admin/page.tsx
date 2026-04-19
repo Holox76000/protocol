@@ -41,12 +41,14 @@ export default async function AdminPage() {
               {orders.length} paid client{orders.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <a
-            href="/admin/stats"
-            className="mt-1 text-[12px] font-semibold text-mute hover:text-void transition-colors"
-          >
-            Stats →
-          </a>
+          <div className="mt-1 flex items-center gap-5">
+            <a href="/admin/stats" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
+              Stats →
+            </a>
+            <a href="/admin/nps" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
+              NPS →
+            </a>
+          </div>
         </div>
         <OrderListClient orders={orders} />
       </div>

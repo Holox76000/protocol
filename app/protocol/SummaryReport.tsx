@@ -203,7 +203,7 @@ export default function SummaryReport({
   const metricGaps = [
     { key: "swr", gap: Math.max(0, ageRanges.swr[0] - metrics.swr) / (ageRanges.swr[0] || 1), label: "V-taper — Shoulders",  value: `SWR ${metrics.swr} → ${swrTarget}`, desc: "Shoulder-waist ratio: targeted upper body development." },
     { key: "cwr", gap: Math.max(0, ageRanges.cwr[0] - metrics.cwr) / (ageRanges.cwr[0] || 1), label: "Chest development",      value: `CWR ${metrics.cwr} → ${cwrTarget}`, desc: "Chest-waist ratio: upper body mass and width." },
-    { key: "bf",  gap: Math.max(0, metrics.bf - ageRanges.bf[1])   / (ageRanges.bf[1] || 1),  label: "Body fat",               value: `${metrics.bf}% → ${bfTarget}%`,      desc: "Central fat reduction — compounds proportionally." },
+    { key: "bf",  gap: Math.max(0, metrics.bf - ageRanges.bf[1])   / (ageRanges.bf[1] || 1),  label: "Body fat",               value: `${+metrics.bf.toFixed(2)}% → ${bfTarget}%`,      desc: "Central fat reduction — compounds proportionally." },
     { key: "pas", gap: Math.max(0, ageRanges.pas[0] - metrics.pas) / (ageRanges.pas[0] || 1), label: "Posture correction",     value: `PAS ${metrics.pas} → ${pasTarget}`,  desc: "Alignment score: upright stance and bearing." },
     { key: "ti",  gap: Math.max(0, ageRanges.ti[0]  - metrics.ti)  / (ageRanges.ti[0] || 1),  label: "Waist taper",            value: `TI ${metrics.ti} → ${tiTarget}`,     desc: "Taper index: visual narrowing of midsection." },
   ].sort((a, b) => b.gap - a.gap);
@@ -225,7 +225,7 @@ export default function SummaryReport({
   const breakdownMetrics: { key: keyof CalibrationMetrics; abbr: string; name: string; value: string; targetLabel: string; targetValue: string }[] = [
     { key: "swr", abbr: "SWR", name: "Shoulder-to-Waist Ratio",  value: String(metrics.swr), targetLabel: "Target", targetValue: String(swrTarget) },
     { key: "cwr", abbr: "CWR", name: "Chest-to-Waist Ratio",     value: String(metrics.cwr), targetLabel: "Target", targetValue: String(cwrTarget) },
-    { key: "bf",  abbr: "BF%", name: "Body Fat Percentage",      value: String(metrics.bf),  targetLabel: "Target", targetValue: `${bfTarget}%` },
+    { key: "bf",  abbr: "BF%", name: "Body Fat Percentage",      value: `${+metrics.bf.toFixed(2)}%`, targetLabel: "Target", targetValue: `${bfTarget}%` },
     { key: "pas", abbr: "PAS", name: "Posture Alignment Score",  value: String(metrics.pas), targetLabel: "Target", targetValue: `≥ ${pasTarget}` },
     { key: "ti",  abbr: "TI",  name: "Taper Index",              value: String(metrics.ti),  targetLabel: "Target", targetValue: String(tiTarget) },
     { key: "pc",  abbr: "PC",  name: "Proportional Composite",   value: String(metrics.pc),  targetLabel: "Range",  targetValue: `${ageRanges.pc[0]}–${ageRanges.pc[1]}` },
@@ -757,24 +757,12 @@ export default function SummaryReport({
         <div className="sr-cta">
           <div style={{ position: "absolute", top: "-40%", right: "-10%", width: "60%", aspectRatio: "1", background: "radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ fontFamily: fontSans, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 14 }}>
-              Next · Your Action Plan
-            </div>
-            <div style={{ fontFamily: fontDisplay, fontSize: 36, fontWeight: 400, letterSpacing: "-0.02em", lineHeight: 1.08, margin: "0 0 10px", maxWidth: 480 }}>
-              Three priorities.<br />
-              <em style={{ fontStyle: "italic", color: "rgba(255,255,255,0.5)" }}>Eighty-four days.</em>
-            </div>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 460, margin: 0 }}>
-              Your personalised training, nutrition and recovery protocol is ready. Short, specific, measurable.
-            </p>
-          </div>
-          <div style={{ position: "relative", zIndex: 1 }}>
             <button
               className="sr-cta-btn"
-              onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: "action-plan" }))}
+              onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: "body-analysis" }))}
               style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "16px 24px", background: "#fff", color: "#253239", fontSize: 14, fontWeight: 500, letterSpacing: "0.02em", borderRadius: 999, border: 0, cursor: "pointer", textDecoration: "none" }}
             >
-              Open Action Plan →
+              View Body Analysis →
             </button>
           </div>
         </div>
@@ -785,10 +773,10 @@ export default function SummaryReport({
       <div className="sr-sticky-cta" style={{ display: "none" }}>
         <button
           className="sr-cta-btn"
-          onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: "action-plan" }))}
+          onClick={() => window.dispatchEvent(new CustomEvent("protocol-navigate", { detail: "body-analysis" }))}
           style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 24px", background: "#fff", color: "#253239", fontSize: 14, fontWeight: 500, letterSpacing: "0.02em", borderRadius: 999, border: 0, cursor: "pointer" }}
         >
-          Open Action Plan →
+          View Body Analysis →
         </button>
       </div>
 

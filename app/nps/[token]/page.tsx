@@ -4,8 +4,6 @@ import NpsForm from "./NpsForm";
 
 export const runtime = "nodejs";
 
-export const runtime = "nodejs";
-
 export default async function NpsPage({
   params,
   searchParams,
