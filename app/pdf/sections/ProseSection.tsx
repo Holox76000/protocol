@@ -184,28 +184,84 @@ function Runs({ runs, style }: { runs: Run[]; style: Style }) {
   );
 }
 
+// ── Height estimation for smart page-break decisions ─────────────────────────
+// SectionPage content area ≈ 841.89 − paddingTop(52) − paddingBottom(72) − breadcrumb(40)
+const CONTENT_H = 678;
+const CHARS_PER_LINE = 78; // Inter 11pt on ~499pt column
+
+function estimateBlockH(block: Block): number {
+  switch (block.type) {
+    case "h2":    return 46;  // 14pt + marginTop 20 + marginBottom 6 + border
+    case "h3":    return 30;  // 8pt + marginTop 14 + marginBottom 4 + tracking
+    case "table": return 28 + block.rows.length * 22 + 16;
+    case "bullet": {
+      const chars = block.runs.reduce((s, r) => s + r.text.length, 0);
+      return Math.max(1, Math.ceil(chars / CHARS_PER_LINE)) * 20 + 4;
+    }
+    case "para": {
+      const chars = block.runs.reduce((s, r) => s + r.text.length, 0);
+      return Math.max(1, Math.ceil(chars / CHARS_PER_LINE)) * 21 + 8;
+    }
+  }
+}
+
+// Returns the set of block indices (h2 only) that need a forced page break before them.
+function computeBreaks(blocks: Block[]): Set<number> {
+  const breaks = new Set<number>();
+  let y = 0;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+
+    if (block.type === "h2" && i > 0) {
+      // Measure height of the entire section starting at this h2 (up to the next h2)
+      let sectionH = 0;
+      for (let j = i; j < blocks.length; j++) {
+        if (j > i && blocks[j].type === "h2") break;
+        sectionH += estimateBlockH(blocks[j]);
+      }
+
+      if (y + sectionH > CONTENT_H) {
+        breaks.add(i);
+        y = 0; // reset: this section starts at top of a new page
+      }
+    }
+
+    const h = estimateBlockH(block);
+    y += h;
+    // If we've overflowed, carry the remainder to the next page
+    if (y > CONTENT_H) y = y % CONTENT_H;
+  }
+
+  return breaks;
+}
+
 // ── ProseSection ─────────────────────────────────────────────────────────────
 export function ProseSection({ content }: { content: string }) {
   const blocks = parseBlocks(sanitize(content));
+  const breaksBefore = computeBreaks(blocks);
 
   return (
     <View>
       {blocks.map((block, i) => {
         if (block.type === "h2") {
+          const forceBreak = breaksBefore.has(i);
           return (
-            <Text key={i} style={{
-              fontFamily: F.sans,
-              fontSize: 14,
-              fontWeight: 600,
-              color: C.void,
-              marginTop: i === 0 ? 0 : 20,
-              marginBottom: 6,
-              paddingBottom: 5,
-              borderBottomWidth: 1,
-              borderBottomColor: C.wire,
-            }}>
-              {block.text}
-            </Text>
+            <View key={i} break={forceBreak}>
+              <Text style={{
+                fontFamily: F.sans,
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.void,
+                marginTop: forceBreak || i === 0 ? 0 : 20,
+                marginBottom: 6,
+                paddingBottom: 5,
+                borderBottomWidth: 1,
+                borderBottomColor: C.wire,
+              }}>
+                {block.text}
+              </Text>
+            </View>
           );
         }
 
