@@ -3,22 +3,25 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
-import type { ProtocolSections } from "../../lib/parseProtocolSections";
+import { OC } from "../admin/orders/[userId]/PhotoCalibrator";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import MetricsPanel from "./MetricsPanel";
 import CalibrationReport from "./CalibrationReport";
 import ProtocolView from "./ProtocolView";
+import SummaryReport from "./SummaryReport";
+import BodyAnalysis from "./BodyAnalysis";
 
 // ── Section IDs ─────────────────────────────────────────────────────────────
 
-type SectionId =
+export type SectionId =
   | "summary"
   | "body-analysis"
   | "action-plan"
-  | "daily-protocol"
   | "nutrition-plan"
+  | "supplement-protocol"
   | "workout-plan"
   | "sleeping-advices"
   | "posture-analysis";
@@ -30,30 +33,30 @@ type NavItem  = { id: SectionId; label: string; icon: string };
 type NavEntry = NavGroup | NavItem;
 
 const NAV: NavEntry[] = [
-  { id: "summary",          label: "Summary Report",   icon: "≡"  },
-  { id: "body-analysis",    label: "Body Analysis",    icon: "◎"  },
-  { id: "action-plan",      label: "Action Plan",      icon: "✓"  },
+  { id: "summary",             label: "Summary Report",      icon: "≡"  },
+  { id: "body-analysis",       label: "Body Analysis",       icon: "◎"  },
+  { id: "action-plan",         label: "Action Plan",         icon: "✓"  },
   { group: "Lifestyle" },
-  { id: "daily-protocol",   label: "Daily Protocol",   icon: "+"  },
-  { id: "nutrition-plan",   label: "Nutrition Plan",   icon: "≡"  },
-  { id: "workout-plan",     label: "Workout Plan",     icon: "›"  },
-  { id: "sleeping-advices", label: "Sleeping Advices", icon: "◇"  },
-  { id: "posture-analysis", label: "Posture Analysis", icon: "↕"  },
+  { id: "nutrition-plan",      label: "Nutrition Plan",      icon: "≡"  },
+  { id: "supplement-protocol", label: "Supplement Protocol", icon: "◈"  },
+  { id: "workout-plan",        label: "Workout Plan",        icon: "›"  },
+  { id: "sleeping-advices",    label: "Sleeping Advices",    icon: "◇"  },
+  { id: "posture-analysis",    label: "Posture Analysis",    icon: "↕"  },
 ];
 
 const SECTION_LABELS: Record<SectionId, string> = {
-  "summary":          "Summary Report",
-  "body-analysis":    "Body Analysis",
-  "action-plan":      "Action Plan",
-  "daily-protocol":   "Daily Protocol",
-  "nutrition-plan":   "Nutrition Plan",
-  "workout-plan":     "Workout Plan",
-  "sleeping-advices": "Sleeping Advices",
-  "posture-analysis": "Posture Analysis",
+  "summary":             "Summary Report",
+  "body-analysis":       "Body Analysis",
+  "action-plan":         "Action Plan",
+  "nutrition-plan":      "Nutrition Plan",
+  "supplement-protocol": "Supplement Protocol",
+  "workout-plan":        "Workout Plan",
+  "sleeping-advices":    "Sleeping Advices",
+  "posture-analysis":    "Posture Analysis",
 };
 
 const LIFESTYLE_IDS = new Set<SectionId>([
-  "daily-protocol", "nutrition-plan", "workout-plan", "sleeping-advices",
+  "nutrition-plan", "supplement-protocol", "workout-plan", "sleeping-advices",
 ]);
 
 function isNavItem(e: NavEntry): e is NavItem {
@@ -73,14 +76,18 @@ type Props = {
   photoSide:              string | null;
   heightCm?:              number;
   age?:                   number;
-  sections:               ProtocolSections;
-  beforeAfterPreviewPath: string | null;
-  summary:                string | null;
-  nutritionPlanContent:   string | null;
-  workoutPlanContent:     string | null;
-  sleepingAdvicesContent: string | null;
-  dailyProtocolContent:   string | null;
-  actionPlanContent:      string | null;
+  weightKg?:              number;
+  isAdmin?:               boolean;
+  initialSection:         SectionId;
+  initialBeforeUrl:       string | null;
+  initialAfterUrl:        string | null;
+  summary:                   string | null;
+  nutritionPlanContent:      string | null;
+  supplementProtocolContent: string | null;
+  workoutPlanContent:        string | null;
+  sleepingAdvicesContent:    string | null;
+  actionPlanContent:         string | null;
+  postureAnalysisContent:    string | null;
 };
 
 // ── Component ───────────────────────────────────────────────────────────────
@@ -96,34 +103,46 @@ export default function ProtocolSidebarLayout({
   photoSide,
   heightCm,
   age,
-  sections,
-  beforeAfterPreviewPath,
+  weightKg,
+  isAdmin = true,
+  initialSection,
+  initialBeforeUrl,
+  initialAfterUrl,
   summary: initialSummary,
-  nutritionPlanContent:   initialNutrition,
-  workoutPlanContent:     initialWorkout,
-  sleepingAdvicesContent: initialSleep,
-  dailyProtocolContent:   initialDaily,
-  actionPlanContent:      initialActionPlan,
+  nutritionPlanContent:      initialNutrition,
+  supplementProtocolContent: initialSupplement,
+  workoutPlanContent:        initialWorkout,
+  sleepingAdvicesContent:    initialSleep,
+  actionPlanContent:         initialActionPlan,
+  postureAnalysisContent:    initialPostureAnalysis,
 }: Props) {
-  const [active, setActive]         = useState<SectionId>("summary");
+  const router = useRouter();
+  const [active, setActive]         = useState<SectionId>(initialSection);
   const [navOpen, setNavOpen]       = useState(false);
   const [summary, setSummary]       = useState<string | null>(initialSummary);
   const [genSummary, setGenSummary] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
   // ── Generated section content ─────────────────────────────────────────
-  const [nutritionContent,   setNutritionContent]   = useState<string | null>(initialNutrition);
-  const [workoutContent,     setWorkoutContent]     = useState<string | null>(initialWorkout);
-  const [sleepContent,       setSleepContent]       = useState<string | null>(initialSleep);
-  const [dailyContent,       setDailyContent]       = useState<string | null>(initialDaily);
-  const [actionPlanContent,  setActionPlanContent]  = useState<string | null>(initialActionPlan);
+  const [nutritionContent,          setNutritionContent]          = useState<string | null>(initialNutrition);
+  const [supplementProtocolContent, setSupplementProtocolContent] = useState<string | null>(initialSupplement);
+  const [workoutContent,            setWorkoutContent]            = useState<string | null>(initialWorkout);
+  const [sleepContent,              setSleepContent]              = useState<string | null>(initialSleep);
+  const [actionPlanContent,         setActionPlanContent]         = useState<string | null>(initialActionPlan);
+  const [postureAnalysisContent,    setPostureAnalysisContent]    = useState<string | null>(initialPostureAnalysis);
+
+  const navigateTo = useCallback((id: SectionId) => {
+    setActive(id);
+    router.push(`/protocol/${encodeURIComponent(email)}/${id}`);
+  }, [router, email]);
 
   const sectionStateMap: Record<string, { content: string | null; setContent: (v: string | null) => void }> = {
-    "nutrition-plan":   { content: nutritionContent,  setContent: setNutritionContent  },
-    "workout-plan":     { content: workoutContent,    setContent: setWorkoutContent    },
-    "sleeping-advices": { content: sleepContent,      setContent: setSleepContent      },
-    "daily-protocol":   { content: dailyContent,      setContent: setDailyContent      },
-    "action-plan":      { content: actionPlanContent, setContent: setActionPlanContent },
+    "nutrition-plan":      { content: nutritionContent,          setContent: setNutritionContent          },
+    "supplement-protocol": { content: supplementProtocolContent, setContent: setSupplementProtocolContent },
+    "workout-plan":        { content: workoutContent,            setContent: setWorkoutContent            },
+    "sleeping-advices":    { content: sleepContent,              setContent: setSleepContent              },
+    "action-plan":         { content: actionPlanContent,         setContent: setActionPlanContent         },
+    "posture-analysis":    { content: postureAnalysisContent,    setContent: setPostureAnalysisContent    },
   };
 
   // ── Summary generation ────────────────────────────────────────────────
@@ -150,23 +169,21 @@ export default function ProtocolSidebarLayout({
   };
 
   // ── Before/After generation state ─────────────────────────────────────
-  const [beforeUrl, setBeforeUrl]   = useState<string | null>(null);
-  const [afterUrl, setAfterUrl]     = useState<string | null>(null);
+  // URLs are pre-fetched server-side — no client-side fetch needed on mount
+  const [beforeUrl, setBeforeUrl]   = useState<string | null>(initialBeforeUrl);
+  const [afterUrl, setAfterUrl]     = useState<string | null>(initialAfterUrl);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError]     = useState<string | null>(null);
 
-  // Load existing preview on mount if one was already generated
-  const loadExisting = useCallback(async () => {
-    if (!beforeAfterPreviewPath) return;
-    const res = await fetch(`/api/admin/generate-before-after?userId=${userId}`);
-    if (res.ok) {
-      const data = await res.json() as { beforeUrl: string | null; afterUrl: string | null };
-      setBeforeUrl(data.beforeUrl);
-      setAfterUrl(data.afterUrl);
-    }
-  }, [beforeAfterPreviewPath, userId]);
-
-  useEffect(() => { loadExisting(); }, [loadExisting]);
+  // Listen for protocol-navigate custom events (e.g. from SummaryReport CTA)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<string>;
+      navigateTo(ce.detail as SectionId);
+    };
+    window.addEventListener("protocol-navigate", handler);
+    return () => window.removeEventListener("protocol-navigate", handler);
+  }, [navigateTo]);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -233,7 +250,7 @@ export default function ProtocolSidebarLayout({
           </div>
 
           {/* Nav items */}
-          <nav className="p-2.5">
+          <nav className="flex-1 p-2.5">
             {NAV.map((entry, i) => {
               if (!isNavItem(entry)) {
                 return (
@@ -249,7 +266,7 @@ export default function ProtocolSidebarLayout({
               return (
                 <button
                   key={entry.id}
-                  onClick={() => setActive(entry.id)}
+                  onClick={() => navigateTo(entry.id)}
                   className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
                     isActive
                       ? "bg-void text-white"
@@ -266,6 +283,7 @@ export default function ProtocolSidebarLayout({
               );
             })}
           </nav>
+
         </aside>
 
         {/* ── Main content ─────────────────────────────────────────────────── */}
@@ -347,7 +365,7 @@ export default function ProtocolSidebarLayout({
                   return (
                     <button
                       key={entry.id}
-                      onClick={() => { setActive(entry.id); setNavOpen(false); }}
+                      onClick={() => { navigateTo(entry.id); setNavOpen(false); }}
                       className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors ${
                         isActive ? "bg-void text-white" : "text-dim active:bg-ash"
                       }`}
@@ -370,148 +388,89 @@ export default function ProtocolSidebarLayout({
             </div>
           )}
 
-          <div className="mx-auto max-w-2xl px-4 py-6 pb-24 sm:px-8 lg:px-10 lg:py-10">
-            {/* Section header */}
-            <div className="mb-6 border-b border-wire pb-5 lg:mb-8 lg:pb-6">
-              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">
-                {LIFESTYLE_IDS.has(active) ? "Lifestyle" : "Protocol"}
-              </p>
-              <h1 className="font-display text-[26px] font-normal leading-tight text-void lg:text-[32px]">
-                {SECTION_LABELS[active]}
-              </h1>
+          {active === "summary" && metrics ? (
+            <SummaryReport
+              firstName={firstName}
+              age={age}
+              deliveredDate={deliveredDate}
+              metrics={metrics}
+              summary={summary}
+              beforeUrl={beforeUrl}
+              afterUrl={afterUrl}
+              weightKg={weightKg}
+              isAdmin={isAdmin}
+              generating={generating}
+              genError={genError}
+              genSummary={genSummary}
+              summaryError={summaryError}
+              onGenerate={handleGenerate}
+              onGenerateSummary={handleGenerateSummary}
+              userId={userId}
+              photoFront={photoFront}
+              onRegenerate={handleGenerate}
+            />
+          ) : active === "summary" ? (
+            <div className="mx-auto max-w-2xl px-4 py-6 pb-24 sm:px-8 lg:px-10 lg:py-10">
+              <EmptyState message="No metrics available. Calibrate first." />
             </div>
-
-            {/* ── Section content ────────────────────────────────────────── */}
-
-            {active === "summary" && (
-              <div className="space-y-10">
-                {/* ── Score ── */}
-                {metrics
-                  ? <MetricsPanel metrics={metrics} age={age} />
-                  : <EmptyState message="No metrics available." />
-                }
-
-                {/* ── Before / After ── */}
-                <div>
-                  <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">
-                    Before / After
-                  </p>
-                  <BeforeAfterSection
-                    userId={userId}
-                    photoFront={photoFront}
-                    beforeUrl={beforeUrl}
-                    afterUrl={afterUrl}
-                    generating={generating}
-                    genError={genError}
-                    hasMetrics={metrics !== null}
-                    onGenerate={handleGenerate}
-                    onRegenerate={handleGenerate}
-                  />
-                </div>
-
-                {/* ── Generated summary ── */}
-                <div>
-                  {summary ? (
-                    <div>
-                      <div className="mb-4 flex items-center justify-between">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">
-                          Analysis
-                        </p>
-                        <button
-                          onClick={handleGenerateSummary}
-                          disabled={genSummary}
-                          className="flex items-center gap-1.5 text-[10px] font-semibold text-mute hover:text-void disabled:opacity-40 transition-colors"
-                        >
-                          {genSummary
-                            ? <><span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border border-current border-t-transparent" /> Generating…</>
-                            : "↻ Regenerate"
-                          }
-                        </button>
-                      </div>
-                      <div className={PROSE_CLASSES}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {summary}
-                        </ReactMarkdown>
-                      </div>
-                      {summaryError && <p className="mt-3 text-[12px] text-red-600">{summaryError}</p>}
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-wire bg-ash p-6">
-                      <p className="mb-1 text-[13px] font-semibold text-void">Generate Summary Report</p>
-                      <p className="mb-4 text-[12.5px] leading-relaxed text-dim">
-                        A personalized analysis of {metrics ? "this client's" : "the client's"} metrics, gaps, and realistic potential — written by Claude.
-                      </p>
-                      <button
-                        onClick={handleGenerateSummary}
-                        disabled={genSummary || !metrics}
-                        className="flex items-center gap-2 rounded-lg bg-void px-5 py-2.5 text-[12.5px] font-semibold text-white transition-opacity hover:opacity-80 disabled:opacity-40"
-                      >
-                        {genSummary
-                          ? <><span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" /> Generating…</>
-                          : "Generate Analysis"
-                        }
-                      </button>
-                      {summaryError && <p className="mt-3 text-[12px] text-red-600">{summaryError}</p>}
-                      {!metrics && <p className="mt-2 text-[11px] text-mute">Calibration required first.</p>}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            )}
-
-            {active === "body-analysis" && (
-              metrics
-                ? (
-                  <CalibrationReport
-                    metrics={metrics}
-                    points={points}
-                    photoFront={photoFront}
-                    photoSide={photoSide}
-                    heightCm={heightCm}
-                  />
-                )
-                : <EmptyState message="No body metrics available." />
-            )}
-
+          ) : active === "body-analysis" && metrics ? (
+            <BodyAnalysis
+              firstName={firstName}
+              age={age}
+              deliveredDate={deliveredDate}
+              metrics={metrics}
+              points={points}
+              photoFront={photoFront}
+              photoSide={photoSide}
+              heightCm={heightCm}
+            />
+          ) : active === "body-analysis" ? (
+            <div className="mx-auto max-w-2xl px-4 py-6 pb-24 sm:px-8 lg:px-10 lg:py-10">
+              <EmptyState message="No body metrics available." />
+            </div>
+          ) : (
+          <ReportSectionPage
+            firstName={firstName}
+            sectionLabel={SECTION_LABELS[active]}
+            categoryLabel={LIFESTYLE_IDS.has(active) ? "Lifestyle" : "Protocol"}
+            email={isAdmin ? email : undefined}
+          >
             {active === "action-plan" && (
               <GeneratedSection
                 sectionKey="action-plan"
                 userId={userId}
                 label="Action Plan"
-                description={`Synthesizes the nutrition, workout, sleep, and daily protocol into a prioritized transformation roadmap for ${firstName}.`}
+                description={`Synthesizes the nutrition, workout, and sleep protocol into a prioritized transformation roadmap for ${firstName}.`}
                 content={sectionStateMap["action-plan"].content}
                 onContent={sectionStateMap["action-plan"].setContent}
                 warningWhenEmpty={
-                  !nutritionContent || !workoutContent || !sleepContent || !dailyContent
+                  !nutritionContent || !workoutContent || !sleepContent
                     ? "For best results, generate all other sections first."
                     : undefined
                 }
               />
             )}
-
-            {active === "daily-protocol" && (
-              <GeneratedSection
-                sectionKey="daily-protocol"
-                userId={userId}
-                label="Daily Protocol"
-                description={`A complete daily operating system for ${firstName} — morning, afternoon, and evening routines aligned with their training and nutrition.`}
-                content={sectionStateMap["daily-protocol"].content}
-                onContent={sectionStateMap["daily-protocol"].setContent}
-              />
-            )}
-
             {active === "nutrition-plan" && (
               <GeneratedSection
                 sectionKey="nutrition-plan"
                 userId={userId}
                 label="Nutrition Plan"
-                description={`Personalized caloric targets, macros, meal structure, food choices, and supplement protocol for ${firstName}.`}
+                description={`Personalized caloric targets, macros, food choices, and a 90-day meal plan for ${firstName}.`}
                 content={sectionStateMap["nutrition-plan"].content}
                 onContent={sectionStateMap["nutrition-plan"].setContent}
+                renderContent={renderNutritionContent}
               />
             )}
-
+            {active === "supplement-protocol" && (
+              <GeneratedSection
+                sectionKey="supplement-protocol"
+                userId={userId}
+                label="Supplement Protocol"
+                description={`Evidence-based supplement stack for ${firstName} — current assessment, recommended stack, and a full timing & dosing protocol.`}
+                content={sectionStateMap["supplement-protocol"].content}
+                onContent={sectionStateMap["supplement-protocol"].setContent}
+              />
+            )}
             {active === "workout-plan" && (
               <GeneratedSection
                 sectionKey="workout-plan"
@@ -522,7 +481,6 @@ export default function ProtocolSidebarLayout({
                 onContent={sectionStateMap["workout-plan"].setContent}
               />
             )}
-
             {active === "sleeping-advices" && (
               <GeneratedSection
                 sectionKey="sleeping-advices"
@@ -533,13 +491,28 @@ export default function ProtocolSidebarLayout({
                 onContent={sectionStateMap["sleeping-advices"].setContent}
               />
             )}
-
             {active === "posture-analysis" && (
-              sections.postureAnalysis
-                ? <ProtocolView content={sections.postureAnalysis} showMetricLabels />
-                : <EmptyState message="Posture analysis not generated yet." />
+              <>
+                {(photoFront || photoSide) && metrics && (
+                  <PosturePhotosPanel
+                    photoFront={photoFront}
+                    photoSide={photoSide}
+                    pas={metrics.pas}
+                    points={points}
+                  />
+                )}
+                <GeneratedSection
+                  sectionKey="posture-analysis"
+                  userId={userId}
+                  label="Posture Analysis"
+                  description={`A personalized posture assessment and correction protocol for ${firstName} — alignment analysis, root causes, and a 12-week correction plan.`}
+                  content={sectionStateMap["posture-analysis"].content}
+                  onContent={sectionStateMap["posture-analysis"].setContent}
+                />
+              </>
             )}
-          </div>
+          </ReportSectionPage>
+          )}
         </main>
       </div>
     </div>
@@ -549,6 +522,285 @@ export default function ProtocolSidebarLayout({
 function EmptyState({ message = "No content available." }: { message?: string }) {
   return (
     <p className="text-[13px] text-mute">{message}</p>
+  );
+}
+
+// ── Report section page layout ───────────────────────────────────────────────
+
+function ReportSectionPage({
+  firstName,
+  sectionLabel,
+  categoryLabel,
+  email,
+  children,
+}: {
+  firstName:     string;
+  sectionLabel:  string;
+  categoryLabel: string;
+  email?:        string;
+  children:      React.ReactNode;
+}) {
+  const [word1, ...rest] = sectionLabel.split(" ");
+  const word2 = rest.join(" ");
+
+  const fontD = '"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif';
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+  const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
+
+  return (
+    <div style={{ background: "#f9fbfb", fontFamily: fontS, color: "#253239", minHeight: "100vh", overflowX: "hidden" }}>
+      <style suppressHydrationWarning>{`
+        .rsp-topbar  { display:flex; align-items:center; justify-content:space-between; padding:20px 56px; border-bottom:1px solid #edf0f1; background:#fff; }
+        .rsp-content { max-width:1100px; margin:0 auto; padding:40px 56px 96px; }
+        .rsp-hero    { padding-bottom:44px; margin-bottom:36px; border-bottom:1px solid #edf0f1; }
+        .rsp-h1      { font-family:${fontD}; font-size:clamp(44px,6vw,72px); font-weight:400; line-height:1.08; letter-spacing:-0.03em; margin:0; color:#253239; }
+        .rsp-article { background:#fff; border:1px solid #edf0f1; border-radius:20px; padding:48px 56px; }
+        @media (max-width:768px) {
+          .rsp-topbar  { display:none; }
+          .rsp-content { padding:24px 16px; padding-bottom:calc(80px + max(12px,env(safe-area-inset-bottom))); }
+          .rsp-hero    { padding-bottom:24px; margin-bottom:24px; }
+          .rsp-h1      { font-size:clamp(32px,8vw,52px) !important; }
+          .rsp-article { padding:24px 20px; border-radius:16px; }
+        }
+      `}</style>
+
+      {/* Top bar — hidden on mobile (ProtocolSidebarLayout owns the mobile header) */}
+      <div className="rsp-topbar">
+        <div style={{ fontFamily: fontM, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#799097" }}>
+          Protocol
+          <span style={{ color: "#9eb1b8", margin: "0 8px" }}>/</span>
+          {firstName}
+          <span style={{ color: "#9eb1b8", margin: "0 8px" }}>/</span>
+          <span style={{ color: "#253239" }}>{sectionLabel}</span>
+        </div>
+      </div>
+
+      <div className="rsp-content">
+        {/* Hero */}
+        <div className="rsp-hero">
+          <div style={{ fontFamily: fontS, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "#799097", marginBottom: 14 }}>
+            Protocol · {categoryLabel}
+          </div>
+          <h1 className="rsp-h1">
+            {word1}
+            {word2 && (
+              <><br /><em style={{ fontStyle: "italic", color: "#9eb1b8" }}>{word2}.</em></>
+            )}
+          </h1>
+        </div>
+
+        {/* Content */}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── Food Choices card renderer ───────────────────────────────────────────────
+
+const FOOD_CATEGORY_ICONS: Record<string, string> = {
+  "Proteins":      "🥩",
+  "Carbohydrates": "🌾",
+  "Fats":          "🫒",
+  "Vegetables":    "🥦",
+};
+
+function parseFoodCategories(content: string): Array<{ name: string; prioritize: string[]; limit: string[] }> {
+  const results: Array<{ name: string; prioritize: string[]; limit: string[] }> = [];
+  const re = /### ([^\n]+)\n\*\*Prioritize:\*\* ([^\n]+)\n\*\*Limit:\*\* ([^\n]+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content)) !== null) {
+    results.push({
+      name:       m[1].trim(),
+      prioritize: m[2].split(",").map(s => s.trim()).filter(Boolean),
+      limit:      m[3].split(",").map(s => s.trim()).filter(Boolean),
+    });
+  }
+  return results;
+}
+
+function FoodChoicesCards({ content }: { content: string }) {
+  const categories = parseFoodCategories(content);
+
+  if (categories.length === 0) {
+    return (
+      <div className={PROSE_CLASSES}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      </div>
+    );
+  }
+
+  const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+
+  return (
+    <div>
+      <h2 style={{ fontFamily: fontS, fontSize: 17, fontWeight: 600, color: "#253239", marginTop: 40, marginBottom: 16, paddingBottom: 8, borderBottom: "1px solid #edf0f1" }}>
+        Food Choices
+      </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 14 }}>
+        {categories.map(cat => (
+          <div key={cat.name} style={{ border: "1px solid #edf0f1", borderRadius: 16, padding: "20px 22px", background: "#fff" }}>
+            <div style={{ fontFamily: fontS, fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.14em", color: "#799097", marginBottom: 16, display: "flex", alignItems: "center", gap: 7 }}>
+              <span style={{ fontSize: 16 }}>{FOOD_CATEGORY_ICONS[cat.name] ?? "●"}</span>
+              <span>{cat.name}</span>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontFamily: fontM, fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.12em", color: "#4a7c59", marginBottom: 7 }}>
+                Prioritize
+              </div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column" as const, gap: 4 }}>
+                {cat.prioritize.map(item => (
+                  <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 13, color: "#253239", lineHeight: 1.55 }}>
+                    <span style={{ color: "#4a7c59", flexShrink: 0, fontWeight: 600, marginTop: 1 }}>+</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <div style={{ fontFamily: fontM, fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.12em", color: "#8a5c30", marginBottom: 7 }}>
+                Limit
+              </div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column" as const, gap: 4 }}>
+                {cat.limit.map(item => (
+                  <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 13, color: "#253239", lineHeight: 1.55 }}>
+                    <span style={{ color: "#8a5c30", flexShrink: 0, fontWeight: 600, marginTop: 1 }}>—</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function renderNutritionContent(content: string): React.ReactNode {
+  // Split at ## section headers, keeping the delimiter with its content
+  const sections = content.split(/(?=^## )/m).filter(s => s.trim());
+  return (
+    <>
+      {sections.map((section, i) => {
+        if (/^## Food Choices/i.test(section.trim())) {
+          return <FoodChoicesCards key={i} content={section} />;
+        }
+        return (
+          <div key={i} className={PROSE_CLASSES}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{section}</ReactMarkdown>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── Posture photos panel ─────────────────────────────────────────────────────
+
+function PosturePhotosPanel({
+  photoFront,
+  photoSide,
+  pas,
+  points,
+}: {
+  photoFront: string | null;
+  photoSide:  string | null;
+  pas:        number;
+  points:     OverlayPoints | null;
+}) {
+  if (!photoFront && !photoSide) return null;
+
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+  const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
+
+  const pasLabel = pas >= 90 ? "Excellent" : pas >= 80 ? "Good" : pas >= 70 ? "Fair" : "Poor";
+  const pasColor = pas >= 90 ? "#4a7c59" : pas >= 80 ? "#4a6c7c" : pas >= 70 ? "#8a7c30" : "#8a4c30";
+  const pasBg    = pas >= 90 ? "rgba(74,124,89,0.1)" : pas >= 80 ? "rgba(74,108,124,0.1)" : pas >= 70 ? "rgba(138,124,48,0.1)" : "rgba(138,76,48,0.1)";
+
+  return (
+    <div style={{ background: "#fff", border: "1px solid #edf0f1", borderRadius: 20, padding: "32px 40px", marginBottom: 24 }}>
+      <style suppressHydrationWarning>{`
+        @media (max-width: 640px) {
+          .posture-photos-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 20, marginBottom: 24, borderBottom: "1px solid #edf0f1" }}>
+        <div style={{ fontFamily: fontM, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: "#799097" }}>
+          Reference Photos{points ? " · calibrated" : ""}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: pasBg, borderRadius: 100, padding: "6px 16px" }}>
+          <span style={{ fontFamily: fontM, fontSize: 9, fontWeight: 700, color: pasColor, textTransform: "uppercase" as const, letterSpacing: "0.12em" }}>PAS</span>
+          <span style={{ fontFamily: fontS, fontSize: 22, fontWeight: 700, color: pasColor, lineHeight: 1 }}>{pas}</span>
+          <span style={{ fontFamily: fontS, fontSize: 12, color: pasColor, fontWeight: 500 }}>{pasLabel}</span>
+        </div>
+      </div>
+
+      {/* Photos grid — lateral first (most relevant for PAS) */}
+      <div className="posture-photos-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {photoSide && (
+          <div>
+            <p style={{ fontFamily: fontM, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.14em", color: "#799097", marginBottom: 10 }}>
+              Lateral view · alignment reference
+            </p>
+            {/* Scan container — same style as BodyAnalysis ba-scan */}
+            <div style={{ position: "relative", aspectRatio: "3/4", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photoSide} alt="Lateral view" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
+
+              {/* Calibration overlay — posture alignment lines */}
+              {points && (() => {
+                const { postureTop: pt, postureBottom: pb } = points;
+                const midX = (pt.x + pb.x) / 2;
+                const midY = (pt.y + pb.y) / 2;
+                return (
+                  <svg
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                  >
+                    {/* Vertical reference (plumb line) */}
+                    <line
+                      x1={midX} y1={pt.y} x2={midX} y2={pb.y}
+                      stroke={OC.posture.faint} strokeWidth="0.4" strokeDasharray="2 2"
+                    />
+                    {/* Actual posture axis */}
+                    <line
+                      x1={pt.x} y1={pt.y} x2={pb.x} y2={pb.y}
+                      stroke={OC.posture.line} strokeWidth="0.6" strokeDasharray="2 1.5"
+                    />
+                    {/* Anchor points */}
+                    <circle cx={pt.x} cy={pt.y} r={1.4} fill={OC.posture.faint} stroke={OC.posture.line} strokeWidth="0.5"/>
+                    <circle cx={pb.x} cy={pb.y} r={1.4} fill={OC.posture.faint} stroke={OC.posture.line} strokeWidth="0.5"/>
+                    {/* Labels */}
+                    <text x={pt.x + 2.5} y={pt.y + 1.2} fontSize="2.3" fill={OC.posture.line} fontWeight="600" letterSpacing="0.1" style={{ fontFamily: "monospace" }}>EAR</text>
+                    <text x={pb.x + 2.5} y={pb.y - 0.8} fontSize="2.3" fill={OC.posture.line} fontWeight="600" letterSpacing="0.1" style={{ fontFamily: "monospace" }}>ANKLE</text>
+                    {/* Score badge at midpoint */}
+                    <text x={midX + 2.5} y={midY + 1} fontSize="2.5" fill={OC.posture.line} fontWeight="700" letterSpacing="0.15" style={{ fontFamily: "monospace" }}>PAS {pas}</text>
+                  </svg>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+        {photoFront && (
+          <div>
+            <p style={{ fontFamily: fontM, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.14em", color: "#799097", marginBottom: 10 }}>
+              Front view · symmetry reference
+            </p>
+            <div style={{ position: "relative", aspectRatio: "3/4", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photoFront} alt="Front view" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -599,6 +851,7 @@ function GeneratedSection({
   content: initialContent,
   onContent,
   warningWhenEmpty,
+  renderContent,
 }: {
   sectionKey:       string;
   userId:           string;
@@ -607,10 +860,19 @@ function GeneratedSection({
   content:          string | null;
   onContent:        (v: string | null) => void;
   warningWhenEmpty?: string;
+  renderContent?:   (content: string) => React.ReactNode;
 }) {
-  const [generating, setGenerating] = useState(false);
-  const [error,      setError]      = useState<string | null>(null);
-  const [content,    setLocalContent] = useState<string | null>(initialContent);
+  const [generating,  setGenerating]  = useState(false);
+  const [error,       setError]       = useState<string | null>(null);
+  const [content,     setLocalContent] = useState<string | null>(initialContent);
+  const [isEditing,   setIsEditing]   = useState(false);
+  const [editDraft,   setEditDraft]   = useState("");
+  const [previewMode, setPreviewMode] = useState(false);
+  const [saving,      setSaving]      = useState(false);
+  const [saveError,   setSaveError]   = useState<string | null>(null);
+
+  const fontM = '"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace';
+  const fontS = '"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif';
 
   const generate = async () => {
     setGenerating(true);
@@ -636,50 +898,190 @@ function GeneratedSection({
     }
   };
 
-  if (content) {
+  const startEdit = () => {
+    setEditDraft(content ?? "");
+    setPreviewMode(false);
+    setSaveError(null);
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const res = await fetch("/api/admin/save-section", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ userId, section: sectionKey, content: editDraft }),
+      });
+      const data = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok || data.error) {
+        setSaveError(data.error ?? "Save failed.");
+      } else {
+        setLocalContent(editDraft);
+        onContent(editDraft);
+        setIsEditing(false);
+      }
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Unknown error.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ── Edit mode ──────────────────────────────────────────────────────────────
+  if (isEditing) {
     return (
-      <div>
-        <div className="mb-5 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">{label}</p>
-          <button
-            onClick={generate}
-            disabled={generating}
-            className="flex items-center gap-1.5 text-[10px] font-semibold text-mute hover:text-void disabled:opacity-40 transition-colors"
-          >
-            {generating
-              ? <><span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border border-current border-t-transparent" /> Generating…</>
-              : "↻ Regenerate"
-            }
-          </button>
+      <article className="rsp-article">
+        <style suppressHydrationWarning>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        {/* Editor toolbar */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, marginBottom: 24, borderBottom: "1px solid #edf0f1", flexWrap: "wrap", gap: 12 }}>
+          {/* Source / Preview tabs */}
+          <div style={{ display: "flex", gap: 3, background: "#f4f6f7", borderRadius: 8, padding: 3 }}>
+            <button
+              onClick={() => setPreviewMode(false)}
+              style={{
+                fontFamily: fontM, fontSize: 10, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em",
+                padding: "5px 14px", borderRadius: 6, border: "none", cursor: "pointer",
+                background: !previewMode ? "#fff" : "transparent",
+                color: !previewMode ? "#253239" : "#799097",
+                boxShadow: !previewMode ? "0 1px 3px rgba(0,0,0,0.07)" : "none",
+                transition: "all 0.15s",
+              }}
+            >
+              Markdown
+            </button>
+            <button
+              onClick={() => setPreviewMode(true)}
+              style={{
+                fontFamily: fontM, fontSize: 10, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em",
+                padding: "5px 14px", borderRadius: 6, border: "none", cursor: "pointer",
+                background: previewMode ? "#fff" : "transparent",
+                color: previewMode ? "#253239" : "#799097",
+                boxShadow: previewMode ? "0 1px 3px rgba(0,0,0,0.07)" : "none",
+                transition: "all 0.15s",
+              }}
+            >
+              Preview
+            </button>
+          </div>
+
+          {/* Cancel / Save */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setIsEditing(false)}
+              style={{ fontFamily: fontS, fontSize: 12, fontWeight: 500, color: "#7f949b", background: "none", border: "1px solid #dde3e5", borderRadius: 7, padding: "7px 16px", cursor: "pointer" }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fontS, fontSize: 12, fontWeight: 600, color: "#fff", background: saving ? "#799097" : "#253239", border: "none", borderRadius: 7, padding: "7px 18px", cursor: saving ? "not-allowed" : "pointer" }}
+            >
+              {saving
+                ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Saving…</>
+                : "Save"
+              }
+            </button>
+          </div>
         </div>
-        <div className={PROSE_CLASSES}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-        </div>
-        {error && <p className="mt-3 text-[12px] text-red-600">{error}</p>}
-      </div>
+
+        {previewMode ? (
+          renderContent ? renderContent(editDraft) : (
+            <div className={PROSE_CLASSES}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{editDraft}</ReactMarkdown>
+            </div>
+          )
+        ) : (
+          <textarea
+            value={editDraft}
+            onChange={e => setEditDraft(e.target.value)}
+            spellCheck={false}
+            style={{
+              width: "100%",
+              minHeight: "65vh",
+              fontFamily: fontM,
+              fontSize: 13,
+              lineHeight: 1.7,
+              color: "#253239",
+              background: "#f9fbfb",
+              border: "1px solid #e4e9eb",
+              borderRadius: 12,
+              padding: "20px 24px",
+              resize: "vertical",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        )}
+
+        {saveError && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{saveError}</p>}
+      </article>
     );
   }
 
+  // ── Content exists ─────────────────────────────────────────────────────────
+  if (content) {
+    return (
+      <article className="rsp-article">
+        <style suppressHydrationWarning>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 20, marginBottom: 32, borderBottom: "1px solid #edf0f1" }}>
+          <div style={{ fontFamily: fontS, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: "#799097" }}>
+            {label}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <button
+              onClick={startEdit}
+              style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em" }}
+            >
+              ✎ Edit
+            </button>
+            <span style={{ width: 1, height: 12, background: "#dde3e5" }} />
+            <button
+              onClick={generate}
+              disabled={generating}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: generating ? "not-allowed" : "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em", opacity: generating ? 0.5 : 1 }}
+            >
+              {generating
+                ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "1px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Regenerating…</>
+                : "↻ Regenerate"
+              }
+            </button>
+          </div>
+        </div>
+        {renderContent ? renderContent(content) : (
+          <div className={PROSE_CLASSES}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          </div>
+        )}
+        {error && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{error}</p>}
+      </article>
+    );
+  }
+
+  // ── Empty state ────────────────────────────────────────────────────────────
   return (
-    <div className="rounded-2xl border border-wire bg-ash p-6">
-      <p className="mb-1 text-[13px] font-semibold text-void">Generate {label}</p>
-      <p className="mb-4 text-[12.5px] leading-relaxed text-dim">{description}</p>
+    <div style={{ background: "#fff", border: "1px solid #edf0f1", borderRadius: 20, padding: "48px 56px" }}>
+      <style suppressHydrationWarning>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <p style={{ marginBottom: 8, fontSize: 15, fontWeight: 600, color: "#253239" }}>Generate {label}</p>
+      <p style={{ marginBottom: 24, fontSize: 14, color: "#7f949b", lineHeight: 1.6, maxWidth: 520 }}>{description}</p>
       {warningWhenEmpty && (
-        <p className="mb-4 text-[11.5px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-          ⚠ {warningWhenEmpty}
+        <p style={{ marginBottom: 20, fontSize: 12, color: "#8a5c30", background: "rgba(138,92,48,0.08)", borderRadius: 8, padding: "10px 14px" }}>
+          {warningWhenEmpty}
         </p>
       )}
       <button
         onClick={generate}
         disabled={generating}
-        className="flex items-center gap-2 rounded-lg bg-void px-5 py-2.5 text-[12.5px] font-semibold text-white transition-opacity hover:opacity-80 disabled:opacity-40"
+        style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", background: "#253239", color: "#fff", border: 0, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: generating ? "not-allowed" : "pointer", opacity: generating ? 0.6 : 1 }}
       >
         {generating
-          ? <><span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" /> Generating…</>
+          ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Generating…</>
           : `Generate ${label}`
         }
       </button>
-      {error && <p className="mt-3 text-[12px] text-red-600">{error}</p>}
+      {error && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{error}</p>}
     </div>
   );
 }
@@ -692,56 +1094,39 @@ function ComparisonSlider({ beforeSrc, afterSrc, onExpand, fullscreen = false }:
   onExpand:   (src: string, label: string) => void;
   fullscreen?: boolean;
 }) {
-  const [position, setPosition] = useState(50); // percent
+  const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
 
-  const updateFromEvent = useCallback((clientX: number) => {
+  const updatePosition = useCallback((clientX: number) => {
     const el = containerRef.current;
     if (!el) return;
     const { left, width } = el.getBoundingClientRect();
-    const pct = Math.min(100, Math.max(0, ((clientX - left) / width) * 100));
-    setPosition(pct);
+    setPosition(Math.min(100, Math.max(0, ((clientX - left) / width) * 100)));
   }, []);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    dragging.current = true;
-    updateFromEvent(e.clientX);
-  };
-  const onTouchStart = (e: React.TouchEvent) => {
-    dragging.current = true;
-    updateFromEvent(e.touches[0].clientX);
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    updatePosition(e.clientX);
   };
 
-  useEffect(() => {
-    const onMove  = (e: MouseEvent)  => { if (dragging.current) updateFromEvent(e.clientX); };
-    const onTMove = (e: TouchEvent)  => { if (dragging.current) updateFromEvent(e.touches[0].clientX); };
-    const onUp    = ()               => { dragging.current = false; };
-    window.addEventListener("mousemove",  onMove);
-    window.addEventListener("touchmove",  onTMove, { passive: true });
-    window.addEventListener("mouseup",    onUp);
-    window.addEventListener("touchend",   onUp);
-    return () => {
-      window.removeEventListener("mousemove",  onMove);
-      window.removeEventListener("touchmove",  onTMove);
-      window.removeEventListener("mouseup",    onUp);
-      window.removeEventListener("touchend",   onUp);
-    };
-  }, [updateFromEvent]);
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    updatePosition(e.clientX);
+  };
+
+  const containerStyle: React.CSSProperties = fullscreen
+    ? { flex: 1, minHeight: 0, cursor: "ew-resize", touchAction: "none", userSelect: "none" }
+    : { aspectRatio: "3/4", cursor: "ew-resize", touchAction: "none", userSelect: "none" };
 
   return (
     <div className={fullscreen ? "flex flex-col h-full" : ""}>
-      {/* Labels above */}
+      {/* Labels */}
       <div className="mb-2 flex justify-between shrink-0">
-        <div className="flex items-center gap-1.5">
-          <span className="rounded bg-[#f0f0ef] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#888]">Before</span>
-        </div>
+        <span className="rounded bg-[#f0f0ef] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#888]">Before</span>
         <div className="flex items-center gap-2">
           {!fullscreen && (
-            <button
-              onClick={() => onExpand(beforeSrc, "")}
-              className="text-[10px] text-mute underline-offset-2 hover:underline"
-            >
+            <button onClick={() => onExpand(beforeSrc, "")} className="text-[10px] text-mute underline-offset-2 hover:underline">
               expand
             </button>
           )}
@@ -752,30 +1137,39 @@ function ComparisonSlider({ beforeSrc, afterSrc, onExpand, fullscreen = false }:
       {/* Slider container */}
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-xl select-none touch-pan-y"
-        style={fullscreen ? { flex: 1, minHeight: 0, cursor: "ew-resize" } : { aspectRatio: "3/4", cursor: "ew-resize" }}
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
+        className="relative overflow-hidden rounded-xl"
+        style={containerStyle}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={e => e.currentTarget.releasePointerCapture(e.pointerId)}
+        onPointerCancel={e => e.currentTarget.releasePointerCapture(e.pointerId)}
       >
-        {/* Before — full width base */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={beforeSrc} alt="Before" className="absolute inset-0 h-full w-full object-cover object-top" />
+        {/* Before */}
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: `url(${beforeSrc})`, backgroundSize: "cover", backgroundPosition: "top center" }}
+        />
 
-        {/* After — clipped to right side of divider */}
-        <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 0 0 ${position}%)` }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={afterSrc} alt="After" className="absolute inset-0 h-full w-full object-cover object-top" />
-        </div>
+        {/* After — revealed from left edge to divider */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${afterSrc})`,
+            backgroundSize: "cover",
+            backgroundPosition: "top center",
+            clipPath: `inset(0 ${100 - position}% 0 0)`,
+          }}
+        />
 
         {/* Divider line */}
         <div
-          className="absolute inset-y-0 w-px bg-white shadow-[0_0_6px_rgba(0,0,0,0.4)]"
+          className="absolute inset-y-0 w-px bg-white shadow-[0_0_6px_rgba(0,0,0,0.4)] pointer-events-none"
           style={{ left: `${position}%` }}
         />
 
         {/* Handle */}
         <div
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg ring-1 ring-black/10"
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg ring-1 ring-black/10 pointer-events-none"
           style={{ left: `${position}%` }}
         >
           <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
@@ -783,7 +1177,7 @@ function ComparisonSlider({ beforeSrc, afterSrc, onExpand, fullscreen = false }:
           </svg>
         </div>
 
-        {/* "Slide" hint — fades out after first interaction */}
+        {/* Slide hint */}
         {position === 50 && (
           <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
             ← drag →
