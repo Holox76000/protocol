@@ -21,61 +21,64 @@ export function SectionTitlePage({ sectionLabel, categoryLabel, sectionIndex }: 
       size="A4"
       style={{ backgroundColor: C.coverBg, flexDirection: "column", justifyContent: "space-between" }}
     >
-      {/* Accent left strip */}
-      <View style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, backgroundColor: C.accent }} />
-
-      {/* Top area */}
-      <View style={{ paddingLeft: PAGE.marginX + 8, paddingTop: PAGE.marginY }}>
+      {/* Top — wordmark + category, same hierarchy as CoverPage */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingTop: PAGE.marginY }}>
+        <Text style={{
+          fontFamily: F.mono,
+          fontSize: 9,
+          color: "#4a6875",
+          letterSpacing: 3,
+          textTransform: "uppercase",
+        }}>
+          PROTOCOL
+        </Text>
         <Text style={{
           fontFamily: F.mono,
           fontSize: 8,
-          color: "#4a6875",
+          color: "#354a53",
           letterSpacing: 2,
           textTransform: "uppercase",
+          marginTop: 4,
         }}>
-          Protocol · {categoryLabel}
+          {categoryLabel}
         </Text>
       </View>
 
-      {/* Center — section name */}
-      <View style={{ paddingLeft: PAGE.marginX + 8, paddingRight: PAGE.marginX }}>
-        {/* Faint large number watermark */}
+      {/* Center — number watermark + section title, mirrors CoverPage name treatment */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingRight: PAGE.marginX }}>
         <Text style={{
           fontFamily: F.sans,
           fontWeight: 600,
-          fontSize: 120,
+          fontSize: 112,
           color: "#253239",
           lineHeight: 1,
-          marginBottom: -20,
+          marginBottom: -16,
         }}>
           {num}
         </Text>
-        {/* Title */}
         <Text style={{
           fontFamily: F.serif,
           fontStyle: "italic",
-          fontSize: 48,
+          fontSize: 44,
           color: C.white,
-          lineHeight: 1.1,
+          lineHeight: 1.15,
         }}>
           {word1}
           {word2 ? `\n${word2}.` : "."}
         </Text>
       </View>
 
-      {/* Bottom */}
-      <View style={{
-        paddingLeft: PAGE.marginX + 8,
-        paddingBottom: PAGE.marginY,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        paddingRight: PAGE.marginX,
-      }}>
-        <Text style={{ fontFamily: F.mono, fontSize: 8, color: "#4a6875", letterSpacing: 2, textTransform: "uppercase" }}>
-          PROTOCOL
+      {/* Bottom — date line style from CoverPage footer */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingBottom: PAGE.marginY }}>
+        <Text style={{
+          fontFamily: F.mono,
+          fontSize: 8,
+          color: "#354a53",
+          letterSpacing: 1,
+          textTransform: "uppercase",
+        }}>
+          CONFIDENTIAL
         </Text>
-        <View style={{ width: 32, height: 2, backgroundColor: C.accent, opacity: 0.5 }} />
       </View>
     </Page>
   );
