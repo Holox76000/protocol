@@ -3,7 +3,7 @@ import sharp from "sharp";
 import { validateSession, SESSION_COOKIE_NAME } from "../../../lib/auth";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { renderProtocolPDFToBuffer } from "../../../app/pdf/ProtocolPDF";
-import type { CalibrationMetrics } from "../../../app/admin/orders/[userId]/PhotoCalibrator";
+import type { CalibrationMetrics, OverlayPoints } from "../../../app/admin/orders/[userId]/PhotoCalibrator";
 
 // Pages Router API route — NOT compiled with the RSC webpack layer.
 // @react-pdf/renderer uses React.Component internally; the RSC bundled React
@@ -83,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const [protocolResult, qrResult] = await Promise.all([
     supabaseAdmin
       .from("protocols")
-      .select("summary, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, metrics, before_after_preview_path")
+      .select("summary, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, metrics, overlay_points, before_after_preview_path")
       .eq("user_id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -108,8 +108,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     fetchPhotoDataUri(signedBeforeAfterUrl),
   ]);
 
-  // Metrics
-  const rawMetrics = (protocol?.metrics as CalibrationMetrics | null) ?? null;
+  // Metrics + overlay points
+  const rawMetrics      = (protocol?.metrics       as CalibrationMetrics | null) ?? null;
+  const rawOverlayPoints = (protocol?.overlay_points as OverlayPoints     | null) ?? null;
 
   // Delivered date
   const deliveredAt   = (protocol?.delivered_at as string | null) ?? null;
@@ -128,6 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       deliveredDate,
       photoDataUri,
       beforeAfterDataUri,
+      overlayPoints: rawOverlayPoints,
       metrics: rawMetrics,
       age,
       summary:                   (protocol?.summary as string | null) ?? null,

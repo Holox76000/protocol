@@ -7,7 +7,8 @@ import { SectionTitlePage, SectionPage } from "./sections/SectionPage";
 import { MetricsGrid } from "./sections/MetricsGrid";
 import { ProseSection } from "./sections/ProseSection";
 import { BeforeAfterSection } from "./sections/BeforeAfterSection";
-import type { CalibrationMetrics } from "../admin/orders/[userId]/PhotoCalibrator";
+import { AnnotatedPhotoSection } from "./sections/AnnotatedPhotoSection";
+import type { CalibrationMetrics, OverlayPoints } from "../admin/orders/[userId]/PhotoCalibrator";
 import { computeAttractivenessScore } from "../../lib/attractivenessScore";
 
 type SectionId =
@@ -46,6 +47,7 @@ export type ProtocolPDFProps = {
   deliveredDate:              string | null;
   photoDataUri:               string | null;
   beforeAfterDataUri:         string | null;
+  overlayPoints:              OverlayPoints | null;
   metrics:                    CalibrationMetrics | null;
   age?:                       number;
   summary:                    string | null;
@@ -62,6 +64,7 @@ export function ProtocolPDF({
   deliveredDate,
   photoDataUri,
   beforeAfterDataUri,
+  overlayPoints,
   metrics,
   age,
   summary,
@@ -152,6 +155,11 @@ export function ProtocolPDF({
             />
             <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
               <MetricsGrid metrics={metrics} age={age} />
+              <AnnotatedPhotoSection
+                photoDataUri={photoDataUri}
+                overlayPoints={overlayPoints}
+                metrics={metrics}
+              />
               <BeforeAfterSection
                 photoFront={photoDataUri}
                 beforeAfterUri={beforeAfterDataUri}
