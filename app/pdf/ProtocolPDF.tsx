@@ -3,9 +3,10 @@ import { Document, renderToBuffer } from "@react-pdf/renderer";
 import { registerFonts } from "./pdfFonts";
 import { CoverPage } from "./sections/CoverPage";
 import { TocPage } from "./sections/TocPage";
-import { SectionPage } from "./sections/SectionPage";
+import { SectionTitlePage, SectionPage } from "./sections/SectionPage";
 import { MetricsGrid } from "./sections/MetricsGrid";
 import { ProseSection } from "./sections/ProseSection";
+import { BeforeAfterSection } from "./sections/BeforeAfterSection";
 import type { CalibrationMetrics } from "../admin/orders/[userId]/PhotoCalibrator";
 import { computeAttractivenessScore } from "../../lib/attractivenessScore";
 
@@ -44,6 +45,7 @@ export type ProtocolPDFProps = {
   firstName:                  string;
   deliveredDate:              string | null;
   photoDataUri:               string | null;
+  beforeAfterDataUri:         string | null;
   metrics:                    CalibrationMetrics | null;
   age?:                       number;
   summary:                    string | null;
@@ -59,6 +61,7 @@ export function ProtocolPDF({
   firstName,
   deliveredDate,
   photoDataUri,
+  beforeAfterDataUri,
   metrics,
   age,
   summary,
@@ -69,14 +72,12 @@ export function ProtocolPDF({
   supplementProtocolContent,
   actionPlanContent,
 }: ProtocolPDFProps) {
-  // Register fonts (idempotent — react-pdf caches by family name)
   registerFonts();
 
   const { score, label: scoreLabel } = metrics
     ? computeAttractivenessScore(metrics, age)
-    : { score: 0, label: "—" };
+    : { score: 0, label: "-" };
 
-  // Build TOC entries — only sections with content
   const sectionContents: Record<SectionId, string | null> = {
     "summary":             summary,
     "body-analysis":       metrics ? "__metrics__" : null,
@@ -90,10 +91,15 @@ export function ProtocolPDF({
 
   const activeSections = SECTION_ORDER.filter(id => sectionContents[id] != null);
 
-  // Include summary separately at the front of TOC if present
   const tocEntries = [
     ...(summary ? [{ label: SECTION_META["summary"].label, category: SECTION_META["summary"].category }] : []),
     ...activeSections.map(id => ({ label: SECTION_META[id].label, category: SECTION_META[id].category })),
+  ];
+
+  // Build section index list for numbering
+  const allSections: SectionId[] = [
+    ...(summary ? ["summary" as SectionId] : []),
+    ...activeSections,
   ];
 
   return (
@@ -117,54 +123,70 @@ export function ProtocolPDF({
       )}
 
       {/* Summary */}
-      {summary && (
-        <SectionPage
-          sectionLabel={SECTION_META["summary"].label}
-          categoryLabel={SECTION_META["summary"].category}
-          firstName={firstName}
-        >
-          <ProseSection content={summary} />
-        </SectionPage>
-      )}
+      {summary && (() => {
+        const idx = allSections.indexOf("summary") + 1;
+        const meta = SECTION_META["summary"];
+        return (
+          <>
+            <SectionTitlePage
+              sectionLabel={meta.label}
+              categoryLabel={meta.category}
+              sectionIndex={idx}
+            />
+            <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
+              <ProseSection content={summary} />
+            </SectionPage>
+          </>
+        );
+      })()}
 
       {/* Body Analysis */}
-      {metrics && (
-        <SectionPage
-          sectionLabel={SECTION_META["body-analysis"].label}
-          categoryLabel={SECTION_META["body-analysis"].category}
-          firstName={firstName}
-        >
-          <MetricsGrid metrics={metrics} age={age} />
-        </SectionPage>
-      )}
+      {metrics && (() => {
+        const idx = allSections.indexOf("body-analysis") + 1;
+        const meta = SECTION_META["body-analysis"];
+        return (
+          <>
+            <SectionTitlePage
+              sectionLabel={meta.label}
+              categoryLabel={meta.category}
+              sectionIndex={idx}
+            />
+            <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
+              <MetricsGrid metrics={metrics} age={age} />
+              <BeforeAfterSection
+                photoFront={photoDataUri}
+                beforeAfterUri={beforeAfterDataUri}
+              />
+            </SectionPage>
+          </>
+        );
+      })()}
 
-      {/* Generated prose sections */}
+      {/* Prose sections */}
       {activeSections
         .filter(id => id !== "body-analysis")
         .map(id => {
           const content = sectionContents[id];
           if (!content) return null;
           const meta = SECTION_META[id];
+          const idx  = allSections.indexOf(id) + 1;
           return (
-            <SectionPage
-              key={id}
-              sectionLabel={meta.label}
-              categoryLabel={meta.category}
-              firstName={firstName}
-            >
-              <ProseSection content={content} />
-            </SectionPage>
+            <React.Fragment key={id}>
+              <SectionTitlePage
+                sectionLabel={meta.label}
+                categoryLabel={meta.category}
+                sectionIndex={idx}
+              />
+              <SectionPage sectionLabel={meta.label} categoryLabel={meta.category} firstName={firstName}>
+                <ProseSection content={content} />
+              </SectionPage>
+            </React.Fragment>
           );
         })}
     </Document>
   );
 }
 
-/**
- * Renders the protocol PDF to a Buffer.
- * Kept in this file so that JSX compilation and renderToBuffer run in the same
- * webpack module context as @react-pdf/renderer — avoids React instance mismatch.
- */
 export async function renderProtocolPDFToBuffer(props: ProtocolPDFProps): Promise<Buffer> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return renderToBuffer(<ProtocolPDF {...props} /> as any);

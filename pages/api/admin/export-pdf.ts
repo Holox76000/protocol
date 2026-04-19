@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const [protocolResult, qrResult] = await Promise.all([
     supabaseAdmin
       .from("protocols")
-      .select("summary, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, metrics")
+      .select("summary, delivered_at, nutrition_plan_content, workout_plan_content, sleeping_advices_content, posture_analysis_content, supplement_protocol_content, action_plan_content, metrics, before_after_preview_path")
       .eq("user_id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -95,10 +95,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const protocol = protocolResult.data as Record<string, unknown> | null;
   const qr       = qrResult.data as Record<string, unknown> | null;
 
-  // Signed photo URL + resize
-  const photoFrontPath = (qr?.photo_front_path as string | null) ?? null;
-  const signedUrl      = await getSignedUrl(photoFrontPath);
-  const photoDataUri   = await fetchPhotoDataUri(signedUrl);
+  // Signed photo URLs + resize (parallel)
+  const photoFrontPath      = (qr?.photo_front_path as string | null) ?? null;
+  const beforeAfterPath     = (protocol?.before_after_preview_path as string | null) ?? null;
+  const [signedUrl, signedBeforeAfterUrl] = await Promise.all([
+    getSignedUrl(photoFrontPath),
+    getSignedUrl(beforeAfterPath),
+  ]);
+  const [photoDataUri, beforeAfterDataUri] = await Promise.all([
+    fetchPhotoDataUri(signedUrl),
+    fetchPhotoDataUri(signedBeforeAfterUrl),
+  ]);
 
   // Metrics
   const rawMetrics = (protocol?.metrics as CalibrationMetrics | null) ?? null;
@@ -119,6 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       firstName,
       deliveredDate,
       photoDataUri,
+      beforeAfterDataUri,
       metrics: rawMetrics,
       age,
       summary:                   (protocol?.summary as string | null) ?? null,

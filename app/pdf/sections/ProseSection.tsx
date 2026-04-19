@@ -1,25 +1,16 @@
 import React from "react";
 import { View, Text } from "@react-pdf/renderer";
+import type { Style } from "@react-pdf/types";
 import { C, F } from "../pdfTheme";
 
-// Minimal markdown → react-pdf renderer.
-// Handles: ## headings, ### subheadings, **bold**, - bullets, paragraphs.
-// No external parser — avoids bundle bloat in a Node.js route.
-
-// Replace Unicode characters that fall outside fontsource Latin subset coverage.
-// Fontsource "latin" covers U+0000–U+024F; General Punctuation (U+2000–U+206F)
-// is NOT included — em/en dashes, smart quotes, ellipsis etc. cause fontkit to
-// crash with "Offset outside DataView bounds" when embedding the glyph subset.
+// ── Unicode sanitizer ────────────────────────────────────────────────────────
+// fontkit v2.0.4 crashes on TrueType composite glyphs (Offset > DataView bounds)
+// for characters outside the fontsource Latin subset. Normalize + strip them.
 function sanitize(text: string): string {
   return (
     text
-      // Decompose accented/composite chars (é → e + ́) then strip combining marks.
-      // fontkit's TrueType composite-glyph encoder crashes with "Offset outside
-      // DataView bounds" on certain accented characters (e.g. é U+00E9) when the
-      // glyph is stored as a TrueType composite in the Inter latin subset font.
       .normalize("NFD")
-      .replace(/[\u0300-\u036F]/g, "")   // strip combining diacritical marks
-      // Punctuation outside Basic Latin / Latin-1 Supplement
+      .replace(/[\u0300-\u036F]/g, "")   // strip combining diacritical marks (é→e)
       .replace(/\u2014/g, "--")           // em dash
       .replace(/\u2013/g, "-")            // en dash
       .replace(/\u2026/g, "...")          // ellipsis
@@ -37,11 +28,13 @@ function sanitize(text: string): string {
   );
 }
 
+// ── Block types ──────────────────────────────────────────────────────────────
 type Block =
-  | { type: "h2";    text: string }
-  | { type: "h3";    text: string }
-  | { type: "bullet"; text: string }
-  | { type: "para";   runs: Run[] };
+  | { type: "h2";     text: string }
+  | { type: "h3";     text: string }
+  | { type: "bullet"; runs: Run[] }
+  | { type: "para";   runs: Run[] }
+  | { type: "table";  headers: string[]; rows: string[][] };
 
 type Run = { text: string; bold: boolean };
 
@@ -59,10 +52,23 @@ function parseRuns(line: string): Run[] {
   return runs;
 }
 
+function parseTableRow(line: string): string[] {
+  return line
+    .split("|")
+    .slice(1, -1)  // remove empty first/last from leading/trailing |
+    .map(cell => cell.trim());
+}
+
+function isTableSeparator(line: string): boolean {
+  return /^\|[\s|:-]+\|$/.test(line);
+}
+
 function parseBlocks(markdown: string): Block[] {
   const blocks: Block[] = [];
   const lines = markdown.split("\n");
   let paraLines: string[] = [];
+  let tableLines: string[] = [];
+  let inTable = false;
 
   const flushPara = () => {
     const text = paraLines.join(" ").trim();
@@ -70,8 +76,43 @@ function parseBlocks(markdown: string): Block[] {
     paraLines = [];
   };
 
+  const flushTable = () => {
+    if (tableLines.length < 2) {
+      // Too few lines for a real table — treat as paragraphs
+      for (const l of tableLines) paraLines.push(l);
+      flushPara();
+    } else {
+      const headers = parseTableRow(tableLines[0]);
+      const dataRows = tableLines.slice(1).filter(l => !isTableSeparator(l)).map(parseTableRow);
+      if (dataRows.length > 0) {
+        blocks.push({ type: "table", headers, rows: dataRows });
+      }
+    }
+    tableLines = [];
+    inTable = false;
+  };
+
   for (const raw of lines) {
     const line = raw.trim();
+
+    // Table detection: line starts and ends with |
+    const isTableLine = line.startsWith("|") && line.endsWith("|");
+
+    if (isTableLine) {
+      if (!inTable) {
+        flushPara(); // flush any pending paragraph before table
+        inTable = true;
+      }
+      if (!isTableSeparator(line)) {
+        tableLines.push(line);
+      }
+      continue;
+    }
+
+    if (inTable) {
+      flushTable();
+    }
+
     if (!line) { flushPara(); continue; }
 
     if (line.startsWith("### ")) { flushPara(); blocks.push({ type: "h3", text: line.slice(4) }); continue; }
@@ -79,15 +120,71 @@ function parseBlocks(markdown: string): Block[] {
     if (line.startsWith("# "))   { flushPara(); blocks.push({ type: "h2", text: line.slice(2) }); continue; }
     if (line.startsWith("- ") || line.startsWith("* ")) {
       flushPara();
-      blocks.push({ type: "bullet", text: line.slice(2) });
+      blocks.push({ type: "bullet", runs: parseRuns(line.slice(2)) });
       continue;
     }
     paraLines.push(line);
   }
+
+  if (inTable) flushTable();
   flushPara();
+
   return blocks;
 }
 
+// ── Table renderer ───────────────────────────────────────────────────────────
+function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) {
+  const colCount = headers.length;
+
+  return (
+    <View style={{ marginBottom: 12, marginTop: 8 }}>
+      {/* Header row */}
+      <View style={{ flexDirection: "row", backgroundColor: C.void }}>
+        {headers.map((h, i) => (
+          <View key={i} style={{ flex: 1, padding: "5pt 8pt", borderRightWidth: i < colCount - 1 ? 1 : 0, borderRightColor: "#354a53" }}>
+            <Text style={{ fontFamily: F.sans, fontSize: 8, fontWeight: 600, color: C.white, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {h}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Data rows */}
+      {rows.map((row, ri) => (
+        <View
+          key={ri}
+          style={{
+            flexDirection: "row",
+            backgroundColor: ri % 2 === 0 ? C.white : C.ash,
+            borderBottomWidth: 1,
+            borderBottomColor: C.wire,
+          }}
+        >
+          {row.map((cell, ci) => (
+            <View key={ci} style={{ flex: 1, padding: "5pt 8pt", borderRightWidth: ci < colCount - 1 ? 1 : 0, borderRightColor: C.wire }}>
+              <Text style={{ fontFamily: F.sans, fontSize: 9, color: C.void, lineHeight: 1.4 }}>
+                {cell}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// ── Runs renderer ────────────────────────────────────────────────────────────
+function Runs({ runs, style }: { runs: Run[]; style: Style }) {
+  return (
+    <Text style={style}>
+      {runs.map((run, j) => (
+        <Text key={j} style={{ fontWeight: run.bold ? 600 : 400 }}>{run.text}</Text>
+      ))}
+    </Text>
+  );
+}
+
+// ── ProseSection ─────────────────────────────────────────────────────────────
 export function ProseSection({ content }: { content: string }) {
   const blocks = parseBlocks(sanitize(content));
 
@@ -128,34 +225,28 @@ export function ProseSection({ content }: { content: string }) {
           );
         }
 
+        if (block.type === "table") {
+          return <TableBlock key={i} headers={block.headers} rows={block.rows} />;
+        }
+
         if (block.type === "bullet") {
           return (
             <View key={i} style={{ flexDirection: "row", marginBottom: 4, paddingLeft: 8 }}>
               <Text style={{ fontFamily: F.sans, fontSize: 11, color: C.accent, marginRight: 6, marginTop: 1 }}>
                 ·
               </Text>
-              <Text style={{ fontFamily: F.sans, fontSize: 11, color: C.void, lineHeight: 1.6, flex: 1 }}>
-                {block.text}
-              </Text>
+              <Runs runs={block.runs} style={{ fontFamily: F.sans, fontSize: 11, color: C.void, lineHeight: 1.6, flex: 1 }} />
             </View>
           );
         }
 
         // para
         return (
-          <Text key={i} style={{
-            fontFamily: F.sans,
-            fontSize: 11,
-            color: C.void,
-            lineHeight: 1.7,
-            marginBottom: 8,
-          }}>
-            {block.runs.map((run, j) => (
-              <Text key={j} style={{ fontWeight: run.bold ? 600 : 400 }}>
-                {run.text}
-              </Text>
-            ))}
-          </Text>
+          <Runs
+            key={i}
+            runs={block.runs}
+            style={{ fontFamily: F.sans, fontSize: 11, color: C.void, lineHeight: 1.7, marginBottom: 8 }}
+          />
         );
       })}
     </View>
