@@ -3,9 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   // /program is now handled by app/program route
 
-  // @react-pdf/renderer v4 is pure ESM. transpilePackages forces webpack to bundle
-  // it instead of externalizing (externalizing would use require(), which fails on ESM).
-  transpilePackages: ["@react-pdf/renderer"],
+  // @react-pdf/renderer is used from the Pages Router API route (pages/api/admin/export-pdf.ts)
+  // to avoid the RSC webpack layer which strips React.Component. No transpilePackages needed;
+  // Next.js handles ESM interop for Pages Router routes automatically.
 
   webpack: (config, { isServer }) => {
     if (isServer) {
