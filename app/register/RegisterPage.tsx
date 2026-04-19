@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+
+declare global {
+  interface Window {
+    TriplePixel?: (event: string, name?: unknown, data?: Record<string, unknown>) => void;
+  }
+}
 
 type Props = {
   registrationToken?: string;
@@ -18,6 +24,15 @@ export default function RegisterPage({
   const [firstName, setFirstName] = useState(prefillFirstName);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Fire AddToCart on page visit
+  useEffect(() => {
+    function fire() {
+      if (!window.TriplePixel) { setTimeout(fire, 400); return; }
+      window.TriplePixel("AddToCart", { item: "attractiveness-protocol", q: 1, v: "89" });
+    }
+    fire();
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +64,18 @@ export default function RegisterPage({
           return;
         }
 
-        window.location.assign(registrationToken ? "/dashboard" : "/checkout");
+        // Triple Whale — account created
+        if (window.TriplePixel) {
+          window.TriplePixel("Contact", { email: email.trim() });
+          window.TriplePixel("custom", "Lead", {
+            category: "lead_capture",
+            subcategory: "account_created",
+            value: 0,
+            $: "0",
+          });
+        }
+
+        window.location.assign(registrationToken ? "/questionnaire" : "/checkout");
       } catch {
         setError("Network error. Please check your connection.");
       } finally {

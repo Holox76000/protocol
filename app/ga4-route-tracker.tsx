@@ -35,15 +35,20 @@ function getPrtclUserId(): string | null {
   }
 }
 
-export default function Ga4RouteTracker() {
+export default function Ga4RouteTracker({ isAdmin = false }: { isAdmin?: boolean }) {
   const previousUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (isAdmin) return;
+
     const trackPageView = () => {
       const pagePath = getCurrentPagePath();
 
       if (previousUrlRef.current === pagePath) return;
       previousUrlRef.current = pagePath;
+
+      // Never track admin routes
+      if (pagePath.startsWith("/admin")) return;
 
       // Capture UTMs from current URL and merge into sessionStorage
       persistUtmParams(getUtmParams());
