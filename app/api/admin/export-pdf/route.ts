@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
 import sharp from "sharp";
 import { requireAdmin } from "../../../../lib/adminAuth";
 import { supabaseAdmin } from "../../../../lib/supabase";
-import { ProtocolPDF } from "../../../pdf/ProtocolPDF";
+import { renderProtocolPDFToBuffer } from "../../../pdf/ProtocolPDF";
 import type { CalibrationMetrics } from "../../../admin/orders/[userId]/PhotoCalibrator";
-import React from "react";
 
 export const runtime = "nodejs";
 
@@ -101,10 +99,11 @@ export async function POST(req: Request) {
   // Age
   const age = (qr?.age as number | null) ?? undefined;
 
-  // Render PDF
+  // Render PDF — renderProtocolPDFToBuffer lives in ProtocolPDF.tsx so that
+  // JSX compilation and renderToBuffer share the same @react-pdf/renderer instance.
   let buffer: Buffer;
   try {
-    const pdfElement = React.createElement(ProtocolPDF, {
+    buffer = await renderProtocolPDFToBuffer({
       firstName,
       deliveredDate,
       photoDataUri,
@@ -118,10 +117,6 @@ export async function POST(req: Request) {
       supplementProtocolContent: (protocol?.supplement_protocol_content as string | null) ?? null,
       actionPlanContent:         (protocol?.action_plan_content as string | null) ?? null,
     });
-    // renderToBuffer expects ReactElement<DocumentProps> — ProtocolPDF returns a <Document>
-    // but React.createElement types the element as the component's own props.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    buffer = await renderToBuffer(pdfElement as any);
   } catch (err) {
     console.error("[export-pdf] renderToBuffer failed:", err);
     return NextResponse.json(

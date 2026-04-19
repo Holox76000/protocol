@@ -1,4 +1,4 @@
-import { Document } from "@react-pdf/renderer";
+import { Document, renderToBuffer } from "@react-pdf/renderer";
 import { registerFonts } from "./pdfFonts";
 import { CoverPage } from "./sections/CoverPage";
 import { TocPage } from "./sections/TocPage";
@@ -157,4 +157,14 @@ export function ProtocolPDF({
         })}
     </Document>
   );
+}
+
+/**
+ * Renders the protocol PDF to a Buffer.
+ * Kept in this file so that JSX compilation and renderToBuffer run in the same
+ * webpack module context as @react-pdf/renderer — avoids React instance mismatch.
+ */
+export async function renderProtocolPDFToBuffer(props: ProtocolPDFProps): Promise<Buffer> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return renderToBuffer(<ProtocolPDF {...props} /> as any);
 }
