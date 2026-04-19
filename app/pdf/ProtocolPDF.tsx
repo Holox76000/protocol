@@ -114,7 +114,6 @@ export function ProtocolPDF({
         deliveredDate={deliveredDate}
         score={score}
         scoreLabel={scoreLabel}
-        photoDataUri={photoDataUri}
       />
 
       {/* Page 2 — TOC */}

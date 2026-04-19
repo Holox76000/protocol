@@ -1,5 +1,5 @@
 import React from "react";
-import { Page, View, Text, Image, Svg, Circle, G, Line } from "@react-pdf/renderer";
+import { Page, View, Text, Svg, Circle, G } from "@react-pdf/renderer";
 import { C, F, PAGE } from "../pdfTheme";
 
 type Props = {
@@ -7,7 +7,6 @@ type Props = {
   deliveredDate: string | null;
   score:         number;
   scoreLabel:    string;
-  photoDataUri:  string | null;
 };
 
 function ScoreRing({ score, label }: { score: number; label: string }) {
@@ -70,111 +69,71 @@ function ScoreRing({ score, label }: { score: number; label: string }) {
   );
 }
 
-export function CoverPage({ firstName, deliveredDate, score, scoreLabel, photoDataUri }: Props) {
+export function CoverPage({ firstName, deliveredDate, score, scoreLabel }: Props) {
   return (
     <Page
       size="A4"
-      style={{ backgroundColor: C.coverBg, flexDirection: "row" }}
+      style={{ backgroundColor: C.coverBg, flexDirection: "column", justifyContent: "space-between" }}
     >
-      {/* Left column */}
-      <View style={{
-        flex: 1,
-        paddingLeft: PAGE.marginX,
-        paddingRight: 24,
-        paddingTop: PAGE.marginY,
-        paddingBottom: PAGE.marginY,
-        justifyContent: "space-between",
-      }}>
-        {/* Wordmark */}
-        <View>
-          <Text style={{
-            fontFamily: F.mono,
-            fontSize: 9,
-            letterSpacing: 3,
-            color: "#4a6875",
-            textTransform: "uppercase",
-            marginBottom: 48,
-          }}>
-            PROTOCOL
-          </Text>
+      {/* Top — wordmark */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingTop: PAGE.marginY }}>
+        <Text style={{
+          fontFamily: F.mono,
+          fontSize: 9,
+          letterSpacing: 3,
+          color: "#4a6875",
+          textTransform: "uppercase",
+        }}>
+          PROTOCOL
+        </Text>
+      </View>
 
-          {/* Name */}
-          <Text style={{
-            fontFamily: F.serif,
-            fontSize: 40,
-            fontStyle: "italic",
-            color: C.white,
-            lineHeight: 1.15,
-            marginBottom: 8,
-          }}>
-            {firstName}
-          </Text>
-          <Text style={{
-            fontFamily: F.sans,
-            fontSize: 12,
-            color: C.mute,
-            marginBottom: 40,
-          }}>
-            Personal Protocol
-          </Text>
+      {/* Center — name + subtitle + score ring */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingRight: PAGE.marginX }}>
+        <Text style={{
+          fontFamily: F.serif,
+          fontSize: 52,
+          fontStyle: "italic",
+          color: C.white,
+          lineHeight: 1.1,
+          marginBottom: 10,
+        }}>
+          {firstName}.
+        </Text>
+        <Text style={{
+          fontFamily: F.sans,
+          fontSize: 12,
+          color: C.mute,
+          marginBottom: 48,
+        }}>
+          Personal Protocol
+        </Text>
 
-          {/* Score ring */}
-          <ScoreRing score={score} label={scoreLabel} />
-        </View>
+        <ScoreRing score={score} label={scoreLabel} />
+      </View>
 
-        {/* Footer */}
-        <View>
-          {deliveredDate && (
-            <Text style={{
-              fontFamily: F.mono,
-              fontSize: 8,
-              color: "#4a6875",
-              letterSpacing: 1,
-              marginBottom: 4,
-            }}>
-              {deliveredDate.toUpperCase()}
-            </Text>
-          )}
+      {/* Bottom — date + confidential */}
+      <View style={{ paddingLeft: PAGE.marginX, paddingBottom: PAGE.marginY }}>
+        {deliveredDate && (
           <Text style={{
             fontFamily: F.mono,
             fontSize: 8,
-            color: "#354a53",
+            color: "#4a6875",
             letterSpacing: 1,
+            marginBottom: 4,
           }}>
-            CONFIDENTIAL
+            {deliveredDate.toUpperCase()}
           </Text>
-        </View>
-      </View>
-
-      {/* Right column — photo */}
-      {photoDataUri && (
-        <View style={{
-          width: 220,
-          paddingTop: 0,
-          paddingBottom: 0,
-          overflow: "hidden",
+        )}
+        <Text style={{
+          fontFamily: F.mono,
+          fontSize: 8,
+          color: "#354a53",
+          letterSpacing: 1,
         }}>
-          <Image
-            src={photoDataUri}
-            style={{
-              width: 220,
-              height: PAGE.height,
-              objectFit: "cover",
-              objectPosition: "top center",
-            }}
-          />
-          {/* Dark edge strip to blend with left column — react-pdf has no gradient support */}
-          <View style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: 16,
-            height: PAGE.height,
-            backgroundColor: C.coverBg,
-            opacity: 0.8,
-          }} />
-        </View>
-      )}
+          CONFIDENTIAL
+        </Text>
+      </View>
     </Page>
   );
 }
