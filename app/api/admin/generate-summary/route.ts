@@ -4,6 +4,9 @@ import { requireAdmin } from "../../../../lib/adminAuth";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { computeAttractivenessScore, computeRealisticPotential, getAgeRanges, bfRealisticTarget, muscleGainMultiplier } from "../../../../lib/attractivenessScore";
 import type { CalibrationMetrics } from "../../../admin/orders/[userId]/PhotoCalibrator";
+import { socialContextBlock } from "../../../../lib/socialContext";
+import { SCIENTIFIC_REFERENCE_BASE } from "../../../../lib/studies";
+import { TONE_OF_VOICE } from "../../../../lib/toneOfVoice";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -11,19 +14,27 @@ export const maxDuration = 60;
 const client = new Anthropic();
 
 function buildPrompt(params: {
-  firstName:          string;
-  age:                number;
-  metrics:            CalibrationMetrics;
-  score:              number;
-  potential:          number;
-  scoreLabel:         string;
-  goal:               string | null;
-  heightCm:           number | null;
-  weightKg:           number | null;
-  trainingExperience: string | null;
-  sessionsPerWeek:    number | null;
+  firstName:                    string;
+  age:                          number;
+  metrics:                      CalibrationMetrics;
+  score:                        number;
+  potential:                    number;
+  scoreLabel:                   string;
+  goal:                         string | null;
+  heightCm:                     number | null;
+  weightKg:                     number | null;
+  trainingExperience:           string | null;
+  sessionsPerWeek:              number | null;
+  professionalEnvironment:      string | null;
+  professionalEnvironmentOther: string | null;
+  typicalClothing:              string | null;
+  socialPerception:             string[] | null;
 }): string {
-  const { firstName, age, metrics, score, potential, scoreLabel, goal, heightCm, weightKg, trainingExperience, sessionsPerWeek } = params;
+  const {
+    firstName, age, metrics, score, potential, scoreLabel, goal, heightCm, weightKg,
+    trainingExperience, sessionsPerWeek,
+    professionalEnvironment, professionalEnvironmentOther, typicalClothing, socialPerception,
+  } = params;
   const ageRanges  = getAgeRanges(age);
   const gainMult   = muscleGainMultiplier(age);
   const r2         = (v: number) => Math.round(v * 100) / 100;
@@ -70,7 +81,22 @@ function buildPrompt(params: {
     return `- ${labels[key]}: current ${value} — ${status} — realistic target: ${realisticTarget}`;
   }).join("\n");
 
-  return `You are writing a personal physical attractiveness analysis report for a client of an elite body transformation protocol service.
+  const socialCtx = socialContextBlock({
+    professional_environment: professionalEnvironment,
+    professional_environment_other: professionalEnvironmentOther,
+    typical_clothing: typicalClothing,
+    social_perception: socialPerception,
+  });
+
+  return `${SCIENTIFIC_REFERENCE_BASE}
+
+---
+
+${TONE_OF_VOICE}
+
+---
+
+You are writing a personal physical attractiveness analysis report for a client of an elite body transformation protocol service.
 
 Client profile:
 - Name: ${firstName}
@@ -80,6 +106,8 @@ Client profile:
 - Goal: ${goal ?? "general improvement"}
 - Training experience: ${trainingExperience ?? "unknown"}
 - Sessions per week: ${sessionsPerWeek ?? "unknown"}
+
+${socialCtx}
 
 Physical Attractiveness Score: ${score}/100 (${scoreLabel})
 Realistic potential for age ${age}: ${potential}/100
@@ -97,9 +125,9 @@ Write a Summary Report in 3–4 short paragraphs:
 
 3. **The opportunity** — explain the gap between ${score} and ${potential}/100. What changes would move the needle most? Be concrete and age-realistic.
 
-4. **Closing** — one motivating sentence calibrated to their age and goal.
+4. **Closing** — one motivating sentence calibrated to their age, goal, and social environment.
 
-Tone: direct, intelligent, no fluff. Like a high-end consultant speaking to a motivated adult. No bullet points — flowing paragraphs only. Do not repeat the metric numbers verbatim — translate them into physical reality. Do not use the word "attractiveness" more than once. Address ${firstName} directly.`;
+Format: flowing paragraphs only, no bullet points. Do not repeat metric numbers verbatim — translate them into physical reality. When describing the opportunity, frame it through the lens of their professional and social environment — the physique ceiling is not just physiological, it is social.`;
 }
 
 export async function POST(request: Request) {
@@ -113,18 +141,19 @@ export async function POST(request: Request) {
     const [protocolRes, qrRes, userRes] = await Promise.all([
       supabaseAdmin.from("protocols").select("metrics").eq("user_id", userId).maybeSingle(),
       supabaseAdmin.from("questionnaire_responses")
-        .select("age, height_cm, weight_kg, training_experience, sessions_per_week, goal")
+        .select("age, height_cm, weight_kg, training_experience, sessions_per_week, goal, professional_environment, professional_environment_other, typical_clothing, social_perception")
         .eq("user_id", userId).maybeSingle(),
       supabaseAdmin.from("users").select("first_name").eq("id", userId).maybeSingle(),
     ]);
 
     const metrics    = (protocolRes.data?.metrics as CalibrationMetrics | null) ?? null;
-    const age        = (qrRes.data?.age            as number | null) ?? 30;
-    const heightCm   = (qrRes.data?.height_cm      as number | null) ?? null;
-    const weightKg   = (qrRes.data?.weight_kg      as number | null) ?? null;
-    const trainingExp = (qrRes.data?.training_experience as string | null) ?? null;
-    const sessions   = (qrRes.data?.sessions_per_week as number | null) ?? null;
-    const goal       = (qrRes.data?.goal           as string | null) ?? null;
+    const qr         = (qrRes.data ?? {}) as Record<string, unknown>;
+    const age        = (qr.age            as number | null) ?? 30;
+    const heightCm   = (qr.height_cm      as number | null) ?? null;
+    const weightKg   = (qr.weight_kg      as number | null) ?? null;
+    const trainingExp = (qr.training_experience as string | null) ?? null;
+    const sessions   = (qr.sessions_per_week as number | null) ?? null;
+    const goal       = (qr.goal           as string | null) ?? null;
     const firstName  = (userRes.data?.first_name   as string | null) ?? "Client";
 
     if (!metrics) return NextResponse.json({ error: "No calibration metrics found. Calibrate first." }, { status: 404 });
@@ -132,7 +161,14 @@ export async function POST(request: Request) {
     const { score, label } = computeAttractivenessScore(metrics, age);
     const { max: potential } = computeRealisticPotential(metrics, age);
 
-    const prompt = buildPrompt({ firstName, age, metrics, score, potential, scoreLabel: label, goal, heightCm, weightKg, trainingExperience: trainingExp, sessionsPerWeek: sessions });
+    const prompt = buildPrompt({
+      firstName, age, metrics, score, potential, scoreLabel: label, goal, heightCm, weightKg,
+      trainingExperience: trainingExp, sessionsPerWeek: sessions,
+      professionalEnvironment:      (qr.professional_environment       as string | null) ?? null,
+      professionalEnvironmentOther: (qr.professional_environment_other as string | null) ?? null,
+      typicalClothing:              (qr.typical_clothing               as string | null) ?? null,
+      socialPerception:             Array.isArray(qr.social_perception) ? qr.social_perception as string[] : null,
+    });
 
     // Call Claude
     const message = await client.messages.create({

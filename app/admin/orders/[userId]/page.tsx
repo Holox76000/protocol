@@ -152,11 +152,19 @@ export default async function OrderDetailPage({
             <h1 className="font-display text-2xl text-void">{user.first_name as string}</h1>
             <p className="text-[13px] text-dim">{user.email as string}</p>
           </div>
-          <span
-            className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${STATUS_COLORS[status] ?? "bg-pebble text-dim"}`}
-          >
-            {STATUS_LABELS[status] ?? status}
-          </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/protocol/${encodeURIComponent(user.email as string)}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-wire bg-white px-3.5 py-2 text-[12px] font-semibold text-void transition-colors hover:border-void hover:bg-ash"
+            >
+              Protocol →
+            </Link>
+            <span
+              className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${STATUS_COLORS[status] ?? "bg-pebble text-dim"}`}
+            >
+              {STATUS_LABELS[status] ?? status}
+            </span>
+          </div>
         </div>
 
         {/* Two-column layout */}

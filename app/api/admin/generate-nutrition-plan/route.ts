@@ -4,6 +4,8 @@ import { requireAdmin } from "../../../../lib/adminAuth";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { computeAttractivenessScore, bfRealisticTarget } from "../../../../lib/attractivenessScore";
 import type { CalibrationMetrics } from "../../../admin/orders/[userId]/PhotoCalibrator";
+import { socialContextBlock } from "../../../../lib/socialContext";
+import { SCIENTIFIC_REFERENCE_BASE } from "../../../../lib/studies";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -17,32 +19,36 @@ function arr(v: unknown): string {
 }
 
 function buildPrompt(data: {
-  firstName:          string;
-  age:                number;
-  heightCm:           number | null;
-  weightKg:           number | null;
-  goal:               string | null;
-  weightTrend:        string | null;
-  waistCm:            number | null;
-  trainingExperience: string | null;
-  sessionsPerWeek:    number | null;
-  sessionDuration:    number | null;
-  trainingLocation:   string | null;
-  dailyActivity:      string | null;
-  dietaryProfile:     string | null;
-  foodAllergies:      string[];
-  eatingHabits:       string[];
-  mealsPerDay:        number | null;
-  mealPrep:           string | null;
-  supplements:        string[];
-  sleepHours:         string | null;
-  stressLevel:        number | null;
-  injuries:           string[];
-  medicalConditions:  string[];
-  medications:        string[];
-  metrics:            CalibrationMetrics | null;
-  currentScore:       number | null;
-  bfTarget:           number | null;
+  firstName:                    string;
+  age:                          number;
+  heightCm:                     number | null;
+  weightKg:                     number | null;
+  goal:                         string | null;
+  weightTrend:                  string | null;
+  waistCm:                      number | null;
+  trainingExperience:           string | null;
+  sessionsPerWeek:              number | null;
+  sessionDuration:              number | null;
+  trainingLocation:             string | null;
+  dailyActivity:                string | null;
+  dietaryProfile:               string | null;
+  foodAllergies:                string[];
+  eatingHabits:                 string[];
+  mealsPerDay:                  number | null;
+  mealPrep:                     string | null;
+  supplements:                  string[];
+  sleepHours:                   string | null;
+  stressLevel:                  number | null;
+  injuries:                     string[];
+  medicalConditions:            string[];
+  medications:                  string[];
+  metrics:                      CalibrationMetrics | null;
+  currentScore:                 number | null;
+  bfTarget:                     number | null;
+  professionalEnvironment:      string | null;
+  professionalEnvironmentOther: string | null;
+  typicalClothing:              string | null;
+  socialPerception:             string[] | null;
 }): string {
   const {
     firstName, age, heightCm, weightKg, goal, weightTrend, waistCm,
@@ -50,6 +56,7 @@ function buildPrompt(data: {
     dietaryProfile, foodAllergies, eatingHabits, mealsPerDay, mealPrep, supplements,
     sleepHours, stressLevel, injuries, medicalConditions, medications,
     metrics, currentScore, bfTarget,
+    professionalEnvironment, professionalEnvironmentOther, typicalClothing, socialPerception,
   } = data;
 
   // Estimate TDEE roughly for context
@@ -64,7 +71,22 @@ function buildPrompt(data: {
     tdeeEstimate = `~${Math.round(bmr * activityMult)} kcal/day (estimated)`;
   }
 
-  return `You are a precision nutrition coach writing a personalized nutrition plan for a male client of an elite body transformation protocol service.
+  const socialCtx = socialContextBlock({
+    professional_environment: professionalEnvironment,
+    professional_environment_other: professionalEnvironmentOther,
+    typical_clothing: typicalClothing,
+    social_perception: socialPerception,
+  });
+
+  return `${SCIENTIFIC_REFERENCE_BASE}
+
+---
+
+You are a precision nutrition coach writing a personalized nutrition plan for a male client of an elite body transformation protocol service.
+
+${socialCtx}
+
+---
 
 ## Client Profile
 - Name: ${firstName}
@@ -146,7 +168,8 @@ export async function POST(request: Request) {
         "age, height_cm, weight_kg, goal, weight_trend_6mo, waist_circumference_cm, " +
         "training_experience, sessions_per_week, session_duration_minutes, training_location, daily_activity_level, " +
         "dietary_profile, food_allergies, eating_habits, meals_per_day, meal_prep_availability, supplement_use, " +
-        "sleep_hours, stress_level, injuries, medical_conditions, medications"
+        "sleep_hours, stress_level, injuries, medical_conditions, medications, " +
+        "professional_environment, professional_environment_other, typical_clothing, social_perception"
       ).eq("user_id", userId).maybeSingle(),
       supabaseAdmin.from("users").select("first_name").eq("id", userId).maybeSingle(),
     ]);
@@ -190,6 +213,10 @@ export async function POST(request: Request) {
       metrics,
       currentScore,
       bfTarget,
+      professionalEnvironment:      (qr.professional_environment       as string | null) ?? null,
+      professionalEnvironmentOther: (qr.professional_environment_other as string | null) ?? null,
+      typicalClothing:              (qr.typical_clothing               as string | null) ?? null,
+      socialPerception:             Array.isArray(qr.social_perception) ? qr.social_perception as string[] : null,
     });
 
     const message = await client.messages.create({
