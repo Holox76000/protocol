@@ -168,13 +168,13 @@ export default function F1Landing() {
         <div className="f1-hero-v1__overlay" aria-hidden="true" />
         <div className="f1-hero-v1__text">
           <div className="f1-hero-v1__kicker">
-            Longform · <em>The shape you&apos;re actually built for</em>
+            Protocol Club
           </div>
           <h1 className="f1-hero-v1__headline">
             4 steps to improve your <em>physical attractiveness</em>
           </h1>
           <p className="f1-hero-v1__deck">
-            A quiet London clinic has spent four years studying what the eye actually reads as attractive in the male body — and built a 12-week protocol around it. For the first time, they&apos;re letting non-patients in.
+            A quiet London clinic has spent four years studying what the eye actually reads as attractive in the male body — and built a 12-week protocol around it.
           </p>
           <div className="f1-hero-v1__byline-row">
             <div className="f1-hero-v1__byline">
@@ -253,7 +253,7 @@ export default function F1Landing() {
             </div>
           </div>
 
-          <div className="f1-listicle__item f1-listicle__item--media-left">
+          <div className="f1-listicle__item f1-listicle__item--media-left f1-listicle__item--keep-size">
             <div className="f1-listicle__media" style={{ aspectRatio: "480 / 380" }}>
               <Image src="/assets/variables_kept_vs_cut_v2.svg" alt="What the protocol keeps vs cuts" fill sizes="(max-width: 900px) 100vw, 500px" style={{ objectFit: "contain" }} />
             </div>
