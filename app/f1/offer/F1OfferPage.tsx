@@ -748,7 +748,7 @@ export default function F1OfferPage() {
           <a href="/terms-of-service">Terms of Service</a>
           <a href="/refund-policy">Refund Policy</a>
           <a href="/medical-disclaimer">Medical Disclaimer</a>
-          <a href="/contact">Contact</a>
+
         </nav>
         <p className="f1-footer__disclaimer">
           * Results may vary. Protocol is not a licensed medical provider. The content on this site is for informational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional before beginning any new training or nutrition program. These statements have not been evaluated by the Food and Drug Administration.
