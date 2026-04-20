@@ -11,7 +11,7 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
 import TrackedLink from "../tracked-link";
-import "../../program/program.css";
+import "../program/program.css";
 import "../f1/f1.css";
 import "./home.css";
 
