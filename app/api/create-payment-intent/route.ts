@@ -14,6 +14,7 @@ type Body = {
   utm_term?: string;
   utm_id?: string;
   fbclid?: string;
+  ga_client_id?: string;
 };
 
 export async function POST(request: Request) {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
   const email = (body.customer_email ?? "").trim().toLowerCase() || null;
   const funnel = body.funnel ?? "f1";
   const utmMetadata: Record<string, string> = {};
-  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid"] as const) {
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid", "ga_client_id"] as const) {
     if (body[key]) utmMetadata[key] = body[key]!;
   }
 

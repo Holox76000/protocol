@@ -6,6 +6,8 @@ import OrderPhotoViewer from "./OrderPhotoViewer";
 import ProtocolWorkflow from "./ProtocolWorkflow";
 import MetricsPanel from "../../../protocol/MetricsPanel";
 import ImpersonateButton from "./ImpersonateButton";
+import MessagesPanel from "./MessagesPanel";
+import type { Message } from "./MessagesPanel";
 import type { OverlayPoints, CalibrationMetrics } from "./PhotoCalibrator";
 import type { ProtocolQuestionnaire } from "./types";
 
@@ -78,10 +80,10 @@ export default async function OrderDetailPage({
 
   const { userId } = params;
 
-  const [userResult, qrResult, protocolResult] = await Promise.all([
+  const [userResult, qrResult, protocolResult, messagesResult] = await Promise.all([
     supabaseAdmin
       .from("users")
-      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id")
+      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id, protocol_viewed_at")
       .eq("id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -94,6 +96,11 @@ export default async function OrderDetailPage({
       .select("delivered_at, overlay_points, metrics, before_after_preview_path")
       .eq("user_id", userId)
       .maybeSingle(),
+    supabaseAdmin
+      .from("client_messages")
+      .select("id, direction, body, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true }),
   ]);
 
   if (!userResult.data) notFound();
@@ -103,7 +110,8 @@ export default async function OrderDetailPage({
   const overlayPoints         = (protocolResult.data?.overlay_points           as OverlayPoints | null)       ?? null;
   const calibrationMetrics    = (protocolResult.data?.metrics                  as CalibrationMetrics | null)  ?? null;
   const beforeAfterPreviewPath = (protocolResult.data?.before_after_preview_path as string | null)            ?? null;
-  const status = user.protocol_status as string;
+  const status   = user.protocol_status as string;
+  const messages = (messagesResult.data ?? []) as Message[];
 
   const submittedAt = qr.submitted_at as string | null;
   const due = getDueDate(submittedAt);
@@ -308,15 +316,19 @@ export default async function OrderDetailPage({
 
           </div>
 
-          {/* Right — protocol workflow (sticky) */}
-          <div className="lg:sticky lg:top-6 lg:self-start">
+          {/* Right — protocol workflow + messages (sticky) */}
+          <div className="lg:sticky lg:top-6 lg:self-start space-y-6">
             <div className="rounded-2xl border border-wire bg-white p-6">
               <ProtocolWorkflow
                 userId={userId}
                 initialStatus={status}
                 initialMetrics={calibrationMetrics}
                 beforeAfterPreviewPath={beforeAfterPreviewPath}
+                protocolViewedAt={(user.protocol_viewed_at as string | null) ?? null}
               />
+            </div>
+            <div className="rounded-2xl border border-wire bg-white p-6">
+              <MessagesPanel userId={userId} initialMessages={messages} />
             </div>
           </div>
 

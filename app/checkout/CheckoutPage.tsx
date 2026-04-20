@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { getPersistedUtmParams } from "../../lib/utm";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
@@ -205,17 +206,27 @@ export function CheckoutPage({ email }: { email: string }) {
   const fetchSecret = useCallback(() => {
     setError(null);
     setClientSecret(null);
+
+    // UTMs: merge URL params (highest priority) over persisted session UTMs
+    const persistedUtms = getPersistedUtmParams();
     const sp = new URLSearchParams(window.location.search);
     const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid"] as const;
-    const utms: Record<string, string> = {};
+    const utms: Record<string, string> = { ...persistedUtms };
     for (const key of utmFields) {
       const val = sp.get(key);
       if (val) utms[key] = val;
     }
+
+    // GA4 client_id from the _ga cookie for server-side attribution
+    const gaClientId = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("_ga="))
+      ?.split("=")[1] ?? undefined;
+
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms }),
+      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }) }),
     })
       .then((r) => r.json())
       .then((d: { clientSecret?: string; error?: string }) => {

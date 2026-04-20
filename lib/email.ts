@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
-const FROM = "Protocol Club <hello@protocol-club.com>";
+const FROM         = "Protocol Club <hello@protocol-club.com>";
+const FROM_EXPERT  = "Protocol Expert <expert@protocol-club.com>";
 
 // Brand colors matching /f1/offer
 const C = {
@@ -320,6 +321,100 @@ export async function sendAbandonedCartEmail(props: {
     return;
   }
   console.log("[resend] abandoned cart email sent", { email: props.email, emailNumber: props.emailNumber });
+}
+
+// ─────────────────────────────────────────────────────────
+// Questionnaire unlocked — sent when admin reopens questionnaire for edits
+// ─────────────────────────────────────────────────────────
+export async function sendQuestionnaireUnlockedEmail(props: {
+  email: string;
+  firstName?: string;
+  questionnaireUrl: string;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const content = `
+    <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your assessment is open for edits, ${name}.
+    </h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Our team has a few questions or needs you to adjust something in your assessment before we can finalize your Protocol.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Click below to review and update your answers. Once you're done, submit again and we'll pick up right where we left off.
+    </p>
+
+    ${btn("Update my assessment →", props.questionnaireUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Questions? Reply directly to this email.
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM_EXPERT,
+    to: props.email,
+    subject: "Action needed — please update your assessment",
+    html: emailShell(content),
+  });
+
+  if (error) throw new Error(`[resend] sendQuestionnaireUnlockedEmail failed: ${error.message}`);
+  console.log("[resend] questionnaire unlocked email sent", { email: props.email });
+}
+
+// ─────────────────────────────────────────────────────────
+// Expert message — sent from admin to client
+// reply-to routes inbound replies back to the admin panel
+// ─────────────────────────────────────────────────────────
+export async function sendExpertMessage(props: {
+  email: string;
+  firstName?: string;
+  body: string;
+  userId: string;
+}): Promise<{ resendEmailId: string }> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const bodyHtml = props.body
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+
+  const content = `
+    <p style="margin:0 0 20px;font-size:11px;font-weight:600;color:${C.subtle};letter-spacing:0.1em;text-transform:uppercase;">
+      A Protocol expert sent you a message
+    </p>
+
+    <p style="margin:0 0 8px;font-size:15px;font-weight:500;color:${C.brand};">Hey ${name},</p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.7;">
+      ${bodyHtml}
+    </p>
+
+    <div style="border-top:1px solid ${C.border};padding-top:20px;">
+      <p style="margin:0;font-size:13px;color:${C.subtle};line-height:1.6;">
+        Reply directly to this email — your expert will see your response.
+      </p>
+    </div>
+  `;
+
+  const inboundDomain = process.env.RESEND_INBOUND_DOMAIN ?? "inbound.protocol-club.com";
+
+  const { data, error } = await resend.emails.send({
+    from: FROM_EXPERT,
+    to: props.email,
+    reply_to: `reply+${props.userId}@${inboundDomain}`,
+    subject: "A message from your Protocol expert",
+    html: emailShell(content),
+  });
+
+  if (error || !data) throw new Error(`[resend] sendExpertMessage failed: ${error?.message ?? "no data"}`);
+  console.log("[resend] expert message sent", { email: props.email, userId: props.userId, id: data.id });
+  return { resendEmailId: data.id };
 }
 
 // ─────────────────────────────────────────────────────────

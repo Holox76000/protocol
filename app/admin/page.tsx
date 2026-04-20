@@ -10,7 +10,7 @@ export default async function AdminPage() {
   const { data } = await supabaseAdmin
     .from("users")
     .select(`
-      id, email, first_name, protocol_status, created_at,
+      id, email, first_name, protocol_status, created_at, protocol_viewed_at,
       questionnaire_responses(submitted_at)
     `)
     .eq("has_paid", true)
@@ -27,6 +27,7 @@ export default async function AdminPage() {
       protocol_status: u.protocol_status as string,
       created_at: u.created_at as string,
       submitted_at: (qr as { submitted_at?: string } | null)?.submitted_at ?? null,
+      protocol_viewed_at: (u.protocol_viewed_at as string | null) ?? null,
     };
   });
 

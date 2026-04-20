@@ -10,6 +10,7 @@ type Order = {
   protocol_status: string;
   created_at: string;
   submitted_at: string | null;
+  protocol_viewed_at: string | null;
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -136,7 +137,7 @@ export default function OrderListClient({ orders }: { orders: Order[] }) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-wire">
-              {["Client", "Email", "Status", "Signed up", "Submitted", "Due by"].map((h) => (
+              {["Client", "Email", "Status", "Viewed", "Signed up", "Submitted", "Due by"].map((h) => (
                 <th
                   key={h}
                   className="px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.15em] text-mute"
@@ -163,6 +164,23 @@ export default function OrderListClient({ orders }: { orders: Order[] }) {
                   >
                     {STATUS_LABELS[o.protocol_status] ?? o.protocol_status}
                   </span>
+                </td>
+                <td className="px-5 py-3.5">
+                  {o.protocol_status === "delivered" ? (
+                    o.protocol_viewed_at ? (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        {fmt(o.protocol_viewed_at)}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-600">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                        Not yet
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-[13px] text-mute">—</span>
+                  )}
                 </td>
                 <td className="px-5 py-3.5 text-[13px] text-dim">{fmt(o.created_at)}</td>
                 <td className="px-5 py-3.5 text-[13px] text-dim">{fmt(o.submitted_at)}</td>

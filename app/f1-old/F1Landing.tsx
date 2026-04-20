@@ -14,12 +14,386 @@ import "./f1.css";
 
 const ResearchImpactSection = dynamic(() => import("../program/ResearchImpactSection"));
 
+/* ─── Body Type Selector ─────────────────────────────────────────────────── */
+
+const BODY_TYPE_IMAGES = [
+  { id: 0, before: "/assets/projection-advertorial-before.svg", after: "/assets/projection-advertorial-after.svg" },
+  { id: 1, before: "/assets/projection-advertorial-before-3.svg", after: "/assets/projection-advertorial-after-3.svg" },
+  { id: 2, before: "/assets/projection-advertorial-before-4.svg", after: "/assets/projection-advertorial-after-4.svg" },
+  { id: 3, before: "/assets/advertorial-projection-before-2.svg", after: "/assets/projection-advertorial-after-2.svg" },
+];
+
+const PROJECTIONS = [
+  {
+    id: 0,
+    situation: "Work presentation",
+    before: "/assets/meeting-before.png",
+    after: "/assets/meeting-after.png",
+    scene: "You present. People listen. No interruptions, no side conversations. They take notes when you speak and ask follow-up questions when you're done.",
+  },
+  {
+    id: 2,
+    situation: "Dating app photo",
+    before: "/assets/dating-app-before.png",
+    after: "/assets/dating-app-after.png",
+    scene: "2 matches, zero messages. Same face, different shape. Now the notifications don\u2019t stop. The photo didn\u2019t change. You did.",
+  },
+  {
+    id: 3,
+    situation: "Beach club",
+    before: "/assets/beach-before.png",
+    after: "/assets/beach-after.png",
+    scene: "Phone down. Shirt off. People come to you. You\u2019re laughing, in the middle of it, not watching from the side.",
+  },
+];
+
+const LOADING_STEPS = [
+  "Analyzing your body type…",
+  "Computing your proportions…",
+  "Generating your projection…",
+];
+
+function BodyTypeSelector({ offerHref }: { offerHref: string }) {
+  const [selected, setSelected] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  const current = BODY_TYPE_IMAGES[selected];
+
+  function handleReveal() {
+    setLoading(true);
+    setProgress(0);
+    setLoadingStep(0);
+
+    const totalMs = 3000;
+    const tickMs = 30;
+    let elapsed = 0;
+
+    const interval = setInterval(() => {
+      elapsed += tickMs;
+      const pct = Math.min((elapsed / totalMs) * 100, 100);
+      setProgress(pct);
+      setLoadingStep(Math.floor((pct / 100) * LOADING_STEPS.length));
+      if (elapsed >= totalMs) {
+        clearInterval(interval);
+        setLoading(false);
+        setRevealed(true);
+      }
+    }, tickMs);
+  }
+
+  return (
+    <div id="step-1" style={{ marginTop: 16, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      <div className="f1-steps">
+        <a href="#step-1" className="f1-steps__item f1-steps__item--active">
+          <span className="f1-steps__num">1</span>
+          <span className="f1-steps__label">Assess your body</span>
+        </a>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <a href="#step-2" className={`f1-steps__item ${revealed ? "f1-steps__item--active" : "f1-steps__item--muted"}`}>
+          <span className="f1-steps__num">2</span>
+          <span className="f1-steps__label">Find what&apos;s changeable</span>
+        </a>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <div className="f1-steps__item f1-steps__item--muted">
+          <span className="f1-steps__num">3</span>
+          <span className="f1-steps__label">Decide your commitment</span>
+        </div>
+        <span className="f1-steps__connector" aria-hidden="true" />
+        <div className="f1-steps__item f1-steps__item--muted">
+          <span className="f1-steps__num">4</span>
+          <span className="f1-steps__label">Build your system</span>
+        </div>
+      </div>
+      {loading ? (
+        <div className="f1-scan-loader">
+          <img
+            src={current.before}
+            alt=""
+            aria-hidden="true"
+            className="f1-scan-loader__image"
+          />
+          <div className="f1-scan-loader__overlay" />
+          <div className="f1-scan-loader__grid" />
+          <div className="f1-scan-loader__line" />
+          <div className="f1-scan-loader__corners" />
+          <div className="f1-scan-loader__bottom">
+            <div key={loadingStep} className="f1-scan-loader__step" aria-live="polite" aria-atomic="true">
+              {LOADING_STEPS[Math.min(loadingStep, LOADING_STEPS.length - 1)]}
+            </div>
+            <div className="f1-scan-loader__bar-track">
+              <div className="f1-scan-loader__bar-fill" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        </div>
+      ) : !revealed ? (
+        <>
+          <p style={{
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#799097",
+            margin: 0,
+          }}>
+            Step 1 — Which one is you?
+          </p>
+          <p style={{
+            fontSize: 12,
+            color: "#6b7280",
+            margin: "4px 0 0",
+            textAlign: "center",
+          }}>
+            We&apos;ll show you what your body could look like after 90 days.
+          </p>
+          <p style={{ fontSize: 11, color: "#9ca3af", margin: "2px 0 0", textAlign: "center", fontStyle: "italic" }}>
+            Sample projections shown. Individual results depend on effort, genetics, consistency, and adherence to the protocol.
+          </p>
+          <div className="f1-body-selector" style={{
+            gap: 8,
+            padding: "10px",
+            background: "#f0efec",
+            borderRadius: 16,
+            width: "100%",
+            maxWidth: 680,
+          }}>
+            {BODY_TYPE_IMAGES.map((bt, i) => (
+              <div key={bt.id} style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => setSelected(i)}
+                  aria-label={["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                  aria-pressed={selected === i}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    aspectRatio: "2 / 3",
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    border: selected === i ? "2.5px solid #1a1a1a" : "2.5px solid transparent",
+                    padding: 0,
+                    cursor: "pointer",
+                    background: "#ddd",
+                    transition: "border-color 0.15s ease, transform 0.15s ease",
+                    transform: selected === i ? "scale(1.06)" : "scale(1)",
+                  }}
+                >
+                  <Image
+                    src={bt.before}
+                    alt={["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                    fill
+                    sizes="(max-width: 640px) 22vw, 120px"
+                    style={{ objectFit: "cover", objectPosition: "top" }}
+                  />
+                </button>
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: selected === i ? "#0a0a0a" : "#9ca3af",
+                  transition: "color 0.15s ease",
+                }}>
+                  {["Skinny fat", "Slim", "Average", "Heavy"][i]}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={handleReveal}
+            className="program-hero__cta"
+            style={{ marginTop: 8 }}
+          >
+            <span>See my projection</span>
+            <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
+          </button>
+        </>
+      ) : (
+        <div className="f1-body-reveal f1-body-reveal--wide" style={{ width: "min(440px, calc(100vw - 40px))", marginInline: "auto" }}>
+          {/* Before / After */}
+          <div style={{
+            display: "flex",
+            width: "100%",
+            gap: 0,
+            borderRadius: 16,
+            overflow: "hidden",
+            position: "relative",
+          }}>
+            {/* Before */}
+            <div style={{ flex: 1, minWidth: 0, position: "relative", aspectRatio: "9 / 16" }}>
+              <Image
+                src={current.before}
+                alt="Before"
+                fill
+                sizes="(max-width: 600px) 50vw, 450px"
+                style={{ objectFit: "cover", objectPosition: "top" }}
+              />
+              <span style={{
+                position: "absolute",
+                bottom: 10,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "rgba(0,0,0,0.52)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                borderRadius: 6,
+                padding: "3px 10px",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}>
+                Before
+              </span>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: 2, background: "#fff", flexShrink: 0 }} />
+
+            {/* After */}
+            <div style={{ flex: 1, minWidth: 0, position: "relative", aspectRatio: "9 / 16" }}>
+              <Image
+                src={current.after}
+                alt="After"
+                fill
+                sizes="(max-width: 600px) 50vw, 450px"
+                style={{ objectFit: "cover", objectPosition: "top" }}
+              />
+              <span style={{
+                position: "absolute",
+                bottom: 10,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "rgba(15,15,15,0.65)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                borderRadius: 6,
+                padding: "3px 10px",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}>
+                After
+              </span>
+            </div>
+          </div>
+
+          {/* Caption */}
+          <p style={{
+            margin: "18px 0 4px",
+            fontSize: 20,
+            fontWeight: 600,
+            color: "#1a1a1a",
+            letterSpacing: "-0.03em",
+            textAlign: "center",
+            lineHeight: 1.2,
+          }}>
+            This is what your body type looks like after 90 days of Protocol.
+          </p>
+          <p style={{
+            margin: "0 0 20px",
+            fontSize: 13,
+            color: "#6b7280",
+            textAlign: "center",
+            lineHeight: 1.5,
+          }}>
+            Your proportions, engineered over 90 days.
+          </p>
+
+          {/* CTAs */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <a href="#projections" className="program-hero__cta">
+              <span>See the real-life difference</span>
+              <span className="program-hero__cta-icon" aria-hidden="true"><ArrowIcon /></span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setRevealed(false)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 12,
+                color: "#6b7280",
+                padding: "12px 16px",
+                minHeight: 44,
+              }}
+            >
+              ← Choose another profile
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Icons ──────────────────────────────────────────────────────────────── */
+
+function PlayIcon() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M9 6.5L20 13L9 19.5V6.5Z" fill="white" />
+    </svg>
+  );
+}
 
 function ArrowIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
       <path d="M6 14H22M22 14L14 6M22 14L14 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* ─── SVG Silhouettes ────────────────────────────────────────────────────── */
+
+function SilhouetteNeutral() {
+  return (
+    <svg viewBox="0 0 120 260" fill="none" aria-hidden="true">
+      <ellipse cx="60" cy="24" rx="16" ry="18" fill="currentColor" opacity="0.35" />
+      <rect x="54" y="40" width="12" height="10" rx="4" fill="currentColor" opacity="0.35" />
+      <path d="M34 50 Q28 90 30 130 Q40 138 60 138 Q80 138 90 130 Q92 90 86 50 Q74 44 60 44 Q46 44 34 50Z" fill="currentColor" opacity="0.35" />
+      <path d="M34 54 Q20 80 22 118 Q26 122 30 118 Q32 84 38 60Z" fill="currentColor" opacity="0.25" />
+      <path d="M86 54 Q100 80 98 118 Q94 122 90 118 Q88 84 82 60Z" fill="currentColor" opacity="0.25" />
+      <path d="M44 136 Q38 170 36 210 Q42 216 50 210 Q54 172 58 140Z" fill="currentColor" opacity="0.35" />
+      <path d="M76 136 Q82 170 84 210 Q78 216 70 210 Q66 172 62 140Z" fill="currentColor" opacity="0.35" />
+    </svg>
+  );
+}
+
+function SilhouetteGymBro() {
+  return (
+    <svg viewBox="0 0 120 260" fill="none" aria-hidden="true">
+      <ellipse cx="60" cy="24" rx="16" ry="18" fill="currentColor" opacity="0.4" />
+      <rect x="53" y="40" width="14" height="10" rx="4" fill="currentColor" opacity="0.4" />
+      <path d="M18 50 Q14 90 18 130 Q36 140 60 140 Q84 140 102 130 Q106 90 102 50 Q82 38 60 38 Q38 38 18 50Z" fill="currentColor" opacity="0.4" />
+      <path d="M18 54 Q4 80 6 120 Q10 124 16 120 Q18 84 24 62Z" fill="currentColor" opacity="0.3" />
+      <path d="M102 54 Q116 80 114 120 Q110 124 104 120 Q102 84 96 62Z" fill="currentColor" opacity="0.3" />
+      <path d="M44 138 Q38 172 36 212 Q42 218 50 212 Q54 174 58 142Z" fill="currentColor" opacity="0.4" />
+      <path d="M76 138 Q82 172 84 212 Q78 218 70 212 Q66 174 62 142Z" fill="currentColor" opacity="0.4" />
+    </svg>
+  );
+}
+
+function SilhouetteHero() {
+  return (
+    <svg viewBox="0 0 120 260" fill="none" aria-hidden="true">
+      <ellipse cx="60" cy="24" rx="16" ry="18" fill="currentColor" opacity="0.8" />
+      <rect x="54" y="40" width="12" height="10" rx="4" fill="currentColor" opacity="0.8" />
+      <path d="M22 50 Q18 75 32 110 Q42 128 60 130 Q78 128 88 110 Q102 75 98 50 Q80 40 60 40 Q40 40 22 50Z" fill="currentColor" opacity="0.8" />
+      <path d="M22 54 Q10 80 12 116 Q16 120 22 116 Q24 84 30 62Z" fill="currentColor" opacity="0.65" />
+      <path d="M98 54 Q110 80 108 116 Q104 120 98 116 Q96 84 90 62Z" fill="currentColor" opacity="0.65" />
+      <path d="M46 128 Q40 166 38 208 Q44 214 52 208 Q56 170 60 136Z" fill="currentColor" opacity="0.8" />
+      <path d="M74 128 Q80 166 82 208 Q76 214 68 208 Q64 170 60 136Z" fill="currentColor" opacity="0.8" />
     </svg>
   );
 }
@@ -48,6 +422,7 @@ const RESEARCH_TABS: ResearchTab[] = [
     { titleHtml: "<strong>Better</strong>", description: "Attractive people are perceived as more moral and trustworthy", source: "Shinners (2009). UW-L Journal of Undergraduate Research." },
   ]},
 ];
+
 
 const VERSIONS = [
   { label: "Designer clothes", desc: "You notice the clothes. You don\u2019t notice him.", verdict: "no" as const, img: "/assets/clothes.svg" },
@@ -136,76 +511,126 @@ function VersionsReveal() {
 /* ─── Component ──────────────────────────────────────────────────────────── */
 
 export default function F1Landing() {
-  const [offerHref, setOfferHref] = useState("/f1/offer");
+  const [offerHref, setOfferHref] = useState("/f1-old/offer");
 
   useEffect(() => {
     // Capture UTM params from landing URL, persist to sessionStorage for downstream pages
     const utm = getUtmParams();
     persistUtmParams(utm);
-    setOfferHref(appendUtmToPath("/f1/offer", utm));
+    setOfferHref(appendUtmToPath("/f1-old/offer", utm));
   }, []);
 
   return (
     <div className="program-page program-page--theme-test f1-page">
 
-      {/* ═══ HERO V1 — GQ / Glossy ═══ */}
-      <div className="f1-pub-bar">
-        <div className="f1-pub-bar__left">
-          <div className="f1-pub-section">The Body Issue</div>
-        </div>
-      </div>
-
-      <div className="f1-hero-v1">
-        <Image
-          src="/assets/14-after.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="f1-hero-v1__img"
-          style={{ objectFit: "cover", objectPosition: "top" }}
-        />
-        <div className="f1-hero-v1__overlay" aria-hidden="true" />
-        <div className="f1-hero-v1__text">
-          <div className="f1-hero-v1__kicker">
-            Longform · <em>The shape you&apos;re actually built for</em>
+      {/* ═══ NAV ═══ */}
+      <header className="program-nav">
+        <div className="program-nav__inner">
+          <a href={offerHref} className="program-nav__logo" aria-label="See the offer">
+            <Image src="/program/static/landing/images/shared/Prtcl.png" alt="Protocol" width={44} height={44} className="program-nav__logo-image" />
+          </a>
+          <nav className="program-nav__links" aria-label="Primary">
+            <a href="#research">The research</a>
+            <a href="#reframe">The reframe</a>
+            <a href="#results">Results</a>
+          </nav>
+          <div className="program-nav__actions">
+            <TrackedLink href={offerHref} className="program-nav__cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "nav" }}>
+              Start my Protocol
+</TrackedLink>
           </div>
-          <h1 className="f1-hero-v1__headline">
-            4 steps to improve your <em>physical attractiveness</em>
-          </h1>
-          <p className="f1-hero-v1__deck">
-            A quiet London clinic has spent four years studying what the eye actually reads as attractive in the male body — and built a 12-week protocol around it. For the first time, they&apos;re letting non-patients in.
-          </p>
-          <div className="f1-hero-v1__byline-row">
-            <div className="f1-hero-v1__byline">
-              By <strong>Eleanor Marsh</strong> · Photographs by <strong>Kaspar Lynn</strong> · 3 min read
+        </div>
+      </header>
+
+      {/* ═══ HERO ═══ */}
+      <section className="program-hero">
+        <div className="program-hero__shell">
+          <div className="program-hero__copy">
+            <h1 className="program-hero__title">
+              4 steps to improve your physical attractiveness
+            </h1>
+            <p className="f1-hero__subtitle">Science found the exact formula. Here&apos;s how to use it.</p>
+            <BodyTypeSelector offerHref={offerHref} />
+            <p className="program-hero__trust">
+              <span className="program-hero__trust-item">Based on published research</span>
+              <span className="program-hero__trust-dot" aria-hidden="true" />
+              <span className="program-hero__trust-item">Personalized to your body</span>
+              <span className="program-hero__trust-dot" aria-hidden="true" />
+              <span className="program-hero__trust-item">90-day guarantee</span>
+            </p>
+
+            {/* VSL — planned, not yet ready. Show when video is available.
+                Trigger condition: A/B test or manual flag once video is produced. */}
+            <div className="f1-vsl" style={{ display: "none" }}>
+              <button type="button" className="f1-vsl__play" aria-label="Play video"><PlayIcon /></button>
+              <span className="f1-vsl__label">Watch: the science breakdown</span>
             </div>
-            <a href="#article" className="f1-hero-v1__cta">
-              Read the full piece
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
           </div>
         </div>
+      </section>
+
+      {/* ═══ PROJECTIONS GRID ═══ */}
+      <section id="step-2" className="f1-section f1-projections">
+        <div className="f1-projections__inner">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">Projections</p>
+            <h2 id="projections" className="f1-section__title f1-section__title--sm">
+              Same Man. Different Shape. <span>Different Life.</span>
+            </h2>
+          </div>
+          <div className="f1-projections__grid">
+            {PROJECTIONS.map((p) => (
+              <div key={p.id} className="f1-projections__item">
+                <p className="f1-projections__situation">{p.situation}</p>
+                <div className="f1-projections__row">
+                  <img src={p.before} alt={`${p.situation} — before`} className="f1-projections__img" loading="lazy" />
+                  <img src={p.after} alt={`${p.situation} — after`} className="f1-projections__img" loading="lazy" />
+                </div>
+                <p className="f1-projections__scene">{p.scene}</p>
+              </div>
+            ))}
+          </div>
+          <div className="f1-mid-cta" style={{ marginTop: 16 }}>
+            <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "projections" }}>
+              Start my Protocol <ArrowIcon />
+            </TrackedLink>
+            <p className="f1-cta-sub">Steps 3 and 4 complete on the next page</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ RESEARCH TABS ═══ */}
+      <div id="research">
+        <ResearchImpactSection
+          tabs={RESEARCH_TABS}
+          titleHtml="Your Body Shape Impacts <strong>Every Part of Your Life</strong>"
+          subtitle=""
+        />
       </div>
 
-      <div className="f1-press-strip">
-        <span className="f1-press-strip__label">Also covered by</span>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/press/gq.webp" alt="GQ" className="f1-press-strip__logo" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/press/wired.webp" alt="Wired" className="f1-press-strip__logo" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/press/the-guardian.webp" alt="The Guardian" className="f1-press-strip__logo" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/press/business-insider.webp" alt="Business Insider" className="f1-press-strip__logo" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/press/mit-technology-review.webp" alt="MIT Tech Review" className="f1-press-strip__logo" />
+      {/* ═══ SHAPE FRAME ═══ */}
+      <section className="f1-section f1-shape" id="shape">
+        <div className="f1-shape__inner">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">The research</p>
+            <h2 className="f1-section__title f1-section__title--sm">
+              The #1 Factor Is Your Shape. <span>And It&apos;s the One You Can Change.</span>
+            </h2>
+          </div>
+          <p className="f1-body">Your face and your height are mostly fixed. According to hundreds of studies in social cognitive science point to the same finding.</p>
+          <p className="f1-body">Your shape is not. It is the single most powerful attractiveness variable you can actually engineer. Most men do not know it exists.</p>
+        </div>
+      </section>
+
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "research" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
       </div>
 
       {/* ═══ LISTICLE ═══ */}
-      <section id="article" className="f1-section">
+      <section className="f1-section">
         <div className="f1-listicle">
 
           <div className="f1-listicle__item f1-listicle__item--media-right">
@@ -214,7 +639,7 @@ export default function F1Landing() {
               <h3 className="f1-listicle__title">A scientific full-body analysis.</h3>
 
               <p className="f1-body">Most programs put you in a box. Ectomorph, mesomorph, endomorph. They hand you a cookie-cutter plan.</p>
-              <p className="f1-body">This protocol runs a complete scientific analysis of your body. Every proportion and structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
+              <p className="f1-body">Protocol runs a complete scientific analysis of your body. Every proportion and structural element that published research has linked to perceived attractiveness gets measured and benchmarked against your profile.</p>
               <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_01" }}>
                 Start attractiveness Protocol <ArrowIcon />
               </TrackedLink>
@@ -231,8 +656,9 @@ export default function F1Landing() {
             <div className="f1-listicle__content">
               <div className="f1-listicle__num">02</div>
               <h3 className="f1-listicle__title">According to social psychology, attractiveness is contextual.</h3>
-              <p className="f1-body">The ideal physique is not a fixed target. It depends on your facial structure, your frame, your age, and the social environment you operate in.</p>
-              <p className="f1-body">An office lawyer with soft features has a different shoulder-to-waist target than a construction foreman with a strong jaw.</p>
+              <p className="f1-body">Your ideal physique is not a fixed target. It depends on your facial structure, your frame, your age, and the social environment you operate in.</p>
+              <p className="f1-body">An office lawyer with soft features has a different shoulder-to-waist target than a construction foreman with a strong jaw. Same science. Different targets. Copying someone else&apos;s physique does not work.</p>
+              <p className="f1-body">Protocol reads all of these variables before designing your plan.</p>
               <TrackedLink href={offerHref} className="f1-cta f1-cta--inline" eventName="f1_cta_clicked" eventParams={{ cta_location: "listicle_02" }}>
                 Start attractiveness Protocol <ArrowIcon />
               </TrackedLink>
@@ -270,76 +696,6 @@ export default function F1Landing() {
 
       <div className="f1-mid-cta">
         <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "mid" }}>
-          Start attractiveness Protocol <ArrowIcon />
-        </TrackedLink>
-        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
-      </div>
-
-      {/* ═══ TESTIMONIALS ═══ */}
-      <section className="f1-section">
-        <div className="f1-testimonials">
-          <div className="f1-section__header">
-            <p className="f1-section__eyebrow">Results</p>
-            <h2 className="f1-section__title f1-section__title--sm">Different Bodies. <span>Same Science.</span></h2>
-          </div>
-          <div className="f1-testimonial-grid">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="f1-testimonial-card">
-                <div className="f1-testimonial-card__images">
-                  <div className="f1-testimonial-card__img-wrap">
-                    <Image src={t.before} alt={`${t.name} before`} fill sizes="(max-width: 900px) 40vw, 200px" />
-                    <span className="f1-testimonial-card__img-label">Before</span>
-                  </div>
-                  <div className="f1-testimonial-card__img-wrap">
-                    <Image src={t.after} alt={`${t.name} after`} fill sizes="(max-width: 900px) 40vw, 200px" />
-                    <span className="f1-testimonial-card__img-label">After</span>
-                  </div>
-                </div>
-                <div className="f1-testimonial-card__obj">Objection: &ldquo;{t.obj}&rdquo;</div>
-                <p className="f1-testimonial-card__quote">&ldquo;{t.quote}&rdquo;</p>
-                <div className="f1-testimonial-card__name">{t.name}</div>
-                <div className="f1-testimonial-card__detail">{t.detail}</div>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", marginTop: 16, fontStyle: "italic" }}>
-            Results are not typical. Individual results vary. Testimonials reflect personal experiences and do not guarantee similar outcomes.
-          </p>
-        </div>
-      </section>
-
-      <div className="f1-mid-cta">
-        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "testimonials" }}>
-          Start attractiveness Protocol <ArrowIcon />
-        </TrackedLink>
-        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
-      </div>
-
-      {/* ═══ RESEARCH TABS ═══ */}
-      <div id="research">
-        <ResearchImpactSection
-          tabs={RESEARCH_TABS}
-          titleHtml="Your Physical Attractiveness Impacts <strong>Every Part Of Your Life</strong>"
-          subtitle=""
-        />
-      </div>
-
-      {/* ═══ SHAPE FRAME ═══ */}
-      <section className="f1-section f1-shape" id="shape">
-        <div className="f1-shape__inner">
-          <div className="f1-section__header">
-            <p className="f1-section__eyebrow">The research</p>
-            <h2 className="f1-section__title f1-section__title--sm">
-              The #1 Factor Is Your Shape. <span>And It&apos;s the One You Can Change.</span>
-            </h2>
-          </div>
-          <p className="f1-body">Your face and your height are mostly fixed. According to hundreds of studies in social cognitive science point to the same finding.</p>
-          <p className="f1-body">Your shape is not. It is the single most powerful attractiveness variable you can actually engineer. Most men do not know it exists.</p>
-        </div>
-      </section>
-
-      <div className="f1-mid-cta">
-        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "research" }}>
           Start attractiveness Protocol <ArrowIcon />
         </TrackedLink>
         <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
@@ -434,6 +790,46 @@ export default function F1Landing() {
 
       <div className="f1-mid-cta">
         <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "proof" }}>
+          Start attractiveness Protocol <ArrowIcon />
+        </TrackedLink>
+        <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>
+      </div>
+
+      {/* ═══ TESTIMONIALS ═══ */}
+      <section className="f1-section">
+        <div className="f1-testimonials">
+          <div className="f1-section__header">
+            <p className="f1-section__eyebrow">Results</p>
+            <h2 className="f1-section__title f1-section__title--sm">Different Bodies. <span>Same Science.</span></h2>
+          </div>
+          <div className="f1-testimonial-grid">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="f1-testimonial-card">
+                <div className="f1-testimonial-card__images">
+                  <div className="f1-testimonial-card__img-wrap">
+                    <Image src={t.before} alt={`${t.name} before`} fill sizes="(max-width: 900px) 40vw, 200px" />
+                    <span className="f1-testimonial-card__img-label">Before</span>
+                  </div>
+                  <div className="f1-testimonial-card__img-wrap">
+                    <Image src={t.after} alt={`${t.name} after`} fill sizes="(max-width: 900px) 40vw, 200px" />
+                    <span className="f1-testimonial-card__img-label">After</span>
+                  </div>
+                </div>
+                <div className="f1-testimonial-card__obj">Objection: &ldquo;{t.obj}&rdquo;</div>
+                <p className="f1-testimonial-card__quote">&ldquo;{t.quote}&rdquo;</p>
+                <div className="f1-testimonial-card__name">{t.name}</div>
+                <div className="f1-testimonial-card__detail">{t.detail}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", marginTop: 16, fontStyle: "italic" }}>
+            Results are not typical. Individual results vary. Testimonials reflect personal experiences and do not guarantee similar outcomes.
+          </p>
+        </div>
+      </section>
+
+      <div className="f1-mid-cta">
+        <TrackedLink href={offerHref} className="f1-cta" eventName="f1_cta_clicked" eventParams={{ cta_location: "testimonials" }}>
           Start attractiveness Protocol <ArrowIcon />
         </TrackedLink>
         <p className="f1-cta-sub">Based on 5 years of published research &middot; Personalized to your body</p>

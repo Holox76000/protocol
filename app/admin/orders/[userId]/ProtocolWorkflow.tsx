@@ -34,17 +34,33 @@ type Props = {
   initialStatus:           string;
   initialMetrics:          CalibrationMetrics | null;
   beforeAfterPreviewPath?: string | null;
+  protocolViewedAt?:       string | null;
 };
 
-export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics, beforeAfterPreviewPath }: Props) {
+export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics, beforeAfterPreviewPath, protocolViewedAt }: Props) {
   const [step,    setStep]    = useState<"calibrate" | "before-after">(initialMetrics ? "before-after" : "calibrate");
   const [metrics] = useState<CalibrationMetrics | null>(initialMetrics);
   const [status,          setStatus]          = useState(initialStatus);
   const [delivering,      setDelivering]      = useState(false);
   const [confirmDeliver,  setConfirmDeliver]  = useState(false);
   const [deliverError,    setDeliverError]    = useState<string | null>(null);
+  const [unlocking,       setUnlocking]       = useState(false);
+  const [unlockError,     setUnlockError]     = useState<string | null>(null);
 
   const isDelivered = status === "delivered";
+  const isInReview  = status === "in_review";
+
+  const handleUnlock = async () => {
+    setUnlocking(true);
+    setUnlockError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${userId}/unlock-questionnaire`, { method: "POST" });
+      const d = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) setUnlockError(d.error ?? "Failed to unlock.");
+      else setStatus("questionnaire_submitted");
+    } catch { setUnlockError("Network error."); }
+    finally { setUnlocking(false); }
+  };
 
   const handleDeliver = async () => {
     if (!confirmDeliver) {
@@ -164,6 +180,27 @@ export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics
         />
       )}
 
+      {/* Unlock questionnaire */}
+      {isInReview && (
+        <div className="border-t border-wire pt-4 space-y-2">
+          {unlockError && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-600">{unlockError}</p>
+          )}
+          <button
+            onClick={handleUnlock}
+            disabled={unlocking}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-wire bg-white px-4 py-2.5 text-[12px] font-semibold text-dim transition-colors hover:border-void hover:text-void disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {unlocking ? (
+              <>
+                <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
+                Unlocking…
+              </>
+            ) : "Unlock questionnaire for edits"}
+          </button>
+        </div>
+      )}
+
       {/* Deliver */}
       <div className="border-t border-wire pt-4 space-y-2">
         {isDelivered && (
@@ -171,6 +208,17 @@ export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics
             <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-700">
               Delivered
             </span>
+            {protocolViewedAt ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Viewed
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                Not viewed
+              </span>
+            )}
           </div>
         )}
         {deliverError && (
