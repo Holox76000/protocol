@@ -5,6 +5,7 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 import OrderPhotoViewer from "./OrderPhotoViewer";
 import ProtocolWorkflow from "./ProtocolWorkflow";
 import MetricsPanel from "../../../protocol/MetricsPanel";
+import ImpersonateButton from "./ImpersonateButton";
 import type { OverlayPoints, CalibrationMetrics } from "./PhotoCalibrator";
 import type { ProtocolQuestionnaire } from "./ProtocolEditor";
 
@@ -153,8 +154,9 @@ export default async function OrderDetailPage({
             <p className="text-[13px] text-dim">{user.email as string}</p>
           </div>
           <div className="flex items-center gap-3">
+            <ImpersonateButton userId={userId} />
             <Link
-              href={`/protocol/${encodeURIComponent(user.email as string)}`}
+              href={`/protocol/${encodeURIComponent(user.email as string)}/summary`}
               className="inline-flex items-center gap-1.5 rounded-lg border border-wire bg-white px-3.5 py-2 text-[12px] font-semibold text-void transition-colors hover:border-void hover:bg-ash"
             >
               Protocol →
