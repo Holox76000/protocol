@@ -5,6 +5,8 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 
 export const runtime = "nodejs";
 
+const FORWARD_TO = "patrypierreandre@gmail.com";
+
 type InboundEmailData = {
   email_id: string;
   to: string[];
@@ -93,6 +95,20 @@ export async function POST(request: Request) {
     console.error("[webhook/resend-inbound] DB insert failed", { error: dbError.message, userId });
   } else {
     console.log("[webhook/resend-inbound] Inbound message stored", { userId, emailId });
+  }
+
+  // Forward a copy to the admin inbox
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: "Protocol Inbound <noreply@protocol-club.com>",
+      to: FORWARD_TO,
+      subject: `[Reply from client] ${event.data.subject ?? "(no subject)"}`,
+      replyTo: event.data.from,
+      text: `From: ${event.data.from}\nUser ID: ${userId}\n\n${body}`,
+    });
+  } catch (err) {
+    console.error("[webhook/resend-inbound] Forward failed", { error: String(err) });
   }
 
   return NextResponse.json({ received: true });
