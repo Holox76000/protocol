@@ -327,6 +327,19 @@ export default function ProtocolSidebarLayout({
             })}
           </nav>
 
+          {/* Logout */}
+          <div className="border-t border-wire p-2.5">
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-dim transition-colors hover:bg-ash hover:text-void"
+              >
+                <span className="shrink-0 w-4 text-center text-[11px] opacity-40">↩</span>
+                <span className="text-[12.5px] font-medium">Log out</span>
+              </button>
+            </form>
+          </div>
+
         </aside>
 
         {/* ── Main content ─────────────────────────────────────────────────── */}
