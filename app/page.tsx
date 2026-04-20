@@ -1,11 +1,12 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import F1OfferPage from "./f1/offer/F1OfferPage";
 
-export default function HomePage({
-  searchParams,
-}: {
-  searchParams?: Record<string, string>;
-}) {
-  const qs = searchParams ? new URLSearchParams(searchParams as Record<string, string>).toString() : "";
-  const destination = qs ? `/offer?${qs}` : "/offer";
-  redirect(destination);
+export const metadata: Metadata = {
+  title: "Protocol Club - Start your body glow up",
+  description:
+    "AI body analysis of your proportions. A 3-month training protocol built for attractiveness, not muscle size. Ask anything to the experts. $89 one-time.",
+};
+
+export default function HomePage() {
+  return <F1OfferPage />;
 }
