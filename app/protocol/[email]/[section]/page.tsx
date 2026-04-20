@@ -46,7 +46,8 @@ export default async function ProtocolSectionPage({
 
   // Dual auth: admin OR the client who owns this email.
   let isAdmin = false;
-  const adminCheck = await requireAdmin().then(() => true).catch(() => false);
+  const adminUser = await requireAdmin();
+  const adminCheck = adminUser !== null;
 
   if (adminCheck) {
     // Admin can force client view via ?as=client
@@ -60,6 +61,13 @@ export default async function ProtocolSectionPage({
     if (user.email.toLowerCase() !== email.toLowerCase()) notFound();
     if (!user.has_paid || user.protocol_status !== "delivered") redirect("/dashboard");
     isAdmin = false;
+
+    // Track first view for NPS trigger — idempotent (WHERE IS NULL).
+    void supabaseAdmin
+      .from("users")
+      .update({ protocol_viewed_at: new Date().toISOString() })
+      .eq("id", user.id)
+      .is("protocol_viewed_at", null);
   }
 
   if (!VALID_SECTIONS.has(params.section)) notFound();
