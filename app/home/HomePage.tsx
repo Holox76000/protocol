@@ -1,21 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import AestheticTestsSection from "../../program/AestheticTestsSection";
-import CompleteFacialAnalysisSection from "../../program/CompleteFacialAnalysisSection";
-import PersonalizedSection from "../../program/PersonalizedSection";
-import InformativeSection from "../../program/InformativeSection";
+import AestheticTestsSection from "../program/AestheticTestsSection";
+import CompleteFacialAnalysisSection from "../program/CompleteFacialAnalysisSection";
+import PersonalizedSection from "../program/PersonalizedSection";
+import InformativeSection from "../program/InformativeSection";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { trackGa4Event } from "../../../lib/ga4Event";
-import { trackEvent } from "../../../lib/analytics";
-import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
-import TrackedLink from "../../tracked-link";
+import { trackGa4Event } from "../../lib/ga4Event";
+import { trackEvent } from "../../lib/analytics";
+import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
+import TrackedLink from "../tracked-link";
 import "../../program/program.css";
-import "../f1.css";
-import "./f1-offer.css";
+import "../f1/f1.css";
+import "./home.css";
 
-const BeforeAfterSlider = dynamic(() => import("../../program/BeforeAfterSlider"), { ssr: false });
+const BeforeAfterSlider = dynamic(() => import("../program/BeforeAfterSlider"), { ssr: false });
 
 /* ─── Icons ──────────────────────────────────────────────────────────────── */
 
@@ -363,7 +363,7 @@ function ReportSlider() {
   );
 }
 
-export default function F1OfferPage() {
+export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [signupHref, setSignupHref] = useState("/register");
   const testimonialsRef = useRef<HTMLDivElement>(null);
