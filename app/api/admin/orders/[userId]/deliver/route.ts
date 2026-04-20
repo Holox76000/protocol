@@ -16,16 +16,26 @@ export async function POST(
 
   const { userId } = params;
 
-  // Guard: protocol must exist and have content
+  // Guard: protocol must exist and have at least one section with content
   const { data: protocol } = await supabaseAdmin
     .from("protocols")
-    .select("content")
+    .select("summary, nutrition_plan_content, workout_plan_content, sleeping_advices_content, action_plan_content, supplement_protocol_content, posture_analysis_content")
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (!protocol || !protocol.content?.trim()) {
+  const hasContent = protocol && (
+    protocol.summary?.trim() ||
+    protocol.nutrition_plan_content?.trim() ||
+    protocol.workout_plan_content?.trim() ||
+    protocol.sleeping_advices_content?.trim() ||
+    protocol.action_plan_content?.trim() ||
+    protocol.supplement_protocol_content?.trim() ||
+    protocol.posture_analysis_content?.trim()
+  );
+
+  if (!hasContent) {
     return NextResponse.json(
-      { error: "Protocol content is empty. Save a draft before delivering." },
+      { error: "Protocol has no content. Generate sections before delivering." },
       { status: 400 }
     );
   }
@@ -39,17 +49,18 @@ export async function POST(
 
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  if (user.protocol_status === "delivered") {
-    return NextResponse.json({ error: "Already delivered" }, { status: 409 });
-  }
+  const isRedelivery = user.protocol_status === "delivered";
 
-  // Mark as delivered in both tables
+  // Mark as delivered — on re-delivery, also reset protocol_viewed_at so NPS re-triggers
   const now = new Date().toISOString();
+
+  const userUpdateFields: Record<string, string | null> = { protocol_status: "delivered" };
+  if (isRedelivery) userUpdateFields.protocol_viewed_at = null;
 
   const [userUpdate, protocolUpdate] = await Promise.all([
     supabaseAdmin
       .from("users")
-      .update({ protocol_status: "delivered" })
+      .update(userUpdateFields)
       .eq("id", userId),
     supabaseAdmin
       .from("protocols")
@@ -69,12 +80,12 @@ export async function POST(
   void sendProtocolDeliveredEmail({
     email: user.email,
     firstName: user.first_name,
-    dashboardUrl: `${SITE_URL}/protocol`,
+    dashboardUrl: `${SITE_URL}/protocol/${encodeURIComponent(user.email)}/summary`,
   }).catch((err) =>
     console.error("[admin/deliver] Protocol delivered email failed", { error: String(err) })
   );
 
-  console.log("[admin/deliver] Protocol delivered", { userId, email: user.email });
+  console.log("[admin/deliver] Protocol delivered", { userId, email: user.email, redelivery: isRedelivery });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, redelivery: isRedelivery });
 }
