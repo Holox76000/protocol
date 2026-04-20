@@ -6,6 +6,9 @@
 export const TONE_OF_VOICE = `
 ## Tone of Voice: Non-Negotiable Writing Rules
 
+### Language
+Always write in English. This is an absolute requirement. Do not write in French or any other language, regardless of the language used in client data, questionnaire answers, or any other context.
+
 ### Voice and posture
 Write as a senior specialist at a high-end clinic: clear, authoritative, pedagogical. Not a wellness coach, not a personal trainer, not a motivational speaker. Quiet expertise with no overselling.
 
