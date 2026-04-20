@@ -86,6 +86,7 @@ type Props = {
   weightKg?:              number;
   sessionsPerWeek?:       number;
   isAdmin?:               boolean;
+  isClientSession?:       boolean; // true when a real client is viewing (hides all admin banners)
   initialSection:         SectionId;
   initialBeforeUrl:       string | null;
   initialAfterUrl:        string | null;
@@ -114,6 +115,7 @@ export default function ProtocolSidebarLayout({
   weightKg,
   sessionsPerWeek,
   isAdmin = true,
+  isClientSession = false,
   initialSection,
   initialBeforeUrl,
   initialAfterUrl,
@@ -250,7 +252,7 @@ export default function ProtocolSidebarLayout({
             </div>
           </div>
         </div>
-      ) : email && (
+      ) : !isClientSession && email && (
         <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-600">

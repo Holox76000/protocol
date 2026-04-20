@@ -154,6 +154,7 @@ export default async function ProtocolSectionPage({
       weightKg={weightKg}
       sessionsPerWeek={sessionsPerWeek}
       isAdmin={isAdmin}
+      isClientSession={!adminCheck}
       initialBeforeUrl={photoFront}
       initialAfterUrl={initialAfterUrl}
       summary={summary}
