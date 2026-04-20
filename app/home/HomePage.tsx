@@ -403,6 +403,7 @@ export default function HomePage() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="program-nav__actions">
+            <a href="/login" className="f1-offer-nav__login">Log in</a>
             <CtaButton label="Start — $89" className="f1-offer-nav__cta" location="nav" href={signupHref} />
           </div>
         </div>
