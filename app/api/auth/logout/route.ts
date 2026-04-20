@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const response = NextResponse.redirect(new URL("/login", request.url));
+  const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
