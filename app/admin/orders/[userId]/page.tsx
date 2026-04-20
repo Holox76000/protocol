@@ -7,7 +7,7 @@ import ProtocolWorkflow from "./ProtocolWorkflow";
 import MetricsPanel from "../../../protocol/MetricsPanel";
 import ImpersonateButton from "./ImpersonateButton";
 import type { OverlayPoints, CalibrationMetrics } from "./PhotoCalibrator";
-import type { ProtocolQuestionnaire } from "./ProtocolEditor";
+import type { ProtocolQuestionnaire } from "./types";
 
 export const runtime = "nodejs";
 
@@ -91,7 +91,7 @@ export default async function OrderDetailPage({
       .maybeSingle(),
     supabaseAdmin
       .from("protocols")
-      .select("content, delivered_at, overlay_points, metrics, before_after_preview_path")
+      .select("delivered_at, overlay_points, metrics, before_after_preview_path")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -100,7 +100,6 @@ export default async function OrderDetailPage({
 
   const user = userResult.data;
   const qr = (qrResult.data ?? {}) as Record<string, unknown>;
-  const protocolContent       = (protocolResult.data?.content                  as string)                    ?? "";
   const overlayPoints         = (protocolResult.data?.overlay_points           as OverlayPoints | null)       ?? null;
   const calibrationMetrics    = (protocolResult.data?.metrics                  as CalibrationMetrics | null)  ?? null;
   const beforeAfterPreviewPath = (protocolResult.data?.before_after_preview_path as string | null)            ?? null;
@@ -314,10 +313,8 @@ export default async function OrderDetailPage({
             <div className="rounded-2xl border border-wire bg-white p-6">
               <ProtocolWorkflow
                 userId={userId}
-                initialContent={protocolContent}
                 initialStatus={status}
                 initialMetrics={calibrationMetrics}
-                questionnaire={questionnaire}
                 beforeAfterPreviewPath={beforeAfterPreviewPath}
               />
             </div>

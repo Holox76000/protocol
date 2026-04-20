@@ -2,9 +2,8 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import ProtocolEditor from "./ProtocolEditor";
 import type { CalibrationMetrics } from "./PhotoCalibrator";
-import type { ProtocolQuestionnaire } from "./ProtocolEditor";
+import type { ProtocolQuestionnaire } from "./types";
 
 const RANGES: Record<keyof CalibrationMetrics, [number, number]> = {
   swr: [1.41, 1.63], cwr: [1.25, 1.35], bf: [10, 17],
@@ -32,16 +31,37 @@ function metricStatus(key: keyof CalibrationMetrics, value: number): "good" | "w
 
 type Props = {
   userId:                  string;
-  initialContent:          string;
   initialStatus:           string;
   initialMetrics:          CalibrationMetrics | null;
-  questionnaire?:          ProtocolQuestionnaire;
   beforeAfterPreviewPath?: string | null;
 };
 
-export default function ProtocolWorkflow({ userId, initialContent, initialStatus, initialMetrics, questionnaire, beforeAfterPreviewPath }: Props) {
-  const [step,    setStep]    = useState<"calibrate" | "write" | "before-after">(initialMetrics ? "write" : "calibrate");
+export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics, beforeAfterPreviewPath }: Props) {
+  const [step,    setStep]    = useState<"calibrate" | "before-after">(initialMetrics ? "before-after" : "calibrate");
   const [metrics] = useState<CalibrationMetrics | null>(initialMetrics);
+  const [status,          setStatus]          = useState(initialStatus);
+  const [delivering,      setDelivering]      = useState(false);
+  const [confirmDeliver,  setConfirmDeliver]  = useState(false);
+  const [deliverError,    setDeliverError]    = useState<string | null>(null);
+
+  const isDelivered = status === "delivered";
+
+  const handleDeliver = async () => {
+    if (!confirmDeliver) {
+      setConfirmDeliver(true);
+      setTimeout(() => setConfirmDeliver(false), 4000);
+      return;
+    }
+    setDelivering(true);
+    setDeliverError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${userId}/deliver`, { method: "POST" });
+      const d = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) setDeliverError(d.error ?? "Delivery failed.");
+      else { setStatus("delivered"); setConfirmDeliver(false); }
+    } catch { setDeliverError("Network error."); }
+    finally { setDelivering(false); }
+  };
 
   const calibrated = metrics !== null;
 
@@ -51,11 +71,10 @@ export default function ProtocolWorkflow({ userId, initialContent, initialStatus
       <div className="flex gap-1 rounded-xl border border-wire bg-ash p-1">
         {([
           { id: "calibrate"    as const, label: "1 · Calibration" },
-          { id: "write"        as const, label: "2 · Protocole"   },
-          { id: "before-after" as const, label: "3 · Before/After" },
+          { id: "before-after" as const, label: "2 · Before/After" },
         ]).map(({ id, label }) => {
           const isActive   = step === id;
-          const isDisabled = (id === "write" || id === "before-after") && !calibrated;
+          const isDisabled = id === "before-after" && !calibrated;
           return (
             <button
               key={id}
@@ -105,10 +124,10 @@ export default function ProtocolWorkflow({ userId, initialContent, initialStatus
                 Edit calibration →
               </Link>
               <button
-                onClick={() => setStep("write")}
+                onClick={() => setStep("before-after")}
                 className="flex w-full items-center justify-center rounded-lg bg-void px-4 py-2.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#1a1a1b]"
               >
-                Write protocol →
+                Before/After →
               </button>
             </>
           ) : (
@@ -137,17 +156,6 @@ export default function ProtocolWorkflow({ userId, initialContent, initialStatus
         </div>
       )}
 
-      {/* Write step */}
-      {step === "write" && (
-        <ProtocolEditor
-          userId={userId}
-          initialContent={initialContent}
-          initialStatus={initialStatus}
-          metrics={metrics}
-          questionnaire={questionnaire}
-        />
-      )}
-
       {/* Before/After step */}
       {step === "before-after" && (
         <BeforeAfterGenerator
@@ -155,6 +163,37 @@ export default function ProtocolWorkflow({ userId, initialContent, initialStatus
           hasExistingPreview={!!beforeAfterPreviewPath}
         />
       )}
+
+      {/* Deliver */}
+      <div className="border-t border-wire pt-4 space-y-2">
+        {isDelivered && (
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-700">
+              Delivered
+            </span>
+          </div>
+        )}
+        {deliverError && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-600">{deliverError}</p>
+        )}
+        <button
+          onClick={handleDeliver}
+          disabled={delivering}
+          className={`flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-[12px] font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+            confirmDeliver
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-void text-white hover:bg-[#1a1a1b]"
+          }`}
+        >
+          {delivering
+            ? "Delivering…"
+            : confirmDeliver
+            ? "Confirm — this will notify the client"
+            : isDelivered
+            ? "Re-deliver"
+            : "Mark as delivered"}
+        </button>
+      </div>
     </div>
   );
 }
