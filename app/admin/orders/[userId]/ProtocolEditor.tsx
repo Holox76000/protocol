@@ -477,33 +477,33 @@ export default function ProtocolEditor({
         <p className="rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-600">{error}</p>
       )}
 
-      {!isDelivered && (
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex w-full items-center justify-center rounded-lg border border-wire bg-white px-4 py-2.5 text-[12px] font-semibold text-void transition-colors hover:bg-ash disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Save draft"}
-          </button>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex w-full items-center justify-center rounded-lg border border-wire bg-white px-4 py-2.5 text-[12px] font-semibold text-void transition-colors hover:bg-ash disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save draft"}
+        </button>
 
-          <button
-            onClick={handleDeliver}
-            disabled={delivering}
-            className={`flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-[12px] font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-              confirmDeliver
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-void text-white hover:bg-[#1a1a1b]"
-            }`}
-          >
-            {delivering
-              ? "Delivering…"
-              : confirmDeliver
-              ? "Confirm — this will notify the client"
-              : "Mark as delivered"}
-          </button>
-        </div>
-      )}
+        <button
+          onClick={handleDeliver}
+          disabled={delivering}
+          className={`flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-[12px] font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+            confirmDeliver
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-void text-white hover:bg-[#1a1a1b]"
+          }`}
+        >
+          {delivering
+            ? "Delivering…"
+            : confirmDeliver
+            ? "Confirm — this will notify the client"
+            : isDelivered
+            ? "Re-deliver"
+            : "Mark as delivered"}
+        </button>
+      </div>
     </div>
   );
 }
