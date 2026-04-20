@@ -407,7 +407,7 @@ export async function sendExpertMessage(props: {
   const { data, error } = await resend.emails.send({
     from: FROM_EXPERT,
     to: props.email,
-    reply_to: `reply+${props.userId}@${inboundDomain}`,
+    replyTo: `reply+${props.userId}@${inboundDomain}`,
     subject: "A message from your Protocol expert",
     html: emailShell(content),
   });
