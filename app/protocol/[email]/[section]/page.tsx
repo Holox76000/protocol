@@ -1,5 +1,7 @@
-import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 import { requireAdmin } from "../../../../lib/adminAuth";
+import { validateSession, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import ProtocolSidebarLayout, { type SectionId } from "../../ProtocolSidebarLayout";
 import type { CalibrationMetrics, OverlayPoints } from "../../../admin/orders/[userId]/PhotoCalibrator";
@@ -35,14 +37,32 @@ async function signedUrl(path: string | null): Promise<string | null> {
 
 export default async function ProtocolSectionPage({
   params,
+  searchParams,
 }: {
   params: { email: string; section: string };
+  searchParams: { as?: string };
 }) {
-  await requireAdmin();
+  const email = decodeURIComponent(params.email);
+
+  // Dual auth: admin OR the client who owns this email.
+  let isAdmin = false;
+  const adminCheck = await requireAdmin().then(() => true).catch(() => false);
+
+  if (adminCheck) {
+    // Admin can force client view via ?as=client
+    isAdmin = searchParams.as !== "client";
+  } else {
+    // Not admin — check if it's the actual client.
+    const sessionToken = cookies().get(SESSION_COOKIE_NAME)?.value;
+    if (!sessionToken) redirect(`/login?next=/protocol/${encodeURIComponent(email)}/${params.section}`);
+    const user = await validateSession(sessionToken);
+    if (!user) redirect(`/login?next=/protocol/${encodeURIComponent(email)}/${params.section}`);
+    if (user.email.toLowerCase() !== email.toLowerCase()) notFound();
+    if (!user.has_paid || user.protocol_status !== "delivered") redirect("/dashboard");
+    isAdmin = false;
+  }
 
   if (!VALID_SECTIONS.has(params.section)) notFound();
-
-  const email = decodeURIComponent(params.email);
 
   const needsPhotos = PHOTO_SECTIONS.has(params.section);
 
@@ -125,7 +145,7 @@ export default async function ProtocolSectionPage({
       age={age}
       weightKg={weightKg}
       sessionsPerWeek={sessionsPerWeek}
-      isAdmin={true}
+      isAdmin={isAdmin}
       initialBeforeUrl={photoFront}
       initialAfterUrl={initialAfterUrl}
       summary={summary}

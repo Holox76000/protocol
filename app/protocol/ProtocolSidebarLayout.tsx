@@ -228,19 +228,43 @@ export default function ProtocolSidebarLayout({
   return (
     <div className="min-h-screen bg-white">
       {/* Admin banner */}
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
-        <div className="flex items-center justify-between">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 truncate">
-            Admin — {email}
-          </p>
-          <Link
-            href={`/admin/orders/${userId}`}
-            className="ml-3 shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900"
-          >
-            ← Order
-          </Link>
+      {isAdmin ? (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 truncate">
+              Admin — {email}
+            </p>
+            <div className="ml-3 flex shrink-0 items-center gap-4">
+              <a
+                href={`/protocol/${encodeURIComponent(email ?? "")}/${active}?as=client`}
+                className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900"
+              >
+                View as client →
+              </a>
+              <Link
+                href={`/admin/orders/${userId}`}
+                className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900"
+              >
+                ← Order
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : email && (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-600">
+              Admin preview — client view
+            </p>
+            <a
+              href={`/protocol/${encodeURIComponent(email)}/${active}`}
+              className="ml-3 shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900"
+            >
+              ← Back to admin view
+            </a>
+          </div>
+        </div>
+      )}
 
       <div className="flex min-h-0 flex-1">
         {/* ── Sidebar — desktop only ───────────────────────────────────────── */}
@@ -458,6 +482,7 @@ export default function ProtocolSidebarLayout({
               <GeneratedSection
                 sectionKey="action-plan"
                 userId={userId}
+                isAdmin={isAdmin}
                 label="Action Plan"
                 description={`Synthesizes the nutrition, workout, and sleep protocol into a prioritized transformation roadmap for ${firstName}.`}
                 content={sectionStateMap["action-plan"].content}
@@ -497,6 +522,7 @@ export default function ProtocolSidebarLayout({
               <GeneratedSection
                 sectionKey="nutrition-plan"
                 userId={userId}
+                isAdmin={isAdmin}
                 label="Nutrition Plan"
                 description={`Personalized caloric targets, macros, food choices, and a 90-day meal plan for ${firstName}.`}
                 content={sectionStateMap["nutrition-plan"].content}
@@ -508,6 +534,7 @@ export default function ProtocolSidebarLayout({
               <GeneratedSection
                 sectionKey="supplement-protocol"
                 userId={userId}
+                isAdmin={isAdmin}
                 label="Supplement Protocol"
                 description={`Evidence-based supplement stack for ${firstName} — current assessment, recommended stack, and a full timing & dosing protocol.`}
                 content={sectionStateMap["supplement-protocol"].content}
@@ -523,6 +550,7 @@ export default function ProtocolSidebarLayout({
                 <GeneratedSection
                   sectionKey="workout-plan"
                   userId={userId}
+                  isAdmin={isAdmin}
                   label="Workout Plan"
                   description={`A structured training program for ${firstName} based on their experience, session availability, equipment, and physique targets.`}
                   content={sectionStateMap["workout-plan"].content}
@@ -645,6 +673,7 @@ export default function ProtocolSidebarLayout({
               <GeneratedSection
                 sectionKey="sleeping-advices"
                 userId={userId}
+                isAdmin={isAdmin}
                 label="Sleeping Advices"
                 description={`A complete sleep optimization protocol for ${firstName} — routines, environment, cortisol management, and supplement timing.`}
                 content={sectionStateMap["sleeping-advices"].content}
@@ -664,6 +693,7 @@ export default function ProtocolSidebarLayout({
                 <GeneratedSection
                   sectionKey="posture-analysis"
                   userId={userId}
+                  isAdmin={isAdmin}
                   label="Posture Analysis"
                   description={`A personalized posture assessment and correction protocol for ${firstName} — alignment analysis, root causes, and a 12-week correction plan.`}
                   content={sectionStateMap["posture-analysis"].content}
@@ -1221,6 +1251,7 @@ function GeneratedSection({
   onContent,
   warningWhenEmpty,
   renderContent,
+  isAdmin = true,
 }: {
   sectionKey:       string;
   userId:           string;
@@ -1230,6 +1261,7 @@ function GeneratedSection({
   onContent:        (v: string | null) => void;
   warningWhenEmpty?: string;
   renderContent?:   (content: string) => React.ReactNode;
+  isAdmin?:         boolean;
 }) {
   const [generating,  setGenerating]  = useState(false);
   const [error,       setError]       = useState<string | null>(null);
@@ -1399,25 +1431,27 @@ function GeneratedSection({
           <div style={{ fontFamily: fontS, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: "#799097" }}>
             {label}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <button
-              onClick={startEdit}
-              style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em" }}
-            >
-              ✎ Edit
-            </button>
-            <span style={{ width: 1, height: 12, background: "#dde3e5" }} />
-            <button
-              onClick={generate}
-              disabled={generating}
-              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: generating ? "not-allowed" : "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em", opacity: generating ? 0.5 : 1 }}
-            >
-              {generating
-                ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "1px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Regenerating…</>
-                : "↻ Regenerate"
-              }
-            </button>
-          </div>
+          {isAdmin && (
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <button
+                onClick={startEdit}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em" }}
+              >
+                ✎ Edit
+              </button>
+              <span style={{ width: 1, height: 12, background: "#dde3e5" }} />
+              <button
+                onClick={generate}
+                disabled={generating}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: generating ? "not-allowed" : "pointer", color: "#7f949b", fontSize: 11, fontFamily: fontM, textTransform: "uppercase" as const, letterSpacing: "0.08em", opacity: generating ? 0.5 : 1 }}
+              >
+                {generating
+                  ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "1px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Regenerating…</>
+                  : "↻ Regenerate"
+                }
+              </button>
+            </div>
+          )}
         </div>
         {renderContent ? renderContent(content) : (
           <div className={PROSE_CLASSES}>
@@ -1440,17 +1474,21 @@ function GeneratedSection({
           {warningWhenEmpty}
         </p>
       )}
-      <button
-        onClick={generate}
-        disabled={generating}
-        style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", background: "#253239", color: "#fff", border: 0, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: generating ? "not-allowed" : "pointer", opacity: generating ? 0.6 : 1 }}
-      >
-        {generating
-          ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Generating…</>
-          : `Generate ${label}`
-        }
-      </button>
-      {error && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{error}</p>}
+      {isAdmin && (
+        <>
+          <button
+            onClick={generate}
+            disabled={generating}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", background: "#253239", color: "#fff", border: 0, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: generating ? "not-allowed" : "pointer", opacity: generating ? 0.6 : 1 }}
+          >
+            {generating
+              ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Generating…</>
+              : `Generate ${label}`
+            }
+          </button>
+          {error && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{error}</p>}
+        </>
+      )}
     </div>
   );
 }
