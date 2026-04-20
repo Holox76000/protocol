@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <F1OfferPage />;
+  return <F1OfferPage variant="home" />;
 }

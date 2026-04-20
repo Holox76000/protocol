@@ -363,7 +363,9 @@ function ReportSlider() {
   );
 }
 
-export default function F1OfferPage() {
+export type F1OfferVariant = "home" | "f1";
+
+export default function F1OfferPage({ variant = "f1" }: { variant?: F1OfferVariant }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [signupHref, setSignupHref] = useState("/register");
   const testimonialsRef = useRef<HTMLDivElement>(null);
