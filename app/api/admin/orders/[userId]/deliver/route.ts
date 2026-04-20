@@ -51,11 +51,16 @@ export async function POST(
 
   const isRedelivery = user.protocol_status === "delivered";
 
-  // Mark as delivered — on re-delivery, also reset protocol_viewed_at so NPS re-triggers
+  // Mark as delivered — on re-delivery, reset NPS fields so the survey re-triggers
   const now = new Date().toISOString();
 
   const userUpdateFields: Record<string, string | null> = { protocol_status: "delivered" };
-  if (isRedelivery) userUpdateFields.protocol_viewed_at = null;
+  if (isRedelivery) {
+    userUpdateFields.protocol_viewed_at = null;
+    userUpdateFields.nps_sent_at = null;
+    userUpdateFields.nps_token = null;
+    userUpdateFields.nps_submitted_at = null;
+  }
 
   const [userUpdate, protocolUpdate] = await Promise.all([
     supabaseAdmin
