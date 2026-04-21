@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="font-body text-ink bg-ash">
+      <body className="font-body text-ink bg-ash" suppressHydrationWarning>
         <Ga4RouteTracker />
         <Script id="meta-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s)

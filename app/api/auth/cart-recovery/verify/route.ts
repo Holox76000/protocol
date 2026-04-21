@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token") ?? "";
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? new URL(request.url).origin;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://protocol-club.com";
 
   if (!token) {
     return NextResponse.redirect(new URL("/register", baseUrl));
