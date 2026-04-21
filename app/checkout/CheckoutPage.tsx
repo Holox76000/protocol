@@ -21,8 +21,9 @@ function SectionLabel({ children }: { children: string }) {
 
 // ── Protocol membership card ───────────────────────────────────────────────────
 
-function ProtocolCard() {
+function ProtocolCard({ amount }: { amount: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const displayPrice = `$${(amount / 100).toFixed(0)}`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -69,7 +70,7 @@ function ProtocolCard() {
         {/* Lower */}
         <div className="flex items-end justify-between px-6 pb-6">
           <p className="flex items-baseline">
-            <strong className="text-[44px] font-light leading-none text-white">$89</strong>
+            <strong className="text-[44px] font-light leading-none text-white">{displayPrice}</strong>
             <span className="ml-1.5 text-[13px] font-normal text-white/50">/ one-time</span>
           </p>
           <p className="text-[11px] text-white/40">No Hidden Fees.</p>
@@ -151,11 +152,12 @@ const stripeAppearance = {
 
 // ── Payment form (inside Elements provider) ────────────────────────────────────
 
-function CheckoutForm() {
+function CheckoutForm({ displayAmount }: { displayAmount: number }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const price = `$${(displayAmount / 100).toFixed(0)}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +193,7 @@ function CheckoutForm() {
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
             Processing…
           </span>
-        ) : "Pay $89 · Start the Protocol"}
+        ) : `Pay ${price} · Start the Protocol`}
       </button>
     </form>
   );
@@ -199,15 +201,31 @@ function CheckoutForm() {
 
 // ── Checkout page ──────────────────────────────────────────────────────────────
 
+type PromoState = {
+  discountLabel: string;
+  newAmount: number;
+  originalAmount: number;
+};
+
 export function CheckoutPage({ email }: { email: string }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Promo code state
+  const [promoInput, setPromoInput] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoApplied, setPromoApplied] = useState<PromoState | null>(null);
+
+  const displayAmount = promoApplied ? promoApplied.newAmount : 8900;
 
   const fetchSecret = useCallback(() => {
     setError(null);
     setClientSecret(null);
+    setPaymentIntentId(null);
+    setPromoApplied(null);
 
-    // UTMs: merge URL params (highest priority) over persisted session UTMs
     const persistedUtms = getPersistedUtmParams();
     const sp = new URLSearchParams(window.location.search);
     const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid"] as const;
@@ -217,7 +235,6 @@ export function CheckoutPage({ email }: { email: string }) {
       if (val) utms[key] = val;
     }
 
-    // GA4 client_id from the _ga cookie for server-side attribution
     const gaClientId = document.cookie
       .split("; ")
       .find((c) => c.startsWith("_ga="))
@@ -229,14 +246,44 @@ export function CheckoutPage({ email }: { email: string }) {
       body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }) }),
     })
       .then((r) => r.json())
-      .then((d: { clientSecret?: string; error?: string }) => {
-        if (d.clientSecret) setClientSecret(d.clientSecret);
-        else setError(d.error ?? "Unable to initialize checkout.");
+      .then((d: { clientSecret?: string; paymentIntentId?: string; error?: string }) => {
+        if (d.clientSecret) {
+          setClientSecret(d.clientSecret);
+          if (d.paymentIntentId) setPaymentIntentId(d.paymentIntentId);
+        } else {
+          setError(d.error ?? "Unable to initialize checkout.");
+        }
       })
       .catch(() => setError("Unable to initialize checkout. Please try again."));
   }, [email]);
 
   useEffect(() => { fetchSecret(); }, [fetchSecret]);
+
+  const handleApplyPromo = async () => {
+    if (!promoInput.trim() || !paymentIntentId) return;
+    setPromoLoading(true);
+    setPromoError(null);
+
+    try {
+      const res = await fetch("/api/apply-promo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), paymentIntentId }),
+      });
+      const data: { valid: boolean; error?: string; discountLabel?: string; newAmount?: number; originalAmount?: number } = await res.json();
+
+      if (data.valid && data.newAmount && data.discountLabel && data.originalAmount) {
+        setPromoApplied({ discountLabel: data.discountLabel, newAmount: data.newAmount, originalAmount: data.originalAmount });
+        setPromoError(null);
+      } else {
+        setPromoError(data.error ?? "Code invalide");
+      }
+    } catch {
+      setPromoError("Unable to validate code. Please try again.");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white">
@@ -302,7 +349,7 @@ export function CheckoutPage({ email }: { email: string }) {
           ) : (
             <div className="lg:mx-[3vw]">
               <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance, locale: "en" }}>
-                <CheckoutForm />
+                <CheckoutForm displayAmount={displayAmount} />
               </Elements>
             </div>
           )}
@@ -310,7 +357,7 @@ export function CheckoutPage({ email }: { email: string }) {
           {/* Trust signals */}
           <div className="mt-7 flex flex-col items-center gap-2.5 lg:px-[3vw]">
             <p className="text-center text-[11px] text-mute">
-              By completing this purchase you authorize a one-time charge of $89 USD. No recurring charges.{" "}
+              By completing this purchase you authorize a one-time charge of ${(displayAmount / 100).toFixed(0)} USD. No recurring charges.{" "}
               <Link href="/terms" className="underline underline-offset-2 transition-colors hover:text-dim">
                 Terms
               </Link>
@@ -345,7 +392,7 @@ export function CheckoutPage({ email }: { email: string }) {
               <span className="text-[11px] text-mute">Powered by</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="42" height="17" viewBox="0 0 42 17" fill="none" aria-label="Stripe">
                 <g clipPath="url(#stripe-clip)">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M40.9002 8.72803C40.9002 5.84185 39.5022 3.56445 36.8302 3.56445C34.1469 3.56445 32.5234 5.84185 32.5234 8.70552C32.5234 12.0991 34.4401 13.8127 37.191 13.8127C38.5326 13.8127 39.5473 13.5083 40.3139 13.0799V10.825C39.5472 11.2084 38.6679 11.4451 37.5517 11.4451C36.4581 11.4451 35.4885 11.0617 35.3645 9.73134H40.8776C40.8777 9.58485 40.9002 8.99858 40.9002 8.72803ZM35.3307 7.65695C35.3307 6.38294 36.1087 5.85311 36.8189 5.85311C37.5067 5.85311 38.2395 6.38302 38.2395 7.65695H35.3307Z" fill="#758084" />
+                  <path fillRule="evenodd" clipRule="evenodd" d="M40.9002 8.72803C40.9002 5.84185 39.5022 3.56445 36.8302 3.56445C34.1469 3.56445 32.5234 5.84185 32.5234 8.70552C32.5234 12.0991 34.4401 13.8127 37.191 13.8127C38.5326 13.8127 39.5473 13.5083 40.3139 13.0799V10.825C39.5472 11.2084 38.6679 11.4451 37.5517 11.4451C36.4581 11.4451 35.4885 11.0617 35.3645 9.73134H40.8776C40.8777 9.58485 40.9002 8.99858 40.9002 8.72803ZM35.3307 7.65695C35.3307 6.38294 36.1087 5.85311 36.8189 5.85311C37.5067 6.38302 38.2395 6.38302 38.2395 7.65695H35.3307Z" fill="#758084" />
                   <path fillRule="evenodd" clipRule="evenodd" d="M28.1726 3.56445C27.0678 3.56445 26.3574 4.08311 25.9628 4.44386L25.8163 3.74487H23.3359V16.8907L26.1545 16.2931L26.1658 13.1025C26.5716 13.3956 27.1691 13.8127 28.1613 13.8127C30.1794 13.8127 32.0171 12.1892 32.0171 8.61531C32.0059 5.34579 30.1456 3.56445 28.1726 3.56445ZM27.4961 11.3324C26.8309 11.3324 26.4364 11.0956 26.1658 10.8025L26.1545 6.6198C26.4476 6.29281 26.8535 6.06737 27.4961 6.06737C28.5221 6.06737 29.2324 7.21733 29.2324 8.69426C29.2324 10.2051 28.5334 11.3324 27.4961 11.3324Z" fill="#758084" />
                   <path fillRule="evenodd" clipRule="evenodd" d="M19.457 2.89947L22.2869 2.29069V0.00195312L19.457 0.599562V2.89947Z" fill="#758084" />
                   <path d="M22.2869 3.75586H19.457V13.6208H22.2869V3.75586Z" fill="#758084" />
@@ -368,7 +415,7 @@ export function CheckoutPage({ email }: { email: string }) {
           <SectionLabel>Your Protocol</SectionLabel>
 
           {/* Card */}
-          <ProtocolCard />
+          <ProtocolCard amount={displayAmount} />
 
           {/* Description */}
           <div className="mb-4 lg:mb-10 text-center">
@@ -389,9 +436,73 @@ export function CheckoutPage({ email }: { email: string }) {
               <span>Protocol Access</span>
               <span>$89</span>
             </div>
+
+            {/* Promo code input */}
+            <div className="mb-3 lg:mb-4">
+              {promoApplied ? (
+                <div className="flex items-center justify-between rounded-lg bg-green-50 border border-green-200 px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <circle cx="7" cy="7" r="6" fill="#22c55e" fillOpacity="0.15" stroke="#22c55e" strokeWidth="1.2" />
+                      <path d="M4.5 7l1.5 1.5L9.5 5" stroke="#22c55e" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-[12px] font-medium text-green-700">
+                      {promoInput.toUpperCase()} · {promoApplied.discountLabel}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => { setPromoApplied(null); setPromoInput(""); }}
+                    className="text-[11px] text-green-600 hover:text-green-800 font-medium"
+                    aria-label="Remove promo code"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleApplyPromo(); } }}
+                    placeholder="Promo code"
+                    disabled={!paymentIntentId}
+                    className="flex-1 rounded-lg border border-wire bg-white px-3 py-2 text-[13px] text-void placeholder:text-mute focus:border-void focus:outline-none disabled:opacity-50"
+                  />
+                  <button
+                    onClick={handleApplyPromo}
+                    disabled={!promoInput.trim() || promoLoading || !paymentIntentId}
+                    className="rounded-lg border border-wire px-3 py-2 text-[12px] font-semibold text-dim transition-colors hover:border-void hover:text-void disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {promoLoading ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-dim/25 border-t-dim" />
+                      </span>
+                    ) : "Apply"}
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p className="mt-1.5 text-[11px] text-red-500">{promoError}</p>
+              )}
+            </div>
+
+            {/* Discount line */}
+            {promoApplied && (
+              <div className="mb-2 flex justify-between text-[13px] text-green-600">
+                <span>Discount ({promoApplied.discountLabel})</span>
+                <span>-${((promoApplied.originalAmount - promoApplied.newAmount) / 100).toFixed(2)}</span>
+              </div>
+            )}
+
             <div className="flex justify-between border-t border-wire pt-2.5 lg:pt-4 text-[15px] font-semibold text-void">
               <span>Due today</span>
-              <span>$89</span>
+              <span className="flex items-center gap-2">
+                {promoApplied && (
+                  <span className="text-[13px] font-normal text-mute line-through">$89</span>
+                )}
+                ${(displayAmount / 100).toFixed(0)}
+              </span>
             </div>
           </div>
         </div>

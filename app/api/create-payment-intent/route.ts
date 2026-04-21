@@ -92,5 +92,8 @@ export async function POST(request: Request) {
     console.error("[create-payment-intent] CAPI failed", { error: String(err) })
   );
 
-  return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+  return NextResponse.json({
+    clientSecret: paymentIntent.client_secret,
+    paymentIntentId: paymentIntent.id,
+  });
 }
