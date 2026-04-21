@@ -63,7 +63,8 @@ export default async function ProtocolSectionPage({
     isAdmin = false;
 
     // Track first view for NPS trigger — idempotent (WHERE IS NULL).
-    void supabaseAdmin
+    // Must be awaited: serverless functions terminate on response, void would be killed mid-flight.
+    await supabaseAdmin
       .from("users")
       .update({ protocol_viewed_at: new Date().toISOString() })
       .eq("id", user.id)
