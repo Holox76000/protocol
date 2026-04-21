@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   if (promoCodes.data.length === 0) {
-    return NextResponse.json({ valid: false, error: "Code invalide ou expiré" });
+    return NextResponse.json({ valid: false, error: "Invalid or expired promo code" });
   }
 
   const coupon = promoCodes.data[0].coupon;
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     discountCents = coupon.amount_off;
     discountLabel = `-$${(coupon.amount_off / 100).toFixed(2)}`;
   } else {
-    return NextResponse.json({ valid: false, error: "Code invalide" });
+    return NextResponse.json({ valid: false, error: "Invalid promo code" });
   }
 
   const newAmount = Math.max(100, BASE_AMOUNT - discountCents);
