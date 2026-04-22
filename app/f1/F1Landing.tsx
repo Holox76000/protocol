@@ -181,7 +181,7 @@ export default function F1Landing() {
               By <strong>Eleanor Marsh</strong> · Photographs by <strong>Kaspar Lynn</strong> · 3 min read
             </div>
             <a href="#article" className="f1-hero-v1__cta">
-              Read the full piece
+              Discover the study
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
