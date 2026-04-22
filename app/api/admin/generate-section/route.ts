@@ -498,11 +498,38 @@ async function generateActionPlanMultiPart(
 
   const enrichedCtx = `${ctx}\n\n${sectionBlock ? `## Protocol Sections (summaries)\n${sectionBlock}` : ""}`;
 
-  return generateMultiPart(
-    `You are writing a transformation cheat sheet for ${name}. Output structured markdown only: tables, task lists (- [ ] format), numbered rules. Zero prose paragraphs. Every section must be scannable in under 10 seconds.`,
-    enrichedCtx,
-    ACTION_PLAN_PARTS,
+  const systemRole = `You are writing a transformation cheat sheet for ${name}. Output structured markdown only: tables, task lists (- [ ] format), numbered rules. Zero prose paragraphs. Every section must be scannable in under 10 seconds.`;
+  const cachedText = `${systemRole}\n\n${TONE_OF_VOICE}\n\n${enrichedCtx}`;
+
+  // All 6 action-plan parts are independent — run in parallel to stay well under timeout.
+  const results = await Promise.all(
+    ACTION_PLAN_PARTS.map((part) => {
+      const dynamicText = `Write ONLY the following section (start directly with the markdown header, no preamble).
+Target length: ${part.maxTokens} tokens. Be concise. Stop as soon as the section is complete — do not pad.
+
+${part.title}
+${part.instructions}`;
+
+      return client.messages.create({
+        model:      "claude-opus-4-6",
+        max_tokens: Math.max(Math.round(part.maxTokens * 1.5), 1024),
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: cachedText, cache_control: { type: "ephemeral" } },
+            { type: "text", text: dynamicText },
+          ],
+        }],
+      }).then((msg) =>
+        msg.content
+          .filter((b) => b.type === "text")
+          .map((b) => (b as { type: "text"; text: string }).text)
+          .join("\n")
+      );
+    })
   );
+
+  return results.join("\n\n");
 }
 
 // ── Route handler ────────────────────────────────────────────────────────────
