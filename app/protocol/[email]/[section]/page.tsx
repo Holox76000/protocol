@@ -78,8 +78,8 @@ export default async function ProtocolSectionPage({
   const extraCols    = PROTOCOL_CONTENT_COLS[params.section] ?? [];
   // Only include photo/metrics columns on sections that actually display them.
   const baseCols     = needsPhotos
-    ? ["delivered_at", "metrics", "overlay_points", "before_after_preview_path", "summary"]
-    : ["delivered_at", "summary"];
+    ? ["delivered_at", "disabled_sections", "metrics", "overlay_points", "before_after_preview_path", "summary"]
+    : ["delivered_at", "disabled_sections", "summary"];
   const protocolCols = [...baseCols, ...extraCols].join(", ");
 
   const { data: userData } = await supabaseAdmin
@@ -110,10 +110,21 @@ export default async function ProtocolSectionPage({
 
   const [p, qr] = await Promise.all([fetchProtocol, fetchQr]);
 
-  const metrics       = (p?.metrics                   as CalibrationMetrics | null) ?? null;
-  const overlayPoints = (p?.overlay_points            as OverlayPoints | null)      ?? null;
-  const previewPath   = (p?.before_after_preview_path as string | null)             ?? null;
-  const summary       = (p?.summary                   as string | null)             ?? null;
+  const metrics          = (p?.metrics                   as CalibrationMetrics | null) ?? null;
+  const overlayPoints    = (p?.overlay_points            as OverlayPoints | null)      ?? null;
+  const previewPath      = (p?.before_after_preview_path as string | null)             ?? null;
+  const summary          = (p?.summary                   as string | null)             ?? null;
+  const disabledSections = (p?.disabled_sections         as string[] | null)           ?? [];
+
+  // Redirect client away from disabled sections to the first available one.
+  if (!isAdmin && disabledSections.includes(params.section)) {
+    const SECTION_ORDER = [
+      "summary", "body-analysis", "nutrition-plan", "workout-plan",
+      "sleeping-advices", "posture-analysis", "supplement-protocol", "action-plan",
+    ];
+    const fallback = SECTION_ORDER.find((s) => !disabledSections.includes(s)) ?? "summary";
+    redirect(`/protocol/${encodeURIComponent(email)}/${fallback}`);
+  }
 
   const nutritionPlanContent      = (p?.nutrition_plan_content      as string | null) ?? null;
   const supplementProtocolContent = (p?.supplement_protocol_content as string | null) ?? null;
@@ -156,6 +167,7 @@ export default async function ProtocolSectionPage({
       sessionsPerWeek={sessionsPerWeek}
       isAdmin={isAdmin}
       isClientSession={!adminCheck}
+      initialDisabledSections={disabledSections as SectionId[]}
       initialBeforeUrl={photoFront}
       initialAfterUrl={initialAfterUrl}
       summary={summary}

@@ -87,6 +87,7 @@ type Props = {
   sessionsPerWeek?:       number;
   isAdmin?:               boolean;
   isClientSession?:       boolean; // true when a real client is viewing (hides all admin banners)
+  initialDisabledSections?: SectionId[];
   initialSection:         SectionId;
   initialBeforeUrl:       string | null;
   initialAfterUrl:        string | null;
@@ -116,6 +117,7 @@ export default function ProtocolSidebarLayout({
   sessionsPerWeek,
   isAdmin = true,
   isClientSession = false,
+  initialDisabledSections = [],
   initialSection,
   initialBeforeUrl,
   initialAfterUrl,
@@ -131,6 +133,7 @@ export default function ProtocolSidebarLayout({
   const [isPending, startTransition] = useTransition();
   const [active, setActive]         = useState<SectionId>(initialSection);
   const [navOpen, setNavOpen]       = useState(false);
+  const [disabledSections, setDisabledSections] = useState<SectionId[]>(initialDisabledSections);
   const [summary, setSummary]       = useState<string | null>(initialSummary);
   const [genSummary, setGenSummary] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
@@ -227,6 +230,32 @@ export default function ProtocolSidebarLayout({
     }
   };
 
+  const handleToggleSection = async (sectionId: SectionId) => {
+    const isDisabled = disabledSections.includes(sectionId);
+    // Optimistic update
+    setDisabledSections(
+      isDisabled
+        ? disabledSections.filter((s) => s !== sectionId)
+        : [...disabledSections, sectionId]
+    );
+    try {
+      const res = await fetch(`/api/admin/orders/${userId}/toggle-section`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sectionId, disabled: !isDisabled }),
+      });
+      const data = await res.json() as { disabledSections?: SectionId[]; error?: string };
+      if (res.ok && data.disabledSections) {
+        setDisabledSections(data.disabledSections);
+      } else {
+        // Rollback on error
+        setDisabledSections(disabledSections);
+      }
+    } catch {
+      setDisabledSections(disabledSections);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Admin banner */}
@@ -294,7 +323,13 @@ export default function ProtocolSidebarLayout({
 
           {/* Nav items */}
           <nav className="flex-1 p-2.5">
-            {NAV.map((entry, i) => {
+            {NAV.filter((entry) => {
+              // Hide disabled sections from client view
+              if (!isAdmin && isNavItem(entry)) {
+                return !disabledSections.includes(entry.id);
+              }
+              return true;
+            }).map((entry, i) => {
               if (!isNavItem(entry)) {
                 return (
                   <p
@@ -305,24 +340,42 @@ export default function ProtocolSidebarLayout({
                   </p>
                 );
               }
-              const isActive = active === entry.id;
+              const isActive   = active === entry.id;
+              const isDisabled = disabledSections.includes(entry.id);
               return (
-                <button
-                  key={entry.id}
-                  onClick={() => navigateTo(entry.id)}
-                  className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                    isActive
-                      ? "bg-void text-white"
-                      : "text-dim hover:bg-ash hover:text-void"
-                  }`}
-                >
-                  <span className={`shrink-0 w-4 text-center text-[11px] ${isActive ? "opacity-80" : "opacity-40"}`}>
-                    {entry.icon}
-                  </span>
-                  <span className={`text-[12.5px] ${isActive ? "font-semibold" : "font-medium"}`}>
-                    {entry.label}
-                  </span>
-                </button>
+                <div key={entry.id} className="group relative flex items-center">
+                  <button
+                    onClick={() => navigateTo(entry.id)}
+                    className={`flex flex-1 items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                      isActive
+                        ? "bg-void text-white"
+                        : isDisabled
+                        ? "text-mute/50 hover:bg-ash hover:text-mute"
+                        : "text-dim hover:bg-ash hover:text-void"
+                    }`}
+                  >
+                    <span className={`shrink-0 w-4 text-center text-[11px] ${isActive ? "opacity-80" : "opacity-30"}`}>
+                      {entry.icon}
+                    </span>
+                    <span className={`text-[12.5px] ${isActive ? "font-semibold" : "font-medium"} ${isDisabled ? "line-through" : ""}`}>
+                      {entry.label}
+                    </span>
+                  </button>
+                  {/* Toggle visibility — admin only */}
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleToggleSection(entry.id)}
+                      title={isDisabled ? "Enable section" : "Disable section"}
+                      className={`absolute right-1 shrink-0 rounded p-1 text-[11px] opacity-0 transition-opacity group-hover:opacity-100 ${
+                        isDisabled
+                          ? "text-red-400 hover:text-red-600"
+                          : "text-mute hover:text-void"
+                      }`}
+                    >
+                      {isDisabled ? "✕" : "◉"}
+                    </button>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -410,7 +463,12 @@ export default function ProtocolSidebarLayout({
                   <p className="text-[12px] font-semibold text-void">{firstName}&apos;s Protocol</p>
                 </div>
                 {/* Nav groups */}
-                {NAV.map((entry, i) => {
+                {NAV.filter((entry) => {
+                  if (!isAdmin && isNavItem(entry)) {
+                    return !disabledSections.includes(entry.id);
+                  }
+                  return true;
+                }).map((entry, i) => {
                   if (!isNavItem(entry)) {
                     return (
                       <p key={i} className="mt-5 mb-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-mute px-1">
@@ -418,27 +476,43 @@ export default function ProtocolSidebarLayout({
                       </p>
                     );
                   }
-                  const isActive = active === entry.id;
+                  const isActive   = active === entry.id;
+                  const isDisabled = disabledSections.includes(entry.id);
                   return (
-                    <button
-                      key={entry.id}
-                      onClick={() => { navigateTo(entry.id); setNavOpen(false); }}
-                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors ${
-                        isActive ? "bg-void text-white" : "text-dim active:bg-ash"
-                      }`}
-                    >
-                      <span className={`shrink-0 w-5 text-center text-[13px] ${isActive ? "opacity-80" : "opacity-40"}`}>
-                        {entry.icon}
-                      </span>
-                      <span className={`text-[14px] ${isActive ? "font-semibold" : "font-medium"}`}>
-                        {entry.label}
-                      </span>
-                      {isActive && (
-                        <svg className="ml-auto w-4 h-4 opacity-60" fill="none" viewBox="0 0 16 16">
-                          <path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                    <div key={entry.id} className="flex items-center gap-1">
+                      <button
+                        onClick={() => { navigateTo(entry.id); setNavOpen(false); }}
+                        className={`flex flex-1 items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors ${
+                          isActive ? "bg-void text-white" : isDisabled ? "text-mute/50 active:bg-ash" : "text-dim active:bg-ash"
+                        }`}
+                      >
+                        <span className={`shrink-0 w-5 text-center text-[13px] ${isActive ? "opacity-80" : "opacity-30"}`}>
+                          {entry.icon}
+                        </span>
+                        <span className={`text-[14px] ${isActive ? "font-semibold" : "font-medium"} ${isDisabled ? "line-through" : ""}`}>
+                          {entry.label}
+                        </span>
+                        {isActive && (
+                          <svg className="ml-auto w-4 h-4 opacity-60" fill="none" viewBox="0 0 16 16">
+                            <path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                      {/* Toggle visibility — admin only */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleToggleSection(entry.id)}
+                          title={isDisabled ? "Enable section" : "Disable section"}
+                          className={`shrink-0 rounded-lg px-2 py-2 text-[12px] transition-colors ${
+                            isDisabled
+                              ? "text-red-400 hover:text-red-600"
+                              : "text-mute hover:text-void"
+                          }`}
+                        >
+                          {isDisabled ? "✕" : "◉"}
+                        </button>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
