@@ -81,8 +81,8 @@ export async function POST(
     return NextResponse.json({ error: "Failed to mark as delivered" }, { status: 500 });
   }
 
-  // Send protocol delivered email via Resend (non-fatal)
-  void sendProtocolDeliveredEmail({
+  // Send protocol delivered email via Resend (non-fatal — await to prevent serverless kill)
+  await sendProtocolDeliveredEmail({
     email: user.email,
     firstName: user.first_name,
     dashboardUrl: `${SITE_URL}/protocol/${encodeURIComponent(user.email)}/summary`,
