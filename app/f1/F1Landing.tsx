@@ -174,7 +174,7 @@ export default function F1Landing() {
             4 steps to improve your <em>physical attractiveness</em>
           </h1>
           <p className="f1-hero-v1__deck">
-            A quiet MIT clinic has spent four years studying what the eye actually reads as attractive in the male body — and built a 12-week protocol around it.
+            A quiet MIT study has spent four years studying what the eye actually reads as attractive in the male body — and built a 12-week protocol around it.
           </p>
           <div className="f1-hero-v1__byline-row">
             <div className="f1-hero-v1__byline">
