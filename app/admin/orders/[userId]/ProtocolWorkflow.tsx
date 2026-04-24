@@ -46,6 +46,9 @@ export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics
   const [deliverError,    setDeliverError]    = useState<string | null>(null);
   const [unlocking,       setUnlocking]       = useState(false);
   const [unlockError,     setUnlockError]     = useState<string | null>(null);
+  const [resendingNps,    setResendingNps]    = useState(false);
+  const [resendNpsOk,     setResendNpsOk]     = useState(false);
+  const [resendNpsError,  setResendNpsError]  = useState<string | null>(null);
 
   const isDelivered = status === "delivered";
   const isInReview  = status === "in_review";
@@ -77,6 +80,19 @@ export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics
       else { setStatus("delivered"); setConfirmDeliver(false); }
     } catch { setDeliverError("Network error."); }
     finally { setDelivering(false); }
+  };
+
+  const handleResendNps = async () => {
+    setResendingNps(true);
+    setResendNpsError(null);
+    setResendNpsOk(false);
+    try {
+      const res = await fetch(`/api/admin/orders/${userId}/resend-nps`, { method: "POST" });
+      const d = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) setResendNpsError(d.error ?? "Failed to resend NPS.");
+      else setResendNpsOk(true);
+    } catch { setResendNpsError("Network error."); }
+    finally { setResendingNps(false); }
   };
 
   const calibrated = metrics !== null;
@@ -197,6 +213,30 @@ export default function ProtocolWorkflow({ userId, initialStatus, initialMetrics
                 Unlocking…
               </>
             ) : "Unlock questionnaire for edits"}
+          </button>
+        </div>
+      )}
+
+      {/* Resend NPS */}
+      {isDelivered && (
+        <div className="border-t border-wire pt-4 space-y-2">
+          {resendNpsError && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-600">{resendNpsError}</p>
+          )}
+          {resendNpsOk && (
+            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-[12px] text-emerald-700">NPS will be resent within 5 minutes.</p>
+          )}
+          <button
+            onClick={handleResendNps}
+            disabled={resendingNps || resendNpsOk}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-wire bg-white px-4 py-2.5 text-[12px] font-semibold text-dim transition-colors hover:border-void hover:text-void disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {resendingNps ? (
+              <>
+                <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
+                Resending…
+              </>
+            ) : resendNpsOk ? "NPS queued ✓" : "Resend NPS survey"}
           </button>
         </div>
       )}

@@ -412,7 +412,7 @@ export default function F1OfferPage() {
       <section className="f1-offer-hero f1-section">
         <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "12px" }}>
           <h1 className="f1-offer-hero__title" style={{ margin: 0, textAlign: "center" }}>
-            Here&apos;s what your Attractiveness Protocol looks like.
+            Here&apos;s what your attractiveness potential looks like.
           </h1>
           <Image
             src="/assets/connor-protocol.png"
