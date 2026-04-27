@@ -1168,10 +1168,10 @@ function PosturePhotosPanel({
             <p style={{ fontFamily: fontM, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.14em", color: "#799097", marginBottom: 10 }}>
               Lateral view · alignment reference
             </p>
-            {/* Scan container — same style as BodyAnalysis ba-scan */}
-            <div style={{ position: "relative", aspectRatio: "3/4", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
+            {/* Scan container — image at natural ratio so SVG overlay aligns exactly with calibration */}
+            <div style={{ position: "relative", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoSide} alt="Lateral view" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
+              <img src={photoSide} alt="Lateral view" style={{ display: "block", width: "100%", height: "auto" }} />
 
               {/* Calibration overlay — posture alignment lines */}
               {points && (() => {
@@ -1213,9 +1213,9 @@ function PosturePhotosPanel({
             <p style={{ fontFamily: fontM, fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.14em", color: "#799097", marginBottom: 10 }}>
               Front view · symmetry reference
             </p>
-            <div style={{ position: "relative", aspectRatio: "3/4", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
+            <div style={{ position: "relative", background: "#1a1410", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(37,50,57,0.08)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoFront} alt="Front view" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
+              <img src={photoFront} alt="Front view" style={{ display: "block", width: "100%", height: "auto" }} />
             </div>
           </div>
         )}

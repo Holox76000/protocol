@@ -1,0 +1,406 @@
+// ─────────────────────────────────────────────────────────
+// PROTOCOL CLUB — ATTRACTIVENESS DIAGNOSTIC V2.6
+// 26 slides: 18 Q · 4 Belief-Shifts · 2 Info · 2 Summary/Promise
+// + 1 Final Loading = 27 total (loading counted in Section 7)
+// ─────────────────────────────────────────────────────────
+
+export type Answers = Record<string, string | string[]>;
+
+export type SlideType =
+  | "single"
+  | "multi"
+  | "numeric-height"
+  | "numeric-weight"
+  | "belief"
+  | "info"
+  | "summary"
+  | "promise"
+  | "yes-ladder"
+  | "final-loading";
+
+export type SingleSlide = {
+  id: string;
+  type: "single";
+  stateKey: string;
+  section: number;
+  sectionLabel: string;
+  qNumber: number;
+  question: string;
+  subtext?: string;
+  options: string[];
+  images?: string[];
+  whyWeAsk?: string;
+};
+
+export type MultiSlide = {
+  id: string;
+  type: "multi";
+  stateKey: string;
+  section: number;
+  sectionLabel: string;
+  qNumber: number;
+  question: string;
+  subtext?: string;
+  options: string[];
+  images?: string[];
+  whyWeAsk?: string;
+};
+
+export type NumericHeightSlide = {
+  id: string;
+  type: "numeric-height";
+  section: number;
+  qNumber: number;
+  question: string;
+  subtext: string;
+};
+
+export type NumericWeightSlide = {
+  id: string;
+  type: "numeric-weight";
+  section: number;
+  qNumber: number;
+  question: string;
+  subtext: string;
+};
+
+export type BeliefSlide = {
+  id: string;
+  type: "belief";
+  bsNumber: 1 | 2 | 3 | 4;
+  headline: string;
+  paragraph: string;
+  footer: string;
+};
+
+export type InfoSlide = {
+  id: string;
+  type: "info";
+  variant: "social-proof" | "objection";
+  headline: string;
+  body: string;
+};
+
+export type SummarySlide = {
+  id: string;
+  type: "summary";
+};
+
+export type PromiseSlide = {
+  id: string;
+  type: "promise";
+};
+
+export type YesLadderSlide = {
+  id: string;
+  type: "yes-ladder";
+  stateKey: string;
+  qNumber: number;
+  loaderStep: 1 | 2 | 3; // 25% / 50% / 75%
+  loaderLabel: string;
+  question: string;
+  options: string[];
+};
+
+export type FinalLoadingSlide = {
+  id: string;
+  type: "final-loading";
+};
+
+export type ProtocolReadySlide = {
+  id: string;
+  type: "protocol-ready";
+};
+
+export type SlideConfig =
+  | SingleSlide
+  | MultiSlide
+  | NumericHeightSlide
+  | NumericWeightSlide
+  | BeliefSlide
+  | InfoSlide
+  | SummarySlide
+  | PromiseSlide
+  | YesLadderSlide
+  | FinalLoadingSlide
+  | ProtocolReadySlide;
+
+// ─── SLIDE SEQUENCE ───────────────────────────────────────
+
+export const SLIDES: SlideConfig[] = [
+  // ── SECTION 1 — CURRENT SITUATION + PAIN ──────────────
+
+  {
+    id: "q1",
+    type: "single",
+    stateKey: "age_bracket",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 1,
+    question: "How old are you?",
+    options: ["20–29", "30–39", "40–49", "50+"],
+    images: [
+      "/assets/1-before.png",
+      "/assets/2-before.png",
+      "/assets/3-before.png",
+      "/assets/4-before.png",
+    ],
+  },
+
+  {
+    id: "q2",
+    type: "single",
+    stateKey: "morphology",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 2,
+    question: "What's your body type right now?",
+    options: [
+      "Skinny",
+      "Skinny-fat",
+      "Overweight",
+      "Muscular",
+    ],
+    images: [
+      "/assets/1-before.png",
+      "/assets/5-before.png",
+      "/assets/7-before.png",
+      "/assets/3-after.png",
+    ],
+  },
+
+  {
+    id: "q3",
+    type: "single",
+    stateKey: "shape_impact",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 3,
+    question: "Has your body shape affected your confidence?",
+    options: [
+      "Yes",
+      "No",
+    ],
+  },
+
+  {
+    id: "q4",
+    type: "single",
+    stateKey: "pain_timeline",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 4,
+    question: "How long has this been the case?",
+    options: [
+      "Over a year ago",
+      "In the past year",
+      "In the past few months",
+      "Not sure",
+    ],
+  },
+
+  {
+    id: "q5",
+    type: "multi",
+    stateKey: "expected_results",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 5,
+    question: "What do you want to change?",
+    subtext: "Choose as many as you'd like.",
+    options: [
+      "Less body fat",
+      "Better shape visible with clothes",
+      "To look stronger",
+      "A more defined waist",
+      "Broader shoulders",
+      "A better overall silhouette",
+    ],
+  },
+
+  {
+    id: "info0",
+    type: "info",
+    variant: "social-proof",
+    headline: "10,000+ men have already taken this assessment.",
+    body: "Built on 4 years of R&D and a dataset of 2,500+ fully measured men.",
+  },
+
+
+  {
+    id: "q6b",
+    type: "single",
+    stateKey: "ethnicity",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 7,
+    question: "Which best describes you?",
+    subtext: "Helps us calibrate your visual reference points.",
+    options: [
+      "Caucasian",
+      "Black",
+      "Asian (East / SE)",
+      "South Asian",
+      "Hispanic-Latino",
+      "MENA",
+    ],
+  },
+
+  {
+    id: "q_height",
+    type: "numeric-height",
+    section: 1,
+    qNumber: 8,
+    question: "What's your height?",
+    subtext: "Used to calibrate your structural targets.",
+  },
+
+  {
+    id: "q_weight",
+    type: "numeric-weight",
+    section: 1,
+    qNumber: 9,
+    question: "What's your current weight?",
+    subtext: "Determines your body composition baseline. Never shared externally.",
+  },
+
+  {
+    id: "q_time",
+    type: "single",
+    stateKey: "weekly_time",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 10,
+    question: "How much time do you put into your physique each week?",
+    subtext: "Our Protocol is built to fit your schedule, not the other way around.",
+    options: [
+      "I don't — zero effort right now",
+      "Less than 1 hour",
+      "1 to 3 hours",
+      "3 to 5 hours",
+      "More than 5 hours",
+    ],
+  },
+
+  {
+    id: "info_time",
+    type: "info",
+    variant: "objection",
+    headline: "A busy schedule doesn't have to stop you from looking good and feeling confident.",
+    body: "By evaluating your answers in this quiz, we'll be able to determine your Attractiveness Protocol and craft an actionable & quick routine to help you achieve your goals.",
+  },
+
+  {
+    id: "q_social_env",
+    type: "single",
+    stateKey: "social_environment",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 11,
+    question: "What's your social environment?",
+    whyWeAsk: "Attractiveness isn't one-size-fits-all. A doctor and a lumberjack don't project the same image — and they shouldn't. We calibrate your protocol to the context where it matters most.",
+    options: [
+      "Corporate",
+      "Entrepreneur / Startup",
+      "Manual / Trade work",
+      "Student",
+      "Creative / Freelance",
+      "Medical / Healthcare",
+      "Other",
+    ],
+  },
+
+  {
+    id: "q_past_solutions",
+    type: "multi",
+    stateKey: "past_solutions",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 12,
+    question: "What have you tried before?",
+    subtext: "Select all that apply.",
+    options: [
+      "Personal trainer",
+      "YouTube advice",
+      "A strict diet",
+      "Surgery or medical procedures",
+      "Nothing yet",
+    ],
+    whyWeAsk: "The fitness and weight-loss industry works well for men who want to build muscle or lose weight. But it was never designed for men who want to be attractive. Training for size and training for attractiveness are two completely different goals.",
+  },
+
+  // ── SECTION 6 — SUMMARY + PROMISE ─────────────────────
+
+  {
+    id: "summary",
+    type: "summary",
+  },
+
+  {
+    id: "promise",
+    type: "promise",
+  },
+
+  // ── SECTION 7 — SOLUTION FRAMING ──────────────────────
+
+  {
+    id: "q16b",
+    type: "yes-ladder",
+    stateKey: "yes_uniqueness",
+    qNumber: 16,
+    loaderStep: 1,
+    loaderLabel: "Analyzing your profile...",
+    question: "Did you know attractiveness is unique to each person — shaped by age, face, social context, and genetics?",
+    options: ["Yes", "No"],
+  },
+
+  {
+    id: "q17",
+    type: "yes-ladder",
+    stateKey: "yes_determination",
+    qNumber: 17,
+    loaderStep: 2,
+    loaderLabel: "Generating your personalized protocol...",
+    question: "Are you ready to improve your attractiveness using science?",
+    options: ["Yes", "No"],
+  },
+
+  {
+    id: "q18",
+    type: "yes-ladder",
+    stateKey: "yes_protocol",
+    qNumber: 18,
+    loaderStep: 3,
+    loaderLabel: "Generating your 12-week protocol...",
+    question: "Would a simple, science-backed protocol — built for your body — interest you?",
+    options: ["Yes", "No"],
+  },
+
+  {
+    id: "protocol-ready",
+    type: "protocol-ready",
+  },
+
+  {
+    id: "final-loading",
+    type: "final-loading",
+  },
+];
+
+// ─── Helpers ──────────────────────────────────────────────
+
+export function isQuestion(slide: SlideConfig): boolean {
+  return (
+    slide.type === "single" ||
+    slide.type === "multi" ||
+    slide.type === "numeric-height" ||
+    slide.type === "numeric-weight" ||
+    slide.type === "yes-ladder"
+  );
+}
+
+export const TOTAL_QUESTIONS = SLIDES.filter(isQuestion).length;
+
+export function questionsAnsweredUpTo(slides: SlideConfig[], upToIndex: number): number {
+  return slides.slice(0, upToIndex + 1).filter(isQuestion).length;
+}
