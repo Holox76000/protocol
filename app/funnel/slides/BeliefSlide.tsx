@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import type { BeliefSlide as BeliefSlideConfig } from "../funnel-config";
 import styles from "./slides.module.css";
 
@@ -105,10 +106,7 @@ export function BeliefSlide({ slide, onNext, onBack }: Props) {
         <p className={styles.bsFooterText}>{slide.footer}</p>
       </div>
 
-      <div className={styles.actions}>
-        <button type="button" className={styles.btnSecondary} onClick={onBack}>
-          Back
-        </button>
+      <div className={styles.actionsFull}>
         <button type="button" className={styles.btnPrimary} onClick={onNext}>
           Continue →
         </button>

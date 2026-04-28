@@ -9,14 +9,35 @@ type Props = {
 
 function getDeadlineDate(): string {
   const d = new Date();
-  d.setDate(d.getDate() + 84); // +12 weeks
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  d.setDate(d.getDate() + 84);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-const MILESTONES = [
-  { week: 4, label: "Measurable ratio shifts begin" },
-  { week: 8, label: "Visible structural changes" },
-  { week: 12, label: "Full formula unlocked" },
+const ROWS = [
+  {
+    when: "Today",
+    title: "Protocol begins",
+    desc: "Baseline locked. First 7-day routine deployed.",
+    mod: "now",
+  },
+  {
+    when: "Week 4",
+    title: "Measurable ratio shifts begin",
+    desc: "SWR, CWR, torso index move within research bands.",
+    mod: "",
+  },
+  {
+    when: "Week 8",
+    title: "Visible structural changes",
+    desc: "Frame change perceptible to others, not just to you.",
+    mod: "",
+  },
+  {
+    when: "Week 12",
+    title: "Full formula unlocked",
+    desc: "Calibration complete. Routine becomes self-directed.",
+    mod: "",
+  },
 ];
 
 export function PromiseSlide({ onNext, onBack }: Props) {
@@ -29,42 +50,37 @@ export function PromiseSlide({ onNext, onBack }: Props) {
         <h2 className={styles.summaryTitle}>Your projected transformation.</h2>
       </div>
 
-      <div className={styles.promiseTimeline}>
-        <div className={styles.promiseRow}>
-          <div className={styles.promiseDot} />
-          <span className={styles.promiseWeek}>TODAY</span>
-          <span className={styles.promiseMilestone}>Protocol begins</span>
-        </div>
-
-        {MILESTONES.map(({ week, label }, i) => (
-          <div key={week} className={styles.promiseRow}>
-            <div className={`${styles.promiseConnector}`} />
-            <div className={`${styles.promiseDot} ${i === MILESTONES.length - 1 ? styles.promiseDotFinal : ""}`} />
-            <span className={styles.promiseWeek}>Week {week}</span>
-            <span className={styles.promiseMilestone}>{label}</span>
-          </div>
-        ))}
-
-        <div className={styles.promiseRow}>
-          <div className={styles.promiseConnector} />
-          <div className={`${styles.promiseDot} ${styles.promiseDotDeadline}`} />
-          <span className={`${styles.promiseWeek} ${styles.promiseDeadlineDate}`}>{deadline}</span>
-          <span className={`${styles.promiseMilestone} ${styles.promiseFinalLabel}`}>
-            Full formula active
-          </span>
-        </div>
-      </div>
-
-      <p className={styles.summaryCaption}>
+      <p className={styles.subtext}>
         Based on your profile, this is the projected outcome of executing the Protocol for 12 weeks.
       </p>
 
-      <div className={styles.actions}>
-        <button type="button" className={styles.btnSecondary} onClick={onBack}>
-          Back
-        </button>
+      <div className={styles.timelineRich}>
+        {ROWS.map((r) => (
+          <div
+            key={r.when}
+            className={`${styles.tlRow} ${r.mod === "now" ? styles.tlRowNow : ""}`}
+          >
+            <span className={styles.tlDot} />
+            <div>
+              <div className={styles.tlWhen}>{r.when}</div>
+              <div className={styles.tlTitle}>{r.title}</div>
+              <div className={styles.tlDesc}>{r.desc}</div>
+            </div>
+          </div>
+        ))}
+        <div className={`${styles.tlRow} ${styles.tlRowEnd}`}>
+          <span className={styles.tlDot} />
+          <div>
+            <div className={styles.tlWhen}>{deadline}</div>
+            <div className={styles.tlTitle}>Full formula active</div>
+            <div className={styles.tlDesc}>Maintenance mode. Long-form data review.</div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.actionsFull}>
         <button type="button" className={styles.btnPrimary} onClick={onNext}>
-          Continue →
+          I'm ready to continue →
         </button>
       </div>
     </div>

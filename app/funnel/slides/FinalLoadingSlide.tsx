@@ -5,16 +5,12 @@ import { useRouter } from "next/navigation";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
-const STEPS = [
-  "Ratio formula calculated",
-  "Training phases matched",
-  "12-week plan generated",
-];
-
-const LABELS = [
-  "Building your personalized Protocol...",
-  "Finalizing your ratio targets...",
-  "Protocol ready. Loading your results...",
+const ITEMS = [
+  "Analyzing your ratios...",
+  "Matching peer-reviewed studies...",
+  "Calibrating to your social context...",
+  "Building your 12-week routine...",
+  "Finalizing recommendations...",
 ];
 
 type Props = {
@@ -36,50 +32,34 @@ function buildRedirectUrl(answers: Answers): string {
 
 export function FinalLoadingSlide({ answers }: Props) {
   const router = useRouter();
-  const [phase, setPhase] = useState(0);
-  const [pct, setPct] = useState(80);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
-    // Already at 75% from yes-ladder; finish the remaining 25%
-    const timeline = [
-      { delay: 400,  pct: 88,  phase: 0 },
-      { delay: 1000, pct: 94,  phase: 1 },
-      { delay: 1800, pct: 100, phase: 2 },
-    ];
-
-    const timers = timeline.map(({ delay, pct: p, phase: ph }) =>
-      setTimeout(() => {
-        setPct(p);
-        setPhase(ph);
-      }, delay)
-    );
-
-    const redirectTimer = setTimeout(() => {
-      router.push(buildRedirectUrl(answers));
-    }, 3200);
-
-    return () => {
-      timers.forEach(clearTimeout);
-      clearTimeout(redirectTimer);
-    };
-  }, [answers, router]);
+    if (active >= ITEMS.length) {
+      const t = setTimeout(() => router.push(buildRedirectUrl(answers)), 800);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setActive((a) => a + 1), 900);
+    return () => clearTimeout(t);
+  }, [active, answers, router]);
 
   return (
     <div className={styles.card}>
-      <div className={styles.finalLoadingInner}>
-        <div className={styles.finalLoaderTrack}>
-          <div
-            className={styles.finalLoaderFill}
-            style={{ width: `${pct}%`, transition: "width 0.6s ease" }}
-          />
-        </div>
-        <p className={styles.finalLoaderLabel}>{LABELS[phase]}</p>
-
-        <div className={styles.finalChecklist}>
-          {STEPS.map((step) => (
-            <div key={step} className={`${styles.finalCheckItem} ${styles.finalCheckItemDone}`}>
-              <span className={styles.finalCheckIcon}>✓</span>
-              <span>{step}</span>
+      <div className={styles.spinnerInner}>
+        <div className={styles.spinnerRing} />
+        <h2 className={styles.spinnerTitle}>
+          Building your Protocol.
+        </h2>
+        <div className={styles.spinnerChecklist}>
+          {ITEMS.map((item, i) => (
+            <div
+              key={item}
+              className={`${styles.checkItem} ${
+                i < active ? styles.checkItemDone : ""
+              } ${i === active ? styles.checkItemActive : ""}`}
+            >
+              <span className={styles.checkItemDot} />
+              {item.replace("...", i < active ? " ✓" : "...")}
             </div>
           ))}
         </div>

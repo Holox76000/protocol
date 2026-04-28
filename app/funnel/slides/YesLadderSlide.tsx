@@ -3,12 +3,6 @@
 import type { YesLadderSlide as YesLadderConfig, Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
-const LOADER_LABELS = [
-  "Calculating your ratio formula...",
-  "Matching training phases...",
-  "Generating your 12-week protocol...",
-];
-
 type Props = {
   slide: YesLadderConfig;
   answers: Answers;
@@ -18,41 +12,43 @@ type Props = {
 };
 
 export function YesLadderSlide({ slide, answers, onAnswer, onNext, onBack }: Props) {
-  const selected = (answers[slide.stateKey] as string) ?? "";
-  const loaderPct = (slide.loaderStep / 3) * 100;
+  const pct = (slide.loaderStep / 3) * 100;
 
   const handleSelect = (option: string) => {
     onAnswer(slide.stateKey, option);
-    setTimeout(onNext, 150);
+    setTimeout(onNext, 200);
   };
 
   return (
     <div className={styles.card}>
-      {/* Processing bar at top */}
-      <div className={styles.loaderBar}>
-        <div className={styles.loaderBarTrack}>
-          <div className={styles.loaderBarFill} style={{ width: `${loaderPct}%` }} />
+      <div className={styles.ladderLoadbar}>
+        <div className={styles.ladderLoadbarHead}>
+          <span>{slide.loaderLabel}</span>
+          <span className={styles.ladderLoadbarPct}>{Math.round(pct)}%</span>
         </div>
-        <p className={styles.loaderBarLabel}>{LOADER_LABELS[slide.loaderStep - 1]}</p>
+        <div className={styles.ladderLoadbarTrack}>
+          <div className={styles.ladderLoadbarFill} style={{ width: `${pct}%` }} />
+        </div>
       </div>
 
-      <div className={styles.cardHeader}>
-        <h2 className={styles.question}>{slide.question}</h2>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+        <h2 className={styles.question} style={{ textAlign: 'center', fontSize: 'clamp(22px, 4vw, 28px)' }}>
+          {slide.question}
+        </h2>
       </div>
 
-      <div className={styles.optionsList}>
+      <div className={styles.ynGrid}>
         {slide.options.map((option) => (
           <button
             key={option}
             type="button"
-            className={`${styles.option} ${selected === option ? styles.optionSelected : ""}`}
+            className={styles.ynBtn}
             onClick={() => handleSelect(option)}
           >
             {option}
           </button>
         ))}
       </div>
-
     </div>
   );
 }

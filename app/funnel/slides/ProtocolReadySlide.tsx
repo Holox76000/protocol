@@ -1,64 +1,101 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
 type Props = {
+  answers: Answers;
   onNext: () => void;
 };
 
-const ITEMS = [
-  "Your Goals",
-  "Your Physical Profile",
-  "Your Attractiveness Protocol",
-];
+const MORPHOLOGY_LABELS: Record<string, string> = {
+  Skinny: "Skinny",
+  "Skinny-fat": "Skinny-fat",
+  Overweight: "Overweight",
+  Muscular: "Muscular",
+};
 
-export function ProtocolReadySlide({ onNext }: Props) {
-  const [filled, setFilled] = useState(0);
+const ENV_LABELS: Record<string, string> = {
+  Corporate: "Corporate",
+  "Entrepreneur / Startup": "Entrepreneur",
+  "Manual / Trade work": "Manual / Trade",
+  Student: "Student",
+  "Creative / Freelance": "Creative",
+  "Medical / Healthcare": "Medical",
+  Other: "Other",
+};
+
+export function ProtocolReadySlide({ answers, onNext }: Props) {
+  const [ready, setReady] = useState(false);
+  const idRef = useRef(`PRTCL-${Math.floor(Math.random() * 9000 + 1000)}`);
 
   useEffect(() => {
-    if (filled >= ITEMS.length) return;
-    const t = setTimeout(() => setFilled((f) => f + 1), 600);
+    const t = setTimeout(() => setReady(true), 1600);
     return () => clearTimeout(t);
-  }, [filled]);
+  }, []);
+
+  const morphology = (answers.morphology as string) ?? "";
+  const social = (answers.social_environment as string) ?? "";
 
   return (
     <div className={styles.card}>
-      <div className={styles.prHeader}>
-        <h2 className={styles.prTitle}>Your Protocol is ready.</h2>
-        <p className={styles.prSubtitle}>
-          Based on your answers, we've built your personalized Attractiveness Protocol.
+      <div className={styles.prReadyInner}>
+        <div className={styles.eyebrow}>21 · Ready</div>
+        <div className={styles.prSeal}>PC</div>
+        <h2 className={styles.prReadyTitle}>Your Protocol is ready.</h2>
+
+        {(morphology || social) && (
+          <div className={styles.prReadyMeta}>
+            {morphology && (
+              <span>
+                Calibrated to your{" "}
+                <strong>{MORPHOLOGY_LABELS[morphology] ?? morphology}</strong> frame
+              </span>
+            )}
+            {social && (
+              <span>
+                Tuned for <strong>{ENV_LABELS[social] ?? social}</strong> context
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className={styles.prReadyDetails}>
+          <div className={styles.prReadyRow}>
+            <span className={styles.prReadyRowLabel}>Profile ID</span>
+            <span className={styles.prReadyRowValue}>{idRef.current}</span>
+          </div>
+          <div className={styles.prReadyRow}>
+            <span className={styles.prReadyRowLabel}>Slot reserved</span>
+            <span className={styles.prReadyRowValue}>15 min</span>
+          </div>
+          <div className={styles.prReadyRow}>
+            <span className={styles.prReadyRowLabel}>Status</span>
+            <span className={`${styles.prReadyRowValue} ${styles.prReadyActive}`}>● Active</span>
+          </div>
+        </div>
+
+        <div className={styles.prReadyPrivacy}>
+          🔒 Encrypted · never shared
+        </div>
+      </div>
+
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.btnPrimary}
+          onClick={onNext}
+          disabled={!ready}
+        >
+          Reveal my Protocol →
+        </button>
+      </div>
+      {!ready && (
+        <p style={{ textAlign: 'center', fontSize: 10, color: 'var(--q-soft)', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: -12 }}>
+          Final step · 30 seconds
         </p>
-      </div>
-
-      <div className={styles.prItems}>
-        {ITEMS.map((label, i) => {
-          const done = filled > i;
-          return (
-            <div key={label} className={styles.prItem}>
-              <div className={styles.prItemHeader}>
-                <span className={styles.prItemLabel}>{label}</span>
-                {done && <span className={styles.prItemCheck}>✓</span>}
-              </div>
-              <div className={styles.prBarTrack}>
-                <div
-                  className={styles.prBarFill}
-                  style={{ width: done ? "100%" : "0%" }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <button
-        type="button"
-        className={styles.btnPrimary}
-        onClick={onNext}
-        disabled={filled < ITEMS.length}
-      >
-        Get my Protocol →
-      </button>
+      )}
     </div>
   );
 }

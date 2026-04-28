@@ -1,80 +1,92 @@
-/* ─── Design tokens ─────────────────────────────────────────── */
+/* ─── Outer page — warm grey background ─────────────────── */
 .page {
-  --bg: #f6f8f3;
-  --bg-raised: #fbfcf8;
-  --bg-surface: rgba(255, 255, 255, 0.92);
-  --text: #667163;
-  --text-strong: #243129;
-  --text-soft: #8a9687;
-  --border: rgba(97, 111, 100, 0.14);
-  --border-hover: rgba(97, 111, 100, 0.28);
-  --accent: #31443a;
-  --accent-bg: rgba(49, 68, 58, 0.07);
-  --accent-glow: rgba(49, 68, 58, 0.05);
-  --shadow: 0 24px 70px rgba(90, 105, 92, 0.08);
-
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top left, rgba(190, 203, 191, 0.18), transparent 30%),
-    linear-gradient(180deg, #f6f8f3 0%, #fbfcf8 40%, #ffffff 100%);
-  color: var(--text);
-  display: grid;
-  grid-template-rows: auto 1fr;
+  background: #f0efec;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-/* ─── Header ──────────────────────────────────────────────── */
-.header {
-  padding: 32px 48px 0;
-  width: min(100%, 720px);
-  margin: 0 auto;
+/* ─── Inner screen column — white ───────────────────────── */
+.screen {
   width: 100%;
+  max-width: 680px;
+  min-height: 100dvh;
+  background: #f9fbfb;
+  display: flex;
+  flex-direction: column;
 }
 
-.headerInner {
+/* ─── Topbar ─────────────────────────────────────────────── */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #edf0f1;
+  padding: 14px 18px 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 14px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.logo {
-  display: block;
-  width: 22px;
-  height: 22px;
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #7f949b;
   flex-shrink: 0;
-  filter: brightness(0);
-  opacity: 0.28;
+  padding: 0;
+  margin-left: -4px;
+  transition: color 0.15s;
+}
+
+.backBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.backBtn:not(:disabled):hover {
+  color: #253239;
 }
 
 .headerProgress {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
-  max-width: 280px;
 }
 
 .progressTrack {
   flex: 1;
   height: 1px;
-  background: var(--border);
+  background: #dfe4e6;
   overflow: hidden;
+  position: relative;
 }
 
 .progressFill {
   display: block;
   height: 100%;
-  background: var(--accent);
-  transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: #253239;
+  transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .progressLabel {
-  font-size: 11px;
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  color: #7f949b;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
 }
 
 .headerProcessing {
@@ -82,7 +94,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #253239;
 }
 
 .tagline {
@@ -91,23 +103,25 @@
 
 /* ─── Content shell ─────────────────────────────────────── */
 .shell {
-  width: min(100%, 720px);
-  margin: 0 auto;
-  padding: 56px 48px 72px;
-  width: 100%;
+  flex: 1;
+  padding: 28px 22px 110px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 720px) {
+@media (max-width: 480px) {
   .header {
-    padding: 24px 28px 0;
+    padding: 12px 14px 10px;
   }
 
   .shell {
-    padding: 40px 28px 56px;
+    padding: 22px 18px 110px;
   }
+}
 
-  .headerProgress {
-    max-width: 180px;
+@media (min-width: 768px) {
+  .shell {
+    padding: 36px 32px 120px;
   }
 }

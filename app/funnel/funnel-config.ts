@@ -13,6 +13,7 @@ export type SlideType =
   | "numeric-weight"
   | "belief"
   | "info"
+  | "stat"
   | "summary"
   | "promise"
   | "yes-ladder"
@@ -81,6 +82,15 @@ export type InfoSlide = {
   body: string;
 };
 
+export type StatSlide = {
+  id: string;
+  type: "stat";
+  stat: string;
+  statLabel: string;
+  headline: string;
+  source?: string;
+};
+
 export type SummarySlide = {
   id: string;
   type: "summary";
@@ -119,6 +129,7 @@ export type SlideConfig =
   | NumericWeightSlide
   | BeliefSlide
   | InfoSlide
+  | StatSlide
   | SummarySlide
   | PromiseSlide
   | YesLadderSlide
@@ -145,6 +156,15 @@ export const SLIDES: SlideConfig[] = [
       "/assets/3-before.png",
       "/assets/4-before.png",
     ],
+  },
+
+  {
+    id: "stat-age",
+    type: "stat",
+    stat: "87%",
+    statLabel: "of men your age",
+    headline: "say their body shape is the #1 driver of low self-esteem",
+    source: "Body Image & Self-Esteem in Men, Journal of Health Psychology, 2022",
   },
 
   {
@@ -286,7 +306,7 @@ export const SLIDES: SlideConfig[] = [
     id: "info_time",
     type: "info",
     variant: "objection",
-    headline: "A busy schedule doesn't have to stop you from looking good and feeling confident.",
+    headline: "A busy schedule is never the deciding factor in how good you look or how confident you feel.",
     body: "By evaluating your answers in this quiz, we'll be able to determine your Attractiveness Protocol and craft an actionable & quick routine to help you achieve your goals.",
   },
 
@@ -334,6 +354,14 @@ export const SLIDES: SlideConfig[] = [
   {
     id: "summary",
     type: "summary",
+  },
+
+  {
+    id: "how-it-works",
+    type: "info",
+    variant: "objection",
+    headline: "Calculated from research. Tailored to your body, face, and context.",
+    body: "Every recommendation comes from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ fully measured men.\n\nYour protocol is what research says about your specific ratios, facial structure, and social environment — nothing generic, nothing guessed.",
   },
 
   {

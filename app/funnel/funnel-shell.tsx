@@ -12,6 +12,7 @@ import { SingleQuestion, MultiQuestion } from "./slides/QuestionSlide";
 import { HeightSlide, WeightSlide } from "./slides/NumericSlide";
 import { BeliefSlide } from "./slides/BeliefSlide";
 import { InfoSlide } from "./slides/InfoSlide";
+import { StatSlide } from "./slides/StatSlide";
 import { SummarySlide } from "./slides/SummarySlide";
 import { PromiseSlide } from "./slides/PromiseSlide";
 import { YesLadderSlide } from "./slides/YesLadderSlide";
@@ -70,16 +71,19 @@ export default function FunnelShell() {
 
   return (
     <main className={styles.page}>
-      {/* ── Header ─────────────────────────────────────────── */}
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <img
-            src="/assets/Prtcl.png"
-            alt="Protocol Club"
-            className={styles.logo}
-            width={28}
-            height={28}
-          />
+      <div className={styles.screen}>
+        {/* ── Header ───────────────────────────────────────── */}
+        <header className={styles.header}>
+          <button
+            className={styles.backBtn}
+            onClick={handleBack}
+            disabled={step === 0}
+            aria-label="Back"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M11 14L6 9l5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
           {!isSection7 && (
             <div className={styles.headerProgress}>
               <div className={styles.progressTrack}>
@@ -89,22 +93,19 @@ export default function FunnelShell() {
                 />
               </div>
               <span className={styles.progressLabel}>
-                {Math.max(0, qCount)} / {TOTAL_QUESTIONS}
+                {String(step + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
               </span>
             </div>
           )}
           {isSection7 && (
             <span className={styles.headerProcessing}>Processing…</span>
           )}
-        </div>
-        <p className={styles.tagline}>
-          Clinical assessment based on 3,000+ peer-reviewed studies on male physical attractiveness.
-        </p>
-      </header>
+        </header>
 
-      {/* ── Slide ──────────────────────────────────────────── */}
-      <div className={styles.shell}>
-        {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack)}
+        {/* ── Slide ──────────────────────────────────────────── */}
+        <div className={styles.shell}>
+          {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack)}
+        </div>
       </div>
     </main>
   );
@@ -181,6 +182,16 @@ function renderSlide(
         />
       );
 
+    case "stat":
+      return (
+        <StatSlide
+          slide={slide}
+          answers={answers}
+          onNext={onNext}
+          onBack={onBack}
+        />
+      );
+
     case "summary":
       return (
         <SummarySlide
@@ -210,7 +221,12 @@ function renderSlide(
       );
 
     case "protocol-ready":
-      return <ProtocolReadySlide onNext={onNext} />;
+      return (
+        <ProtocolReadySlide
+          answers={answers}
+          onNext={onNext}
+        />
+      );
 
     case "final-loading":
       return <FinalLoadingSlide answers={answers} />;

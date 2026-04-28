@@ -1,8 +1,18 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import type { SingleSlide, MultiSlide, Answers } from "../funnel-config";
 import styles from "./slides.module.css";
+
+function parseEm(text: string): React.ReactNode {
+  const parts = text.split(/(\*[^*]+\*)/g);
+  return parts.map((part, i) =>
+    part.startsWith("*") && part.endsWith("*")
+      ? <em key={i} style={{ fontStyle: "italic", color: "var(--q-soft)" }}>{part.slice(1, -1)}</em>
+      : part
+  );
+}
 
 // ── Single Select ─────────────────────────────────────────
 
@@ -14,6 +24,16 @@ type SingleProps = {
   onBack: () => void;
 };
 
+const EYEBROWS: Record<string, string> = {
+  age_bracket: "01 · Profile",
+  morphology: "03 · Composition",
+  shape_impact: "04 · Impact",
+  pain_timeline: "05 · Duration",
+  ethnicity: "08 · Reference points",
+  weekly_time: "11 · Schedule",
+  social_environment: "13 · Context",
+};
+
 export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: SingleProps) {
   const selected = (answers[slide.stateKey] as string) ?? "";
 
@@ -22,10 +42,14 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
     setTimeout(onNext, 150);
   };
 
+  const eyebrow = EYEBROWS[slide.stateKey];
+  const isYesNo = !slide.images && slide.options.length === 2;
+
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.question}>{slide.question}</h2>
+        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
+        <h2 className={styles.question}>{parseEm(slide.question)}</h2>
         {slide.subtext && <p className={styles.subtext}>{slide.subtext}</p>}
       </div>
 
@@ -54,6 +78,19 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
             );
           })}
         </div>
+      ) : isYesNo ? (
+        <div className={styles.ynGrid}>
+          {slide.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={styles.ynBtn}
+              onClick={() => handleSelect(option)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
       ) : (
         <div className={styles.optionsList}>
           {slide.options.map((option) => (
@@ -70,12 +107,13 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
       )}
 
       {slide.whyWeAsk && (
-        <aside className={styles.whyWeAsk}>
-          <p className={styles.whyWeAskLabel}>Why we ask</p>
-          <p className={styles.whyWeAskText}>{slide.whyWeAsk}</p>
+        <aside className={styles.contextNote}>
+          <div>
+            <p className={styles.contextNoteLabel}>Why we ask</p>
+            <p style={{ margin: 0 }}>{slide.whyWeAsk}</p>
+          </div>
         </aside>
       )}
-
     </div>
   );
 }
@@ -90,9 +128,15 @@ type MultiProps = {
   onBack: () => void;
 };
 
+const MULTI_EYEBROWS: Record<string, string> = {
+  expected_results: "06 · Targets",
+  past_solutions: "14 · Background",
+};
+
 export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: MultiProps) {
   const selected = (answers[slide.stateKey] as string[]) ?? [];
   const canAdvance = selected.length > 0;
+  const eyebrow = MULTI_EYEBROWS[slide.stateKey];
 
   const toggle = (option: string) => {
     const next = selected.includes(option)
@@ -104,7 +148,8 @@ export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: Mult
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.question}>{slide.question}</h2>
+        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
+        <h2 className={styles.question}>{parseEm(slide.question)}</h2>
         {slide.subtext && <p className={styles.subtext}>{slide.subtext}</p>}
       </div>
 
@@ -116,16 +161,22 @@ export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: Mult
             className={`${styles.option} ${selected.includes(option) ? styles.optionSelected : ""}`}
             onClick={() => toggle(option)}
           >
-            <span className={`${styles.optionCheck} ${selected.includes(option) ? styles.optionCheckActive : ""}`} aria-hidden="true" />
             {option}
+            <span className={`${styles.optionCheck} ${selected.includes(option) ? styles.optionCheckActive : ""}`} aria-hidden="true" />
           </button>
         ))}
       </div>
 
+      <p className={styles.multiCounter}>
+        <strong>{selected.length}</strong> selected · pick at least 1
+      </p>
+
       {slide.whyWeAsk && (
-        <aside className={styles.whyWeAsk}>
-          <p className={styles.whyWeAskLabel}>Why we ask</p>
-          <p className={styles.whyWeAskText}>{slide.whyWeAsk}</p>
+        <aside className={styles.contextNote}>
+          <div>
+            <p className={styles.contextNoteLabel}>Category note</p>
+            <p style={{ margin: 0 }}>{slide.whyWeAsk}</p>
+          </div>
         </aside>
       )}
 
@@ -139,7 +190,7 @@ export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: Mult
           onClick={onNext}
           disabled={!canAdvance}
         >
-          Continue
+          Continue →
         </button>
       </div>
     </div>
