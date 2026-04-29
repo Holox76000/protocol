@@ -295,6 +295,93 @@ function extractImageFromGemini(payload: unknown): string | null {
   return null;
 }
 
+// ── Shared generation logic (used in dev sync path) ──────────────────────
+
+async function runGenerationInline(
+  userId: string,
+  photoPath: string,
+  metrics: CalibrationMetrics,
+  qr: Record<string, unknown>,
+): Promise<Response> {
+  const { data: photoData, error: dlError } = await supabaseAdmin.storage.from("user-photos").download(photoPath);
+  if (dlError || !photoData) {
+    return NextResponse.json({ error: "Could not download user photo.", detail: dlError?.message }, { status: 500 });
+  }
+
+  const photoBuffer = Buffer.from(await photoData.arrayBuffer());
+  const photoBase64 = photoBuffer.toString("base64");
+  const photoMime   = photoData.type || "image/jpeg";
+
+  const apiKey = process.env.NANOBANANA_API_KEY;
+  const model  = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
+  if (!apiKey) return NextResponse.json({ error: "NANOBANANA_API_KEY not configured." }, { status: 503 });
+
+  const geminiUrl = `${DEFAULT_API_BASE}/models/${model}:generateContent`;
+  const promptParams: PromptParams = {
+    age:                          (qr.age             as number | null) ?? 30,
+    metrics,
+    heightCm:                     (qr.height_cm       as number | null) ?? null,
+    weightKg:                     (qr.weight_kg       as number | null) ?? null,
+    waistCm:                      (qr.waist_circumference_cm as number | null) ?? null,
+    trainingExperience:           (qr.training_experience as string | null) ?? null,
+    professionalEnvironment:      (qr.professional_environment as string | null) ?? null,
+    professionalEnvironmentOther: (qr.professional_environment_other as string | null) ?? null,
+    typicalClothing:              (qr.typical_clothing as string | null) ?? null,
+    socialPerception:             Array.isArray(qr.social_perception) ? qr.social_perception as string[] : null,
+  };
+
+  // Step 1: analysis
+  const analysisRes = await fetchWithRetry(geminiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [
+        { inline_data: { mime_type: photoMime, data: photoBase64 } },
+        { text: buildAnalysisPrompt(promptParams) },
+      ]}],
+      generationConfig: { responseModalities: ["TEXT"], temperature: 0.3, maxOutputTokens: 1500 },
+    }),
+  }, 4, "step1");
+  const analysisRaw = await analysisRes.text();
+  if (!analysisRes.ok) return NextResponse.json({ error: "Photo analysis failed.", detail: analysisRaw.slice(0, 400) }, { status: analysisRes.status });
+  const analysis = extractTextFromGemini(JSON.parse(analysisRaw));
+  if (!analysis) return NextResponse.json({ error: "Photo analysis returned no content." }, { status: 502 });
+
+  // Step 2: image generation
+  const generationRes = await fetchWithRetry(geminiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [
+        { inline_data: { mime_type: photoMime, data: photoBase64 } },
+        { text: buildGenerationPrompt(promptParams, analysis) },
+      ]}],
+      generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "3:4", imageSize: "1K" }, temperature: 0.4 },
+    }),
+  }, 4, "step2");
+  const generationRaw = await generationRes.text();
+  if (!generationRes.ok) return NextResponse.json({ error: "Image generation failed.", detail: generationRaw.slice(0, 400) }, { status: generationRes.status });
+  const afterDataUrl = extractImageFromGemini(JSON.parse(generationRaw));
+  if (!afterDataUrl) return NextResponse.json({ error: "Gemini did not return an image." }, { status: 502 });
+
+  // Upload + persist
+  const match = afterDataUrl.match(/^data:(.+?);base64,(.+)$/);
+  if (!match) return NextResponse.json({ error: "Malformed image data URL." }, { status: 500 });
+  const [, afterMime, afterBase64] = match;
+  const storagePath = `before-after/${userId}.${afterMime === "image/png" ? "png" : "jpg"}`;
+  const { error: uploadError } = await supabaseAdmin.storage.from("user-photos").upload(
+    storagePath, Buffer.from(afterBase64, "base64"), { contentType: afterMime, upsert: true },
+  );
+  if (uploadError) return NextResponse.json({ error: "Upload failed.", detail: uploadError.message }, { status: 500 });
+  await supabaseAdmin.from("protocols").update({ before_after_preview_path: storagePath, before_after_analysis: analysis }).eq("user_id", userId);
+
+  const [beforeSigned, afterSigned] = await Promise.all([
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath, 3600),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(storagePath, 3600),
+  ]);
+  return NextResponse.json({ status: "done", beforeUrl: beforeSigned.data?.signedUrl ?? null, afterUrl: afterSigned.data?.signedUrl ?? null, analysis });
+}
+
 // ── Main route ────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
@@ -348,8 +435,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ status: "generating" });
     }
 
-    // Development fallback: run synchronously (no Netlify timeout in dev)
-    return NextResponse.json({ error: "Background function not available in dev. Run via netlify dev." }, { status: 503 });
+    // Development fallback: run synchronously inline (no timeout constraint in dev)
+    return runGenerationInline(userId, photoPath, metrics, qrRes.data as Record<string, unknown>);
 
   } catch (err) {
     console.error("[generate-before-after] POST error", err);

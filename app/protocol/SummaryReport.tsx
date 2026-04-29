@@ -601,6 +601,7 @@ export default function SummaryReport({
                       <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Generating…</>
                     ) : "Generate Before/After"}
                   </button>
+                  {generating && <p style={{ marginTop: 12, fontSize: 12, color: "#7f949b" }}>Generation in progress — this may take 1–3 minutes. The page will update automatically.</p>}
                   {genError && <p style={{ marginTop: 12, fontSize: 12, color: "#9a4040" }}>{genError}</p>}
                 </div>
               )}

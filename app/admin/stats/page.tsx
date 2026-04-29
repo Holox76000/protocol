@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export default async function StatsPage() {
   await requireAdmin();
 
-  const EXCLUDED_EMAILS = ["patrypierreandre", "sofiane.lekfif"];
+  const EXCLUDED_EMAILS = ["patrypierreandre", "sofiane.lekfif", "thibault.cdn"];
 
   // Fetch all users with date + paid status (exclude internal accounts)
   const { data: users } = await supabaseAdmin
