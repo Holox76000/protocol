@@ -7,6 +7,8 @@ import { trackEvent } from "../../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
 import "../f1.css";
 import "./f1-offer.css";
+import "../../program/program.css";
+import CompleteFacialAnalysisSection from "../../program/CompleteFacialAnalysisSection";
 
 /* ─── Icons ─────────────────────────────────────────────────────────────── */
 
@@ -722,6 +724,7 @@ export default function F1OfferPage() {
       <MHeroV1 href={signupHref} />
       <MPress />
       <MSteps />
+      <CompleteFacialAnalysisSection />
       <MResults href={signupHref} />
       <MScience />
       <MCompare />
