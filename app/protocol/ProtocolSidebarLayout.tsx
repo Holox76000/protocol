@@ -91,6 +91,7 @@ type Props = {
   initialSection:         SectionId;
   initialBeforeUrl:       string | null;
   initialAfterUrl:        string | null;
+  initialGenerating?:     boolean;
   summary:                   string | null;
   nutritionPlanContent:      string | null;
   supplementProtocolContent: string | null;
@@ -121,6 +122,7 @@ export default function ProtocolSidebarLayout({
   initialSection,
   initialBeforeUrl,
   initialAfterUrl,
+  initialGenerating = false,
   summary: initialSummary,
   nutritionPlanContent:      initialNutrition,
   supplementProtocolContent: initialSupplement,
@@ -193,7 +195,7 @@ export default function ProtocolSidebarLayout({
   // ── Before/After generation state ─────────────────────────────────────
   const [beforeUrl, setBeforeUrl]   = useState<string | null>(initialBeforeUrl);
   const [afterUrl, setAfterUrl]     = useState<string | null>(initialAfterUrl);
-  const [generating, setGenerating] = useState(false);
+  const [generating, setGenerating] = useState(initialGenerating);
   const [genError, setGenError]     = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -202,6 +204,12 @@ export default function ProtocolSidebarLayout({
   }, []);
 
   useEffect(() => () => stopPolling(), [stopPolling]);
+
+  // Auto-start polling if generation was already in progress when page loaded
+  useEffect(() => {
+    if (initialGenerating) startPolling();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Listen for protocol-navigate custom events (e.g. from SummaryReport CTA)
   useEffect(() => {
@@ -224,6 +232,7 @@ export default function ProtocolSidebarLayout({
           setBeforeUrl(data.beforeUrl ?? null);
           setAfterUrl(data.afterUrl ?? null);
           setGenerating(false);
+          router.refresh();
         } else if (data.status === "error") {
           stopPolling();
           setGenError(data.error ?? "Generation failed.");
@@ -262,6 +271,7 @@ export default function ProtocolSidebarLayout({
       setBeforeUrl(data.beforeUrl ?? null);
       setAfterUrl(data.afterUrl ?? null);
       setGenerating(false);
+      router.refresh();
     } catch (e) {
       setGenError(e instanceof Error ? e.message : "Unknown error.");
       setGenerating(false);
