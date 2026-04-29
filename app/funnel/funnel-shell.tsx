@@ -92,9 +92,6 @@ export default function FunnelShell() {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className={styles.progressLabel}>
-                {String(step + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
-              </span>
             </div>
           )}
           {isSection7 && (
@@ -224,11 +221,10 @@ function renderSlide(
       return (
         <ProtocolReadySlide
           answers={answers}
-          onNext={onNext}
         />
       );
 
     case "final-loading":
-      return <FinalLoadingSlide answers={answers} />;
+      return <FinalLoadingSlide answers={answers} onNext={onNext} />;
   }
 }

@@ -242,8 +242,8 @@ export const SLIDES: SlideConfig[] = [
     id: "info0",
     type: "info",
     variant: "social-proof",
-    headline: "10,000+ men have already taken this assessment.",
-    body: "Built on 4 years of R&D and a dataset of 2,500+ fully measured men.",
+    headline: "2,500+ men have already taken this assessment.",
+    body: "Built on 4 years of R&D and a dataset of 2,500+ men who have reached their peak potential.",
   },
 
 
@@ -294,7 +294,7 @@ export const SLIDES: SlideConfig[] = [
     question: "How much time do you put into your physique each week?",
     subtext: "Our Protocol is built to fit your schedule, not the other way around.",
     options: [
-      "I don't — zero effort right now",
+      "Zero effort right now",
       "Less than 1 hour",
       "1 to 3 hours",
       "3 to 5 hours",
@@ -306,8 +306,8 @@ export const SLIDES: SlideConfig[] = [
     id: "info_time",
     type: "info",
     variant: "objection",
-    headline: "A busy schedule is never the deciding factor in how good you look or how confident you feel.",
-    body: "By evaluating your answers in this quiz, we'll be able to determine your Attractiveness Protocol and craft an actionable & quick routine to help you achieve your goals.",
+    headline: "A busy schedule won't make your transformation harder.",
+    body: "Looking and feeling your best doesn't require hours a day. Based on your answers, we'll build a Protocol that fits into your life: precise, efficient, and designed around your actual schedule.",
   },
 
   {
@@ -318,7 +318,7 @@ export const SLIDES: SlideConfig[] = [
     sectionLabel: "Current Situation",
     qNumber: 11,
     question: "What's your social environment?",
-    whyWeAsk: "Attractiveness isn't one-size-fits-all. A doctor and a lumberjack don't project the same image — and they shouldn't. We calibrate your protocol to the context where it matters most.",
+    whyWeAsk: "Attractiveness isn't one-size-fits-all. A doctor and a lumberjack don't project the same image, and they shouldn't. We calibrate your protocol to the context where it matters most.",
     options: [
       "Corporate",
       "Entrepreneur / Startup",
@@ -360,8 +360,8 @@ export const SLIDES: SlideConfig[] = [
     id: "how-it-works",
     type: "info",
     variant: "objection",
-    headline: "Calculated from research. Tailored to your body, face, and context.",
-    body: "Every recommendation comes from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ fully measured men.\n\nYour protocol is what research says about your specific ratios, facial structure, and social environment — nothing generic, nothing guessed.",
+    headline: "We build your protocol calculated from research and tailored by aesthetic experts.",
+    body: "Every recommendation is built from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ men.\n\nEach protocol is then reviewed by our team of aesthetic experts to make sure every detail fits your specific ratios, facial structure, and social context. Nothing generic, nothing guessed.",
   },
 
   {
@@ -378,7 +378,7 @@ export const SLIDES: SlideConfig[] = [
     qNumber: 16,
     loaderStep: 1,
     loaderLabel: "Analyzing your profile...",
-    question: "Did you know attractiveness is unique to each person — shaped by age, face, social context, and genetics?",
+    question: "Did you know attractiveness is unique to each person, shaped by age, face, social context, and genetics?",
     options: ["Yes", "No"],
   },
 
@@ -400,18 +400,18 @@ export const SLIDES: SlideConfig[] = [
     qNumber: 18,
     loaderStep: 3,
     loaderLabel: "Generating your 12-week protocol...",
-    question: "Would a simple, science-backed protocol — built for your body — interest you?",
+    question: "Would a simple, science-backed protocol built specifically for your body interest you?",
     options: ["Yes", "No"],
-  },
-
-  {
-    id: "protocol-ready",
-    type: "protocol-ready",
   },
 
   {
     id: "final-loading",
     type: "final-loading",
+  },
+
+  {
+    id: "protocol-ready",
+    type: "protocol-ready",
   },
 ];
 

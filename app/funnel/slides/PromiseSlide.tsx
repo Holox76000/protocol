@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import styles from "./slides.module.css";
 
 type Props = {
@@ -22,19 +23,19 @@ const ROWS = [
   },
   {
     when: "Week 4",
-    title: "Measurable ratio shifts begin",
+    title: "You start seeing visible results",
     desc: "SWR, CWR, torso index move within research bands.",
     mod: "",
   },
   {
     when: "Week 8",
-    title: "Visible structural changes",
+    title: "People start to treat you differently",
     desc: "Frame change perceptible to others, not just to you.",
     mod: "",
   },
   {
     when: "Week 12",
-    title: "Full formula unlocked",
+    title: "You start to feel like in a new body",
     desc: "Calibration complete. Routine becomes self-directed.",
     mod: "",
   },
@@ -51,28 +52,28 @@ export function PromiseSlide({ onNext, onBack }: Props) {
       </div>
 
       <p className={styles.subtext}>
-        Based on your profile, this is the projected outcome of executing the Protocol for 12 weeks.
+        This is the projected outcome of executing the Protocol for 12 weeks.
       </p>
 
       <div className={styles.timelineRich}>
-        {ROWS.map((r) => (
-          <div
-            key={r.when}
-            className={`${styles.tlRow} ${r.mod === "now" ? styles.tlRowNow : ""}`}
-          >
-            <span className={styles.tlDot} />
-            <div>
-              <div className={styles.tlWhen}>{r.when}</div>
-              <div className={styles.tlTitle}>{r.title}</div>
-              <div className={styles.tlDesc}>{r.desc}</div>
+        {ROWS.map((r, i) => (
+          <Fragment key={r.when}>
+            <div className={`${styles.tlRow} ${r.mod === "now" ? styles.tlRowNow : ""}`}>
+              <span className={styles.tlDot} />
+              <div>
+                <div className={styles.tlWhen}>{r.when}</div>
+                <div className={styles.tlTitle}>{r.title}</div>
+                {r.desc && <div className={styles.tlDesc}>{r.desc}</div>}
+              </div>
             </div>
-          </div>
+            <div className={styles.tlArrow} />
+          </Fragment>
         ))}
         <div className={`${styles.tlRow} ${styles.tlRowEnd}`}>
           <span className={styles.tlDot} />
           <div>
             <div className={styles.tlWhen}>{deadline}</div>
-            <div className={styles.tlTitle}>Full formula active</div>
+            <div className={styles.tlTitle}>You reach your peak potential</div>
             <div className={styles.tlDesc}>Maintenance mode. Long-form data review.</div>
           </div>
         </div>

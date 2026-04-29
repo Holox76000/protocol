@@ -191,11 +191,17 @@ export default function ProtocolSidebarLayout({
   };
 
   // ── Before/After generation state ─────────────────────────────────────
-  // URLs are pre-fetched server-side — no client-side fetch needed on mount
   const [beforeUrl, setBeforeUrl]   = useState<string | null>(initialBeforeUrl);
   const [afterUrl, setAfterUrl]     = useState<string | null>(initialAfterUrl);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError]     = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  }, []);
+
+  useEffect(() => () => stopPolling(), [stopPolling]);
 
   // Listen for protocol-navigate custom events (e.g. from SummaryReport CTA)
   useEffect(() => {
@@ -207,6 +213,26 @@ export default function ProtocolSidebarLayout({
     return () => window.removeEventListener("protocol-navigate", handler);
   }, [navigateTo]);
 
+  const startPolling = useCallback(() => {
+    stopPolling();
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/admin/generate-before-after?userId=${encodeURIComponent(userId)}`);
+        const data = await res.json() as { status?: string; beforeUrl?: string; afterUrl?: string; error?: string };
+        if (data.status === "done") {
+          stopPolling();
+          setBeforeUrl(data.beforeUrl ?? null);
+          setAfterUrl(data.afterUrl ?? null);
+          setGenerating(false);
+        } else if (data.status === "error") {
+          stopPolling();
+          setGenError(data.error ?? "Generation failed.");
+          setGenerating(false);
+        }
+      } catch { /* keep polling on network error */ }
+    }, 5000);
+  }, [userId, stopPolling]);
+
   const handleGenerate = async () => {
     setGenerating(true);
     setGenError(null);
@@ -216,16 +242,28 @@ export default function ProtocolSidebarLayout({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
       });
-      const data = await res.json() as { beforeUrl?: string; afterUrl?: string; error?: string };
+      const rawText = await res.text();
+      let data: { status?: string; beforeUrl?: string; afterUrl?: string; error?: string };
+      try {
+        data = JSON.parse(rawText) as typeof data;
+      } catch {
+        throw new Error(`Erreur serveur (${res.status})`);
+      }
       if (!res.ok || data.error) {
         setGenError(data.error ?? "Generation failed.");
-      } else {
-        setBeforeUrl(data.beforeUrl ?? null);
-        setAfterUrl(data.afterUrl  ?? null);
+        setGenerating(false);
+        return;
       }
+      if (data.status === "generating") {
+        startPolling(); // check every 5s until done
+        return;
+      }
+      // Dev mode: sync response
+      setBeforeUrl(data.beforeUrl ?? null);
+      setAfterUrl(data.afterUrl ?? null);
+      setGenerating(false);
     } catch (e) {
       setGenError(e instanceof Error ? e.message : "Unknown error.");
-    } finally {
       setGenerating(false);
     }
   };

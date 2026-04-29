@@ -21,7 +21,7 @@ export function InfoSlide({ slide, onNext, onBack }: Props) {
         {isSocialProof && (
           <>
             <div className={styles.infoStat}>
-              <span className={styles.infoStatNumber}>10,000+</span>
+              <span className={styles.infoStatNumber}>2,500+</span>
               <span className={styles.infoStatLabel}>men assessed</span>
             </div>
             <div className={styles.infoAvatarRow}>

@@ -240,6 +240,17 @@
   gap: 10px;
 }
 
+.actionsInline {
+  padding: 20px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.actionsInline .btnPrimary {
+  padding: 0 32px;
+  width: auto;
+}
+
 .actionsFull {
   position: sticky;
   bottom: 0;
@@ -1546,6 +1557,62 @@
 
 .prReadyActive { color: #4a7a5e; }
 
+.prQualBadge {
+  display: inline-block;
+  background: rgba(74, 122, 94, 0.12);
+  color: #4a7a5e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.prReadySubtext {
+  font-size: 14px;
+  color: var(--q-soft);
+  line-height: 1.55;
+  text-align: center;
+  margin: 0;
+}
+
+.prQualGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.prQualItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--q-strong);
+  background: rgba(37, 50, 57, 0.04);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.prQualCheck {
+  color: #4a7a5e;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.prReadyHint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--q-soft);
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
 .prReadyPrivacy {
   display: flex;
   align-items: center;
@@ -1586,6 +1653,14 @@
   text-align: center;
   margin: 0;
   color: var(--q-strong);
+}
+
+.spinnerSubtext {
+  font-size: 14px;
+  color: var(--q-soft);
+  line-height: 1.5;
+  text-align: center;
+  margin: 0;
 }
 
 .spinnerChecklist {
@@ -1737,13 +1812,30 @@
 .timelineRich::before {
   content: "";
   position: absolute;
-  left: 13px; top: 6px; bottom: 6px;
+  left: 13px; top: 10px; bottom: 10px;
   width: 1px;
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--q-border-h) 0 4px,
-    transparent 4px 8px
-  );
+  background: var(--q-border-h);
+}
+
+.tlArrow {
+  display: flex;
+  align-items: center;
+  height: 0;
+  position: relative;
+  margin: -9px 0;
+}
+
+.tlArrow::before {
+  content: "▾";
+  position: absolute;
+  left: 8px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--q-soft);
+  background: var(--q-surface-soft);
+  line-height: 1;
+  padding: 0 1px;
+  z-index: 2;
 }
 
 .tlRow {
@@ -1781,7 +1873,8 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--q-soft);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
+  display: block;
 }
 
 .tlRowNow .tlWhen { color: var(--q-accent); }

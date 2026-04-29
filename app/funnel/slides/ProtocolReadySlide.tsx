@@ -1,13 +1,22 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
-type Props = {
-  answers: Answers;
-  onNext: () => void;
-};
+function buildRedirectUrl(answers: Answers): string {
+  const params = new URLSearchParams();
+  for (const [key, val] of Object.entries(answers)) {
+    if (Array.isArray(val)) {
+      params.set(key, val.join("|"));
+    } else if (val) {
+      params.set(key, val);
+    }
+  }
+  params.set("funnel", "quiz");
+  return `/f1/offer?${params.toString()}`;
+}
 
 const MORPHOLOGY_LABELS: Record<string, string> = {
   Skinny: "Skinny",
@@ -26,7 +35,15 @@ const ENV_LABELS: Record<string, string> = {
   Other: "Other",
 };
 
-export function ProtocolReadySlide({ answers, onNext }: Props) {
+const QUALIFIERS = [
+  "Body type assessed",
+  "Goals identified",
+  "Social context matched",
+  "Protocol available",
+];
+
+export function ProtocolReadySlide({ answers }: { answers: Answers }) {
+  const router = useRouter();
   const [ready, setReady] = useState(false);
   const idRef = useRef(`PRTCL-${Math.floor(Math.random() * 9000 + 1000)}`);
 
@@ -41,9 +58,23 @@ export function ProtocolReadySlide({ answers, onNext }: Props) {
   return (
     <div className={styles.card}>
       <div className={styles.prReadyInner}>
-        <div className={styles.eyebrow}>21 · Ready</div>
-        <div className={styles.prSeal}>PC</div>
-        <h2 className={styles.prReadyTitle}>Your Protocol is ready.</h2>
+        <div className={styles.prQualBadge}>Qualified</div>
+
+        <h2 className={styles.prReadyTitle}>Your profile matches our Protocol.</h2>
+
+        <p className={styles.prReadySubtext}>
+          Based on your answers, we can help you. Your profile gives us everything we need to build
+          a protocol that works specifically for you.
+        </p>
+
+        <div className={styles.prQualGrid}>
+          {QUALIFIERS.map((q) => (
+            <div key={q} className={styles.prQualItem}>
+              <span className={styles.prQualCheck}>✓</span>
+              <span>{q}</span>
+            </div>
+          ))}
+        </div>
 
         {(morphology || social) && (
           <div className={styles.prReadyMeta}>
@@ -61,41 +92,25 @@ export function ProtocolReadySlide({ answers, onNext }: Props) {
           </div>
         )}
 
-        <div className={styles.prReadyDetails}>
-          <div className={styles.prReadyRow}>
-            <span className={styles.prReadyRowLabel}>Profile ID</span>
-            <span className={styles.prReadyRowValue}>{idRef.current}</span>
-          </div>
-          <div className={styles.prReadyRow}>
-            <span className={styles.prReadyRowLabel}>Slot reserved</span>
-            <span className={styles.prReadyRowValue}>15 min</span>
-          </div>
-          <div className={styles.prReadyRow}>
-            <span className={styles.prReadyRowLabel}>Status</span>
-            <span className={`${styles.prReadyRowValue} ${styles.prReadyActive}`}>● Active</span>
-          </div>
-        </div>
-
-        <div className={styles.prReadyPrivacy}>
-          🔒 Encrypted · never shared
+        <div className={styles.prReadyRow}>
+          <span className={styles.prReadyRowLabel}>Profile ID</span>
+          <span className={styles.prReadyRowValue}>{idRef.current}</span>
         </div>
       </div>
 
-      <div className={styles.actions}>
+      <div className={styles.actionsFull}>
         <button
           type="button"
           className={styles.btnPrimary}
-          onClick={onNext}
+          onClick={() => router.push(buildRedirectUrl(answers))}
           disabled={!ready}
         >
-          Reveal my Protocol →
+          See my Protocol →
         </button>
+        {!ready && (
+          <p className={styles.prReadyHint}>Finalizing your profile…</p>
+        )}
       </div>
-      {!ready && (
-        <p style={{ textAlign: 'center', fontSize: 10, color: 'var(--q-soft)', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: -12 }}>
-          Final step · 30 seconds
-        </p>
-      )}
     </div>
   );
 }

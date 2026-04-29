@@ -7,7 +7,6 @@ import { getAgeRanges, bfRealisticTarget, muscleGainMultiplier } from "../../../
 import { socialContextBlock } from "../../../../lib/socialContext";
 
 export const runtime = "nodejs";
-export const maxDuration = 180; // two Gemini calls — allow more time
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_MODEL    = "gemini-3.1-flash-image-preview";
@@ -299,204 +298,73 @@ function extractImageFromGemini(payload: unknown): string | null {
 // ── Main route ────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
-  const requestId = crypto.randomUUID();
-
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
+    if (!admin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
     const { userId } = (await request.json()) as { userId: string };
-    if (!userId) {
-      return NextResponse.json({ error: "userId is required." }, { status: 400 });
-    }
+    if (!userId) return NextResponse.json({ error: "userId is required." }, { status: 400 });
 
-    // 1. Fetch user data
+    // Quick pre-flight: verify photo + metrics exist before triggering the bg job
     const [protocolRes, qrRes] = await Promise.all([
-      supabaseAdmin
-        .from("protocols")
-        .select("metrics, before_after_preview_path")
-        .eq("user_id", userId)
-        .maybeSingle(),
-      supabaseAdmin
-        .from("questionnaire_responses")
-        .select("photo_front_path, age, height_cm, weight_kg, waist_circumference_cm, training_experience, professional_environment, professional_environment_other, typical_clothing, social_perception")
-        .eq("user_id", userId)
-        .maybeSingle(),
+      supabaseAdmin.from("protocols").select("metrics, before_after_preview_path").eq("user_id", userId).maybeSingle(),
+      supabaseAdmin.from("questionnaire_responses").select("photo_front_path").eq("user_id", userId).maybeSingle(),
     ]);
 
-    const metrics    = (protocolRes.data?.metrics as CalibrationMetrics | null) ?? null;
-    const qr         = (qrRes.data ?? {}) as Record<string, unknown>;
-    const photoPath  = (qr.photo_front_path as string | null) ?? null;
+    const photoPath = (qrRes.data?.photo_front_path as string | null) ?? null;
+    const metrics   = (protocolRes.data?.metrics as CalibrationMetrics | null) ?? null;
 
-    if (!photoPath) {
-      return NextResponse.json({ error: "No front photo found for this user." }, { status: 404 });
-    }
-    if (!metrics) {
-      return NextResponse.json({ error: "No calibration metrics found. Calibrate first." }, { status: 404 });
-    }
+    if (!photoPath) return NextResponse.json({ error: "No front photo found for this user." }, { status: 404 });
+    if (!metrics)   return NextResponse.json({ error: "No calibration metrics found. Calibrate first." }, { status: 404 });
 
-    const promptParams: PromptParams = {
-      age:                          (qr.age             as number | null) ?? 30,
-      metrics,
-      heightCm:                     (qr.height_cm       as number | null) ?? null,
-      weightKg:                     (qr.weight_kg       as number | null) ?? null,
-      waistCm:                      (qr.waist_circumference_cm as number | null) ?? null,
-      trainingExperience:           (qr.training_experience as string | null) ?? null,
-      professionalEnvironment:      (qr.professional_environment       as string | null) ?? null,
-      professionalEnvironmentOther: (qr.professional_environment_other as string | null) ?? null,
-      typicalClothing:              (qr.typical_clothing               as string | null) ?? null,
-      socialPerception:             Array.isArray(qr.social_perception) ? qr.social_perception as string[] : null,
-    };
-
-    // 2. Download original photo
-    const { data: photoData, error: dlError } = await supabaseAdmin.storage
-      .from("user-photos")
-      .download(photoPath);
-
-    if (dlError || !photoData) {
-      return NextResponse.json({ error: "Could not download user photo.", detail: dlError?.message }, { status: 500 });
+    // Prevent double-trigger if already generating
+    const currentPath = protocolRes.data?.before_after_preview_path as string | null;
+    if (currentPath === "__generating") {
+      return NextResponse.json({ status: "generating" });
     }
 
-    const photoBuffer = Buffer.from(await photoData.arrayBuffer());
-    const photoBase64 = photoBuffer.toString("base64");
-    const photoMime   = photoData.type || "image/jpeg";
+    const siteUrl = process.env.URL ?? process.env.NETLIFY_SITE_URL;
 
-    const apiKey = process.env.NANOBANANA_API_KEY;
-    const model  = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
+    if (siteUrl) {
+      // Production (Netlify): trigger background function, return immediately
+      await supabaseAdmin.from("protocols").update({
+        before_after_preview_path: "__generating",
+      }).eq("user_id", userId);
 
-    if (!apiKey) {
-      return NextResponse.json({ error: "NANOBANANA_API_KEY not configured." }, { status: 503 });
+      const bgRes = await fetch(`${siteUrl}/.netlify/functions/generate-bg-background`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, secret: process.env.BG_FN_SECRET }),
+      });
+
+      if (bgRes.status !== 202) {
+        await supabaseAdmin.from("protocols").update({
+          before_after_preview_path: currentPath ?? null,
+        }).eq("user_id", userId);
+        const errText = await bgRes.text().catch(() => "");
+        return NextResponse.json({ error: `Failed to start background job (${bgRes.status}): ${errText.slice(0, 100)}` }, { status: 500 });
+      }
+
+      return NextResponse.json({ status: "generating" });
     }
 
-    const geminiUrl = `${DEFAULT_API_BASE}/models/${model}:generateContent`;
+    // Development fallback: run synchronously (no Netlify timeout in dev)
+    return NextResponse.json({ error: "Background function not available in dev. Run via netlify dev." }, { status: 503 });
 
-    // ── STEP 1: Photo analysis (text only) ──────────────────────────────────
-    console.log(`[generate-before-after] Step 1 — analysing photo for ${userId}`);
-
-    const analysisRes = await fetchWithRetry(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [
-            { inline_data: { mime_type: photoMime, data: photoBase64 } },
-            { text: buildAnalysisPrompt(promptParams) },
-          ],
-        }],
-        generationConfig: {
-          responseModalities: ["TEXT"],
-          temperature: 0.3,
-          maxOutputTokens: 1500,
-        },
-      }),
-    }, 4, "step1-analysis");
-
-    const analysisRaw = await analysisRes.text();
-
-    if (!analysisRes.ok) {
-      console.error("[generate-before-after] Step 1 failed", { requestId, status: analysisRes.status, body: analysisRaw.slice(0, 500) });
-      return NextResponse.json({ error: "Photo analysis failed.", detail: analysisRaw.slice(0, 400) }, { status: analysisRes.status });
-    }
-
-    const analysisPayload = JSON.parse(analysisRaw);
-    const analysis = extractTextFromGemini(analysisPayload);
-
-    if (!analysis) {
-      console.error("[generate-before-after] Step 1 returned no text", { requestId });
-      return NextResponse.json({ error: "Photo analysis returned no content.", requestId }, { status: 502 });
-    }
-
-    console.log(`[generate-before-after] Step 1 complete — analysis length: ${analysis.length} chars`);
-
-    // ── STEP 2: Image generation ─────────────────────────────────────────────
-    console.log(`[generate-before-after] Step 2 — generating after image for ${userId}`);
-
-    const generationRes = await fetchWithRetry(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [
-            { inline_data: { mime_type: photoMime, data: photoBase64 } },
-            { text: buildGenerationPrompt(promptParams, analysis) },
-          ],
-        }],
-        generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"],
-          imageConfig: { aspectRatio: "3:4", imageSize: "1K" },
-          temperature: 0.4,
-        },
-      }),
-    }, 4, "step2-generation");
-
-    const generationRaw = await generationRes.text();
-
-    if (!generationRes.ok) {
-      console.error("[generate-before-after] Step 2 failed", { requestId, status: generationRes.status, body: generationRaw.slice(0, 500) });
-      return NextResponse.json({ error: "Image generation failed.", detail: generationRaw.slice(0, 400) }, { status: generationRes.status });
-    }
-
-    const generationPayload = JSON.parse(generationRaw);
-    const afterDataUrl = extractImageFromGemini(generationPayload);
-
-    if (!afterDataUrl) {
-      return NextResponse.json({ error: "Gemini did not return an image.", requestId }, { status: 502 });
-    }
-
-    // 3. Upload generated "after" image
-    const match = afterDataUrl.match(/^data:(.+?);base64,(.+)$/);
-    if (!match) {
-      return NextResponse.json({ error: "Generated image data URL is malformed." }, { status: 500 });
-    }
-    const [, afterMime, afterBase64] = match;
-    const afterBuffer  = Buffer.from(afterBase64, "base64");
-    const ext          = afterMime === "image/png" ? "png" : "jpg";
-    const storagePath  = `before-after/${userId}.${ext}`;
-
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from("user-photos")
-      .upload(storagePath, afterBuffer, { contentType: afterMime, upsert: true });
-
-    if (uploadError) {
-      console.error("[generate-before-after] storage upload failed", uploadError);
-      return NextResponse.json({ error: "Failed to save generated image.", detail: uploadError.message }, { status: 500 });
-    }
-
-    // 4. Persist: save storage path + analysis text
-    await supabaseAdmin
-      .from("protocols")
-      .update({
-        before_after_preview_path: storagePath,
-        before_after_analysis: analysis,
-      })
-      .eq("user_id", userId);
-
-    // 5. Return signed URLs
-    const [beforeSigned, afterSigned] = await Promise.all([
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath,   3600),
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(storagePath, 3600),
-    ]);
-
-    return NextResponse.json({
-      beforeUrl: beforeSigned.data?.signedUrl ?? null,
-      afterUrl:  afterSigned.data?.signedUrl  ?? null,
-      analysis,
-      requestId,
-    });
   } catch (err) {
-    console.error("[generate-before-after] unhandled error", { requestId, err });
+    console.error("[generate-before-after] POST error", err);
     return NextResponse.json(
-      { error: "Server error.", detail: err instanceof Error ? err.message : String(err), requestId },
-      { status: 500 }
+      { error: "Server error.", detail: err instanceof Error ? err.message : String(err) },
+      { status: 500 },
     );
   }
 }
 
-// Re-generate signed URLs for an already-generated preview
+// Poll generation status / re-fetch signed URLs
 export async function GET(request: Request) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
+    if (!admin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
@@ -507,20 +375,24 @@ export async function GET(request: Request) {
       supabaseAdmin.from("questionnaire_responses").select("photo_front_path").eq("user_id", userId).maybeSingle(),
     ]);
 
-    const previewPath = protocolRes.data?.before_after_preview_path as string | null;
-    const photoPath   = qrRes.data?.photo_front_path                as string | null;
-    const analysis    = (protocolRes.data?.before_after_analysis    as string | null) ?? null;
+    const previewPath = (protocolRes.data?.before_after_preview_path as string | null) ?? null;
+    const photoPath   = (qrRes.data?.photo_front_path                as string | null) ?? null;
+    const analysis    = (protocolRes.data?.before_after_analysis      as string | null) ?? null;
 
-    if (!previewPath || !photoPath) {
-      return NextResponse.json({ beforeUrl: null, afterUrl: null, analysis: null });
+    if (!previewPath) return NextResponse.json({ status: "not_started" });
+    if (previewPath === "__generating") return NextResponse.json({ status: "generating" });
+    if (previewPath.startsWith("__error:")) {
+      return NextResponse.json({ status: "error", error: previewPath.slice(8) });
     }
 
+    // Done — return signed URLs
     const [before, after] = await Promise.all([
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath,   3600),
+      supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath ?? previewPath, 3600),
       supabaseAdmin.storage.from("user-photos").createSignedUrl(previewPath, 3600),
     ]);
 
     return NextResponse.json({
+      status: "done",
       beforeUrl: before.data?.signedUrl ?? null,
       afterUrl:  after.data?.signedUrl  ?? null,
       analysis,

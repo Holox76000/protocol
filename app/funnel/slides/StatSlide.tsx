@@ -36,7 +36,7 @@ export function StatSlide({ slide, answers, onNext, onBack }: Props) {
         )}
       </div>
 
-      <div className={styles.actionsFull}>
+      <div className={styles.actionsInline}>
         <button type="button" className={styles.btnPrimary} onClick={onNext}>
           I see myself in this →
         </button>
