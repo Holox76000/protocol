@@ -322,7 +322,7 @@ const handler: Handler = async (event) => {
     const photoMime   = photoData.type || "image/jpeg";
 
     const apiKey = process.env.NANOBANANA_API_KEY;
-    const model  = process.env.NANOBANANA_MODEL || "gemini-2.0-flash-preview-image-generation";
+    const model  = process.env.NANOBANANA_MODEL || "gemini-3.1-flash-image-preview";
     if (!apiKey) {
       await markError("API key not configured.");
       return { statusCode: 200, body: "done (no api key)" };
