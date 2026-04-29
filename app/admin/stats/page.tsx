@@ -14,9 +14,10 @@ export default async function StatsPage() {
   // Fetch all users with date + paid status (exclude internal accounts)
   const { data: users } = await supabaseAdmin
     .from("users")
-    .select("created_at, has_paid, email")
+    .select("created_at, has_paid, email, paid_amount_cents")
     .not("email", "ilike", `%${EXCLUDED_EMAILS[0]}%`)
     .not("email", "ilike", `%${EXCLUDED_EMAILS[1]}%`)
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[2]}%`)
     .order("created_at", { ascending: true });
 
   // Fetch leads (exclude internal accounts)
@@ -25,6 +26,7 @@ export default async function StatsPage() {
     .select("created_at, email")
     .not("email", "ilike", `%${EXCLUDED_EMAILS[0]}%`)
     .not("email", "ilike", `%${EXCLUDED_EMAILS[1]}%`)
+    .not("email", "ilike", `%${EXCLUDED_EMAILS[2]}%`)
     .order("created_at", { ascending: true });
 
   // Build daily series starting from first event
@@ -57,6 +59,9 @@ export default async function StatsPage() {
   // Count by day
   const leadsByDay: Record<string, number> = {};
   const ordersByDay: Record<string, number> = {};
+  const revenueByDay: Record<string, number> = {};
+
+  const FALLBACK_PRICE_CENTS = 8900;
 
   for (const l of leads ?? []) {
     const day = (l.created_at as string).slice(0, 10);
@@ -66,6 +71,8 @@ export default async function StatsPage() {
     const day = (u.created_at as string).slice(0, 10);
     if ((u as { has_paid: boolean }).has_paid) {
       ordersByDay[day] = (ordersByDay[day] ?? 0) + 1;
+      const cents = (u as { paid_amount_cents: number | null }).paid_amount_cents ?? FALLBACK_PRICE_CENTS;
+      revenueByDay[day] = (revenueByDay[day] ?? 0) + cents;
     } else {
       leadsByDay[day] = (leadsByDay[day] ?? 0) + 1;
     }
@@ -81,6 +88,7 @@ export default async function StatsPage() {
       date: day,
       leads: leadsByDay[day] ?? 0,
       orders: ordersByDay[day] ?? 0,
+      revenue: revenueByDay[day] ?? 0,
       cumLeads,
       cumOrders,
     };

@@ -132,6 +132,7 @@ export async function POST(request: Request) {
               .from("users")
               .update({
                 has_paid: true,
+                paid_amount_cents: pi.amount,
                 ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
               })
               .eq("id", existingUser.id);
@@ -278,6 +279,7 @@ export async function POST(request: Request) {
             .from("users")
             .update({
               has_paid: true,
+              paid_amount_cents: typeof session.amount_total === "number" ? session.amount_total : 8900,
               ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
             })
             .eq("id", existingUser.id);

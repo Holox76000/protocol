@@ -63,9 +63,8 @@ function ageContextLine(age: number): string {
   return `Age ${age} — subtle, age-appropriate improvements only.`;
 }
 
-const VISUAL_BOOST = 1.25;
 function visualGainMult(age: number): number {
-  return Math.min(0.97, muscleGainMultiplier(age) * VISUAL_BOOST);
+  return muscleGainMultiplier(age);
 }
 
 function buildAnalysisPrompt(p: PromptParams): string {
@@ -419,10 +418,21 @@ const handler: Handler = async (event) => {
       return { statusCode: 200, body: "done (upload failed)" };
     }
 
-    // 6. Persist
+    // 6. Create 10-year signed URLs for permanent access
+    const TEN_YEARS = 315_360_000;
+    const [beforeSigned, afterSigned] = await Promise.all([
+      supabase.storage.from("user-photos").createSignedUrl(photoPath, TEN_YEARS),
+      supabase.storage.from("user-photos").createSignedUrl(storagePath, TEN_YEARS),
+    ]);
+    const beforeUrl = beforeSigned.data?.signedUrl ?? null;
+    const afterUrl  = afterSigned.data?.signedUrl  ?? null;
+
+    // 7. Persist
     await supabase.from("protocols").update({
       before_after_preview_path: storagePath,
       before_after_analysis: analysis,
+      before_url: beforeUrl,
+      after_url:  afterUrl,
     }).eq("user_id", userId);
 
     console.log(`[generate-bg] Done for ${userId} — ${storagePath}`);

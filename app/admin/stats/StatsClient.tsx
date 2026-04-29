@@ -1,9 +1,12 @@
 "use client";
 
+import { useState, useMemo } from "react";
+
 type DayData = {
   date: string;
   leads: number;
   orders: number;
+  revenue: number;
   cumLeads: number;
   cumOrders: number;
 };
@@ -20,12 +23,39 @@ const LEAD_COLOR = "#7f949b";
 const ORDER_COLOR = "#253239";
 const W = 600;
 const BAR_H = 220;
-const AREA_H = 180;
 const PAD = { top: 12, right: 8, bottom: 28, left: 32 };
+
+type Preset = "7d" | "30d" | "90d" | "all";
 
 function formatDate(iso: string) {
   const d = new Date(iso + "T00:00:00Z");
   return d.toLocaleDateString("fr-FR", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+function formatCurrency(cents: number) {
+  return (cents / 100).toLocaleString("fr-FR", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+}
+
+function isoWeekLabel(dateIso: string): string {
+  const d = new Date(dateIso + "T00:00:00Z");
+  const day = d.getUTCDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + diff);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  const fmt = (dt: Date) =>
+    dt.toLocaleDateString("fr-FR", { month: "short", day: "numeric", timeZone: "UTC" });
+  return `${fmt(monday)} – ${fmt(sunday)}`;
+}
+
+function isoWeekKey(dateIso: string): string {
+  const d = new Date(dateIso + "T00:00:00Z");
+  const day = d.getUTCDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + diff);
+  return monday.toISOString().slice(0, 10);
 }
 
 function KpiCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -38,21 +68,49 @@ function KpiCard({ label, value, sub }: { label: string; value: string | number;
   );
 }
 
-function BarChartSvg({ data }: { data: DayData[] }) {
-  const display = data.slice(-30);
-  const maxVal = Math.max(...display.map((d) => d.leads + d.orders), 1);
+function LineChartSvg({ data }: { data: DayData[] }) {
+  const maxVal = Math.max(...data.map((d) => Math.max(d.leads, d.orders)), 1);
   const innerW = W - PAD.left - PAD.right;
   const innerH = BAR_H - PAD.top - PAD.bottom;
-  const barGroupW = innerW / display.length;
-  const barW = Math.max(3, barGroupW * 0.35);
+  const xStep = innerW / Math.max(data.length - 1, 1);
 
-  // Y-axis ticks
   const yTicks = [0, Math.ceil(maxVal / 2), maxVal];
+
+  const pointsFor = (key: "leads" | "orders") =>
+    data.map((d, i) => [i * xStep, innerH - (d[key] / maxVal) * innerH] as [number, number]);
+
+  const toPath = (pts: [number, number][]) => {
+    if (pts.length === 0) return "";
+    return pts.reduce((acc, [x, y], i) => {
+      if (i === 0) return `M ${x} ${y}`;
+      const [px, py] = pts[i - 1];
+      const cpx = (px + x) / 2;
+      return `${acc} C ${cpx} ${py} ${cpx} ${y} ${x} ${y}`;
+    }, "");
+  };
+
+  const toArea = (pts: [number, number][]) => {
+    if (pts.length === 0) return "";
+    return `${toPath(pts)} L ${pts[pts.length - 1][0]} ${innerH} L ${pts[0][0]} ${innerH} Z`;
+  };
+
+  const leadsPoints = pointsFor("leads");
+  const ordersPoints = pointsFor("orders");
 
   return (
     <svg viewBox={`0 0 ${W} ${BAR_H}`} className="w-full" style={{ overflow: "visible" }}>
+      <defs>
+        <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={LEAD_COLOR} stopOpacity={0.18} />
+          <stop offset="100%" stopColor={LEAD_COLOR} stopOpacity={0} />
+        </linearGradient>
+        <linearGradient id="gradOrders" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={ORDER_COLOR} stopOpacity={0.18} />
+          <stop offset="100%" stopColor={ORDER_COLOR} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+
       <g transform={`translate(${PAD.left},${PAD.top})`}>
-        {/* Grid lines */}
         {yTicks.map((t) => {
           const y = innerH - (t / maxVal) * innerH;
           return (
@@ -63,128 +121,87 @@ function BarChartSvg({ data }: { data: DayData[] }) {
           );
         })}
 
-        {/* Bars */}
-        {display.map((d, i) => {
-          const cx = i * barGroupW + barGroupW / 2;
-          const leadsH = (d.leads / maxVal) * innerH;
-          const ordersH = (d.orders / maxVal) * innerH;
+        <path d={toArea(leadsPoints)} fill="url(#gradLeads)" />
+        <path d={toArea(ordersPoints)} fill="url(#gradOrders)" />
 
+        <path d={toPath(leadsPoints)} fill="none" stroke={LEAD_COLOR} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.8} />
+        <path d={toPath(ordersPoints)} fill="none" stroke={ORDER_COLOR} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+
+        {data.map((d, i) => {
+          if (data.length > 10 && i % Math.ceil(data.length / 8) !== 0) return null;
           return (
-            <g key={d.date}>
-              {/* Leads bar */}
-              <rect
-                x={cx - barW - 1}
-                y={innerH - leadsH}
-                width={barW}
-                height={leadsH}
-                fill={LEAD_COLOR}
-                rx={2}
-                opacity={0.7}
-              />
-              {/* Orders bar */}
-              <rect
-                x={cx + 1}
-                y={innerH - ordersH}
-                width={barW}
-                height={ordersH}
-                fill={ORDER_COLOR}
-                rx={2}
-              />
-              {/* X label — show every N labels to avoid crowding */}
-              {(display.length <= 10 || i % Math.ceil(display.length / 8) === 0) && (
-                <text
-                  x={cx}
-                  y={innerH + 16}
-                  textAnchor="middle"
-                  fontSize={9}
-                  fill="#7f949b"
-                >
-                  {formatDate(d.date)}
-                </text>
-              )}
-            </g>
+            <text key={d.date} x={i * xStep} y={innerH + 16} textAnchor="middle" fontSize={9} fill="#7f949b">
+              {formatDate(d.date)}
+            </text>
           );
         })}
       </g>
 
-      {/* Legend */}
       <g transform={`translate(${PAD.left}, ${BAR_H - 4})`}>
-        <rect x={0} y={0} width={8} height={8} fill={LEAD_COLOR} rx={2} opacity={0.7} />
-        <text x={12} y={8} fontSize={10} fill="#7f949b">Leads</text>
-        <rect x={52} y={0} width={8} height={8} fill={ORDER_COLOR} rx={2} />
-        <text x={64} y={8} fontSize={10} fill="#7f949b">Orders</text>
-      </g>
-    </svg>
-  );
-}
-
-function AreaChartSvg({ data }: { data: DayData[] }) {
-  const maxVal = Math.max(...data.map((d) => d.cumLeads), 1);
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = AREA_H - PAD.top - PAD.bottom;
-  const yTicks = [0, Math.ceil(maxVal / 2), maxVal];
-
-  function px(i: number) {
-    return (i / (data.length - 1 || 1)) * innerW;
-  }
-  function py(v: number) {
-    return innerH - (v / maxVal) * innerH;
-  }
-
-  const leadPoints = data.map((d, i) => `${px(i)},${py(d.cumLeads)}`).join(" ");
-  const orderPoints = data.map((d, i) => `${px(i)},${py(d.cumOrders)}`).join(" ");
-  const leadArea = `${px(0)},${innerH} ${leadPoints} ${px(data.length - 1)},${innerH}`;
-  const orderArea = `${px(0)},${innerH} ${orderPoints} ${px(data.length - 1)},${innerH}`;
-
-  return (
-    <svg viewBox={`0 0 ${W} ${AREA_H}`} className="w-full" style={{ overflow: "visible" }}>
-      <defs>
-        <linearGradient id="gL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={LEAD_COLOR} stopOpacity={0.2} />
-          <stop offset="100%" stopColor={LEAD_COLOR} stopOpacity={0} />
-        </linearGradient>
-        <linearGradient id="gO" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={ORDER_COLOR} stopOpacity={0.25} />
-          <stop offset="100%" stopColor={ORDER_COLOR} stopOpacity={0} />
-        </linearGradient>
-      </defs>
-      <g transform={`translate(${PAD.left},${PAD.top})`}>
-        {yTicks.map((t) => {
-          const y = py(t);
-          return (
-            <g key={t}>
-              <line x1={0} y1={y} x2={innerW} y2={y} stroke="#edf0f1" strokeWidth={1} />
-              <text x={-4} y={y + 4} textAnchor="end" fontSize={10} fill="#7f949b">{t}</text>
-            </g>
-          );
-        })}
-
-        <polygon points={leadArea} fill="url(#gL)" />
-        <polyline points={leadPoints} fill="none" stroke={LEAD_COLOR} strokeWidth={2} strokeLinejoin="round" />
-
-        <polygon points={orderArea} fill="url(#gO)" />
-        <polyline points={orderPoints} fill="none" stroke={ORDER_COLOR} strokeWidth={2} strokeLinejoin="round" />
-
-        {/* X axis labels */}
-        {[0, Math.floor((data.length - 1) / 2), data.length - 1].map((i) => (
-          <text key={i} x={px(i)} y={innerH + 16} textAnchor="middle" fontSize={9} fill="#7f949b">
-            {formatDate(data[i].date)}
-          </text>
-        ))}
-      </g>
-
-      {/* Legend */}
-      <g transform={`translate(${PAD.left}, ${AREA_H - 4})`}>
-        <rect x={0} y={0} width={8} height={8} fill={LEAD_COLOR} rx={2} opacity={0.7} />
-        <text x={12} y={8} fontSize={10} fill="#7f949b">Leads</text>
-        <rect x={52} y={0} width={8} height={8} fill={ORDER_COLOR} rx={2} />
-        <text x={64} y={8} fontSize={10} fill="#7f949b">Orders</text>
+        <line x1={0} y1={4} x2={16} y2={4} stroke={LEAD_COLOR} strokeWidth={2} opacity={0.8} />
+        <text x={20} y={8} fontSize={10} fill="#7f949b">Leads</text>
+        <line x1={60} y1={4} x2={76} y2={4} stroke={ORDER_COLOR} strokeWidth={2} />
+        <text x={80} y={8} fontSize={10} fill="#7f949b">Orders</text>
       </g>
     </svg>
   );
 }
 
 export default function StatsClient({ chartData, kpis }: { chartData: DayData[]; kpis: Kpis }) {
+  const [preset, setPreset] = useState<Preset>("30d");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+
+  const filteredData = useMemo(() => {
+    if (preset !== "all" && customFrom === "" && customTo === "") {
+      const days = preset === "7d" ? 7 : preset === "30d" ? 30 : 90;
+      return chartData.slice(-days);
+    }
+    if (customFrom || customTo) {
+      return chartData.filter((d) => {
+        if (customFrom && d.date < customFrom) return false;
+        if (customTo && d.date > customTo) return false;
+        return true;
+      });
+    }
+    return chartData;
+  }, [chartData, preset, customFrom, customTo]);
+
+  const weeklyData = useMemo(() => {
+    const map = new Map<string, { label: string; leads: number; orders: number; revenue: number }>();
+    for (const d of filteredData) {
+      const key = isoWeekKey(d.date);
+      const existing = map.get(key);
+      if (existing) {
+        existing.leads += d.leads;
+        existing.orders += d.orders;
+        existing.revenue += d.revenue;
+      } else {
+        map.set(key, { label: isoWeekLabel(d.date), leads: d.leads, orders: d.orders, revenue: d.revenue });
+      }
+    }
+    return Array.from(map.values()).reverse();
+  }, [filteredData]);
+
+  const PRESETS: { id: Preset; label: string }[] = [
+    { id: "7d", label: "7 jours" },
+    { id: "30d", label: "30 jours" },
+    { id: "90d", label: "90 jours" },
+    { id: "all", label: "Tout" },
+  ];
+
+  function handlePreset(p: Preset) {
+    setPreset(p);
+    setCustomFrom("");
+    setCustomTo("");
+  }
+
+  function handleCustomDate(field: "from" | "to", value: string) {
+    if (field === "from") setCustomFrom(value);
+    else setCustomTo(value);
+    setPreset("all");
+  }
+
   return (
     <main className="min-h-screen bg-[#f9fbfb] px-6 py-10">
       <div className="mx-auto max-w-5xl">
@@ -210,12 +227,89 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
           <KpiCard label="Last 7 days" value={kpis.last7Orders} sub={`${kpis.last7Leads} leads`} />
         </div>
 
-        {/* Daily bar chart */}
+        {/* Date selector */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="flex gap-1">
+            {PRESETS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => handlePreset(p.id)}
+                className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
+                  preset === p.id && customFrom === "" && customTo === ""
+                    ? "bg-[#253239] text-white"
+                    : "bg-white border border-[#edf0f1] text-[#7f949b] hover:text-[#253239]"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => handleCustomDate("from", e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-[#edf0f1] text-[12px] text-[#253239] bg-white"
+            />
+            <span className="text-[12px] text-[#7f949b]">→</span>
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => handleCustomDate("to", e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-[#edf0f1] text-[12px] text-[#253239] bg-white"
+            />
+          </div>
+        </div>
+
+        {/* Daily line chart */}
+        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mb-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
+            Activité quotidienne
+          </p>
+          <LineChartSvg data={filteredData} />
+        </div>
+
+        {/* Weekly revenue table */}
         <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
-            Daily activity {chartData.length > 30 ? "(last 30 days)" : ""}
+            C.A. par semaine
           </p>
-          <BarChartSvg data={chartData} />
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-[#edf0f1]">
+                  <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b]">Semaine</th>
+                  <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">Leads</th>
+                  <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">Orders</th>
+                  <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">C.A.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weeklyData.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-[13px] text-[#7f949b]">Aucune donnée</td>
+                  </tr>
+                ) : (
+                  weeklyData.map((w, i) => (
+                    <tr key={i} className="border-b border-[#edf0f1] last:border-0 hover:bg-[#f9fbfb] transition-colors">
+                      <td className="py-3 text-[13px] text-[#253239]">{w.label}</td>
+                      <td className="py-3 text-[13px] text-[#7f949b] text-right">{w.leads}</td>
+                      <td className="py-3 text-[13px] text-[#253239] text-right font-medium">{w.orders}</td>
+                      <td className="py-3 text-[13px] text-[#253239] text-right font-medium">{formatCurrency(w.revenue)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-[#edf0f1]">
+                  <td className="pt-3 text-[12px] font-semibold text-[#253239]">Total</td>
+                  <td className="pt-3 text-[12px] text-[#7f949b] text-right">{weeklyData.reduce((s, w) => s + w.leads, 0)}</td>
+                  <td className="pt-3 text-[12px] font-semibold text-[#253239] text-right">{weeklyData.reduce((s, w) => s + w.orders, 0)}</td>
+                  <td className="pt-3 text-[12px] font-semibold text-[#253239] text-right">{formatCurrency(weeklyData.reduce((s, w) => s + w.revenue, 0))}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
 
       </div>

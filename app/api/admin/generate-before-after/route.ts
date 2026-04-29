@@ -80,11 +80,8 @@ interface PromptParams {
 // ── STEP 1: Analysis prompt ───────────────────────────────────────────────
 // Asks Gemini to look at the photo and identify weaknesses using the research.
 
-// Amplify the visual transformation targets by 25% vs. the conservative scoring ceiling.
-// Capped at 0.97 — still physiologically grounded, but shows the upper bound.
-const VISUAL_BOOST = 1.25;
 function visualGainMult(age: number): number {
-  return Math.min(0.97, muscleGainMultiplier(age) * VISUAL_BOOST);
+  return muscleGainMultiplier(age);
 }
 
 function buildAnalysisPrompt(p: PromptParams): string {
@@ -184,7 +181,7 @@ function buildGenerationPrompt(p: PromptParams, analysis: string): string {
     social_perception: p.socialPerception,
   });
 
-  return `Create a realistic "after" transformation photo of this exact person. Show the upper end of what natural training achieves — not the average result, the best realistic result.
+  return `Create a realistic "after" transformation photo of this exact person. Show optimistic but realistic 12-week progress — credible, not the absolute ceiling.
 
 ${ageContextLine(age)}
 ${gainMult < 0.4 ? "IMPORTANT: This person's age limits transformation potential — keep changes conservative and realistic. No dramatic muscle gains." : ""}
@@ -203,10 +200,10 @@ ${analysis}
 — Preserve identity exactly: same face structure, skin tone, ethnicity, hair color, hair style, eye color. This must be recognizably the same person.
 — Same camera angle and background as the original photo.
 — Lighting: use professional fitness studio lighting — soft but directional, with slight shadow depth that reveals muscle separation, shoulder roundness, chest definition, waist leanness, and facial bone structure. Upgrade flat or dim original lighting. Never flat, never blown out.
-— Maximise the V-taper silhouette: shoulder width and waist narrowness should be as visually prominent as the physique allows. This is the single most impactful change — lean into it.
+— Show the natural V-taper improvement that results from the specific changes in the analysis above — broader shoulders, narrower waist — without exaggerating beyond what's visible at 12 weeks.
 — Face leanness: show the jawline and cheekbone definition at the leanest realistic level for this person's body fat target. The face should look noticeably leaner and sharper.
 — The result must look like a real photograph, not a digital render or a different person.
-— All changes must be within physiological limits for age ${age} through natural training — but show the ceiling, not the average.
+— All changes must be within physiological limits for age ${age} through natural training at 12 weeks.
 — Ground every change in the specific weaknesses from the analysis above. Do not produce a generic fitness model.`;
 }
 
@@ -344,7 +341,11 @@ async function runGenerationInline(
   }, 4, "step1");
   const analysisRaw = await analysisRes.text();
   if (!analysisRes.ok) return NextResponse.json({ error: "Photo analysis failed.", detail: analysisRaw.slice(0, 400) }, { status: analysisRes.status });
-  const analysis = extractTextFromGemini(JSON.parse(analysisRaw));
+  let analysisPayload: unknown;
+  try { analysisPayload = JSON.parse(analysisRaw); } catch {
+    return NextResponse.json({ error: "Gemini step1 returned non-JSON.", detail: analysisRaw.slice(0, 200) }, { status: 502 });
+  }
+  const analysis = extractTextFromGemini(analysisPayload);
   if (!analysis) return NextResponse.json({ error: "Photo analysis returned no content." }, { status: 502 });
 
   // Step 2: image generation
@@ -361,7 +362,11 @@ async function runGenerationInline(
   }, 4, "step2");
   const generationRaw = await generationRes.text();
   if (!generationRes.ok) return NextResponse.json({ error: "Image generation failed.", detail: generationRaw.slice(0, 400) }, { status: generationRes.status });
-  const afterDataUrl = extractImageFromGemini(JSON.parse(generationRaw));
+  let generationPayload: unknown;
+  try { generationPayload = JSON.parse(generationRaw); } catch {
+    return NextResponse.json({ error: "Gemini step2 returned non-JSON.", detail: generationRaw.slice(0, 200) }, { status: 502 });
+  }
+  const afterDataUrl = extractImageFromGemini(generationPayload);
   if (!afterDataUrl) return NextResponse.json({ error: "Gemini did not return an image." }, { status: 502 });
 
   // Upload + persist
@@ -373,13 +378,22 @@ async function runGenerationInline(
     storagePath, Buffer.from(afterBase64, "base64"), { contentType: afterMime, upsert: true },
   );
   if (uploadError) return NextResponse.json({ error: "Upload failed.", detail: uploadError.message }, { status: 500 });
-  await supabaseAdmin.from("protocols").update({ before_after_preview_path: storagePath, before_after_analysis: analysis }).eq("user_id", userId);
 
+  const TEN_YEARS = 315_360_000;
   const [beforeSigned, afterSigned] = await Promise.all([
-    supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath, 3600),
-    supabaseAdmin.storage.from("user-photos").createSignedUrl(storagePath, 3600),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath, TEN_YEARS),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(storagePath, TEN_YEARS),
   ]);
-  return NextResponse.json({ status: "done", beforeUrl: beforeSigned.data?.signedUrl ?? null, afterUrl: afterSigned.data?.signedUrl ?? null, analysis });
+
+  const beforeUrl = beforeSigned.data?.signedUrl ?? null;
+  const afterUrl  = afterSigned.data?.signedUrl  ?? null;
+
+  await supabaseAdmin.from("protocols").update({
+    before_after_preview_path: storagePath,
+    before_after_analysis: analysis,
+  }).eq("user_id", userId);
+
+  return NextResponse.json({ status: "done", beforeUrl, afterUrl, analysis });
 }
 
 // ── Main route ────────────────────────────────────────────────────────────
@@ -395,7 +409,9 @@ export async function POST(request: Request) {
     // Quick pre-flight: verify photo + metrics exist before triggering the bg job
     const [protocolRes, qrRes] = await Promise.all([
       supabaseAdmin.from("protocols").select("metrics, before_after_preview_path").eq("user_id", userId).maybeSingle(),
-      supabaseAdmin.from("questionnaire_responses").select("photo_front_path").eq("user_id", userId).maybeSingle(),
+      supabaseAdmin.from("questionnaire_responses")
+        .select("photo_front_path, age, height_cm, weight_kg, waist_circumference_cm, training_experience, professional_environment, professional_environment_other, typical_clothing, social_perception")
+        .eq("user_id", userId).maybeSingle(),
     ]);
 
     const photoPath = (qrRes.data?.photo_front_path as string | null) ?? null;
@@ -457,14 +473,16 @@ export async function GET(request: Request) {
     const userId = searchParams.get("userId");
     if (!userId) return NextResponse.json({ error: "userId is required." }, { status: 400 });
 
-    const [protocolRes, qrRes] = await Promise.all([
-      supabaseAdmin.from("protocols").select("before_after_preview_path, before_after_analysis").eq("user_id", userId).maybeSingle(),
-      supabaseAdmin.from("questionnaire_responses").select("photo_front_path").eq("user_id", userId).maybeSingle(),
-    ]);
+    const protocolRes = await supabaseAdmin
+      .from("protocols")
+      .select("before_after_preview_path, before_after_analysis, before_url, after_url")
+      .eq("user_id", userId)
+      .maybeSingle();
 
     const previewPath = (protocolRes.data?.before_after_preview_path as string | null) ?? null;
-    const photoPath   = (qrRes.data?.photo_front_path                as string | null) ?? null;
     const analysis    = (protocolRes.data?.before_after_analysis      as string | null) ?? null;
+    let beforeUrl     = (protocolRes.data?.before_url                 as string | null) ?? null;
+    let afterUrl      = (protocolRes.data?.after_url                  as string | null) ?? null;
 
     if (!previewPath) return NextResponse.json({ status: "not_started" });
     if (previewPath === "__generating") return NextResponse.json({ status: "generating" });
@@ -472,19 +490,35 @@ export async function GET(request: Request) {
       return NextResponse.json({ status: "error", error: previewPath.slice(8) });
     }
 
-    // Done — return signed URLs
-    const [before, after] = await Promise.all([
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath ?? previewPath, 3600),
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(previewPath, 3600),
-    ]);
+    // Fallback: if URLs were never stored (pre-fix or bg function failure), create them now
+    if (!afterUrl && previewPath && !previewPath.startsWith("__")) {
+      const TEN_YEARS = 315_360_000;
+      const qrRes = await supabaseAdmin
+        .from("questionnaire_responses")
+        .select("photo_front_path")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const photoPath = (qrRes.data?.photo_front_path as string | null) ?? null;
+
+      const [beforeSigned, afterSigned] = await Promise.all([
+        photoPath ? supabaseAdmin.storage.from("user-photos").createSignedUrl(photoPath, TEN_YEARS) : Promise.resolve({ data: null }),
+        supabaseAdmin.storage.from("user-photos").createSignedUrl(previewPath, TEN_YEARS),
+      ]);
+      beforeUrl = beforeSigned.data?.signedUrl ?? null;
+      afterUrl  = afterSigned.data?.signedUrl  ?? null;
+
+      // Store for next time
+      await supabaseAdmin.from("protocols").update({ before_url: beforeUrl, after_url: afterUrl }).eq("user_id", userId);
+    }
 
     return NextResponse.json({
       status: "done",
-      beforeUrl: before.data?.signedUrl ?? null,
-      afterUrl:  after.data?.signedUrl  ?? null,
+      beforeUrl,
+      afterUrl,
       analysis,
     });
   } catch (err) {
+    console.error("[generate-before-after] GET error", err);
     return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }

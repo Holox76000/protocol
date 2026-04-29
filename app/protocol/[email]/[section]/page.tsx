@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { unstable_noStore as noStore } from "next/cache";
 import { requireAdmin } from "../../../../lib/adminAuth";
 import { validateSession, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { supabaseAdmin } from "../../../../lib/supabase";
@@ -30,8 +31,8 @@ const PROTOCOL_CONTENT_COLS: Record<string, string[]> = {
 };
 
 async function signedUrl(path: string | null): Promise<string | null> {
-  if (!path) return null;
-  const { data } = await supabaseAdmin.storage.from("user-photos").createSignedUrl(path, 3600);
+  if (!path || path.startsWith("__")) return null;
+  const { data } = await supabaseAdmin.storage.from("user-photos").createSignedUrl(path, 86400);
   return data?.signedUrl ?? null;
 }
 
@@ -42,6 +43,7 @@ export default async function ProtocolSectionPage({
   params: { email: string; section: string };
   searchParams: { as?: string };
 }) {
+  noStore();
   const email = decodeURIComponent(params.email);
 
   // Dual auth: admin OR the client who owns this email.
@@ -112,8 +114,8 @@ export default async function ProtocolSectionPage({
 
   const metrics          = (p?.metrics                   as CalibrationMetrics | null) ?? null;
   const overlayPoints    = (p?.overlay_points            as OverlayPoints | null)      ?? null;
-  const previewPath      = (p?.before_after_preview_path as string | null)             ?? null;
-  const summary          = (p?.summary                   as string | null)             ?? null;
+  const previewPath      = (p?.before_after_preview_path as string | null) ?? null;
+  const summary          = (p?.summary                   as string | null) ?? null;
   const disabledSections = (p?.disabled_sections         as string[] | null)           ?? [];
 
   // Redirect client away from disabled sections to the first available one.
@@ -140,10 +142,13 @@ export default async function ProtocolSectionPage({
   const weightKg        = (qr?.weight_kg         as number | null) ?? undefined;
   const sessionsPerWeek = (qr?.sessions_per_week as number | null) ?? undefined;
 
-  // Signed URLs only for photo sections (3 network calls otherwise skipped).
-  const [photoFront, photoSide, initialAfterUrl] = needsPhotos
+  // Photos: signed URLs created fresh on each page load (24h expiry, always valid).
+  const [photoFront, photoSide, afterUrl] = needsPhotos
     ? await Promise.all([signedUrl(photoFrontPath), signedUrl(photoSidePath), signedUrl(previewPath)])
     : [null, null, null];
+
+  const initialBeforeUrl = photoFront;
+  const initialAfterUrl  = afterUrl;
 
   const deliveredDate = p?.delivered_at
     ? new Date(p.delivered_at as string).toLocaleDateString("en-US", {
@@ -168,8 +173,9 @@ export default async function ProtocolSectionPage({
       isAdmin={isAdmin}
       isClientSession={!adminCheck}
       initialDisabledSections={disabledSections as SectionId[]}
-      initialBeforeUrl={photoFront}
+      initialBeforeUrl={initialBeforeUrl}
       initialAfterUrl={initialAfterUrl}
+      initialGenerating={previewPath === "__generating"}
       summary={summary}
       nutritionPlanContent={nutritionPlanContent}
       supplementProtocolContent={supplementProtocolContent}
