@@ -9,6 +9,10 @@ import "../f1.css";
 import "./f1-offer.css";
 import "../../program/program.css";
 import CompleteFacialAnalysisSection from "../../program/CompleteFacialAnalysisSection";
+import PersonalizedSection from "../../program/PersonalizedSection";
+import InformativeSection from "../../program/InformativeSection";
+import AestheticTestsSection from "../../program/AestheticTestsSection";
+import ProtocolSection from "../../program/ProtocolSection";
 
 /* ─── Icons ─────────────────────────────────────────────────────────────── */
 
@@ -725,6 +729,10 @@ export default function F1OfferPage() {
       <MPress />
       <MSteps />
       <CompleteFacialAnalysisSection />
+      <PersonalizedSection />
+      <InformativeSection />
+      <AestheticTestsSection />
+      <ProtocolSection />
       <MResults href={signupHref} />
       <MScience />
       <MCompare />

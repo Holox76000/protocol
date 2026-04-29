@@ -1104,3 +1104,242 @@
     display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
   }
 }
+
+/* ── Body Analysis section — align with f1-offer DA ──────────────────────── */
+.mo-page .program-complete-analysis {
+  padding: 56px 0 0;
+  background: var(--mo-surface);
+}
+
+.mo-page .program-complete-analysis__shell {
+  gap: 3.2rem;
+}
+
+.mo-page .program-complete-analysis__header {
+  padding: 0 16px;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.mo-page .program-complete-analysis__eyebrow {
+  font-family: var(--mo-font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mo-accent-label);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  line-height: 1;
+}
+
+.mo-page .program-complete-analysis__eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--mo-border-mid);
+  flex-shrink: 0;
+}
+
+.mo-page .program-complete-analysis__title {
+  font-family: var(--mo-font-display);
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--mo-brand);
+  margin: 0;
+}
+
+.mo-page .program-complete-analysis__title span {
+  font-style: italic;
+  color: var(--mo-brand-muted-light);
+}
+
+.mo-page .program-complete-analysis__subtitle {
+  font-family: var(--mo-font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mo-brand-secondary);
+  margin: 0;
+  max-width: 52ch;
+}
+
+@media (min-width: 768px) {
+  .mo-page .program-complete-analysis__title {
+    font-size: 48px;
+  }
+}
+
+/* ── Shared overrides: program sections inside f1-offer ──────────────────── */
+
+/* Section containers — use !important to override inline styles on imported components */
+.mo-page .program-personalized,
+.mo-page .program-informative,
+.mo-page .program-tests,
+.mo-page .program-protocol {
+  padding-top: 56px !important;
+  padding-bottom: 56px !important;
+}
+
+.mo-page .program-personalized,
+.mo-page .program-informative {
+  background: #fff;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.mo-page .program-tests {
+  background: var(--mo-surface);
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.mo-page .program-protocol {
+  background: var(--mo-surface-warm);
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Section eyebrows */
+.mo-page .program-personalized__eyebrow,
+.mo-page .program-informative__eyebrow,
+.mo-page .program-tests__mark {
+  display: none; /* eyebrows are redundant; keep titles */
+}
+
+.mo-page .program-protocol__eyebrow {
+  font-family: var(--mo-font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mo-accent-label);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mo-page .program-protocol__eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--mo-border-mid);
+  flex-shrink: 0;
+}
+
+/* Section titles */
+.mo-page .program-personalized__title,
+.mo-page .program-informative__title,
+.mo-page .program-tests__title,
+.mo-page .program-protocol__title {
+  font-family: var(--mo-font-display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--mo-brand);
+  margin: 0;
+}
+
+.mo-page .program-tests__title span,
+.mo-page .program-protocol__title span {
+  font-style: italic;
+  color: var(--mo-brand-muted-light);
+}
+
+/* Section subtitles */
+.mo-page .program-tests__subtitle,
+.mo-page .program-protocol__subtitle,
+.mo-page .program-protocol__subtitle span {
+  font-family: var(--mo-font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mo-brand-secondary);
+  font-size: 14px;
+}
+
+/* Item titles & descriptions */
+.mo-page .program-personalized__item-title,
+.mo-page .program-informative__item-title {
+  font-family: var(--mo-font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mo-brand);
+  line-height: 1.3;
+}
+
+.mo-page .program-personalized__item-description,
+.mo-page .program-informative__item-description {
+  font-family: var(--mo-font-sans);
+  font-size: 13px;
+  color: var(--mo-brand-muted);
+  line-height: 1.5;
+}
+
+/* Personalized panel background */
+.mo-page .program-personalized__panel {
+  background: var(--mo-surface);
+  border-radius: 16px;
+}
+
+/* Informative panel background */
+.mo-page .program-informative__panel {
+  background: var(--mo-surface);
+}
+
+/* Protocol bottom section */
+.mo-page .program-protocol__bottom h3 {
+  font-family: var(--mo-font-display);
+  font-weight: 400;
+  color: var(--mo-brand);
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.mo-page .program-protocol__bottom h3 span {
+  font-style: italic;
+  color: var(--mo-brand-muted-light);
+}
+
+.mo-page .program-protocol__bottom p {
+  font-family: var(--mo-font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mo-brand-secondary);
+}
+
+.mo-page .program-protocol__list p {
+  font-family: var(--mo-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mo-brand);
+}
+
+.mo-page .program-protocol__check {
+  color: var(--mo-brand);
+}
+
+/* Header alignment: left on wide screens */
+.mo-page .program-personalized__header,
+.mo-page .program-informative__header {
+  align-items: flex-start;
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .mo-page .program-personalized__title,
+  .mo-page .program-informative__title,
+  .mo-page .program-tests__title,
+  .mo-page .program-protocol__title {
+    font-size: 42px;
+  }
+}
