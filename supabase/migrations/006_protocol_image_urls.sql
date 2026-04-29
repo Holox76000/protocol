@@ -1,0 +1,3 @@
+ALTER TABLE protocols
+ADD COLUMN IF NOT EXISTS before_url TEXT,
+ADD COLUMN IF NOT EXISTS after_url  TEXT;

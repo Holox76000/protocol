@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/utm";
@@ -140,15 +140,6 @@ const RESULTS = [
   { name: "Marcus, 31", ratio: "ATTRACTIVENESS SCORE 45 → 67", before: "/assets/14-before.png", after: "/assets/14-after.png" },
 ];
 
-const SCIENCE_VARS = [
-  { num: "01", name: "Shoulder-to-waist ratio", sub: "Primary V-taper indicator", val: "1.29 → 1.44" },
-  { num: "02", name: "Chest-to-waist ratio", sub: "Upper-body proportion", val: "1.18 → 1.32" },
-  { num: "03", name: "Torso index", sub: "Length vs. width balance", val: "3.8 → 5.1" },
-  { num: "04", name: "Hip-to-shoulder ratio", sub: "Lower-frame anchoring", val: "0.74 → 0.69" },
-  { num: "05", name: "Posture grade (cervical)", sub: "Forward-head + thoracic", val: "54 → 87/100" },
-  { num: "06", name: "Body-fat distribution", sub: "8 visceral / subcutaneous zones", val: "— mapped" },
-  { num: "+100", name: "Hundred more variables", sub: "Arm, neck, calf, posterior, gait", val: "— measured" },
-];
 
 const COMPARE_ROWS = [
   {
@@ -379,7 +370,7 @@ function MResults({ href }: { href: string }) {
         <div className="mo-section-head--rule">
           <div>
             <div className="mo-section-eyebrow">Members, 13 weeks in</div>
-            <h2 className="mo-section-title" style={{ marginTop: 4 }}>Real photos. <em>Real ratios.</em></h2>
+            <h2 className="mo-section-title" style={{ marginTop: 4 }}>Real people. <em>Real confidence.</em></h2>
           </div>
           <div className="mo-section-head__meta">2,500+ men · 13 weeks avg</div>
         </div>
@@ -411,66 +402,6 @@ function MResults({ href }: { href: string }) {
   );
 }
 
-function MScience() {
-  return (
-    <section id="mo-science" className="mo-section mo-section--warm">
-      <div className="mo-container">
-        <div className="mo-science-grid">
-          {/* Left: text + list */}
-          <div className="mo-science__text">
-            <div className="mo-section-eyebrow">What we measure</div>
-            <h2 className="mo-section-title" style={{ marginTop: 4 }}>
-              Hundreds structural variables. <em>One protocol per body.</em>
-            </h2>
-            <div className="mo-science__list">
-              {SCIENCE_VARS.map((v, i) => (
-                <div key={i} className="mo-science__item">
-                  <div className="mo-science__item-num">{v.num}</div>
-                  <div className="mo-science__item-name">{v.name}<span>{v.sub}</span></div>
-                  <div className="mo-science__item-val">{v.val}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Right: annotated visual */}
-          <div className="mo-science__visual">
-            <Image src="/assets/2-after.png" alt="Body analysis" width={400} height={500} />
-            <div className="mo-science__overlay">
-              {/* Posture — cou, tag flottant sans dot */}
-              <div className="mo-science__marker" style={{ top: "13%", left: "75%" }}>
-                <div className="mo-science__marker-tag">Posture · 87/100</div>
-              </div>
-              {/* SHL — dot anchored at left edge */}
-              <div className="mo-science__marker" style={{ top: "21%", left: "15%", transform: "translateY(-50%)" }}>
-                <div className="mo-science__marker-dot" />
-                <div className="mo-science__marker-line" />
-                <div className="mo-science__marker-tag">SHL 51.2 cm</div>
-              </div>
-              {/* CWR — dot anchored at right edge */}
-              <div className="mo-science__marker" style={{ top: "42%", left: "72%", transform: "translate(-100%, -50%)" }}>
-                <div className="mo-science__marker-tag">CWR 1.32</div>
-                <div className="mo-science__marker-line" />
-                <div className="mo-science__marker-dot" />
-              </div>
-              {/* WST — dot anchored at left edge */}
-              <div className="mo-science__marker" style={{ top: "60%", left: "32%", transform: "translateY(-50%)" }}>
-                <div className="mo-science__marker-dot" />
-                <div className="mo-science__marker-line" />
-                <div className="mo-science__marker-tag">WST 78 cm</div>
-              </div>
-              {/* TI — dot anchored at right edge */}
-              <div className="mo-science__marker" style={{ top: "31%", left: "79%", transform: "translate(-100%, -50%)" }}>
-                <div className="mo-science__marker-tag">TI 5.1</div>
-                <div className="mo-science__marker-line" />
-                <div className="mo-science__marker-dot" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function MCompare() {
   return (
@@ -551,6 +482,60 @@ function MTestimonials() {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+const OUTCOMES = [
+  { rank: "01", category: "Mindset", label: "Self-confidence",        delta: 37, scaleMax: 50, delay: 0.05 },
+  { rank: "02", category: "Career",  label: "Salary increase",        delta: 12, scaleMax: 50, delay: 0.20 },
+  { rank: "03", category: "Dating",  label: "Matches on dating apps", delta: 34, scaleMax: 50, delay: 0.35 },
+];
+
+function MMemberOutcomes() {
+  const ref = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={ref} className="mo-outcomes">
+      <div className="mo-container">
+        <header className="mo-outcomes__head">
+          <p className="mo-outcomes__eyebrow">Reported effects · post-protocol</p>
+          <h2 className="mo-outcomes__title">
+            What members <em>report the most</em> after finishing their protocol.
+          </h2>
+        </header>
+        <div className="mo-outcomes__rows">
+          {OUTCOMES.map((o) => (
+            <article key={o.rank} className="mo-outcomes__row">
+              <div className="mo-outcomes__num"><em>+</em>{o.delta}<span>%</span></div>
+              <div className="mo-outcomes__body">
+                <p className="mo-outcomes__cat">{o.rank} — {o.category}</p>
+                <p className="mo-outcomes__label">{o.label}</p>
+                <div className="mo-outcomes__bar">
+                  <div
+                    className={`mo-outcomes__bar-fill${visible ? " mo-outcomes__bar-fill--animate" : ""}`}
+                    style={{ "--pct": `${(o.delta / o.scaleMax) * 100}%`, "--delay": `${o.delay}s` } as React.CSSProperties}
+                  />
+                </div>
+                <div className="mo-outcomes__scale"><span>0%</span><span>+25%</span><span>+50%</span></div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="mo-outcomes__foot">Self-reported · 2,500+ members · 6 months post-protocol</p>
       </div>
     </section>
   );
@@ -728,13 +713,14 @@ export default function F1OfferPage() {
       <MHeroV1 href={signupHref} />
       <MPress />
       <MSteps />
+      <MResults href={signupHref} />
+      <MMemberOutcomes />
       <CompleteFacialAnalysisSection />
       <PersonalizedSection />
       <InformativeSection />
       <AestheticTestsSection />
-      <ProtocolSection />
-      <MResults href={signupHref} />
-      <MScience />
+      <ProtocolSection interfaceSrc="/assets/connor-protocol.png" />
+
       <MCompare />
       <MTestimonials />
       <MPricing href={signupHref} />

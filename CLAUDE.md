@@ -1,5 +1,10 @@
 # Protocol Club — Dev Notes
 
+## Permissions
+
+**Ne jamais demander de confirmation** pour exécuter des outils (bash, edit, read, screenshot, etc.). Procéder directement. Demander seulement avant d'entrer en mode Plan (`/plan`) pour aligner sur l'approche.
+
+
 ## Frontend Workflow
 
 After every edit to a `.tsx`, `.css`, or `.module.css` file, **always check the visual render** :

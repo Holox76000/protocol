@@ -66,7 +66,7 @@ export default function HeroComparison({
           return;
         }
 
-        const response = await fetch(`/generated/previews/${previewId}.json`, { cache: "no-store" });
+        const response = await fetch(`/api/preview/${previewId}`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Preview metadata request failed with status ${response.status}`);
         }

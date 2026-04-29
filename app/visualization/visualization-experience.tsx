@@ -412,6 +412,23 @@ export default function VisualizationExperience({
         previewId: payload.previewId ?? null,
       });
 
+      if (payload.previewId) {
+        const pid = payload.previewId;
+        const before = sourceBlob;
+        const after = nextResultBlob;
+        void (async () => {
+          try {
+            const fd = new FormData();
+            fd.append("previewId", pid);
+            fd.append("before", new File([before], "before.jpg", { type: before.type || "image/jpeg" }));
+            fd.append("after", new File([after], "after.jpg", { type: after.type || "image/jpeg" }));
+            await fetch("/api/visualize/save", { method: "POST", body: fd });
+          } catch (e) {
+            console.warn("[visualization] server save failed (non-blocking)", e);
+          }
+        })();
+      }
+
       trackGa4Event("preview_generation_succeeded", {
         funnel,
         step: "preview",
