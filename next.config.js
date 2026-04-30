@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/sign/**",
+      },
+    ],
+  },
   // /program is now handled by app/program route
 
   // @react-pdf/renderer is used from the Pages Router API route (pages/api/admin/export-pdf.ts)
