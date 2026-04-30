@@ -779,7 +779,6 @@ export default function F1OfferPage() {
       <MNav href={signupHref} />
       <MHeroV1 href={signupHref} />
       <MPress />
-      <MSteps />
       {preview.status === "done" && (
         <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
       )}
@@ -789,6 +788,7 @@ export default function F1OfferPage() {
           Generating your personalized preview…
         </div>
       )}
+      <MSteps />
       <MResults href={signupHref} />
       <MMemberOutcomes />
       <CompleteFacialAnalysisSection />
