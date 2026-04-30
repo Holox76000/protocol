@@ -2090,6 +2090,21 @@
   color: var(--q-soft);
 }
 
+.photoSkipLink {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--q-soft);
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .photoPreviewWrap {
   display: flex;
   flex-direction: column;

@@ -80,25 +80,30 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
       </div>
 
       {status === "idle" && (
-        <div
-          className={styles.photoDropZone}
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file) handleFile(file);
-          }}
-        >
-          <div className={styles.photoDropIcon}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-            </svg>
+        <>
+          <div
+            className={styles.photoDropZone}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files[0];
+              if (file) handleFile(file);
+            }}
+          >
+            <div className={styles.photoDropIcon}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div className={styles.photoDropLabel}>Tap to upload a photo</div>
+            <div className={styles.photoDropSub}>Full-body or upper-body · JPEG or PNG</div>
           </div>
-          <div className={styles.photoDropLabel}>Tap to upload a photo</div>
-          <div className={styles.photoDropSub}>Full-body or upper-body · JPEG or PNG</div>
-        </div>
+          <button type="button" className={styles.photoSkipLink} onClick={onNext}>
+            Skip this step — I don&apos;t want a preview
+          </button>
+        </>
       )}
 
       {status !== "idle" && status !== "error" && (
@@ -155,9 +160,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
 
       <div className={styles.actions}>
         <button type="button" className={styles.btnSecondary} onClick={onBack}>Back</button>
-        <button type="button" className={styles.btnPrimary} onClick={onNext}>
-          {status === "idle" ? "Skip →" : "Continue →"}
-        </button>
+        <button type="button" className={styles.btnPrimary} onClick={onNext}>Continue →</button>
       </div>
     </div>
   );
