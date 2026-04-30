@@ -8,6 +8,7 @@ import styles from "./slides.module.css";
 function buildRedirectUrl(answers: Answers): string {
   const params = new URLSearchParams();
   for (const [key, val] of Object.entries(answers)) {
+    if (key.startsWith("_")) continue;
     if (Array.isArray(val)) {
       params.set(key, val.join("|"));
     } else if (val) {
@@ -15,6 +16,11 @@ function buildRedirectUrl(answers: Answers): string {
     }
   }
   params.set("funnel", "quiz");
+  const sessionId = answers._session_id as string | undefined;
+  const photoPath = answers._photo_path as string | undefined;
+  if (sessionId && photoPath) {
+    params.set("funnel_sid", sessionId);
+  }
   return `/f1/offer?${params.toString()}`;
 }
 
@@ -22,7 +28,7 @@ const MORPHOLOGY_LABELS: Record<string, string> = {
   Skinny: "Skinny",
   "Skinny-fat": "Skinny-fat",
   Overweight: "Overweight",
-  Muscular: "Muscular",
+  Average: "Average",
 };
 
 const ENV_LABELS: Record<string, string> = {

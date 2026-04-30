@@ -18,6 +18,7 @@ import { PromiseSlide } from "./slides/PromiseSlide";
 import { YesLadderSlide } from "./slides/YesLadderSlide";
 import { FinalLoadingSlide } from "./slides/FinalLoadingSlide";
 import { ProtocolReadySlide } from "./slides/ProtocolReadySlide";
+import { PhotoUploadSlide } from "./slides/PhotoUploadSlide";
 import styles from "./funnel.module.css";
 
 const STORAGE_KEY = "protocol.funnel.v26";
@@ -29,8 +30,11 @@ export default function FunnelShell() {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Answers;
+      let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
+      if (!parsed._session_id) {
+        parsed = { ...parsed, _session_id: crypto.randomUUID() };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
       setAnswers(parsed);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -210,6 +214,16 @@ function renderSlide(
       return (
         <YesLadderSlide
           slide={slide}
+          answers={answers}
+          onAnswer={onAnswer}
+          onNext={onNext}
+          onBack={onBack}
+        />
+      );
+
+    case "photo-upload":
+      return (
+        <PhotoUploadSlide
           answers={answers}
           onAnswer={onAnswer}
           onNext={onNext}

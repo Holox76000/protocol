@@ -688,11 +688,47 @@ function MSticky({ href, visible }: { href: string; visible: boolean }) {
   );
 }
 
+/* ─── Personalized preview ───────────────────────────────────────────────── */
+
+type PreviewState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "generating" }
+  | { status: "done"; before_url: string; after_url: string }
+  | { status: "error" };
+
+function MPersonalizedPreview({ before_url, after_url }: { before_url: string; after_url: string }) {
+  return (
+    <section className="mo-section mo-section--surface mo-personalized-preview">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <div className="mo-section-eyebrow mo-section-eyebrow--center">Your transformation preview</div>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            Based on your profile. <em>What you could look like.</em>
+          </h2>
+        </div>
+        <div className="mo-preview-split">
+          <div className="mo-preview-col">
+            <Image src={before_url} alt="Before" fill className="object-cover object-top" sizes="300px" />
+            <span className="mo-preview-label">Now</span>
+          </div>
+          <div className="mo-preview-col">
+            <Image src={after_url} alt="After" fill className="object-cover object-top" sizes="300px" />
+            <span className="mo-preview-label mo-preview-label--after">12 weeks</span>
+          </div>
+        </div>
+        <p className="mo-preview-disclaimer">AI-generated preview based on your diagnostic answers. Individual results may vary.</p>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 
 export default function F1OfferPage() {
   const [signupHref, setSignupHref] = useState("/register");
   const [stickyVisible, setStickyVisible] = useState(false);
+  const [preview, setPreview] = useState<PreviewState>({ status: "idle" });
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
@@ -704,6 +740,37 @@ export default function F1OfferPage() {
 
     const onScroll = () => setStickyVisible(window.scrollY > 600);
     window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Load personalized preview if funnel_sid present
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("funnel_sid");
+    if (sid) {
+      setPreview({ status: "loading" });
+      let attempts = 0;
+      const maxAttempts = 12;
+      const poll = async () => {
+        try {
+          const res = await fetch(`/api/funnel/session?id=${encodeURIComponent(sid)}`);
+          if (!res.ok) { setPreview({ status: "error" }); return; }
+          const data = await res.json() as { status: string; before_url?: string; after_url?: string };
+          if (data.status === "done" && data.before_url && data.after_url) {
+            setPreview({ status: "done", before_url: data.before_url, after_url: data.after_url });
+          } else if (data.status === "generating" && attempts < maxAttempts) {
+            attempts++;
+            setPreview({ status: "generating" });
+            setTimeout(poll, 8000);
+          } else if (data.status === "not_started") {
+            setPreview({ status: "idle" });
+          } else {
+            setPreview({ status: "error" });
+          }
+        } catch {
+          setPreview({ status: "error" });
+        }
+      };
+      poll();
+    }
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -713,6 +780,15 @@ export default function F1OfferPage() {
       <MHeroV1 href={signupHref} />
       <MPress />
       <MSteps />
+      {preview.status === "done" && (
+        <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
+      )}
+      {preview.status === "generating" && (
+        <div className="mo-preview-generating">
+          <span className="mo-preview-spinner" />
+          Generating your personalized preview…
+        </div>
+      )}
       <MResults href={signupHref} />
       <MMemberOutcomes />
       <CompleteFacialAnalysisSection />

@@ -17,7 +17,8 @@ export type SlideType =
   | "summary"
   | "promise"
   | "yes-ladder"
-  | "final-loading";
+  | "final-loading"
+  | "photo-upload";
 
 export type SingleSlide = {
   id: string;
@@ -122,6 +123,11 @@ export type ProtocolReadySlide = {
   type: "protocol-ready";
 };
 
+export type PhotoUploadSlide = {
+  id: string;
+  type: "photo-upload";
+};
+
 export type SlideConfig =
   | SingleSlide
   | MultiSlide
@@ -134,7 +140,8 @@ export type SlideConfig =
   | PromiseSlide
   | YesLadderSlide
   | FinalLoadingSlide
-  | ProtocolReadySlide;
+  | ProtocolReadySlide
+  | PhotoUploadSlide;
 
 // ─── Dynamic image resolver ───────────────────────────────
 
@@ -389,6 +396,11 @@ export const SLIDES: SlideConfig[] = [
   },
 
   // ── SECTION 6 — SUMMARY + PROMISE ─────────────────────
+
+  {
+    id: "photo-upload",
+    type: "photo-upload",
+  },
 
   {
     id: "summary",
