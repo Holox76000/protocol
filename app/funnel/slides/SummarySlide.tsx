@@ -1,7 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
+
+const AGE_KEY: Record<string, string> = {
+  "20–29": "20-29", "30–39": "30-39", "40–49": "40-49", "50+": "50plus",
+};
+const ETH_KEY: Record<string, string> = {
+  "Caucasian": "caucasian", "Black": "black", "Asian (East / SE)": "asian-east-se",
+  "South Asian": "south-asian", "Hispanic-Latino": "hispanic-latino", "MENA": "mena",
+};
+const MORPH_KEY: Record<string, string> = {
+  "Skinny": "skinny", "Skinny-fat": "skinny-fat", "Overweight": "overweight", "Average": "average",
+};
 
 type Props = {
   answers: Answers;
@@ -43,13 +55,18 @@ const ROOM: Record<string, string> = {
   Skinny: "Build mass",
   "Skinny-fat": "Recomposition",
   Overweight: "Body composition",
-  Muscular: "Symmetry & posture",
+  Average: "Symmetry & posture",
 };
 
 export function SummarySlide({ answers, onNext, onBack }: Props) {
   const potential = computePotential(answers);
   const morphology = (answers.morphology as string) ?? "—";
   const environment = (answers.social_environment as string) ?? "—";
+
+  const age = AGE_KEY[answers.age_bracket as string] ?? "20-29";
+  const eth = ETH_KEY[answers.ethnicity as string] ?? "caucasian";
+  const morph = MORPH_KEY[morphology] ?? "average";
+  const photoSrc = `/assets/funnel/morphology/${age}-${eth}-${morph}.png`;
   const goals = (answers.expected_results as string[]) ?? [];
   const primaryGoal = goals[0] ?? "—";
 
@@ -69,9 +86,20 @@ export function SummarySlide({ answers, onNext, onBack }: Props) {
 
   return (
     <div className={styles.card}>
-      <div className={styles.summaryHeader}>
-        <p className={styles.eyebrow}>15 · Diagnostic</p>
-        <h2 className={styles.summaryTitle}>Summary of your Physical Profile.</h2>
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+        <div className={styles.summaryHeader} style={{ flex: 1 }}>
+          <p className={styles.eyebrow}>15 · Diagnostic</p>
+          <h2 className={styles.summaryTitle}>Summary of your Physical Profile.</h2>
+        </div>
+        <div className={styles.summaryPhotoWrap}>
+          <Image
+            src={photoSrc}
+            alt={morphology}
+            fill
+            className="object-cover object-top"
+            sizes="120px"
+          />
+        </div>
       </div>
 
       {/* Chips */}

@@ -26,12 +26,12 @@ type SingleProps = {
 
 const EYEBROWS: Record<string, string> = {
   age_bracket: "01 · Profile",
+  ethnicity: "02 · Reference points",
   morphology: "03 · Composition",
   shape_impact: "04 · Impact",
   pain_timeline: "05 · Duration",
-  ethnicity: "08 · Reference points",
-  weekly_time: "11 · Schedule",
-  social_environment: "13 · Context",
+  weekly_time: "07 · Schedule",
+  social_environment: "08 · Context",
 };
 
 export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: SingleProps) {
@@ -43,7 +43,10 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
   };
 
   const eyebrow = EYEBROWS[slide.stateKey];
-  const isYesNo = !slide.images && slide.options.length === 2;
+  const resolvedImages = typeof slide.images === "function"
+    ? slide.images(answers)
+    : slide.images;
+  const isYesNo = !resolvedImages && slide.options.length === 2;
 
   return (
     <div className={styles.card}>
@@ -53,7 +56,7 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
         {slide.subtext && <p className={styles.subtext}>{slide.subtext}</p>}
       </div>
 
-      {slide.images ? (
+      {resolvedImages ? (
         <div className={styles.imageGrid}>
           {slide.options.map((option, i) => {
             const isSelected = selected === option;
@@ -65,7 +68,7 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
                 onClick={() => handleSelect(option)}
               >
                 <Image
-                  src={slide.images![i]}
+                  src={resolvedImages[i]}
                   alt={option}
                   fill
                   className="object-cover object-top"

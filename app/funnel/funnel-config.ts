@@ -29,7 +29,7 @@ export type SingleSlide = {
   question: string;
   subtext?: string;
   options: string[];
-  images?: string[];
+  images?: string[] | ((answers: Answers) => string[]);
   whyWeAsk?: string;
 };
 
@@ -136,6 +136,49 @@ export type SlideConfig =
   | FinalLoadingSlide
   | ProtocolReadySlide;
 
+// ─── Dynamic image resolver ───────────────────────────────
+
+const AGE_KEY_MAP: Record<string, string> = {
+  "20–29": "20-29",
+  "30–39": "30-39",
+  "40–49": "40-49",
+  "50+": "50plus",
+};
+
+const ETHNICITY_KEY_MAP: Record<string, string> = {
+  "Caucasian":        "caucasian",
+  "Black":            "black",
+  "Asian (East / SE)":"asian-east-se",
+  "South Asian":      "south-asian",
+  "Hispanic-Latino":  "hispanic-latino",
+  "MENA":             "mena",
+};
+
+function morphologyImages(answers: Answers): string[] {
+  const age = AGE_KEY_MAP[answers.age_bracket as string] ?? "20-29";
+  const eth = ETHNICITY_KEY_MAP[answers.ethnicity as string] ?? "caucasian";
+  const base = `/assets/funnel/morphology/${age}-${eth}`;
+  return [
+    `${base}-skinny.png`,
+    `${base}-skinny-fat.png`,
+    `${base}-overweight.png`,
+    `${base}-average.png`,
+  ];
+}
+
+function ethnicityImages(answers: Answers): string[] {
+  const age = AGE_KEY_MAP[answers.age_bracket as string] ?? "20-29";
+  const base = `/assets/funnel/ethnicity/${age}`;
+  return [
+    `${base}-caucasian.png`,
+    `${base}-black.png`,
+    `${base}-asian-east-se.png`,
+    `${base}-south-asian.png`,
+    `${base}-hispanic-latino.png`,
+    `${base}-mena.png`,
+  ];
+}
+
 // ─── SLIDE SEQUENCE ───────────────────────────────────────
 
 export const SLIDES: SlideConfig[] = [
@@ -151,10 +194,10 @@ export const SLIDES: SlideConfig[] = [
     question: "How old are you?",
     options: ["20–29", "30–39", "40–49", "50+"],
     images: [
-      "/assets/1-before.png",
-      "/assets/2-before.png",
-      "/assets/3-before.png",
-      "/assets/4-before.png",
+      "/assets/20-29.png",
+      "/assets/30-39.png",
+      "/assets/40-49.png",
+      "/assets/+50.png",
     ],
   },
 
@@ -168,25 +211,40 @@ export const SLIDES: SlideConfig[] = [
   },
 
   {
+    id: "q6b",
+    type: "single",
+    stateKey: "ethnicity",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 2,
+    question: "Which best describes you?",
+    subtext: "Helps us calibrate your visual reference points.",
+    options: [
+      "Caucasian",
+      "Black",
+      "Asian (East / SE)",
+      "South Asian",
+      "Hispanic-Latino",
+      "MENA",
+    ],
+    images: ethnicityImages,
+  },
+
+  {
     id: "q2",
     type: "single",
     stateKey: "morphology",
     section: 1,
     sectionLabel: "Current Situation",
-    qNumber: 2,
+    qNumber: 3,
     question: "What's your body type right now?",
     options: [
       "Skinny",
       "Skinny-fat",
       "Overweight",
-      "Muscular",
+      "Average",
     ],
-    images: [
-      "/assets/1-before.png",
-      "/assets/5-before.png",
-      "/assets/7-before.png",
-      "/assets/3-after.png",
-    ],
+    images: morphologyImages,
   },
 
   {
@@ -246,25 +304,6 @@ export const SLIDES: SlideConfig[] = [
     body: "Built on 4 years of R&D and a dataset of 2,500+ men who have reached their peak potential.",
   },
 
-
-  {
-    id: "q6b",
-    type: "single",
-    stateKey: "ethnicity",
-    section: 1,
-    sectionLabel: "Current Situation",
-    qNumber: 7,
-    question: "Which best describes you?",
-    subtext: "Helps us calibrate your visual reference points.",
-    options: [
-      "Caucasian",
-      "Black",
-      "Asian (East / SE)",
-      "South Asian",
-      "Hispanic-Latino",
-      "MENA",
-    ],
-  },
 
   {
     id: "q_height",
@@ -361,7 +400,7 @@ export const SLIDES: SlideConfig[] = [
     type: "info",
     variant: "objection",
     headline: "We build your protocol calculated from research and tailored by aesthetic experts.",
-    body: "Every recommendation is built from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ men.\n\nEach protocol is then reviewed by our team of aesthetic experts to make sure every detail fits your specific ratios, facial structure, and social context. Nothing generic, nothing guessed.",
+    body: "Every recommendation is built from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ men.",
   },
 
   {
