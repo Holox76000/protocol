@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
+import { trackFunnelPhotoUploaded } from "../../../lib/funnel-analytics";
 
 type Props = {
   answers: Answers;
@@ -46,6 +47,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
 
     onAnswer("_photo_path", path);
     if (beforeUrl) onAnswer("_before_url", beforeUrl);
+    trackFunnelPhotoUploaded();
     setStatus("generating");
 
     // Fire & forget — generation runs in background

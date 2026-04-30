@@ -20,6 +20,7 @@ import { FinalLoadingSlide } from "./slides/FinalLoadingSlide";
 import { ProtocolReadySlide } from "./slides/ProtocolReadySlide";
 import { PhotoUploadSlide } from "./slides/PhotoUploadSlide";
 import styles from "./funnel.module.css";
+import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 
 const STORAGE_KEY = "protocol.funnel.v26";
 
@@ -56,6 +57,10 @@ export default function FunnelShell() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    trackFunnelPageView(SLIDES[step].id);
+  }, [step]);
+
   const slide = SLIDES[step];
   const qCount = questionsAnsweredUpTo(SLIDES, step);
   const progress = Math.round((qCount / TOTAL_QUESTIONS) * 100);
@@ -75,6 +80,10 @@ export default function FunnelShell() {
 
   const handleAnswer = (key: string, value: string | string[]) => {
     saveAnswer({ [key]: value });
+    const currentSlide = SLIDES[step];
+    if (currentSlide.type === "single" || currentSlide.type === "yes-ladder") {
+      trackFunnelAnswer(currentSlide.id, value);
+    }
   };
 
   const handleAnswerMulti = (updates: Record<string, string>) => {
