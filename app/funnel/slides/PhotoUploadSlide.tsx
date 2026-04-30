@@ -97,9 +97,14 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
         </div>
       )}
 
-      {status !== "idle" && status !== "error" && preview && (
+      {status !== "idle" && status !== "error" && (
         <div className={styles.photoPreviewWrap}>
-          <img src={preview} alt="Your photo" className={styles.photoPreviewImg} />
+          {preview && (
+            <img src={preview} alt="Your photo" className={styles.photoPreviewImg} />
+          )}
+          {!preview && status === "done" && (
+            <div className={styles.photoPreviewPlaceholder}>Photo uploadée ✓</div>
+          )}
           <div className={styles.photoStatusBadge}>
             {status === "uploading" && "Uploading…"}
             {status === "generating" && (
@@ -107,6 +112,15 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
             )}
             {status === "done" && "✓ Preview queued — ready on next page"}
           </div>
+          {(status === "done" || status === "generating") && (
+            <button
+              type="button"
+              className={styles.photoChangeBtn}
+              onClick={() => inputRef.current?.click()}
+            >
+              Change photo
+            </button>
+          )}
         </div>
       )}
 
@@ -128,6 +142,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
         type="file"
         accept="image/jpeg,image/png,image/heic,image/heif"
         style={{ display: "none" }}
+        onClick={(e) => { (e.target as HTMLInputElement).value = ""; }}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleFile(file);

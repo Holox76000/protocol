@@ -2157,3 +2157,29 @@
   padding: 6px 14px;
   cursor: pointer;
 }
+
+.photoChangeBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--q-soft);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.photoPreviewPlaceholder {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  background: var(--q-surface);
+  border: 1px solid var(--q-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--q-soft);
+}
