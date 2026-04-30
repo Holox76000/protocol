@@ -723,6 +723,54 @@ function MPersonalizedPreview({ before_url, after_url }: { before_url: string; a
   );
 }
 
+function MPreviewGenerating() {
+  return (
+    <section className="mo-section mo-section--surface mo-personalized-preview">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <div className="mo-section-eyebrow mo-section-eyebrow--center">Your transformation preview</div>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            Our AI is analyzing your photo. <em>Hold tight.</em>
+          </h2>
+        </div>
+
+        {/* Skeleton before/after */}
+        <div className="mo-preview-split">
+          <div className="mo-preview-col mo-preview-col--skeleton">
+            <div className="mo-preview-shimmer" />
+            <span className="mo-preview-label">Now</span>
+          </div>
+          <div className="mo-preview-col mo-preview-col--skeleton">
+            <div className="mo-preview-shimmer" />
+            <span className="mo-preview-label mo-preview-label--after">
+              <span className="mo-preview-dot-anim" />
+              Generating
+            </span>
+          </div>
+        </div>
+
+        {/* Steps */}
+        <div className="mo-preview-steps">
+          <div className="mo-preview-step mo-preview-step--done">
+            <span className="mo-preview-step-icon">✓</span>
+            Photo uploaded
+          </div>
+          <div className="mo-preview-step mo-preview-step--active">
+            <span className="mo-preview-step-spinner" />
+            Analyzing your body type
+          </div>
+          <div className="mo-preview-step mo-preview-step--pending">
+            <span className="mo-preview-step-dot" />
+            Generating your transformation
+          </div>
+        </div>
+
+        <p className="mo-preview-disclaimer">This takes 30–60 seconds. Scroll down while you wait — your preview will appear here automatically.</p>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 
 export default function F1OfferPage() {
@@ -782,12 +830,7 @@ export default function F1OfferPage() {
       {preview.status === "done" && (
         <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
       )}
-      {preview.status === "generating" && (
-        <div className="mo-preview-generating">
-          <span className="mo-preview-spinner" />
-          Generating your personalized preview…
-        </div>
-      )}
+      {preview.status === "generating" && <MPreviewGenerating />}
       <MSteps />
       <MResults href={signupHref} />
       <MMemberOutcomes />

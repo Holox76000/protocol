@@ -5,6 +5,31 @@ export const runtime = "nodejs";
 
 const TEN_YEARS = 315_360_000;
 
+export async function POST(request: Request) {
+  const body = await request.json() as { session_id?: string; answers?: Record<string, unknown> };
+  const { session_id, answers } = body;
+
+  if (!session_id || !/^[a-f0-9-]{36}$/.test(session_id)) {
+    return NextResponse.json({ error: "Invalid session_id" }, { status: 400 });
+  }
+
+  // Strip large transient values before persisting
+  const { _before_url: _dropped, ...cleanAnswers } = (answers ?? {}) as Record<string, unknown> & { _before_url?: unknown };
+
+  const { error } = await supabaseAdmin
+    .from("funnel_sessions")
+    .upsert(
+      { session_id, answers: cleanAnswers, updated_at: new Date().toISOString() },
+      { onConflict: "session_id" }
+    );
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");

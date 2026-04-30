@@ -1562,3 +1562,105 @@
 @keyframes mo-spin {
   to { transform: rotate(360deg); }
 }
+
+/* ─── Preview generating skeleton ───────────────────────────────────────── */
+
+.mo-preview-col--skeleton {
+  background: var(--mo-surface);
+}
+
+.mo-preview-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    var(--mo-border) 0%,
+    var(--mo-surface) 40%,
+    var(--mo-border) 60%,
+    var(--mo-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: mo-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes mo-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.mo-preview-dot-anim {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: mo-pulse 1s ease-in-out infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+@keyframes mo-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.mo-preview-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 24px auto 0;
+  max-width: 320px;
+}
+
+.mo-preview-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--mo-brand-muted);
+}
+
+.mo-preview-step--done {
+  color: var(--mo-brand);
+}
+
+.mo-preview-step--active {
+  color: var(--mo-brand);
+  font-weight: 500;
+}
+
+.mo-preview-step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--mo-brand);
+  color: #fff;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.mo-preview-step-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--mo-border-mid);
+  border-top-color: var(--mo-brand);
+  border-radius: 50%;
+  animation: mo-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.mo-preview-step-dot {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--mo-border);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* remove the old simple bar */
+.mo-preview-generating { display: none; }

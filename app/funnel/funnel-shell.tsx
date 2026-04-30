@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   SLIDES,
   TOTAL_QUESTIONS,
@@ -26,6 +26,20 @@ const STORAGE_KEY = "protocol.funnel.v26";
 export default function FunnelShell() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const syncToDb = (data: Answers) => {
+    const sessionId = data._session_id as string | undefined;
+    if (!sessionId) return;
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      fetch("/api/funnel/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, answers: data }),
+      }).catch(() => {});
+    }, 1500);
+  };
 
   useEffect(() => {
     try {
@@ -36,9 +50,11 @@ export default function FunnelShell() {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
       setAnswers(parsed);
+      syncToDb(parsed);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const slide = SLIDES[step];
@@ -55,6 +71,7 @@ export default function FunnelShell() {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {}
+    syncToDb(next);
   };
 
   const handleAnswer = (key: string, value: string | string[]) => {
