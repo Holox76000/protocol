@@ -50,7 +50,6 @@ export default function FunnelShell() {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
       setAnswers(parsed);
-      syncToDb(parsed);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
