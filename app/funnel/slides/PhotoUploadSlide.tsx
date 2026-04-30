@@ -33,10 +33,11 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
     form.append("session_id", sessionId);
 
     let path: string;
+    let beforeUrl: string | null = null;
     try {
       const res = await fetch("/api/funnel/upload-photo", { method: "POST", body: form });
       if (!res.ok) throw new Error("Upload failed");
-      ({ path } = await res.json() as { path: string });
+      ({ path, before_url: beforeUrl } = await res.json() as { path: string; before_url: string | null });
     } catch {
       setStatus("error");
       setErrorMsg("Upload failed. Please try again.");
@@ -44,6 +45,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
     }
 
     onAnswer("_photo_path", path);
+    if (beforeUrl) onAnswer("_before_url", beforeUrl);
     setStatus("generating");
 
     // Fire & forget — generation runs in background

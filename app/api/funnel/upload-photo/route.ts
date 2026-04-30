@@ -37,5 +37,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ path });
+  const TEN_YEARS = 315_360_000;
+  const { data: signed } = await supabaseAdmin.storage
+    .from("user-photos")
+    .createSignedUrl(path, TEN_YEARS);
+
+  return NextResponse.json({ path, before_url: signed?.signedUrl ?? null });
 }

@@ -66,7 +66,8 @@ export function SummarySlide({ answers, onNext, onBack }: Props) {
   const age = AGE_KEY[answers.age_bracket as string] ?? "20-29";
   const eth = ETH_KEY[answers.ethnicity as string] ?? "caucasian";
   const morph = MORPH_KEY[morphology] ?? "average";
-  const photoSrc = `/assets/funnel/morphology/${age}-${eth}-${morph}.png`;
+  const beforeUrl = answers._before_url as string | undefined;
+  const photoSrc = beforeUrl ?? `/assets/funnel/morphology/${age}-${eth}-${morph}.png`;
   const goals = (answers.expected_results as string[]) ?? [];
   const primaryGoal = goals[0] ?? "—";
 
