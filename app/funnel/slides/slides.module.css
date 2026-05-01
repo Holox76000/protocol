@@ -1270,6 +1270,23 @@
   }
 }
 
+@media (min-width: 640px) {
+  /* 4-option grids: single row of 4 */
+  .imageGrid[data-count="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* 6-option grids: 3 per row */
+  .imageGrid[data-count="6"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Shorter aspect ratio in horizontal layout */
+  .imageGrid[data-count="4"] .imageCard {
+    aspect-ratio: 2 / 3;
+  }
+}
+
 @media (min-width: 768px) {
   .card {
     padding: 40px;

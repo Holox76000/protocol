@@ -57,7 +57,7 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
       </div>
 
       {resolvedImages ? (
-        <div className={styles.imageGrid}>
+        <div className={styles.imageGrid} data-count={slide.options.length}>
           {slide.options.map((option, i) => {
             const isSelected = selected === option;
             return (

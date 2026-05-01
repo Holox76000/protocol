@@ -121,7 +121,21 @@
 }
 
 @media (min-width: 768px) {
+  .screen {
+    max-width: 820px;
+  }
+
   .shell {
-    padding: 36px 32px 120px;
+    padding: 36px 40px 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .screen {
+    max-width: 960px;
+  }
+
+  .shell {
+    padding: 44px 52px 130px;
   }
 }
