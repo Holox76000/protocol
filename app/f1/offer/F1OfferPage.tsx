@@ -14,6 +14,40 @@ import InformativeSection from "../../program/InformativeSection";
 import AestheticTestsSection from "../../program/AestheticTestsSection";
 import ProtocolSection from "../../program/ProtocolSection";
 
+/* ─── Funnel eyebrow maps ────────────────────────────────────────────────── */
+
+const BODY_LABELS: Record<string, string> = {
+  "Skinny":     "skinny",
+  "Skinny-fat": "skinny-fat",
+  "Overweight": "overweight",
+  "Average":    "average",
+};
+
+const ETH_LABELS: Record<string, string> = {
+  "Caucasian":        "Caucasian",
+  "Black":            "Black",
+  "Asian (East / SE)":"Asian",
+  "South Asian":      "South Asian",
+  "Hispanic-Latino":  "Latino",
+  "MENA":             "Arabic",
+};
+
+const AGE_PHRASES: Record<string, string> = {
+  "20–29": "in their 20's",
+  "30–39": "in their 30's",
+  "40–49": "over 40",
+  "50+":   "over 50",
+};
+
+function buildEyebrow(morphology: string | null, ethnicity: string | null, age: string | null): string | null {
+  const body = morphology ? BODY_LABELS[morphology] : null;
+  const eth  = ethnicity  ? ETH_LABELS[ethnicity]   : null;
+  const phrase = age      ? AGE_PHRASES[age]         : null;
+  if (!body || !eth || !phrase) return null;
+  const ethPart = eth === "Caucasian" ? "" : ` ${eth}`;
+  return `For ${body}${ethPart} men ${phrase}.`;
+}
+
 /* ─── Icons ─────────────────────────────────────────────────────────────── */
 
 function ArrowIcon({ size = 14 }: { size?: number }) {
@@ -141,33 +175,107 @@ const RESULTS = [
 ];
 
 
-const COMPARE_ROWS = [
-  {
-    feature: "Personalised to your frame",
-    app: <XIcon />, pt: "Sometimes",
-    us: <span className="mo-compare__check"><CheckIcon /> Your ratios, your plan</span>,
+/* ─── Compare section ────────────────────────────────────────────────────── */
+
+type ColDef = {
+  label: string;
+  personalised: React.ReactNode;
+  research: React.ReactNode;
+  coach: React.ReactNode;
+  refund: React.ReactNode;
+  commitment: React.ReactNode;
+};
+
+type ColKey = "generic-app" | "youtube" | "strict-diet" | "surgery" | "personal-trainer";
+
+const COL_DEFS: Record<ColKey, ColDef> = {
+  "generic-app": {
+    label: "Generic App",
+    personalised: <XIcon />,
+    research: "Partial",
+    coach: <XIcon />,
+    refund: <XIcon />,
+    commitment: "Monthly sub",
   },
-  {
-    feature: "Backed by published research",
-    app: "Partial", pt: <XIcon />,
-    us: <span className="mo-compare__check"><CheckIcon /> Measured outcomes</span>,
+  "youtube": {
+    label: "Free YouTube Advice",
+    personalised: "No",
+    research: "Mixed",
+    coach: "No",
+    refund: "N/A",
+    commitment: "Free, no system",
   },
-  {
-    feature: "Direct access to your coach",
-    app: <XIcon />, pt: "In-person only",
-    us: <span className="mo-compare__check"><CheckIcon /> WhatsApp · 6h reply</span>,
+  "strict-diet": {
+    label: "Strict Dieting",
+    personalised: "No",
+    research: "Partial",
+    coach: "No",
+    refund: "No",
+    commitment: "$300+/month groceries",
   },
-  {
-    feature: "Refund if it doesn't work",
-    app: <XIcon />, pt: <XIcon />,
-    us: <span className="mo-compare__check"><CheckIcon /> 90-day, no questions</span>,
+  "surgery": {
+    label: "Aesthetic Surgery",
+    personalised: "Yes (one-time)",
+    research: "Yes",
+    coach: "In-person only",
+    refund: "No",
+    commitment: "$5,000–$15,000",
   },
-  {
-    feature: "Commitment",
-    app: "Monthly sub", pt: "$200/session",
-    us: "One-time · $89",
+  "personal-trainer": {
+    label: "Personal Trainer",
+    personalised: "Sometimes",
+    research: <XIcon />,
+    coach: "In-person only",
+    refund: <XIcon />,
+    commitment: "$200/session",
   },
+};
+
+const US_COL: ColDef = {
+  label: "Protocol Club",
+  personalised: <span className="mo-compare__check"><CheckIcon /> Yes. Your ratios, your plan.</span>,
+  research:     <span className="mo-compare__check"><CheckIcon /> Yes. 3,000+ studies.</span>,
+  coach:        <span className="mo-compare__check"><CheckIcon /> WhatsApp · 6h reply</span>,
+  refund:       <span className="mo-compare__check"><CheckIcon /> 90-day, no questions</span>,
+  commitment:   "One-time · $89",
+};
+
+const COMPARE_FEATURES: Array<{ label: string; field: keyof Omit<ColDef, "label"> }> = [
+  { label: "Personalised to your frame",   field: "personalised" },
+  { label: "Backed by published research", field: "research" },
+  { label: "Direct access to your coach",  field: "coach" },
+  { label: "Refund if it doesn't work",    field: "refund" },
+  { label: "Commitment",                   field: "commitment" },
 ];
+
+const ATTEMPT_TO_COL: Record<string, ColKey> = {
+  "Personal trainer":            "personal-trainer",
+  "YouTube advice":              "youtube",
+  "A strict diet":               "strict-diet",
+  "Surgery or medical procedures": "surgery",
+};
+
+function resolveCompareCols(pastAttempts: string[]): { col1: ColDef; col2: ColDef } {
+  const relevant = pastAttempts.filter(a => ATTEMPT_TO_COL[a]);
+
+  if (relevant.length === 0) {
+    return { col1: COL_DEFS["generic-app"], col2: COL_DEFS["personal-trainer"] };
+  }
+
+  if (relevant.length === 1) {
+    const attempt = relevant[0];
+    if (attempt === "Personal trainer") {
+      return {
+        col1: COL_DEFS["generic-app"],
+        col2: { ...COL_DEFS["personal-trainer"], label: "Your Personal Trainer" },
+      };
+    }
+    return { col1: COL_DEFS[ATTEMPT_TO_COL[attempt]], col2: COL_DEFS["personal-trainer"] };
+  }
+
+  const [a1, a2] = relevant.slice(0, 2);
+  return { col1: COL_DEFS[ATTEMPT_TO_COL[a1]], col2: COL_DEFS[ATTEMPT_TO_COL[a2]] };
+}
 
 const TESTIMONIALS = [
   {
@@ -246,13 +354,14 @@ function MNav({ href }: { href: string }) {
   );
 }
 
-function MHeroV1({ href }: { href: string }) {
+function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
   return (
     <section className="mo-hero mo-hero-v1">
       {/* Left column: copy (desktop only) */}
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
-          <h1 className="mo-hero__title">Reach your full <em>potential</em></h1>
+          {eyebrow && <p className="mo-hero__eyebrow">{eyebrow}</p>}
+          <h1 className="mo-hero__title">Reach your full <em>attractiveness potential</em></h1>
           <p className="mo-hero__desc">
             A 12-week protocol built around the published research on what the eye reads as attractive.
           </p>
@@ -272,7 +381,8 @@ function MHeroV1({ href }: { href: string }) {
 
       {/* Mobile-only: title + desc ABOVE the image */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
-        <h1 className="mo-hero__title">Reach your full <em>potential</em></h1>
+        {eyebrow && <p className="mo-hero__eyebrow">{eyebrow}</p>}
+        <h1 className="mo-hero__title">Reach your full <em>attractiveness potential</em></h1>
         <p className="mo-hero__desc">
           A 12-week protocol built around the published research on what the eye reads as attractive.
         </p>
@@ -403,7 +513,15 @@ function MResults({ href }: { href: string }) {
 }
 
 
-function MCompare() {
+function MCompare({ pastAttempts }: { pastAttempts: string[] }) {
+  const { col1, col2 } = resolveCompareCols(pastAttempts);
+
+  const groups = [
+    { label: col1.label,       vals: COMPARE_FEATURES.map(f => col1[f.field]),   isUs: false },
+    { label: col2.label,       vals: COMPARE_FEATURES.map(f => col2[f.field]),   isUs: false },
+    { label: "Protocol Club",  vals: COMPARE_FEATURES.map(f => US_COL[f.field]), isUs: true  },
+  ];
+
   return (
     <section className="mo-section">
       <div className="mo-container">
@@ -418,32 +536,28 @@ function MCompare() {
         <div className="mo-compare__table">
           <div className="mo-compare__row mo-compare__row--head">
             <div>What you get</div>
-            <div>Generic app</div>
-            <div>Personal trainer</div>
+            <div>{col1.label}</div>
+            <div>{col2.label}</div>
             <div className="mo-compare__col-us">Protocol Club</div>
           </div>
-          {COMPARE_ROWS.map((r, i) => (
-            <div key={i} className="mo-compare__row">
-              <div className="mo-compare__cell-row">{r.feature}</div>
-              <div className="mo-compare__cell mo-compare__x">{r.app}</div>
-              <div className="mo-compare__cell mo-compare__x">{r.pt}</div>
-              <div className="mo-compare__cell mo-compare__col-us">{r.us}</div>
+          {COMPARE_FEATURES.map((f) => (
+            <div key={f.label} className="mo-compare__row">
+              <div className="mo-compare__cell-row">{f.label}</div>
+              <div className="mo-compare__cell mo-compare__x">{col1[f.field]}</div>
+              <div className="mo-compare__cell mo-compare__x">{col2[f.field]}</div>
+              <div className="mo-compare__cell mo-compare__col-us">{US_COL[f.field]}</div>
             </div>
           ))}
         </div>
 
         {/* Mobile: stacked cards */}
         <div className="mo-compare__mobile">
-          {[
-            { label: "Generic app", vals: COMPARE_ROWS.map((r) => r.app), isUs: false },
-            { label: "Personal trainer", vals: COMPARE_ROWS.map((r) => r.pt), isUs: false },
-            { label: "Protocol Club", vals: COMPARE_ROWS.map((r) => r.us), isUs: true },
-          ].map((group) => (
+          {groups.map((group) => (
             <div key={group.label} className="mo-compare__group">
               <div className={`mo-compare__head ${group.isUs ? "mo-compare__head--us" : ""}`}>{group.label}</div>
-              {COMPARE_ROWS.map((row, i) => (
-                <div key={i} className="mo-compare__mrow">
-                  <div className="mo-compare__row-label">{row.feature}</div>
+              {COMPARE_FEATURES.map((f, i) => (
+                <div key={f.label} className="mo-compare__mrow">
+                  <div className="mo-compare__row-label">{f.label}</div>
                   <div className={`mo-compare__row-val ${!group.isUs ? "mo-compare__row-val--x" : ""} ${group.isUs ? "mo-compare__row-val--check" : ""}`}>
                     {group.vals[i]}
                   </div>
@@ -777,6 +891,8 @@ export default function F1OfferPage() {
   const [signupHref, setSignupHref] = useState("/register");
   const [stickyVisible, setStickyVisible] = useState(false);
   const [preview, setPreview] = useState<PreviewState>({ status: "idle" });
+  const [heroEyebrow, setHeroEyebrow] = useState<string | null>(null);
+  const [pastAttempts, setPastAttempts] = useState<string[]>([]);
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
@@ -791,6 +907,17 @@ export default function F1OfferPage() {
 
     // Load personalized preview if funnel_sid present
     const params = new URLSearchParams(window.location.search);
+
+    const eyebrow = buildEyebrow(
+      params.get("morphology"),
+      params.get("ethnicity"),
+      params.get("age_bracket"),
+    );
+    if (eyebrow) setHeroEyebrow(eyebrow);
+
+    const rawAttempts = params.get("past_solutions");
+    if (rawAttempts) setPastAttempts(rawAttempts.split("|"));
+
     const sid = params.get("funnel_sid");
     if (sid) {
       setPreview({ status: "loading" });
@@ -825,7 +952,7 @@ export default function F1OfferPage() {
   return (
     <div className="mo-page">
       <MNav href={signupHref} />
-      <MHeroV1 href={signupHref} />
+      <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
       <MPress />
       {preview.status === "done" && (
         <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
@@ -840,7 +967,7 @@ export default function F1OfferPage() {
       <AestheticTestsSection />
       <ProtocolSection interfaceSrc="/assets/connor-protocol.png" />
 
-      <MCompare />
+      <MCompare pastAttempts={pastAttempts} />
       <MTestimonials />
       <MPricing href={signupHref} />
       <MGuarantee />

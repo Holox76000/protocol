@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
@@ -66,8 +67,10 @@ export function SummarySlide({ answers, onNext, onBack }: Props) {
   const age = AGE_KEY[answers.age_bracket as string] ?? "20-29";
   const eth = ETH_KEY[answers.ethnicity as string] ?? "caucasian";
   const morph = MORPH_KEY[morphology] ?? "average";
-  const beforeUrl = answers._before_url as string | undefined;
-  const photoSrc = beforeUrl ?? `/assets/funnel/morphology/${age}-${eth}-${morph}.png`;
+  const morphologySrc = `/assets/funnel/morphology/${age}-${eth}-${morph}.png`;
+  const photoPath = answers._photo_path as string | undefined;
+  const beforeUrl = photoPath ? (answers._before_url as string | undefined) : undefined;
+  const [imgSrc, setImgSrc] = useState(beforeUrl ?? morphologySrc);
   const goals = (answers.expected_results as string[]) ?? [];
   const primaryGoal = goals[0] ?? "—";
 
@@ -94,11 +97,12 @@ export function SummarySlide({ answers, onNext, onBack }: Props) {
         </div>
         <div className={styles.summaryPhotoWrap}>
           <Image
-            src={photoSrc}
+            src={imgSrc}
             alt={morphology}
             fill
             className="object-cover object-top"
             sizes="120px"
+            onError={() => { if (imgSrc !== morphologySrc) setImgSrc(morphologySrc); }}
           />
         </div>
       </div>

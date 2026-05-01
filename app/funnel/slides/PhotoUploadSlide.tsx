@@ -112,7 +112,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
             <img src={preview} alt="Your photo" className={styles.photoPreviewImg} />
           )}
           {!preview && status === "done" && (
-            <div className={styles.photoPreviewPlaceholder}>Photo uploadée ✓</div>
+            <div className={styles.photoPreviewPlaceholder}>Photo uploaded ✓</div>
           )}
           <div className={styles.photoStatusBadge}>
             {status === "uploading" && "Uploading…"}
