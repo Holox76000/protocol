@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 const SITE_URL = "https://protocol-club.com";
 const NPS_DELAY_MIN = 30;
 const NPS_30D_DELAY_DAYS = 30;
+const NPS_REMINDER_DELAY_H = 24;
 const FROM = "Protocol Club <hello@protocol-club.com>";
 
 const C = {
@@ -181,6 +182,82 @@ const handler = schedule("*/5 * * * *", async () => {
     } catch (err) {
       console.error("[nps-survey] 30d failed", { email: user.email, error: String(err) });
       await sb.from("users").update({ nps_30d_sent_at: null, nps_30d_token: null }).eq("id", user.id);
+    }
+  }
+
+  // ── Pass 3: NPS reminders — J+1, J+2, J+3 for non-responders ──
+  const reminderCutoff = new Date(now.getTime() - NPS_REMINDER_DELAY_H * 60 * 60 * 1000).toISOString();
+
+  const REMINDERS = [
+    {
+      sentAtField:  "nps_reminder_1_sent_at" as const,
+      prevField:    "nps_sent_at" as const,
+      day:          1,
+      subject:      (name: string) => `Still 30 seconds, ${name}`,
+      intro:        (name: string) => `You haven't shared your thoughts on your Protocol yet, ${name}. One question — 30 seconds.`,
+    },
+    {
+      sentAtField:  "nps_reminder_2_sent_at" as const,
+      prevField:    "nps_reminder_1_sent_at" as const,
+      day:          2,
+      subject:      (name: string) => `Quick check-in, ${name}`,
+      intro:        (name: string) => `Two days in — how's your Protocol holding up, ${name}?`,
+    },
+    {
+      sentAtField:  "nps_reminder_3_sent_at" as const,
+      prevField:    "nps_reminder_2_sent_at" as const,
+      day:          3,
+      subject:      (name: string) => `Last time we'll ask, ${name}`,
+      intro:        (name: string) => `This is the last time we'll reach out about this. One question on your Protocol, ${name}.`,
+    },
+  ] as const;
+
+  for (const reminder of REMINDERS) {
+    const { data: reminderUsers, error: reminderErr } = await sb
+      .from("users")
+      .select("id, email, first_name, nps_token")
+      .eq("has_paid", true)
+      .not("nps_token", "is", null)
+      .is("nps_submitted_at", null)
+      .is(reminder.sentAtField, null)
+      .not(reminder.prevField, "is", null)
+      .lte(reminder.prevField, reminderCutoff)
+      .limit(50);
+
+    if (reminderErr) {
+      console.error(`[nps-survey] reminder-${reminder.day} query failed`, reminderErr.message);
+      continue;
+    }
+
+    for (const user of reminderUsers ?? []) {
+      await sb.from("users").update({ [reminder.sentAtField]: now.toISOString() }).eq("id", user.id);
+
+      const name = user.first_name ?? "there";
+      const content = `
+        <h1 style="margin:0 0 8px;font-size:24px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+          ${reminder.intro(name)}
+        </h1>
+        <p style="margin:0 0 20px;font-size:15px;font-weight:600;color:${C.brand};line-height:1.5;">
+          How likely are you to recommend Protocol Club to a friend?
+        </p>
+        ${scoreButtonsHtml(user.nps_token)}
+        <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+          Takes 30 seconds.${reminder.day === 3 ? " This is our last reminder." : ""}
+        </p>
+      `;
+
+      try {
+        await resend.emails.send({
+          from: FROM,
+          to: user.email,
+          subject: reminder.subject(name),
+          html: emailShell(content),
+        });
+        console.log(`[nps-survey] reminder-${reminder.day} sent`, { email: user.email });
+      } catch (err) {
+        console.error(`[nps-survey] reminder-${reminder.day} failed`, { email: user.email, error: String(err) });
+        await sb.from("users").update({ [reminder.sentAtField]: null }).eq("id", user.id);
+      }
     }
   }
 
