@@ -83,6 +83,7 @@ export async function POST(request: Request) {
     userAgent,
     ipAddress,
     email,
+    fbclid: body.fbclid || null,
     customData: {
       content_name: "Attractiveness Protocol",
       content_ids: ["f1-attractiveness-protocol"],

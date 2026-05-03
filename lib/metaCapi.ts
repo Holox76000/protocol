@@ -9,6 +9,7 @@ type MetaEvent = {
   userAgent?: string;
   ipAddress?: string;
   email?: string | null;
+  fbclid?: string | null;
   customData?: Record<string, unknown>;
 };
 
@@ -20,7 +21,10 @@ export async function sendMetaEvent(event: MetaEvent) {
   const accessToken = process.env.META_ACCESS_TOKEN;
   const pixelId = process.env.META_PIXEL_ID;
 
-  if (!accessToken || !pixelId) return;
+  if (!accessToken || !pixelId) {
+    console.warn("[meta] sendMetaEvent skipped — META_ACCESS_TOKEN or META_PIXEL_ID not set");
+    return;
+  }
 
   const userData: Record<string, string> = {};
   if (event.email) {
@@ -31,6 +35,10 @@ export async function sendMetaEvent(event: MetaEvent) {
   }
   if (event.userAgent) userData.client_user_agent = event.userAgent;
   if (event.ipAddress) userData.client_ip_address = event.ipAddress;
+  // fbc is required for proper ad attribution — format: fb.1.{timestamp_ms}.{fbclid}
+  if (event.fbclid) {
+    userData.fbc = `fb.1.${event.eventTime * 1000}.${event.fbclid}`;
+  }
 
   const body = {
     data: [
@@ -49,7 +57,7 @@ export async function sendMetaEvent(event: MetaEvent) {
   };
 
   try {
-    const response = await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
+    const response = await fetch(`https://graph.facebook.com/v22.0/${pixelId}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)

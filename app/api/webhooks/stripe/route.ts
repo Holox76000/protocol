@@ -87,6 +87,7 @@ export async function POST(request: Request) {
           actionSource: "website",
           eventSourceUrl: "https://protocol-club.com/dashboard",
           email: customerEmail,
+          fbclid: meta.fbclid || null,
           customData: {
             value: pi.amount / 100,
             currency: (pi.currency ?? "usd").toUpperCase(),
@@ -99,7 +100,6 @@ export async function POST(request: Request) {
             ...(meta.utm_campaign && { utm_campaign: meta.utm_campaign }),
             ...(meta.utm_content && { utm_content: meta.utm_content }),
             ...(meta.utm_term && { utm_term: meta.utm_term }),
-            ...(meta.fbclid && { fbclid: meta.fbclid }),
           },
         });
       } catch (err) {
@@ -227,6 +227,7 @@ export async function POST(request: Request) {
         actionSource: "website",
         eventSourceUrl: "https://protocol-club.com/checkout",
         email: customerEmail,
+        fbclid: meta.fbclid || null,
         customData: {
           value: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
           currency: (session.currency ?? "usd").toUpperCase(),
@@ -240,7 +241,6 @@ export async function POST(request: Request) {
           ...(meta.utm_campaign && { utm_campaign: meta.utm_campaign }),
           ...(meta.utm_content && { utm_content: meta.utm_content }),
           ...(meta.utm_term && { utm_term: meta.utm_term }),
-          ...(meta.fbclid && { fbclid: meta.fbclid }),
         },
       });
       console.log("[webhook/stripe] Purchase CAPI sent", { sessionId: session.id });
