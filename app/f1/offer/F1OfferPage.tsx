@@ -908,6 +908,15 @@ export default function F1OfferPage() {
     // Load personalized preview if funnel_sid present
     const params = new URLSearchParams(window.location.search);
 
+    if (params.get("funnel") === "quiz") {
+      const from = params.get("from") ?? "funnel";
+      (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq?.(
+        "track",
+        "CompleteRegistration",
+        { content_name: from }
+      );
+    }
+
     const eyebrow = buildEyebrow(
       params.get("morphology"),
       params.get("ethnicity"),

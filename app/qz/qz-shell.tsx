@@ -7,25 +7,26 @@ import {
   questionsAnsweredUpTo,
   type Answers,
   type SlideConfig,
-} from "./funnel-config";
-import { SingleQuestion, MultiQuestion } from "./slides/QuestionSlide";
-import { HeightSlide, WeightSlide } from "./slides/NumericSlide";
-import { BeliefSlide } from "./slides/BeliefSlide";
-import { InfoSlide } from "./slides/InfoSlide";
-import { StatSlide } from "./slides/StatSlide";
-import { SummarySlide } from "./slides/SummarySlide";
-import { PromiseSlide } from "./slides/PromiseSlide";
-import { YesLadderSlide } from "./slides/YesLadderSlide";
-import { FinalLoadingSlide } from "./slides/FinalLoadingSlide";
-import { ProtocolReadySlide } from "./slides/ProtocolReadySlide";
-import { PhotoUploadSlide } from "./slides/PhotoUploadSlide";
-import { IntroSlide } from "./slides/IntroSlide";
-import styles from "./funnel.module.css";
+} from "../funnel/funnel-config";
+import { SingleQuestion, MultiQuestion } from "../funnel/slides/QuestionSlide";
+import { HeightSlide, WeightSlide } from "../funnel/slides/NumericSlide";
+import { BeliefSlide } from "../funnel/slides/BeliefSlide";
+import { InfoSlide } from "../funnel/slides/InfoSlide";
+import { StatSlide } from "../funnel/slides/StatSlide";
+import { SummarySlide } from "../funnel/slides/SummarySlide";
+import { PromiseSlide } from "../funnel/slides/PromiseSlide";
+import { YesLadderSlide } from "../funnel/slides/YesLadderSlide";
+import { FinalLoadingSlide } from "../funnel/slides/FinalLoadingSlide";
+import { ProtocolReadySlide } from "../funnel/slides/ProtocolReadySlide";
+import { PhotoUploadSlide } from "../funnel/slides/PhotoUploadSlide";
+import { IntroSlide } from "../funnel/slides/IntroSlide";
+import styles from "../funnel/funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 
-const STORAGE_KEY = "protocol.funnel.v26";
+const STORAGE_KEY = "protocol.qz.v1";
+const BASE_PATH = "/qz";
 
-export default function FunnelShell() {
+export default function QzShell() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,7 +60,7 @@ export default function FunnelShell() {
   }, []);
 
   useEffect(() => {
-    trackFunnelPageView(SLIDES[step].id);
+    trackFunnelPageView(SLIDES[step].id, BASE_PATH);
   }, [step]);
 
   const slide = SLIDES[step];
@@ -83,7 +84,7 @@ export default function FunnelShell() {
     saveAnswer({ [key]: value });
     const currentSlide = SLIDES[step];
     if (currentSlide.type === "single" || currentSlide.type === "yes-ladder") {
-      trackFunnelAnswer(currentSlide.id, value);
+      trackFunnelAnswer(currentSlide.id, value, BASE_PATH);
     }
   };
 
@@ -96,15 +97,15 @@ export default function FunnelShell() {
       const currentSlide = SLIDES[step];
       if (currentSlide.type === "multi" && "stateKey" in currentSlide) {
         const val = answers[currentSlide.stateKey];
-        if (val) trackFunnelAnswer(currentSlide.id, val);
+        if (val) trackFunnelAnswer(currentSlide.id, val, BASE_PATH);
       } else if (currentSlide.type === "numeric-height") {
         const unit = answers.height_unit as string | undefined;
         const val = unit === "cm"
           ? `${answers.height_cm ?? ""} cm`
           : `${answers.height_ft ?? ""}ft ${answers.height_in ?? ""}in`;
-        trackFunnelAnswer(currentSlide.id, val);
+        trackFunnelAnswer(currentSlide.id, val, BASE_PATH);
       } else if (currentSlide.type === "numeric-weight") {
-        trackFunnelAnswer(currentSlide.id, `${answers.weight_value ?? ""} ${answers.weight_unit ?? ""}`);
+        trackFunnelAnswer(currentSlide.id, `${answers.weight_value ?? ""} ${answers.weight_unit ?? ""}`, BASE_PATH);
       }
       setStep((s) => s + 1);
     }
@@ -117,7 +118,6 @@ export default function FunnelShell() {
   return (
     <main className={styles.page}>
       <div className={styles.screen}>
-        {/* ── Header ───────────────────────────────────────── */}
         <header className={styles.header}>
           <button
             className={styles.backBtn}
@@ -144,7 +144,6 @@ export default function FunnelShell() {
           )}
         </header>
 
-        {/* ── Slide ──────────────────────────────────────────── */}
         <div className={styles.shell}>
           {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack)}
         </div>
@@ -210,49 +209,19 @@ function renderSlide(
       );
 
     case "belief":
-      return (
-        <BeliefSlide
-          slide={slide}
-          onNext={onNext}
-          onBack={onBack}
-        />
-      );
+      return <BeliefSlide slide={slide} onNext={onNext} onBack={onBack} />;
 
     case "info":
-      return (
-        <InfoSlide
-          slide={slide}
-          onNext={onNext}
-          onBack={onBack}
-        />
-      );
+      return <InfoSlide slide={slide} onNext={onNext} onBack={onBack} />;
 
     case "stat":
-      return (
-        <StatSlide
-          slide={slide}
-          answers={answers}
-          onNext={onNext}
-          onBack={onBack}
-        />
-      );
+      return <StatSlide slide={slide} answers={answers} onNext={onNext} onBack={onBack} />;
 
     case "summary":
-      return (
-        <SummarySlide
-          answers={answers}
-          onNext={onNext}
-          onBack={onBack}
-        />
-      );
+      return <SummarySlide answers={answers} onNext={onNext} onBack={onBack} />;
 
     case "promise":
-      return (
-        <PromiseSlide
-          onNext={onNext}
-          onBack={onBack}
-        />
-      );
+      return <PromiseSlide onNext={onNext} onBack={onBack} />;
 
     case "yes-ladder":
       return (
@@ -276,11 +245,7 @@ function renderSlide(
       );
 
     case "protocol-ready":
-      return (
-        <ProtocolReadySlide
-          answers={answers}
-        />
-      );
+      return <ProtocolReadySlide answers={answers} source="qz" />;
 
     case "final-loading":
       return <FinalLoadingSlide answers={answers} onNext={onNext} />;

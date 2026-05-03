@@ -6,18 +6,18 @@ function post(body: Record<string, unknown>) {
   }).catch(() => {});
 }
 
-export function trackFunnelPageView(slideId: string) {
+export function trackFunnelPageView(slideId: string, basePath = "/funnel") {
   post({
     eventName: "page_view",
-    pagePath: `/funnel/step/${slideId}`,
+    pagePath: `${basePath}/step/${slideId}`,
     pageTitle: `Funnel — ${slideId}`,
   });
 }
 
-export function trackFunnelAnswer(slideId: string, value: string | string[]) {
+export function trackFunnelAnswer(slideId: string, value: string | string[], basePath = "/funnel") {
   post({
     eventName: "funnel_answer",
-    pagePath: `/funnel/step/${slideId}`,
+    pagePath: `${basePath}/step/${slideId}`,
     params: {
       slide_id: slideId,
       answer_value: Array.isArray(value) ? value.join("|") : value,
@@ -25,9 +25,9 @@ export function trackFunnelAnswer(slideId: string, value: string | string[]) {
   });
 }
 
-export function trackFunnelPhotoUploaded() {
+export function trackFunnelPhotoUploaded(basePath = "/funnel") {
   post({
     eventName: "funnel_photo_uploaded",
-    pagePath: "/funnel/step/photo-upload",
+    pagePath: `${basePath}/step/photo-upload`,
   });
 }

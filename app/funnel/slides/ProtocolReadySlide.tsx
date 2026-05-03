@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
-function buildRedirectUrl(answers: Answers): string {
+function buildRedirectUrl(answers: Answers, source?: string): string {
   const params = new URLSearchParams();
   for (const [key, val] of Object.entries(answers)) {
     if (key.startsWith("_")) continue;
@@ -16,6 +16,7 @@ function buildRedirectUrl(answers: Answers): string {
     }
   }
   params.set("funnel", "quiz");
+  if (source) params.set("from", source);
   const sessionId = answers._session_id as string | undefined;
   const photoPath = answers._photo_path as string | undefined;
   if (sessionId && photoPath) {
@@ -48,7 +49,7 @@ const QUALIFIERS = [
   "Protocol available",
 ];
 
-export function ProtocolReadySlide({ answers }: { answers: Answers }) {
+export function ProtocolReadySlide({ answers, source }: { answers: Answers; source?: string }) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const idRef = useRef(`PRTCL-${Math.floor(Math.random() * 9000 + 1000)}`);
@@ -108,7 +109,7 @@ export function ProtocolReadySlide({ answers }: { answers: Answers }) {
         <button
           type="button"
           className={styles.btnPrimary}
-          onClick={() => router.push(buildRedirectUrl(answers))}
+          onClick={() => router.push(buildRedirectUrl(answers, source))}
           disabled={!ready}
         >
           See my Protocol →

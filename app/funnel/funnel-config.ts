@@ -7,6 +7,7 @@
 export type Answers = Record<string, string | string[]>;
 
 export type SlideType =
+  | "intro"
   | "single"
   | "multi"
   | "numeric-height"
@@ -118,6 +119,11 @@ export type FinalLoadingSlide = {
   type: "final-loading";
 };
 
+export type IntroSlide = {
+  id: string;
+  type: "intro";
+};
+
 export type ProtocolReadySlide = {
   id: string;
   type: "protocol-ready";
@@ -129,6 +135,7 @@ export type PhotoUploadSlide = {
 };
 
 export type SlideConfig =
+  | IntroSlide
   | SingleSlide
   | MultiSlide
   | NumericHeightSlide
@@ -189,6 +196,12 @@ function ethnicityImages(answers: Answers): string[] {
 // ─── SLIDE SEQUENCE ───────────────────────────────────────
 
 export const SLIDES: SlideConfig[] = [
+  // ── INTRO ─────────────────────────────────────────────
+  {
+    id: "intro",
+    type: "intro",
+  },
+
   // ── SECTION 1 — CURRENT SITUATION + PAIN ──────────────
 
   {
