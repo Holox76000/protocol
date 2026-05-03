@@ -7,6 +7,7 @@ export const runtime = "nodejs";
 type Body = {
   customer_email?: string;
   funnel?: string;
+  from?: string;
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
   for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid", "ga_client_id"] as const) {
     if (body[key]) utmMetadata[key] = body[key]!;
   }
+  if (body.from) utmMetadata.from = body.from;
 
   // Find or create Stripe customer so the payment is linked to them
   let customerId: string | undefined;

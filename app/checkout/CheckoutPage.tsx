@@ -240,10 +240,13 @@ export function CheckoutPage({ email }: { email: string }) {
       .find((c) => c.startsWith("_ga="))
       ?.split("=")[1] ?? undefined;
 
+    let funnelFrom: string | undefined;
+    try { funnelFrom = sessionStorage.getItem("protocol.funnel.from") ?? undefined; } catch {}
+
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }) }),
+      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }), ...(funnelFrom && { from: funnelFrom }) }),
     })
       .then((r) => r.json())
       .then((d: { clientSecret?: string; paymentIntentId?: string; error?: string }) => {

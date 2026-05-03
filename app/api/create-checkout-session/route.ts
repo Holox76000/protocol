@@ -9,6 +9,7 @@ const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1"]);
 type Body = {
   funnel?: string;
   funnel_type?: string;
+  from?: string;
   customer_email?: string;
   landing_page?: string;
   utm_source?: string;
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
     ...(body.utm_id && { utm_id: body.utm_id }),
     ...(body.fbclid && { fbclid: body.fbclid }),
     ...(body.ga_client_id && { ga_client_id: body.ga_client_id }),
+    ...(body.from && { from: body.from }),
   };
 
   let session;

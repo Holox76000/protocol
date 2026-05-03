@@ -910,6 +910,7 @@ export default function F1OfferPage() {
 
     if (params.get("funnel") === "quiz") {
       const from = params.get("from") ?? "funnel";
+      try { sessionStorage.setItem("protocol.funnel.from", from); } catch {}
       (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq?.(
         "track",
         "CompleteRegistration",
