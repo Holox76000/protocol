@@ -2,7 +2,7 @@ import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL    = "gemini-3.1-flash-image-preview";
+const DEFAULT_MODEL    = "gemini-2.5-flash-image";
 
 const BODY_ANALYSIS_RESEARCH = `
 ## Key Research Findings: Male Physical Attractiveness (Visual)

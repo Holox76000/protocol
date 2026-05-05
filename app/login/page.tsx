@@ -2,8 +2,13 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { validateSession, SESSION_COOKIE_NAME } from "../../lib/auth";
 import LoginPage from "./LoginPage";
+import type { Metadata } from "next";
 
 export const runtime = "nodejs";
+
+export const metadata: Metadata = {
+  title: "Protocol — Male Attractiveness",
+};
 
 export default async function Login({
   searchParams,
