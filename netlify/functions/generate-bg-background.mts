@@ -329,7 +329,7 @@ const handler: Handler = async (event) => {
     }
 
     const analysisUrl   = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
-    const generationUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`;
+    const generationUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent`;
 
     const promptParams: PromptParams = {
       age:                          (qr.age             as number | null) ?? 30,
