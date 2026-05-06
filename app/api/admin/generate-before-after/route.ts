@@ -181,7 +181,7 @@ function buildGenerationPrompt(p: PromptParams, analysis: string): string {
     social_perception: p.socialPerception,
   });
 
-  return `Generate a professional fitness photograph of a man with the following physical profile. This is a realistic representation of his target physique after 12 weeks of structured training.
+  return `Using the reference image for camera angle, background, lighting, and the subject's facial features and skin tone — generate a professional fitness photo of this same man showing the physique improvements described below.
 
 ${ageContextLine(age)}
 ${gainMult < 0.4 ? "Keep improvements conservative and realistic — no dramatic muscle gains for this age group." : ""}
@@ -190,18 +190,19 @@ ${socialCtx}
 
 ---
 
-## Physical Profile & Target Physique (from expert analysis)
+## Target Physique (apply to the reference image subject)
 
 ${analysis}
 
 ---
 
-## Photo Requirements
-— Realistic fitness photograph. Natural lighting, not a digital render or illustration.
-— Professional studio lighting — directional with soft shadows that reveal V-taper, shoulder roundness, chest definition, waist leanness, and facial bone structure.
-— V-taper silhouette: broader shoulders, narrower waist, within what 12 weeks of natural training can achieve at age ${age}.
-— Face leanness: defined jawline and visible cheekbone structure.
-— Athletic build — not bodybuilder. Ground every detail in the physique description above.`;
+## Requirements
+— Same face, skin tone, hair, eye color as the reference image.
+— Same camera angle and background.
+— Professional fitness studio lighting revealing muscle separation, V-taper, and facial definition.
+— V-taper: broader shoulders, narrower waist — within 12-week natural training limits at age ${age}.
+— Leaner jawline and cheekbone definition.
+— Athletic build (not bodybuilder).`;
 }
 
 // ── Gemini API helpers ────────────────────────────────────────────────────
@@ -351,6 +352,7 @@ async function runGenerationInline(
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
       contents: [{ role: "user", parts: [
+        { inline_data: { mime_type: photoMime, data: photoBase64 } },
         { text: buildGenerationPrompt(promptParams, analysis) },
       ]}],
       generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "3:4", imageSize: "1K" }, temperature: 0.4 },
