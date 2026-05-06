@@ -140,6 +140,11 @@ export default function ProtocolSidebarLayout({
   const [genSummary, setGenSummary] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
+  // ── Generate All state ────────────────────────────────────────────────
+  const [generatingAll,    setGeneratingAll]    = useState(false);
+  const [generateAllPhase, setGenerateAllPhase] = useState<1 | 2 | null>(null);
+  const [generateAllDone,  setGenerateAllDone]  = useState(0);
+
   // ── Generated section content ─────────────────────────────────────────
   const [nutritionContent,          setNutritionContent]          = useState<string | null>(initialNutrition);
   const [supplementProtocolContent, setSupplementProtocolContent] = useState<string | null>(initialSupplement);
@@ -190,6 +195,51 @@ export default function ProtocolSidebarLayout({
     } finally {
       setGenSummary(false);
     }
+  };
+
+  // ── Generate All ─────────────────────────────────────────────────────
+  const handleGenerateAll = async () => {
+    setGeneratingAll(true);
+    setGenerateAllDone(0);
+    setGenerateAllPhase(1);
+
+    const phase1: Array<{ section: string; setter: (v: string | null) => void }> = [
+      { section: "nutrition-plan",      setter: setNutritionContent          },
+      { section: "workout-plan",        setter: setWorkoutContent            },
+      { section: "sleeping-advices",    setter: setSleepContent              },
+      { section: "supplement-protocol", setter: setSupplementProtocolContent },
+      { section: "posture-analysis",    setter: setPostureAnalysisContent    },
+    ];
+
+    await Promise.allSettled(
+      phase1.map(async ({ section, setter }) => {
+        try {
+          const res  = await fetch("/api/admin/generate-section", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, section }),
+          });
+          const data = await res.json() as { content?: string; error?: string };
+          if (res.ok && data.content) setter(data.content);
+        } finally {
+          setGenerateAllDone((n) => n + 1);
+        }
+      })
+    );
+
+    setGenerateAllPhase(2);
+    try {
+      const res  = await fetch("/api/admin/generate-section", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, section: "action-plan" }),
+      });
+      const data = await res.json() as { content?: string; error?: string };
+      if (res.ok && data.content) setActionPlanContent(data.content);
+    } catch { /* user can regenerate manually */ }
+
+    setGeneratingAll(false);
+    setGenerateAllPhase(null);
   };
 
   // ── Before/After generation state ─────────────────────────────────────
@@ -314,6 +364,17 @@ export default function ProtocolSidebarLayout({
               Admin — {email}
             </p>
             <div className="ml-3 flex shrink-0 items-center gap-4">
+              <button
+                onClick={handleGenerateAll}
+                disabled={generatingAll}
+                className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generatingAll
+                  ? generateAllPhase === 1
+                    ? `Generating… ${generateAllDone}/5`
+                    : "Action Plan…"
+                  : "⚡ Generate All"}
+              </button>
               <a
                 href={`/protocol/${encodeURIComponent(email ?? "")}/${active}?as=client`}
                 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 hover:text-amber-900"
