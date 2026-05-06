@@ -116,56 +116,45 @@ async function generateMultiPart(
   ctx: string,
   parts: Array<{ title: string; instructions: string; maxTokens: number }>,
 ): Promise<string> {
-  const generatedParts: string[] = [];
-
-  // The base context is identical across all calls for this section — cache it.
-  // Call 1 writes the cache; calls 2-N hit it at $1.50/MTok instead of $15/MTok.
   const cachedText = `${systemRole}\n\n${TONE_OF_VOICE}\n\n${ctx}`;
 
-  for (const part of parts) {
-    const previousContext = generatedParts.length > 0
-      ? `\n## Already written sections (for coherence)\n${generatedParts.map(p => p.slice(0, 400)).join("\n\n")}\n`
-      : "";
-
-    const dynamicText = `${previousContext}
-Write ONLY the following section (start directly with the markdown header, no preamble).
+  const results = await Promise.all(
+    parts.map((part) => {
+      const dynamicText = `Write ONLY the following section (start directly with the markdown header, no preamble).
 Target length: ${part.maxTokens} tokens. Be concise. Stop as soon as the section is complete — do not pad.
 
 ${part.title}
 ${part.instructions}`;
 
-    // Hard ceiling: 1.5× the target to absorb natural variance without ever cutting mid-sentence.
-    // Claude stops when done — it will not inflate to the ceiling.
-    const message = await client.messages.create({
-      model:      "claude-opus-4-6",
-      max_tokens: Math.max(Math.round(part.maxTokens * 1.5), 1024),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type:          "text",
-              text:          cachedText,
-              cache_control: { type: "ephemeral" },
-            },
-            {
-              type: "text",
-              text: dynamicText,
-            },
-          ],
-        },
-      ],
-    });
+      return client.messages.create({
+        model:      "claude-sonnet-4-6",
+        max_tokens: Math.max(Math.round(part.maxTokens * 1.5), 1024),
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type:          "text",
+                text:          cachedText,
+                cache_control: { type: "ephemeral" },
+              },
+              {
+                type: "text",
+                text: dynamicText,
+              },
+            ],
+          },
+        ],
+      }).then((msg) =>
+        msg.content
+          .filter((b) => b.type === "text")
+          .map((b) => (b as { type: "text"; text: string }).text)
+          .join("\n")
+      );
+    })
+  );
 
-    const text = message.content
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { type: "text"; text: string }).text)
-      .join("\n");
-
-    generatedParts.push(text);
-  }
-
-  return generatedParts.join("\n\n");
+  return results.join("\n\n");
 }
 
 // ── Section parts definitions ─────────────────────────────────────────────────
@@ -511,7 +500,7 @@ ${part.title}
 ${part.instructions}`;
 
       return client.messages.create({
-        model:      "claude-opus-4-6",
+        model:      "claude-sonnet-4-6",
         max_tokens: Math.max(Math.round(part.maxTokens * 1.5), 1024),
         messages: [{
           role: "user",
