@@ -40,6 +40,66 @@
   color: #777;
 }
 
+/* ─── Article nav ────────────────────────────────────────────────────────── */
+.f2-article-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.f2-article-nav__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.f2-article-nav__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.f2-article-nav__current {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #111;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.f2-article-nav__link {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.f2-article-nav__link:hover {
+  color: #111;
+}
+
+@media (max-width: 600px) {
+  .f2-article-nav__inner {
+    padding: 0 16px;
+    gap: 20px;
+  }
+}
+
 /* ─── Article header ─────────────────────────────────────────────────────── */
 .f2-article {
   max-width: 720px;
