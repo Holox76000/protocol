@@ -229,13 +229,13 @@ function supplementParts(name: string): Array<{ title: string; instructions: str
     },
     {
       title:        "## Recommended Stack",
-      instructions: `Full evidence-based supplement stack for this client's goals and profile. For each supplement:
+      instructions: `Evidence-based supplement stack for this client. For each supplement:
 - Name and form (e.g. Creatine monohydrate)
-- Why it applies to this specific client (link to their metrics, goal, training volume, or health profile)
-- Evidence tier: **Tier 1** (strong RCT evidence), **Tier 2** (moderate/emerging evidence), or **Tier 3** (theoretical/limited)
+- Why it applies to this client (metrics, goal, training volume, or health profile)
+- Evidence tier: **Tier 1** (strong RCT evidence), **Tier 2** (moderate/emerging), or **Tier 3** (theoretical)
 
-Order by impact. Include only what genuinely moves the needle for this profile. Be specific about forms and avoid generic lists. Write complete entries — do not truncate.`,
-      maxTokens:    2000,
+Order by impact. Max 8 supplements. Only what genuinely moves the needle for this profile.`,
+      maxTokens:    1400,
     },
     {
       title:        "## Timing & Dosing Protocol",
@@ -274,7 +274,7 @@ After all session tables, output:
 
 ### Weekly Schedule
 A compact 7-row table: Day | Session (include rest days as "Rest").`,
-      maxTokens:    2800,
+      maxTokens:    2200,
     },
     {
       title:        "## 3-Month Progression",
