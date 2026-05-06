@@ -1,0 +1,374 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   F2 — Editorial Advertorial
+   Newspaper / long-form article style
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tokens inherited from f1.css */
+
+/* ─── Page shell ─────────────────────────────────────────────────────────── */
+.f2-page {
+  background: #fff;
+  color: #111;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Publication bar ────────────────────────────────────────────────────── */
+.f2-pubbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 2px solid #111;
+}
+
+.f2-pubbar__name {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #111;
+  text-decoration: none;
+}
+
+.f2-pubbar__right {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+/* ─── Article header ─────────────────────────────────────────────────────── */
+.f2-article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.f2-category {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #111;
+  margin: 40px 0 18px;
+  display: block;
+}
+
+.f2-headline {
+  font-family: "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: #111;
+  margin: 0 0 20px;
+}
+
+.f2-deck {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(17px, 2.2vw, 20px);
+  line-height: 1.5;
+  color: #333;
+  margin: 0 0 20px;
+  font-weight: 400;
+}
+
+.f2-byline {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.f2-byline a {
+  color: #111;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.f2-byline__sep {
+  color: #bbb;
+}
+
+.f2-rule {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0 28px;
+}
+
+/* ─── Body text ──────────────────────────────────────────────────────────── */
+.f2-body p {
+  font-size: 18px;
+  line-height: 1.75;
+  color: #1a1a1a;
+  margin: 0 0 24px;
+}
+
+.f2-body p.f2-drop-cap::first-letter {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 72px;
+  font-weight: 400;
+  line-height: 0.78;
+  float: left;
+  margin: 6px 8px -4px 0;
+  color: #111;
+}
+
+/* ─── Pull quote ─────────────────────────────────────────────────────────── */
+.f2-pullquote {
+  border-left: 3px solid #111;
+  padding: 4px 0 4px 24px;
+  margin: 36px 0;
+}
+
+.f2-pullquote p {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.45;
+  font-style: italic;
+  color: #111;
+  margin: 0;
+}
+
+/* ─── Research callout ───────────────────────────────────────────────────── */
+.f2-research {
+  background: #f5f4f0;
+  border-radius: 4px;
+  padding: 24px 28px;
+  margin: 40px 0;
+}
+
+.f2-research__label {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #777;
+  margin: 0 0 16px;
+}
+
+.f2-research__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.f2-research__list li {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  padding-left: 20px;
+  position: relative;
+}
+
+.f2-research__list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: #999;
+}
+
+/* ─── Section heading ────────────────────────────────────────────────────── */
+.f2-section-head {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+  margin: 48px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ─── "Read more" preview CTA ────────────────────────────────────────────── */
+.f2-preview-gate {
+  position: relative;
+  margin: 0 -24px;
+}
+
+.f2-preview-fade {
+  height: 160px;
+  background: linear-gradient(to bottom, transparent, #fff 80%);
+  margin-top: -80px;
+  pointer-events: none;
+}
+
+.f2-preview-cta {
+  text-align: center;
+  padding: 0 24px 40px;
+}
+
+.f2-preview-cta__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+  color: #111;
+  text-decoration: none;
+  border-bottom: 1px solid #111;
+  padding-bottom: 2px;
+  transition: opacity 0.15s;
+}
+
+.f2-preview-cta__link:hover {
+  opacity: 0.65;
+}
+
+.f2-preview-cta__link svg {
+  flex-shrink: 0;
+}
+
+/* ─── Offer CTA block ────────────────────────────────────────────────────── */
+.f2-offer {
+  background: var(--f1-brand, #253239);
+  color: #fff;
+  border-radius: 8px;
+  padding: 40px 36px;
+  margin: 48px 0;
+  text-align: center;
+}
+
+.f2-offer__eyebrow {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 12px;
+}
+
+.f2-offer__title {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.f2-offer__sub {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 28px;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.f2-offer__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  color: var(--f1-brand, #253239);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 4px;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s;
+}
+
+.f2-offer__cta:hover {
+  opacity: 0.88;
+}
+
+.f2-offer__guarantee {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 12px;
+}
+
+/* ─── Testimonials ───────────────────────────────────────────────────────── */
+.f2-testimonials {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 40px 0;
+}
+
+.f2-testimonial {
+  border-left: 2px solid #e0e0e0;
+  padding: 4px 0 4px 20px;
+}
+
+.f2-testimonial__quote {
+  font-family: Georgia, serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #222;
+  font-style: italic;
+  margin: 0 0 8px;
+}
+
+.f2-testimonial__attr {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.f2-footer-disclosure {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.6;
+  padding-top: 32px;
+  border-top: 1px solid #eee;
+  margin-top: 60px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .f2-pubbar {
+    padding: 12px 16px;
+  }
+
+  .f2-article {
+    padding: 0 16px 60px;
+  }
+
+  .f2-category {
+    margin-top: 28px;
+  }
+
+  .f2-body p {
+    font-size: 17px;
+  }
+
+  .f2-body p.f2-drop-cap::first-letter {
+    font-size: 56px;
+  }
+
+  .f2-pullquote p {
+    font-size: 19px;
+  }
+
+  .f2-offer {
+    padding: 32px 20px;
+  }
+}
