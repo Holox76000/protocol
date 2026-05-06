@@ -326,7 +326,7 @@ const handler: Handler = async (event) => {
       return { statusCode: 200, body: "done (no api key)" };
     }
 
-    const analysisUrl   = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+    const analysisUrl   = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
     const generationUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`;
 
     const promptParams: PromptParams = {

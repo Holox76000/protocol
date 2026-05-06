@@ -2,7 +2,7 @@ import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
 const DEFAULT_API_BASE    = "https://generativelanguage.googleapis.com/v1beta";
-const ANALYSIS_MODEL      = "gemini-2.0-flash";
+const ANALYSIS_MODEL      = "gemini-2.5-flash";
 const GENERATION_MODEL    = "gemini-2.5-flash-image";
 
 const BODY_ANALYSIS_RESEARCH = `

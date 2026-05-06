@@ -179,7 +179,7 @@ async function runFunnelGenerationInline(
   const apiKey = process.env.NANOBANANA_API_KEY;
   if (!apiKey) throw new Error("NANOBANANA_API_KEY not configured");
 
-  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.0-flash:generateContent`;
+  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.5-flash:generateContent`;
   const generationUrl = `${DEFAULT_API_BASE}/models/gemini-2.5-flash-image:generateContent`;
 
   // Step 1: Analysis

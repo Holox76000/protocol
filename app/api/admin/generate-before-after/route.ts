@@ -312,7 +312,7 @@ async function runGenerationInline(
   const apiKey = process.env.NANOBANANA_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "NANOBANANA_API_KEY not configured." }, { status: 503 });
 
-  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.0-flash:generateContent`;
+  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.5-flash:generateContent`;
   const generationUrl = `${DEFAULT_API_BASE}/models/gemini-2.5-flash-image:generateContent`;
   const promptParams: PromptParams = {
     age:                          (qr.age             as number | null) ?? 30,
