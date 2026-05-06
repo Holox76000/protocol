@@ -4,7 +4,6 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 export const runtime = "nodejs";
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL    = "gemini-2.5-flash-image";
 
 const BODY_ANALYSIS_RESEARCH = `
 ## Key Research Findings: Male Physical Attractiveness (Visual)
@@ -178,13 +177,13 @@ async function runFunnelGenerationInline(
   const photoMime   = photoData.type || "image/jpeg";
 
   const apiKey = process.env.NANOBANANA_API_KEY;
-  const model  = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
   if (!apiKey) throw new Error("NANOBANANA_API_KEY not configured");
 
-  const geminiUrl = `${DEFAULT_API_BASE}/models/${model}:generateContent`;
+  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.0-flash:generateContent`;
+  const generationUrl = `${DEFAULT_API_BASE}/models/gemini-2.5-flash-image:generateContent`;
 
   // Step 1: Analysis
-  const analysisRes = await fetchWithRetry(geminiUrl, {
+  const analysisRes = await fetchWithRetry(analysisUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
@@ -200,7 +199,7 @@ async function runFunnelGenerationInline(
   if (!analysis) throw new Error("Analysis returned no content");
 
   // Step 2: Image generation
-  const generationRes = await fetchWithRetry(geminiUrl, {
+  const generationRes = await fetchWithRetry(generationUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({

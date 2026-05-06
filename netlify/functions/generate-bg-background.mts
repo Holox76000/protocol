@@ -321,13 +321,13 @@ const handler: Handler = async (event) => {
     const photoMime   = photoData.type || "image/jpeg";
 
     const apiKey = process.env.NANOBANANA_API_KEY;
-    const model  = process.env.NANOBANANA_MODEL || "gemini-2.5-flash-image";
     if (!apiKey) {
       await markError("API key not configured.");
       return { statusCode: 200, body: "done (no api key)" };
     }
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    const analysisUrl   = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+    const generationUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`;
 
     const promptParams: PromptParams = {
       age:                          (qr.age             as number | null) ?? 30,
@@ -344,7 +344,7 @@ const handler: Handler = async (event) => {
 
     // 3. Step 1: Analysis
     console.log(`[generate-bg] Step 1 — analysis for ${userId}`);
-    const analysisRes = await fetchWithRetry(geminiUrl, {
+    const analysisRes = await fetchWithRetry(analysisUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
@@ -371,7 +371,7 @@ const handler: Handler = async (event) => {
 
     // 4. Step 2: Image generation
     console.log(`[generate-bg] Step 2 — generation for ${userId}`);
-    const generationRes = await fetchWithRetry(geminiUrl, {
+    const generationRes = await fetchWithRetry(generationUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({

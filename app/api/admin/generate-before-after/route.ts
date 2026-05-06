@@ -10,7 +10,6 @@ export const runtime = "nodejs";
 export const maxDuration = 120;
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL    = "gemini-2.5-flash-image";
 
 // ── Condensed research reference for visual body analysis ─────────────────
 // Extracted from the full SCIENTIFIC_REFERENCE_BASE — focused on findings
@@ -311,10 +310,10 @@ async function runGenerationInline(
   const photoMime   = photoData.type || "image/jpeg";
 
   const apiKey = process.env.NANOBANANA_API_KEY;
-  const model  = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
   if (!apiKey) return NextResponse.json({ error: "NANOBANANA_API_KEY not configured." }, { status: 503 });
 
-  const geminiUrl = `${DEFAULT_API_BASE}/models/${model}:generateContent`;
+  const analysisUrl   = `${DEFAULT_API_BASE}/models/gemini-2.0-flash:generateContent`;
+  const generationUrl = `${DEFAULT_API_BASE}/models/gemini-2.5-flash-image:generateContent`;
   const promptParams: PromptParams = {
     age:                          (qr.age             as number | null) ?? 30,
     metrics,
@@ -329,7 +328,7 @@ async function runGenerationInline(
   };
 
   // Step 1: analysis
-  const analysisRes = await fetchWithRetry(geminiUrl, {
+  const analysisRes = await fetchWithRetry(analysisUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
@@ -350,7 +349,7 @@ async function runGenerationInline(
   if (!analysis) return NextResponse.json({ error: "Photo analysis returned no content." }, { status: 502 });
 
   // Step 2: image generation
-  const generationRes = await fetchWithRetry(geminiUrl, {
+  const generationRes = await fetchWithRetry(generationUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({

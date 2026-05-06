@@ -1,8 +1,9 @@
 import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
-const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL    = "gemini-2.5-flash-image";
+const DEFAULT_API_BASE    = "https://generativelanguage.googleapis.com/v1beta";
+const ANALYSIS_MODEL      = "gemini-2.0-flash";
+const GENERATION_MODEL    = "gemini-2.5-flash-image";
 
 const BODY_ANALYSIS_RESEARCH = `
 ## Key Research Findings: Male Physical Attractiveness (Visual)
@@ -214,17 +215,17 @@ const handler: Handler = async (event) => {
     const photoMime   = photoData.type || "image/jpeg";
 
     const apiKey = process.env.NANOBANANA_API_KEY;
-    const model  = process.env.NANOBANANA_MODEL || DEFAULT_MODEL;
     if (!apiKey) {
       await markError("API key not configured.");
       return { statusCode: 200, body: "done (no api key)" };
     }
 
-    const geminiUrl = `${DEFAULT_API_BASE}/models/${model}:generateContent`;
+    const analysisUrl   = `${DEFAULT_API_BASE}/models/${ANALYSIS_MODEL}:generateContent`;
+    const generationUrl = `${DEFAULT_API_BASE}/models/${GENERATION_MODEL}:generateContent`;
 
     // Step 1: Analysis
     console.log("[funnel-preview-bg] Step 1 — analysis");
-    const analysisRes = await fetchWithRetry(geminiUrl, {
+    const analysisRes = await fetchWithRetry(analysisUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
@@ -251,7 +252,7 @@ const handler: Handler = async (event) => {
 
     // Step 2: Image generation
     console.log("[funnel-preview-bg] Step 2 — generation");
-    const generationRes = await fetchWithRetry(geminiUrl, {
+    const generationRes = await fetchWithRetry(generationUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
