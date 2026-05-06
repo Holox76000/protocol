@@ -73,27 +73,25 @@ function buildGenerationPrompt(ageBracket: string, analysis: string): string {
   const age = AGE_BRACKET_MID[ageBracket] ?? 30;
   const conservative = age >= 45;
 
-  return `Create a realistic "after" transformation photo of this exact person. Show optimistic but realistic 12-week progress.
+  return `Generate a professional fitness photograph of a man with the following physical profile. This is a realistic representation of his target physique after 12 weeks of structured training.
 
 ${ageContextLine(age)}
-${conservative ? "IMPORTANT: Keep changes conservative and realistic. No dramatic muscle gains." : ""}
+${conservative ? "Keep improvements conservative and realistic — no dramatic muscle gains for this age group." : ""}
 
 ---
 
-## Transformation Brief
+## Physical Profile & Target Physique (from expert analysis)
 
 ${analysis}
 
 ---
 
-## Absolute Rules
-— Preserve identity exactly: same face structure, skin tone, ethnicity, hair color, hair style, eye color.
-— Same camera angle and background as the original photo.
-— Lighting: professional fitness studio lighting — soft but directional, revealing muscle separation and definition.
-— Show the natural V-taper: broader shoulders, narrower waist — within 12-week limits.
-— Face leanness: show jawline and cheekbone definition at the leanest realistic level.
-— The result must look like a real photograph, not a digital render.
-— All changes must be within physiological limits through natural training.`;
+## Photo Requirements
+— Realistic fitness photograph. Natural lighting, not a digital render or illustration.
+— Professional studio lighting — directional with soft shadows that reveal V-taper, shoulder roundness, chest definition, waist leanness, and facial bone structure.
+— V-taper silhouette: broader shoulders, narrower waist, within what 12 weeks of natural training can achieve.
+— Face leanness: defined jawline and visible cheekbone structure.
+— Athletic build — not bodybuilder. Ground every detail in the physique description above.`;
 }
 
 function extractText(payload: unknown): string | null {
@@ -257,7 +255,6 @@ const handler: Handler = async (event) => {
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [
-          { inline_data: { mime_type: photoMime, data: photoBase64 } },
           { text: buildGenerationPrompt(age_bracket, analysis) },
         ]}],
         generationConfig: {

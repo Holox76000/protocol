@@ -154,26 +154,27 @@ function buildGenerationPrompt(p: PromptParams, analysis: string): string {
     social_perception: p.socialPerception,
   });
 
-  return `Create a realistic "after" transformation photo of this exact person. Show the upper end of what natural training achieves.
+  return `Generate a professional fitness photograph of a man with the following physical profile. This is a realistic representation of his target physique after 12 weeks of structured training.
 
 ${ageContextLine(age)}
-${gainMult < 0.4 ? "IMPORTANT: This person's age limits transformation potential — keep changes conservative and realistic." : ""}
+${gainMult < 0.4 ? "Keep improvements conservative and realistic — no dramatic muscle gains for this age group." : ""}
 
 ${socialCtx}
 
 ---
 
-## Transformation Brief (from expert analysis of this photo)
+## Physical Profile & Target Physique (from expert analysis)
 
 ${analysis}
 
 ---
 
-## Absolute Rules
-— Preserve identity exactly: same face structure, skin tone, ethnicity, hair color, hair style, eye color.
-— Same camera angle and background as the original photo.
-— Lighting: professional fitness studio lighting — soft but directional, revealing muscle separation and definition.
-— Maximise the V-taper silhouette.
+## Photo Requirements
+— Realistic fitness photograph. Natural lighting, not a digital render or illustration.
+— Professional studio lighting — directional with soft shadows that reveal V-taper, shoulder roundness, chest definition, waist leanness, and facial bone structure.
+— V-taper silhouette: broader shoulders, narrower waist, within what 12 weeks of natural training can achieve at age ${age}.
+— Face leanness: defined jawline and visible cheekbone structure.
+— Athletic build — not bodybuilder. Ground every detail in the physique description above.
 — Face leanness: show jawline and cheekbone definition at the leanest realistic level.
 — The result must look like a real photograph, not a digital render.
 — All changes must be within physiological limits for age ${age} through natural training.
@@ -376,7 +377,6 @@ const handler: Handler = async (event) => {
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [
-          { inline_data: { mime_type: photoMime, data: photoBase64 } },
           { text: buildGenerationPrompt(promptParams, analysis) },
         ]}],
         generationConfig: {

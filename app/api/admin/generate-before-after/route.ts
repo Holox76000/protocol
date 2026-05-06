@@ -181,30 +181,27 @@ function buildGenerationPrompt(p: PromptParams, analysis: string): string {
     social_perception: p.socialPerception,
   });
 
-  return `Create a realistic "after" transformation photo of this exact person. Show optimistic but realistic 12-week progress — credible, not the absolute ceiling.
+  return `Generate a professional fitness photograph of a man with the following physical profile. This is a realistic representation of his target physique after 12 weeks of structured training.
 
 ${ageContextLine(age)}
-${gainMult < 0.4 ? "IMPORTANT: This person's age limits transformation potential — keep changes conservative and realistic. No dramatic muscle gains." : ""}
+${gainMult < 0.4 ? "Keep improvements conservative and realistic — no dramatic muscle gains for this age group." : ""}
 
 ${socialCtx}
 
 ---
 
-## Transformation Brief (from expert analysis of this photo)
+## Physical Profile & Target Physique (from expert analysis)
 
 ${analysis}
 
 ---
 
-## Absolute Rules
-— Preserve identity exactly: same face structure, skin tone, ethnicity, hair color, hair style, eye color. This must be recognizably the same person.
-— Same camera angle and background as the original photo.
-— Lighting: use professional fitness studio lighting — soft but directional, with slight shadow depth that reveals muscle separation, shoulder roundness, chest definition, waist leanness, and facial bone structure. Upgrade flat or dim original lighting. Never flat, never blown out.
-— Show the natural V-taper improvement that results from the specific changes in the analysis above — broader shoulders, narrower waist — without exaggerating beyond what's visible at 12 weeks.
-— Face leanness: show the jawline and cheekbone definition at the leanest realistic level for this person's body fat target. The face should look noticeably leaner and sharper.
-— The result must look like a real photograph, not a digital render or a different person.
-— All changes must be within physiological limits for age ${age} through natural training at 12 weeks.
-— Ground every change in the specific weaknesses from the analysis above. Do not produce a generic fitness model.`;
+## Photo Requirements
+— Realistic fitness photograph. Natural lighting, not a digital render or illustration.
+— Professional studio lighting — directional with soft shadows that reveal V-taper, shoulder roundness, chest definition, waist leanness, and facial bone structure.
+— V-taper silhouette: broader shoulders, narrower waist, within what 12 weeks of natural training can achieve at age ${age}.
+— Face leanness: defined jawline and visible cheekbone structure.
+— Athletic build — not bodybuilder. Ground every detail in the physique description above.`;
 }
 
 // ── Gemini API helpers ────────────────────────────────────────────────────
@@ -354,7 +351,6 @@ async function runGenerationInline(
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
       contents: [{ role: "user", parts: [
-        { inline_data: { mime_type: photoMime, data: photoBase64 } },
         { text: buildGenerationPrompt(promptParams, analysis) },
       ]}],
       generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "3:4", imageSize: "1K" }, temperature: 0.4 },
