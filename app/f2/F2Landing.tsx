@@ -128,6 +128,10 @@ export default function F2Landing() {
             that no one else notices.
           </p>
 
+          <figure className="f2-figure">
+            <img src="/assets/fitness_vs_attractiveness_goals_v2.svg" alt="Chart: fitness goals vs attractiveness goals on the same plane" className="f2-figure__img" />
+          </figure>
+
           <p className="f2-section-head">What the meta-analysis actually found</p>
 
           <p>
@@ -189,6 +193,10 @@ export default function F2Landing() {
             equation. Until recently, no one had built a system to compute it.
           </p>
 
+          <figure className="f2-figure">
+            <img src="/assets/attractiveness_contextual_targets.svg" alt="Same science, different targets — two contextual attractiveness profiles" className="f2-figure__img" />
+          </figure>
+
           {/* ─ Protocol ─ */}
           <p id="protocol" className="f2-section-head">The protocol</p>
 
@@ -203,6 +211,10 @@ export default function F2Landing() {
           </p>
 
           <p>The result is the Attractiveness Protocol. It works in four steps, in this order.</p>
+
+          <figure className="f2-figure">
+            <img src="/assets/variables_kept_vs_cut_v2.svg" alt="What most men track vs what Protocol measures" className="f2-figure__img" />
+          </figure>
 
           <div className="f2-steps">
             <div className="f2-step">

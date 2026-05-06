@@ -377,6 +377,21 @@
   }
 }
 
+/* ─── Figures / illustrations ────────────────────────────────────────────── */
+.f2-figure {
+  margin: 36px 0;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.f2-figure__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* ─── Protocol steps ─────────────────────────────────────────────────────── */
 .f2-steps {
   display: flex;
