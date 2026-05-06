@@ -6,12 +6,12 @@ import "../f1/f1.css";
 import "./f2.css";
 
 export default function F2Landing() {
-  const [offerHref, setOfferHref] = useState("/funnel");
+  const [offerHref, setOfferHref] = useState("/f1/offer");
 
   useEffect(() => {
     const utm = getUtmParams();
     persistUtmParams(utm);
-    setOfferHref(appendUtmToPath("/funnel", utm));
+    setOfferHref(appendUtmToPath("/f1/offer", utm));
   }, []);
 
   return (
