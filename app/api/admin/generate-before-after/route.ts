@@ -7,6 +7,7 @@ import { getAgeRanges, bfRealisticTarget, muscleGainMultiplier } from "../../../
 import { socialContextBlock } from "../../../../lib/socialContext";
 
 export const runtime = "nodejs";
+export const maxDuration = 120;
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_MODEL    = "gemini-2.5-flash-image";
@@ -367,7 +368,15 @@ async function runGenerationInline(
     return NextResponse.json({ error: "Gemini step2 returned non-JSON.", detail: generationRaw.slice(0, 200) }, { status: 502 });
   }
   const afterDataUrl = extractImageFromGemini(generationPayload);
-  if (!afterDataUrl) return NextResponse.json({ error: "Gemini did not return an image." }, { status: 502 });
+  if (!afterDataUrl) {
+    const payload = generationPayload as Record<string, unknown>;
+    const candidate = (Array.isArray(payload?.candidates) ? payload.candidates[0] : null) as Record<string, unknown> | null;
+    const finishReason = candidate?.finishReason ?? "unknown";
+    const partsCount = (candidate?.content as Record<string, unknown> | undefined)?.parts;
+    const partTypes = Array.isArray(partsCount) ? partsCount.map((p: Record<string, unknown>) => Object.keys(p).join(",")) : [];
+    console.error("[generate-before-after] step2 no image — finishReason:", finishReason, "parts:", partTypes);
+    return NextResponse.json({ error: "Gemini did not return an image.", detail: { finishReason, partTypes } }, { status: 502 });
+  }
 
   // Upload + persist
   const match = afterDataUrl.match(/^data:(.+?);base64,(.+)$/);
