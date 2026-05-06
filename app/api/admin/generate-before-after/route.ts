@@ -9,7 +9,7 @@ import { socialContextBlock } from "../../../../lib/socialContext";
 export const runtime = "nodejs";
 
 const DEFAULT_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL    = "gemini-3.1-flash-image-preview";
+const DEFAULT_MODEL    = "gemini-2.5-flash-image";
 
 // ── Condensed research reference for visual body analysis ─────────────────
 // Extracted from the full SCIENTIFIC_REFERENCE_BASE — focused on findings

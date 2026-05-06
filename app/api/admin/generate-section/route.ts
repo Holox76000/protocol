@@ -195,22 +195,22 @@ Account for allergies, dietary profile, and meal prep constraints. Each item mus
       maxTokens:    700,
     },
     {
-      title:        "## 90-Day Meal Plan",
-      instructions: `Generate a complete 90-day meal plan as a markdown table with EXACTLY this format:
+      title:        "## 4-Week Rotating Meal Plan",
+      instructions: `Generate a 4-week rotating meal plan as a markdown table with EXACTLY this format:
 
 | Day | Breakfast | Lunch | Dinner | Snack |
 |-----|-----------|-------|--------|-------|
-| 1 | dish name | dish name | dish name | snack |
-| 2 | ... | ... | ... | ... |
+| Mon | dish name | dish name | dish name | snack |
+| Tue | ... | ... | ... | ... |
 
 Rules:
-- Include all 90 rows (Day 1 through Day 90), no skipping
+- Include all 7 days × 4 weeks = 28 rows total (label as Week 1 Mon … Week 4 Sun)
+- After Week 4, the plan repeats — note this at the top: "Weeks 5-12: repeat this cycle"
 - Each meal entry: concise dish name only (2–5 words), no descriptions or macros
-- Align with the caloric target, macros, and food choices from previous sections
-- Account for the client's dietary profile, food allergies, meal prep availability, and eating habits
-- Rotate meals across weeks for variety; avoid repeating the same meal more than twice per week
-- Structure progressively: build habits in Month 1, introduce variety in Month 2, refine in Month 3`,
-      maxTokens:    5000,
+- Align with the caloric target, macros, and food choices from this client's profile
+- Account for dietary profile, food allergies, meal prep availability, and eating habits
+- Vary meals across weeks; avoid repeating the same meal more than twice per week`,
+      maxTokens:    2500,
     },
     {
       title:        "## Key Rules",
