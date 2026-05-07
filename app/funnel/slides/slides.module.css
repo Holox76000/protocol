@@ -647,7 +647,7 @@
 /* ─── Intro slide ────────────────────────────────────────── */
 .introInner {
   display: grid;
-  gap: 20px;
+  gap: 14px;
   padding: 8px 0;
 }
 
@@ -672,10 +672,10 @@
 .introStats {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 16px 20px;
+  gap: 16px;
+  padding: 12px 16px;
   border: 1px solid var(--q-border);
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.9);
   width: fit-content;
 }
@@ -710,6 +710,77 @@
   height: 32px;
   background: var(--q-border);
   flex-shrink: 0;
+}
+
+.introLogo {
+  width: 80px;
+  height: auto;
+  opacity: 0.85;
+}
+
+.introPress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--q-border);
+  border-bottom: 1px solid var(--q-border);
+}
+
+.introPressLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--q-soft);
+  text-align: center;
+}
+
+.introPressLogos {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.introPressLogos::-webkit-scrollbar {
+  display: none;
+}
+
+.introPressLogo {
+  height: 32px;
+  width: auto;
+  flex-shrink: 0;
+  opacity: 0.55;
+  filter: grayscale(1);
+  object-fit: contain;
+}
+
+/* ─── Intro rating ───────────────────────────────────────── */
+.introRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.introRatingStars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--q-strong);
+}
+
+.introRatingScore {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--q-strong);
+  letter-spacing: -0.02em;
+}
+
+.introRatingCount {
+  font-size: 13px;
+  color: var(--q-soft);
 }
 
 /* ─── Info slide ─────────────────────────────────────────── */

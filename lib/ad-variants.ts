@@ -9,7 +9,7 @@ export const DEFAULT_VARIANT: AdVariant = {
   badge: "Attractiveness Diagnostic",
   headline: "Find out exactly where you stand.",
   subtext:
-    "A 3-minute science-based assessment that maps your appearance across 18 data points — and tells you what to fix first.",
+    "A 3-minute assessment that measures 18 variables in your appearance — and tells you exactly what to fix first.",
   cta: "Start the assessment →",
 };
 
@@ -41,7 +41,7 @@ const FIRST_IMPRESSION_BAR: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "Research found the formula that controls this first impression. Take 3 minutes to find out where you stand — and what it takes to reach your potential.",
+    "Research found the formula that controls this first impression. Take 3 minutes to find out where you stand — and what it actually takes to change it.",
   cta: "Find out where I stand →",
 };
 
@@ -77,7 +77,7 @@ const SCORE_UPGRADE: AdVariant = {
   badge: "Attractiveness Score",
   headline: "Find out if this protocol can take you from where you are to a 9/10.",
   subtext:
-    "A science-backed assessment that calculates your current attractiveness score and maps the exact path to your realistic potential. Takes 3 minutes.",
+    "An assessment that gives you your current score and shows you exactly what it takes to go higher. Takes 3 minutes.",
   cta: "See if it works for me →",
 };
 
@@ -86,7 +86,7 @@ const STRENGTH_VS_ATTRACTIVENESS: AdVariant = {
   badge: "Attractiveness vs. Strength",
   headline: "What's wrong with this physique? Nothing — if your goal is strength.",
   subtext:
-    "But if your goal is attractiveness, you need a completely different formula. We built it — based on 25,000+ peer-reviewed studies.",
+    "But if your goal is attractiveness, you need a completely different formula. One built around what research actually says the eye reads as attractive.",
   cta: "See the formula →",
 };
 
@@ -104,7 +104,7 @@ const TWELVE_WEEKS_WORK: AdVariant = {
   badge: "12-Week Protocol",
   headline: "12 weeks is how long it takes to change how people perceive you at work.",
   subtext:
-    "Your body speaks before you do. This assessment maps exactly what's holding your professional presence back — and the protocol to fix it.",
+    "Your body speaks before you do. This assessment tells you exactly what's holding your professional presence back — and what to do about it.",
   cta: "Visualize my potential →",
 };
 
@@ -113,7 +113,7 @@ const TWELVE_WEEKS_BAR: AdVariant = {
   badge: "12-Week Protocol",
   headline: "12 weeks is how long it takes to change who approaches you.",
   subtext:
-    "Your body speaks before you do. This assessment maps exactly what's holding you back socially — and the protocol to change it.",
+    "Your body speaks before you do. This assessment tells you exactly what's holding you back socially — and what to do about it.",
   cta: "Visualize my potential →",
 };
 
@@ -122,7 +122,7 @@ const MIRROR: AdVariant = {
   badge: "Body Scan",
   headline: "What your mirror won't tell you about your appearance.",
   subtext:
-    "AI scans 100+ body proportion markers — posture alignment, chest development, frame ratios. Reveals exactly what to train for attractiveness, not just muscle size.",
+    "One photo. We measure your proportions, posture, and frame — and tell you exactly what to train for attractiveness, not just muscle size.",
   cta: "Get my body scan →",
 };
 
@@ -131,7 +131,7 @@ const SCAN: AdVariant = {
   badge: "Body Scan",
   headline: "Scan your body. Get your exact protocol.",
   subtext:
-    "AI analyzes 100+ body attractiveness markers from one photo. Your personalized protocol is built from the results.",
+    "One photo. Your proportions are measured and scored. The protocol follows directly from the results.",
   cta: "Get my analysis →",
 };
 
@@ -149,7 +149,7 @@ const BODY_ANALYZED: AdVariant = {
   badge: "Body Analysis",
   headline: "See your body analyzed — every proportion, score, and 12-week potential.",
   subtext:
-    "A personalized assessment that maps your exact body proportions and tells you precisely what to change to reach your highest attractiveness score.",
+    "An assessment that measures your exact proportions and tells you precisely what to change — and what your score looks like in 12 weeks.",
   cta: "Analyze my body →",
 };
 
@@ -158,7 +158,7 @@ const GET_SCORE: AdVariant = {
   badge: "Attractiveness Score",
   headline: "Get your attractiveness score — measured scientifically.",
   subtext:
-    "What if you could measure exactly where you stand and which levers to pull? 3 minutes. 100+ data points. Your exact roadmap.",
+    "3 minutes. 18 variables measured. You get your score, what's pulling it down, and exactly what to do about it.",
   cta: "Get my score →",
 };
 
@@ -176,7 +176,7 @@ const THREE_MONTHS: AdVariant = {
   badge: "Protocol Difference",
   headline: "3 months. Same gym. A different protocol changes everything.",
   subtext:
-    "AI-powered body analysis → personalized training for attractiveness, not just size. Aesthetic Score: 63 → 84. The difference is the protocol.",
+    "Same gym. Different training targets. Aesthetic Score: 63 → 84. What changed wasn't effort — it was knowing what to train for.",
   cta: "Build my protocol →",
 };
 
