@@ -142,7 +142,7 @@ export default function FunnelShell() {
               <path d="M11 14L6 9l5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          {!isSection7 && (
+          {!isSection7 && step > 0 && (
             <div className={styles.headerProgress}>
               <div className={styles.progressTrack}>
                 <span
