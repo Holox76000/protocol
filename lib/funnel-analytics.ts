@@ -1,4 +1,5 @@
 function post(body: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") return;
   fetch("/api/ga4-event", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

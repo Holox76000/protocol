@@ -31,6 +31,7 @@ function getSessionId(): string {
 
 export function trackEvent(name: EventName, payload: EventPayload = {}) {
   if (typeof window === "undefined") return;
+  if (process.env.NODE_ENV !== "production") return;
   const sessionId = getSessionId();
   const eventId = `${sessionId}:${name}:${Date.now()}`;
 

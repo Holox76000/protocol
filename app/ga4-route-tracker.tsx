@@ -42,6 +42,8 @@ export default function Ga4RouteTracker({ isAdmin = false }: { isAdmin?: boolean
     if (isAdmin) return;
 
     const trackPageView = () => {
+      if (process.env.NODE_ENV !== "production") return;
+
       const pagePath = getCurrentPagePath();
 
       if (previousUrlRef.current === pagePath) return;
