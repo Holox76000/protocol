@@ -423,6 +423,14 @@ export const SLIDES: SlideConfig[] = [
   },
 
   {
+    id: "how-it-works",
+    type: "info",
+    variant: "objection",
+    headline: "We build your protocol calculated from research and tailored by aesthetic experts.",
+    body: "Every recommendation is built from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ men.",
+  },
+
+  {
     id: "promise",
     type: "promise",
   },
