@@ -9,7 +9,7 @@ export const DEFAULT_VARIANT: AdVariant = {
   badge: "Attractiveness Diagnostic",
   headline: "Find out exactly where you stand.",
   subtext:
-    "A 3-minute assessment that measures 18 variables in your appearance and tells you exactly what to fix first.",
+    "A 2-minute assessment that measures 18 variables in your appearance and tells you exactly what to fix first.",
   cta: "Start the assessment →",
 };
 
@@ -23,7 +23,7 @@ const FIXABLE: AdVariant = {
   badge: "Fixability Assessment",
   headline: "Find out if the way people treat you is actually fixable.",
   subtext:
-    "Your body sends signals before you speak. A 3-minute assessment tells you your Body Signal Score and how high your real ceiling is.",
+    "Your body sends signals before you speak. A 2-minute assessment tells you your Body Signal Score and how high your real ceiling is.",
   cta: "Take the assessment →",
 };
 
@@ -41,7 +41,7 @@ const FIRST_IMPRESSION_BAR: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "Research found the formula that controls this first impression. Take 3 minutes to find out where you stand and what it actually takes to change it.",
+    "Research found the formula that controls this first impression. Take 2 minutes to find out where you stand and what it actually takes to change it.",
   cta: "Find out where I stand →",
 };
 
@@ -50,7 +50,7 @@ const FIRST_IMPRESSION_DRESSED: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "Your body speaks before you do, even fully dressed. 3 minutes to find out what your appearance signals and the exact formula to change it.",
+    "Your body speaks before you do, even fully dressed. 2 minutes to find out what your appearance signals and the exact formula to change it.",
   cta: "Find out where I stand →",
 };
 
@@ -59,7 +59,7 @@ const FIRST_IMPRESSION_PHYSIQUE: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "There is one variable that controls the first impression you make. Research found it. We built the protocol around it. 3 minutes to see yours.",
+    "There is one variable that controls the first impression you make. Research found it. We built the protocol around it. 2 minutes to see yours.",
   cta: "Find out where I stand →",
 };
 
@@ -77,7 +77,7 @@ const SCORE_UPGRADE: AdVariant = {
   badge: "Attractiveness Score",
   headline: "Find out if this protocol can take you from where you are to a 9/10.",
   subtext:
-    "An assessment that gives you your current score and shows you exactly what it takes to go higher. Takes 3 minutes.",
+    "An assessment that gives you your current score and shows you exactly what it takes to go higher. Takes 2 minutes.",
   cta: "See if it works for me →",
 };
 
@@ -95,7 +95,7 @@ const FOUR_SHAPES: AdVariant = {
   badge: "Body Shape Analysis",
   headline: "Four shapes. One man. Only one maximizes your attractiveness score.",
   subtext:
-    "Skinny-fat: 34/100. Overweight: 42/100. Bodybuilder: 58/100. Optimal shape: 94/100. A 3-minute assessment tells you exactly where you rank.",
+    "Skinny-fat: 34/100. Overweight: 42/100. Bodybuilder: 58/100. Optimal shape: 94/100. A 2-minute assessment tells you exactly where you rank.",
   cta: "See where I rank →",
 };
 
@@ -140,7 +140,7 @@ const POSTIT: AdVariant = {
   badge: "Your Body Blueprint",
   headline: "Stop trying things that don't work for your body.",
   subtext:
-    "YouTube workouts. Eat more protein. Copy influencer routines. They don't work because they're not built for your structure. 3 minutes to find your blueprint.",
+    "YouTube workouts. Eat more protein. Copy influencer routines. They don't work because they're not built for your structure. 2 minutes to find your blueprint.",
   cta: "Find my blueprint →",
 };
 
@@ -158,7 +158,7 @@ const GET_SCORE: AdVariant = {
   badge: "Attractiveness Score",
   headline: "Get your attractiveness score, measured to the number.",
   subtext:
-    "3 minutes. 18 variables measured. You get your score, what's pulling it down, and exactly what to do about it.",
+    "2 minutes. 18 variables measured. You get your score, what's pulling it down, and exactly what to do about it.",
   cta: "Get my score →",
 };
 
@@ -167,7 +167,7 @@ const DONALD: AdVariant = {
   badge: "Your Body Blueprint",
   headline: "Don't be like Donald. Your body has a blueprint. Are you training on the right one?",
   subtext:
-    "Most men train off the wrong blueprint and see no results for years. 3 minutes to find out exactly what your body is actually built for.",
+    "Most men train off the wrong blueprint and see no results for years. 2 minutes to find out exactly what your body is actually built for.",
   cta: "See what my body is built for →",
 };
 
@@ -185,7 +185,7 @@ const FIVE_YEARS_STUDY: AdVariant = {
   badge: "Research Findings",
   headline: "After 5 years studying what makes men attractive, one variable explains most of it.",
   subtext:
-    "A 3-minute assessment measures that variable, tells you your score, and shows you exactly what to do about it.",
+    "A 2-minute assessment measures that variable, tells you your score, and shows you exactly what to do about it.",
   cta: "See my score →",
 };
 
@@ -194,7 +194,7 @@ const FOUR_STEPS: AdVariant = {
   badge: "Body Improvement Protocol",
   headline: "There are 4 steps to looking better. Most men skip the most important one.",
   subtext:
-    "The step most men miss has nothing to do with training harder. A 3-minute assessment identifies exactly where you are and what to fix first.",
+    "The step most men miss has nothing to do with training harder. A 2-minute assessment identifies exactly where you are and what to fix first.",
   cta: "Find out where I am →",
 };
 
@@ -203,7 +203,7 @@ const SHOW_POTENTIAL: AdVariant = {
   badge: "Potential Analysis",
   headline: "We can show you exactly what your body is capable of in 12 weeks.",
   subtext:
-    "Not a generic transformation. Your proportions, your structure, your ceiling. A 3-minute assessment maps it out.",
+    "Not a generic transformation. Your proportions, your structure, your ceiling. A 2-minute assessment maps it out.",
   cta: "Show me my potential →",
 };
 
@@ -212,7 +212,7 @@ const BODY_POTENTIAL: AdVariant = {
   badge: "Body Potential",
   headline: "You have no idea how good your body could look. This changes that.",
   subtext:
-    "Most men train without ever knowing their actual ceiling. A 3-minute assessment maps your proportions and shows you exactly how high you can go.",
+    "Most men train without ever knowing their actual ceiling. A 2-minute assessment maps your proportions and shows you exactly how high you can go.",
   cta: "See my ceiling →",
 };
 
