@@ -23,6 +23,7 @@ import { IntroSlide } from "./slides/IntroSlide";
 import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
+import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 
 const STORAGE_KEY = "protocol.funnel.v26";
 
@@ -46,7 +47,11 @@ export default function FunnelShell() {
   };
 
   useEffect(() => {
-    const adId = new URLSearchParams(window.location.search).get("ad_id") ?? undefined;
+    // Persist UTMs from URL (so they survive internal navigation) and resolve ad variant
+    const urlUtms = getUtmParams();
+    if (Object.keys(urlUtms).length > 0) persistUtmParams(urlUtms);
+    const utms = { ...getPersistedUtmParams(), ...urlUtms };
+    const adId = utms.utm_ad ?? utms.utm_content ?? undefined;
     if (adId) setAdVariant(getAdVariant(adId));
 
     try {
