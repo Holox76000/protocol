@@ -97,7 +97,7 @@ function CityInput({ value, onChange }: { value: string; onChange: (v: string) =
 const GOAL_OPTIONS = [
   { value: "sharpen_proportions", label: "Sharpen my proportions", sublabel: "Optimize my shoulder-to-waist ratio and silhouette" },
   { value: "build_muscle", label: "Build lean muscle", sublabel: "Increase mass in the right places" },
-  { value: "reshape", label: "Reshape my body", sublabel: "Significant change in overall physique" },
+  { value: "reshape", label: "Improve my attractiveness", sublabel: "Significant change in overall physique" },
   { value: "improve_posture", label: "Improve my posture and presence", sublabel: "Carry myself differently" },
   { value: "full_transformation", label: "Full transformation", sublabel: "All of the above" },
 ];
