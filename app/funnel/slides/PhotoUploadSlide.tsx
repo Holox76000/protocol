@@ -100,9 +100,6 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
             <div className={styles.photoDropLabel}>Tap to upload a photo</div>
             <div className={styles.photoDropSub}>Full-body or upper-body · JPEG or PNG</div>
           </div>
-          <button type="button" className={styles.photoSkipBtn} onClick={onNext}>
-            Skip for now — add photo later in dashboard
-          </button>
         </>
       )}
 
@@ -160,7 +157,9 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
 
       <div className={styles.actions}>
         <button type="button" className={styles.btnSecondary} onClick={onBack}>Back</button>
-        <button type="button" className={styles.btnPrimary} onClick={onNext}>Continue →</button>
+        <button type="button" className={styles.btnPrimary} onClick={onNext}>
+          {status === "done" || status === "generating" ? "Continue →" : "Skip for now →"}
+        </button>
       </div>
     </div>
   );
