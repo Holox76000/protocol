@@ -75,11 +75,11 @@ function arr(v: unknown): string {
 export default async function OrderDetailPage({
   params,
 }: {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }) {
   await requireAdmin();
 
-  const { userId } = params;
+  const { userId } = await params;
 
   const [userResult, qrResult, protocolResult, messagesResult] = await Promise.all([
     supabaseAdmin
