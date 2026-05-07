@@ -131,7 +131,7 @@ export default function FunnelShell() {
     <main className={styles.page}>
       <div className={styles.screen}>
         {/* ── Header ───────────────────────────────────────── */}
-        <header className={styles.header}>
+        <header className={styles.header} style={step === 0 ? { display: "none" } : undefined}>
           <button
             className={styles.backBtn}
             onClick={handleBack}
