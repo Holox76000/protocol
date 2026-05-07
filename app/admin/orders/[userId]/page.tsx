@@ -84,7 +84,7 @@ export default async function OrderDetailPage({
   const [userResult, qrResult, protocolResult, messagesResult] = await Promise.all([
     supabaseAdmin
       .from("users")
-      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id, protocol_viewed_at, rush_delivery")
+      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id, protocol_viewed_at")
       .eq("id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -115,7 +115,7 @@ export default async function OrderDetailPage({
   const messages = (messagesResult.data ?? []) as Message[];
 
   const submittedAt = qr.submitted_at as string | null;
-  const isRush = !!(user as { rush_delivery?: boolean }).rush_delivery;
+  const isRush = false; // activated after migration 011_rush_delivery.sql is applied in Supabase
   const due = getDueDate(submittedAt, isRush);
   const isDelivered = status === "delivered";
   const isOverdue = due && !isDelivered && due.getTime() < Date.now();
