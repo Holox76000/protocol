@@ -651,65 +651,19 @@
   padding: 8px 0;
 }
 
-.introTitle {
-  margin: 0;
-  color: var(--q-strong);
-  font-family: "Kessler", "Iowan Old Style", "Palatino Linotype", serif;
-  font-weight: 400;
-  font-size: clamp(34px, 6vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
-}
-
-.introBody {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--q-text);
-  max-width: 44ch;
-}
-
-.introStats {
+/* Top bar: logo + "Free · 2 min · No card" */
+.introTopBar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  border: 1px solid var(--q-border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  width: fit-content;
+  justify-content: space-between;
 }
 
-.introStatItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-
-.introStatValue {
-  font-size: 20px;
+.introTopMeta {
+  font-size: 11px;
   font-weight: 500;
-  color: var(--q-strong);
-  letter-spacing: -0.03em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.introStatLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--q-soft);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-}
-
-.introStatDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--q-border);
-  flex-shrink: 0;
+  color: var(--q-soft);
 }
 
 .introLogo {
@@ -718,30 +672,76 @@
   opacity: 0.85;
 }
 
-.introTrustBlock {
+.introTitle {
+  margin: 0;
+  color: var(--q-strong);
+  font-family: "Kessler", "Iowan Old Style", "Palatino Linotype", serif;
+  font-weight: 400;
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+.introBody {
+  margin: 0;
+  font-size: clamp(15px, 1.8vw, 17px);
+  line-height: 1.55;
+  color: var(--q-text);
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+/* ─── Meta strip (2 min · 11 Questions · Free) ──────────── */
+.introMetaStrip {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px 0;
+  align-items: stretch;
+  padding: 16px 0;
   border-top: 1px solid var(--q-border);
   border-bottom: 1px solid var(--q-border);
 }
 
-.introTrustDivider {
-  width: 100%;
-  height: 1px;
+.introMetaCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.introMetaVal {
+  font-family: "Kessler", "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 400;
+  color: var(--q-strong);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.introMetaMono {
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+}
+
+.introMetaLabel {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--q-soft);
+  margin-top: 7px;
+}
+
+.introMetaDiv {
+  width: 1px;
+  align-self: stretch;
   background: var(--q-border);
-  margin: 2px 0;
+  flex-shrink: 0;
+  margin: 0 8px;
 }
 
-/* keep .introPress for any other usage */
-.introPress {
+/* ─── Press block ────────────────────────────────────────── */
+.introPressBlock {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 0;
-  border-top: 1px solid var(--q-border);
-  border-bottom: 1px solid var(--q-border);
+  gap: 12px;
 }
 
 .introPressLabel {
@@ -750,20 +750,13 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--q-soft);
-  text-align: center;
 }
 
 .introPressLogos {
   display: flex;
   align-items: center;
-  gap: 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.introPressLogos::-webkit-scrollbar {
-  display: none;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .introPressLogo {
@@ -775,56 +768,98 @@
   object-fit: contain;
 }
 
-/* ─── Intro rating (Trustpilot style) ───────────────────── */
-.introRating {
+/* ─── Trust / Trustpilot row ─────────────────────────────── */
+.introTrustRow {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  padding-top: 14px;
+  border-top: 1px solid var(--q-border);
 }
 
-.introRatingRow {
+.introTrustTopLine {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.introRatingCount {
-  font-size: 11px;
-  color: var(--q-soft);
+  gap: 8px;
 }
 
 .introRatingLabel {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--q-strong);
   letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
 .introRatingStars {
   display: inline-flex;
   gap: 3px;
-}
-
-.introRatingStar {
-  width: clamp(22px, 6vw, 28px);
-  height: clamp(22px, 6vw, 28px);
-  border-radius: 3px;
-  background: #00b67a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
 
-.introRatingStarHalf {
-  background: linear-gradient(to right, #00b67a 60%, #dcdce6 60%);
+.introTrustReview {
+  font-size: 12px;
+  color: var(--q-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
+.introMono {
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  color: var(--q-strong);
+}
 
 .introRatingTpLogo {
-  height: 22px;
+  height: 20px;
   width: auto;
   object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ─── CTA inline (desktop ≥ 720px) ──────────────────────── */
+.introCtaInline {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.introCtaCaption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--q-soft);
+}
+
+.introCaptionPair {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.introCaptionDot {
+  color: var(--q-border-h);
+}
+
+@media (min-width: 720px) {
+  .introCtaInline {
+    display: flex;
+  }
+  .introCtaInline .btnPrimary {
+    max-width: 360px;
+    width: auto;
+    align-self: flex-start;
+  }
+  .introCtaInline .introCtaCaption {
+    justify-content: flex-start;
+  }
+  /* hide sticky CTA on desktop — inline CTA takes over */
+  .introCtaSticky {
+    display: none;
+  }
 }
 
 /* ─── Info slide ─────────────────────────────────────────── */

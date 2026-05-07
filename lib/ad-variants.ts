@@ -180,6 +180,42 @@ const THREE_MONTHS: AdVariant = {
   cta: "Build my protocol →",
 };
 
+// "After 5 years to study" — research/study-angle video
+const FIVE_YEARS_STUDY: AdVariant = {
+  badge: "Research Findings",
+  headline: "After 5 years studying what makes men attractive, one variable explains most of it.",
+  subtext:
+    "A 3-minute assessment measures that variable, tells you your score, and shows you exactly what to do about it.",
+  cta: "See my score →",
+};
+
+// "4 steps to look better" — step framework video
+const FOUR_STEPS: AdVariant = {
+  badge: "Body Improvement Protocol",
+  headline: "There are 4 steps to looking better. Most men skip the most important one.",
+  subtext:
+    "The step most men miss has nothing to do with training harder. A 3-minute assessment identifies exactly where you are and what to fix first.",
+  cta: "Find out where I am →",
+};
+
+// "We can show you your potential" — before/after potential reveal video
+const SHOW_POTENTIAL: AdVariant = {
+  badge: "Potential Analysis",
+  headline: "We can show you exactly what your body is capable of in 12 weeks.",
+  subtext:
+    "Not a generic transformation. Your proportions, your structure, your ceiling. A 3-minute assessment maps it out.",
+  cta: "Show me my potential →",
+};
+
+// "You have no idea how good your body could look" — untapped potential video
+const BODY_POTENTIAL: AdVariant = {
+  badge: "Body Potential",
+  headline: "You have no idea how good your body could look. This changes that.",
+  subtext:
+    "Most men train without ever knowing their actual ceiling. A 3-minute assessment maps your proportions and shows you exactly how high you can go.",
+  cta: "See my ceiling →",
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
@@ -249,6 +285,24 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
 
   // 3 months. Same gym. Different protocol.
   "120242965578480660": THREE_MONTHS,
+
+  // After 5 years to study — two ad sets
+  "120243912430230660": FIVE_YEARS_STUDY,
+  "120242452036090660": FIVE_YEARS_STUDY,
+
+  // 4 steps to look better — two ad sets
+  "120243912430220660": FOUR_STEPS,
+  "120242428657600660": FOUR_STEPS,
+
+  // We can show you your potential — three ad sets
+  "120243912430210660": SHOW_POTENTIAL,
+  "120242428657580660": SHOW_POTENTIAL,
+  "120242428657590660": SHOW_POTENTIAL,
+
+  // You have no idea how good your body could look
+  "120242906468380660": BODY_POTENTIAL,
+
+  // "I found an AI tool..." video — falls back to DEFAULT (no variant added)
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
