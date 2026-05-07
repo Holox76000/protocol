@@ -111,15 +111,20 @@ export default async function StatsPage() {
     "Final loading", "Protocol ready",
   ];
 
-  const stepCounts: Record<number, number> = {};
+  // reached[N] = sessions where _max_step >= N (arrived at step N at least once)
+  const reached: number[] = new Array(SLIDE_NAMES.length).fill(0);
   for (const s of sessions ?? []) {
-    const step = Number((s.answers as Record<string, unknown>)._max_step ?? -1);
-    if (step >= 0) stepCounts[step] = (stepCounts[step] ?? 0) + 1;
+    const maxStep = Number((s.answers as Record<string, unknown>)._max_step ?? -1);
+    if (maxStep >= 0) {
+      for (let i = 0; i <= maxStep && i < SLIDE_NAMES.length; i++) {
+        reached[i]++;
+      }
+    }
   }
-  const totalSessions = Object.values(stepCounts).reduce((a, b) => a + b, 0);
+  const totalSessions = reached[0] ?? 0;
   const dropoffRows = SLIDE_NAMES.map((name, i) => {
-    const count = stepCounts[i] ?? 0;
-    const prev = i > 0 ? (stepCounts[i - 1] ?? 0) : totalSessions;
+    const count = reached[i] ?? 0;
+    const prev = i > 0 ? (reached[i - 1] ?? 0) : count;
     const dropPct = prev > 0 ? Math.round((1 - count / prev) * 100) : 0;
     const pctTotal = totalSessions > 0 ? Math.round((count / totalSessions) * 100) : 0;
     return { step: i, name, count, pctTotal, dropPct };
