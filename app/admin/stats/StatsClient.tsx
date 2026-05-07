@@ -19,6 +19,14 @@ type Kpis = {
   last7Orders: number;
 };
 
+type DropoffRow = {
+  step: number;
+  name: string;
+  count: number;
+  pctTotal: number;
+  dropPct: number;
+};
+
 const LEAD_COLOR = "#7f949b";
 const ORDER_COLOR = "#253239";
 const W = 600;
@@ -147,7 +155,62 @@ function LineChartSvg({ data }: { data: DayData[] }) {
   );
 }
 
-export default function StatsClient({ chartData, kpis }: { chartData: DayData[]; kpis: Kpis }) {
+function FunnelDropoff({ rows }: { rows: DropoffRow[] }) {
+  if (rows.length === 0) return null;
+  const topDrops = [...rows]
+    .sort((a, b) => b.dropPct - a.dropPct)
+    .slice(0, 3)
+    .map((r) => r.step);
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mt-6">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
+        Funnel Drop-off — 30 days
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-[#edf0f1]">
+              <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] w-8">Step</th>
+              <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b]">Slide</th>
+              <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">Sessions</th>
+              <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">% total</th>
+              <th className="pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7f949b] text-right">Drop vs prev</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => {
+              const isHighDrop = topDrops.includes(r.step) && r.dropPct > 0;
+              return (
+                <tr key={r.step} className="border-b border-[#edf0f1] last:border-0 hover:bg-[#f9fbfb] transition-colors">
+                  <td className="py-2.5 text-[12px] text-[#7f949b]">{r.step}</td>
+                  <td className="py-2.5 text-[13px] text-[#253239]">{r.name}</td>
+                  <td className="py-2.5 text-[13px] text-[#253239] text-right font-medium">{r.count}</td>
+                  <td className="py-2.5 text-[12px] text-[#7f949b] text-right">{r.pctTotal}%</td>
+                  <td className="py-2.5 text-right">
+                    {r.step === 0 ? (
+                      <span className="text-[12px] text-[#7f949b]">—</span>
+                    ) : (
+                      <span className={`text-[12px] font-medium px-2 py-0.5 rounded ${
+                        isHighDrop
+                          ? "bg-red-50 text-red-700"
+                          : "text-[#7f949b]"
+                      }`}>
+                        {r.dropPct}%
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default function StatsClient({ chartData, kpis, dropoffRows }: { chartData: DayData[]; kpis: Kpis; dropoffRows: DropoffRow[] }) {
   const [preset, setPreset] = useState<Preset>("30d");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -270,7 +333,7 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
         </div>
 
         {/* Weekly revenue table */}
-        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6">
+        <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mb-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
             C.A. par semaine
           </p>
@@ -311,6 +374,9 @@ export default function StatsClient({ chartData, kpis }: { chartData: DayData[];
             </table>
           </div>
         </div>
+
+        {/* Funnel drop-off */}
+        <FunnelDropoff rows={dropoffRows} />
 
       </div>
     </main>
