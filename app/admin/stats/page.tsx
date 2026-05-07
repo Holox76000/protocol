@@ -95,16 +95,6 @@ export default async function StatsPage() {
     };
   });
 
-  // KPIs
-  const totalLeads = cumLeads;
-  const totalOrders = cumOrders;
-  const conversionRate = totalLeads > 0 ? ((totalOrders / totalLeads) * 100).toFixed(1) : "0";
-
-  // Last 7 days
-  const last7 = chartData.slice(-7);
-  const last7Leads = last7.reduce((s, d) => s + d.leads, 0);
-  const last7Orders = last7.reduce((s, d) => s + d.orders, 0);
-
   // Funnel drop-off — last 30 days
   const { data: sessions } = await supabaseAdmin
     .from("funnel_sessions")
@@ -138,7 +128,6 @@ export default async function StatsPage() {
   return (
     <StatsClient
       chartData={chartData}
-      kpis={{ totalLeads, totalOrders, conversionRate, last7Leads, last7Orders }}
       dropoffRows={dropoffRows}
     />
   );

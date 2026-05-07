@@ -11,14 +11,6 @@ type DayData = {
   cumOrders: number;
 };
 
-type Kpis = {
-  totalLeads: number;
-  totalOrders: number;
-  conversionRate: string;
-  last7Leads: number;
-  last7Orders: number;
-};
-
 type DropoffRow = {
   step: number;
   name: string;
@@ -210,7 +202,7 @@ function FunnelDropoff({ rows }: { rows: DropoffRow[] }) {
   );
 }
 
-export default function StatsClient({ chartData, kpis, dropoffRows }: { chartData: DayData[]; kpis: Kpis; dropoffRows: DropoffRow[] }) {
+export default function StatsClient({ chartData, dropoffRows }: { chartData: DayData[]; dropoffRows: DropoffRow[] }) {
   const [preset, setPreset] = useState<Preset>("30d");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -229,6 +221,14 @@ export default function StatsClient({ chartData, kpis, dropoffRows }: { chartDat
     }
     return chartData;
   }, [chartData, preset, customFrom, customTo]);
+
+  const kpis = useMemo(() => {
+    const totalLeads = filteredData.reduce((s, d) => s + d.leads, 0);
+    const totalOrders = filteredData.reduce((s, d) => s + d.orders, 0);
+    const totalRevenue = filteredData.reduce((s, d) => s + d.revenue, 0);
+    const conversionRate = totalLeads > 0 ? ((totalOrders / totalLeads) * 100).toFixed(1) : "0";
+    return { totalLeads, totalOrders, totalRevenue, conversionRate };
+  }, [filteredData]);
 
   const weeklyData = useMemo(() => {
     const map = new Map<string, { label: string; leads: number; orders: number; revenue: number }>();
@@ -282,16 +282,8 @@ export default function StatsClient({ chartData, kpis, dropoffRows }: { chartDat
           </div>
         </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          <KpiCard label="Total leads" value={kpis.totalLeads} sub="since launch" />
-          <KpiCard label="Total orders" value={kpis.totalOrders} sub="paid clients" />
-          <KpiCard label="Conversion" value={`${kpis.conversionRate}%`} sub="leads → orders" />
-          <KpiCard label="Last 7 days" value={kpis.last7Orders} sub={`${kpis.last7Leads} leads`} />
-        </div>
-
         {/* Date selector */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="flex gap-1">
             {PRESETS.map((p) => (
               <button
@@ -322,6 +314,14 @@ export default function StatsClient({ chartData, kpis, dropoffRows }: { chartDat
               className="px-3 py-1.5 rounded-lg border border-[#edf0f1] text-[12px] text-[#253239] bg-white"
             />
           </div>
+        </div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <KpiCard label="Leads" value={kpis.totalLeads} sub="période sélectionnée" />
+          <KpiCard label="Orders" value={kpis.totalOrders} sub="clients payants" />
+          <KpiCard label="Conversion" value={`${kpis.conversionRate}%`} sub="leads → orders" />
+          <KpiCard label="Revenue" value={formatCurrency(kpis.totalRevenue)} sub="période sélectionnée" />
         </div>
 
         {/* Daily line chart */}
