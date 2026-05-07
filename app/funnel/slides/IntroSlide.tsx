@@ -43,21 +43,15 @@ export function IntroSlide({ onNext, variant }: Props) {
         {v.badge && <p className={styles.eyebrow}>{v.badge}</p>}
         <h1 className={styles.introTitle}>{v.headline}</h1>
         <p className={styles.introBody}>{v.subtext}</p>
-        <div className={styles.introPress}>
+        <div className={styles.introTrustBlock}>
           <span className={styles.introPressLabel}>As seen on</span>
           <div className={styles.introPressLogos}>
             {PRESS_LOGOS.map((logo) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={logo.alt}
-                src={logo.src}
-                alt={logo.alt}
-                className={styles.introPressLogo}
-              />
+              <img key={logo.alt} src={logo.src} alt={logo.alt} className={styles.introPressLogo} />
             ))}
           </div>
-        </div>
-        <div className={styles.introRating}>
+          <div className={styles.introTrustDivider} />
           <div className={styles.introRatingRow}>
             <span className={styles.introRatingLabel}>Great</span>
             <div className={styles.introRatingStars}>
