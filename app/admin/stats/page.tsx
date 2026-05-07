@@ -95,45 +95,22 @@ export default async function StatsPage() {
     };
   });
 
-  // Funnel drop-off — last 30 days
+  // Funnel sessions — pass raw to client so drop-off reacts to the date selector
   const { data: sessions } = await supabaseAdmin
     .from("funnel_sessions")
-    .select("answers")
+    .select("created_at, answers")
     .not("answers->_max_step", "is", null)
-    .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+    .order("created_at", { ascending: true });
 
-  const SLIDE_NAMES = [
-    "Intro", "Age", "Stat — age", "Ethnicity", "Body type",
-    "Confidence", "Timeline", "Goals", "Social proof",
-    "Height", "Weight", "Time / week", "Info — time", "Social env",
-    "Past solutions", "Photo upload", "Summary", "Promise",
-    "Yes-ladder 1", "Yes-ladder 2", "Yes-ladder 3",
-    "Final loading", "Protocol ready",
-  ];
-
-  // reached[N] = sessions where _max_step >= N (arrived at step N at least once)
-  const reached: number[] = new Array(SLIDE_NAMES.length).fill(0);
-  for (const s of sessions ?? []) {
-    const maxStep = Number((s.answers as Record<string, unknown>)._max_step ?? -1);
-    if (maxStep >= 0) {
-      for (let i = 0; i <= maxStep && i < SLIDE_NAMES.length; i++) {
-        reached[i]++;
-      }
-    }
-  }
-  const totalSessions = reached[0] ?? 0;
-  const dropoffRows = SLIDE_NAMES.map((name, i) => {
-    const count = reached[i] ?? 0;
-    const prev = i > 0 ? (reached[i - 1] ?? 0) : count;
-    const dropPct = prev > 0 ? Math.round((1 - count / prev) * 100) : 0;
-    const pctTotal = totalSessions > 0 ? Math.round((count / totalSessions) * 100) : 0;
-    return { step: i, name, count, pctTotal, dropPct };
-  });
+  const funnelSessions = (sessions ?? []).map((s) => ({
+    date: (s.created_at as string).slice(0, 10),
+    maxStep: Number((s.answers as Record<string, unknown>)._max_step ?? -1),
+  })).filter((s) => s.maxStep >= 0);
 
   return (
     <StatsClient
       chartData={chartData}
-      dropoffRows={dropoffRows}
+      funnelSessions={funnelSessions}
     />
   );
 }

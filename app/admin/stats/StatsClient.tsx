@@ -11,6 +11,8 @@ type DayData = {
   cumOrders: number;
 };
 
+type FunnelSession = { date: string; maxStep: number };
+
 type DropoffRow = {
   step: number;
   name: string;
@@ -18,6 +20,37 @@ type DropoffRow = {
   pctTotal: number;
   dropPct: number;
 };
+
+const SLIDE_NAMES = [
+  "Intro", "Age", "Stat — age", "Ethnicity", "Body type",
+  "Confidence", "Timeline", "Goals", "Social proof",
+  "Height", "Weight", "Time / week", "Info — time", "Social env",
+  "Past solutions", "Photo upload", "Summary", "Promise",
+  "Yes-ladder 1", "Yes-ladder 2", "Yes-ladder 3",
+  "Final loading", "Protocol ready",
+];
+
+function computeDropoff(sessions: FunnelSession[], from: string, to: string): DropoffRow[] {
+  const filtered = sessions.filter((s) => {
+    if (from && s.date < from) return false;
+    if (to && s.date > to) return false;
+    return true;
+  });
+  const reached: number[] = new Array(SLIDE_NAMES.length).fill(0);
+  for (const s of filtered) {
+    for (let i = 0; i <= s.maxStep && i < SLIDE_NAMES.length; i++) {
+      reached[i]++;
+    }
+  }
+  const total = reached[0] ?? 0;
+  return SLIDE_NAMES.map((name, i) => {
+    const count = reached[i] ?? 0;
+    const prev = i > 0 ? (reached[i - 1] ?? 0) : count;
+    const dropPct = prev > 0 ? Math.round((1 - count / prev) * 100) : 0;
+    const pctTotal = total > 0 ? Math.round((count / total) * 100) : 0;
+    return { step: i, name, count, pctTotal, dropPct };
+  });
+}
 
 const LEAD_COLOR = "#7f949b";
 const ORDER_COLOR = "#253239";
@@ -202,7 +235,7 @@ function FunnelDropoff({ rows }: { rows: DropoffRow[] }) {
   );
 }
 
-export default function StatsClient({ chartData, dropoffRows }: { chartData: DayData[]; dropoffRows: DropoffRow[] }) {
+export default function StatsClient({ chartData, funnelSessions }: { chartData: DayData[]; funnelSessions: FunnelSession[] }) {
   const [preset, setPreset] = useState<Preset>("30d");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -245,6 +278,12 @@ export default function StatsClient({ chartData, dropoffRows }: { chartData: Day
     }
     return Array.from(map.values()).reverse();
   }, [filteredData]);
+
+  const dropoffRows = useMemo(() => {
+    const from = filteredData.length > 0 ? filteredData[0].date : "";
+    const to = filteredData.length > 0 ? filteredData[filteredData.length - 1].date : "";
+    return computeDropoff(funnelSessions, from, to);
+  }, [funnelSessions, filteredData]);
 
   const PRESETS: { id: Preset; label: string }[] = [
     { id: "7d", label: "7 jours" },
