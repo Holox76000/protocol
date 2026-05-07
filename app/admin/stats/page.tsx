@@ -71,12 +71,11 @@ export default async function StatsPage() {
   }
   for (const u of users ?? []) {
     const day = (u.created_at as string).slice(0, 10);
+    leadsByDay[day] = (leadsByDay[day] ?? 0) + 1;
     if ((u as { has_paid: boolean }).has_paid) {
       ordersByDay[day] = (ordersByDay[day] ?? 0) + 1;
       const cents = (u as { paid_amount_cents: number | null }).paid_amount_cents ?? FALLBACK_PRICE_CENTS;
       revenueByDay[day] = (revenueByDay[day] ?? 0) + cents;
-    } else {
-      leadsByDay[day] = (leadsByDay[day] ?? 0) + 1;
     }
   }
 
