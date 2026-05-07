@@ -648,7 +648,8 @@
 .introInner {
   display: grid;
   gap: 14px;
-  padding: 8px 0;
+  padding: 0;
+  margin-top: -16px;
   overflow-x: hidden;
   min-width: 0;
 }
