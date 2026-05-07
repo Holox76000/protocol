@@ -99,6 +99,7 @@ ${(Object.keys(metrics) as (keyof CalibrationMetrics)[]).map((key) => {
 - Professional environment: ${a(d.professional_environment)} · City: ${a(d.city)}
 - Typical clothing: ${a(d.typical_clothing)}
 - Social perception: ${a(d.social_perception)}
+- Sexual orientation: ${a(d.sexual_orientation)}
 ${metricsBlock}
 ${d.coach_notes ? `### Coach Notes\n${d.coach_notes}` : ""}
 

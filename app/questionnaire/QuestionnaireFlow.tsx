@@ -59,6 +59,7 @@ export type Answers = {
   training_consistency?: string;
   concern_areas?: string[];
   coach_notes?: string;
+  sexual_orientation?: string;
 };
 
 export type SectionProps = {

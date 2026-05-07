@@ -14,7 +14,7 @@ const PHOTO_SLOTS: {
   icon: string;
 }[] = [
   { slot: "front", label: "Front", sublabel: "Full body, face visible", field: "photo_front_path", icon: "↑" },
-  { slot: "side", label: "Side (left)", sublabel: "Full body, left side", field: "photo_side_path", icon: "→" },
+  { slot: "side", label: "Side (left)", sublabel: "Ears to feet, left profile", field: "photo_side_path", icon: "→" },
   { slot: "back", label: "Back", sublabel: "Full body, back to camera", field: "photo_back_path", icon: "↓" },
   { slot: "face", label: "Face", sublabel: "Shoulders up, neutral", field: "photo_face_path", icon: "◎" },
 ];

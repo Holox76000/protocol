@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     "meals_per_day", "meal_prep_availability", "supplement_use", "supplement_use_other", "food_allergies_other",
     "injuries", "injuries_other", "medical_conditions", "medical_conditions_other",
     "medications", "medications_other", "sleep_hours", "stress_level",
-    "training_consistency", "concern_areas", "coach_notes",
+    "training_consistency", "concern_areas", "coach_notes", "sexual_orientation",
   ] as const;
 
   const payload: Record<string, unknown> = { current_section: currentSection };

@@ -110,6 +110,14 @@ const MOTIVATION_OPTIONS = [
   { value: "health", label: "Health and longevity — I want a body that lasts" },
 ];
 
+const ORIENTATION_OPTIONS = [
+  { value: "straight", label: "Straight" },
+  { value: "gay", label: "Gay" },
+  { value: "bisexual", label: "Bisexual" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
+];
+
 export default function S1Identity({ answers, setAnswer, onNext, onBack, saving, serverError, isFirst }: SectionProps & { isFirst?: boolean }) {
   const [error, setError] = useState<string | null>(null);
 
@@ -170,6 +178,14 @@ export default function S1Identity({ answers, setAnswer, onNext, onBack, saving,
             value={answers.motivation}
             onChange={(v) => setAnswer("motivation", v)}
             options={MOTIVATION_OPTIONS}
+          />
+        </Field>
+
+        <Field label="Sexual orientation" sublabel="Helps us understand who you're optimizing for. Optional and private.">
+          <CardSelect
+            value={answers.sexual_orientation}
+            onChange={(v) => setAnswer("sexual_orientation", v)}
+            options={ORIENTATION_OPTIONS}
           />
         </Field>
       </div>
