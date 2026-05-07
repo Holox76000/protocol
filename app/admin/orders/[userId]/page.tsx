@@ -251,6 +251,7 @@ export default async function OrderDetailPage({
               <Section title="Identity & Goals">
                 <Field label="Goal" value={qr.goal as string} />
                 <Field label="Motivation" value={qr.motivation as string} />
+                <Field label="Sexual orientation" value={qr.sexual_orientation as string} />
               </Section>
             </div>
 
