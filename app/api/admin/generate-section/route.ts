@@ -100,6 +100,7 @@ ${(Object.keys(metrics) as (keyof CalibrationMetrics)[]).map((key) => {
 - Typical clothing: ${a(d.typical_clothing)}
 - Social perception: ${a(d.social_perception)}
 ${metricsBlock}
+${d.coach_notes ? `### Coach Notes\n${d.coach_notes}` : ""}
 
 ${socialContextBlock({
   professional_environment: d.professional_environment as string | null,
