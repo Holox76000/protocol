@@ -218,13 +218,40 @@ export function CheckoutPage({ email }: { email: string }) {
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoApplied, setPromoApplied] = useState<PromoState | null>(null);
 
-  const displayAmount = promoApplied ? promoApplied.newAmount : 8900;
+  // Rush delivery upsell
+  const [rushDelivery, setRushDelivery] = useState(false);
+  const [rushLoading, setRushLoading] = useState(false);
+
+  const baseAmount = promoApplied ? promoApplied.newAmount : 8900;
+  const displayAmount = baseAmount + (rushDelivery ? 2900 : 0);
+
+  const handleRushToggle = async (checked: boolean) => {
+    if (!paymentIntentId) return;
+    setRushLoading(true);
+    try {
+      await fetch("/api/update-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentIntentId,
+          rush_delivery: checked,
+          discountedBase: promoApplied ? promoApplied.newAmount : 8900,
+        }),
+      });
+      setRushDelivery(checked);
+    } catch {
+      // silent — UI stays unchanged
+    } finally {
+      setRushLoading(false);
+    }
+  };
 
   const fetchSecret = useCallback(() => {
     setError(null);
     setClientSecret(null);
     setPaymentIntentId(null);
     setPromoApplied(null);
+    setRushDelivery(false);
 
     const persistedUtms = getPersistedUtmParams();
     const sp = new URLSearchParams(window.location.search);
@@ -495,6 +522,36 @@ export function CheckoutPage({ email }: { email: string }) {
               <div className="mb-2 flex justify-between text-[13px] text-green-600">
                 <span>Discount ({promoApplied.discountLabel})</span>
                 <span>-${((promoApplied.originalAmount - promoApplied.newAmount) / 100).toFixed(2)}</span>
+              </div>
+            )}
+
+            {/* Rush delivery upsell */}
+            <label className={`mb-3 flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${rushDelivery ? "border-void bg-void/[0.03]" : "border-wire hover:border-void/30"} ${rushLoading ? "opacity-60 pointer-events-none" : ""}`}>
+              <div
+                onClick={() => handleRushToggle(!rushDelivery)}
+                className={`mt-0.5 h-4 w-4 shrink-0 rounded border transition-all duration-150 flex items-center justify-center ${rushDelivery ? "border-void bg-void" : "border-wire"}`}
+              >
+                {rushDelivery && (
+                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
+                    <path d="M1.5 4.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[13px] font-semibold text-void">24-hour delivery</span>
+                  <span className="text-[13px] font-semibold text-void">+$29</span>
+                </div>
+                <p className="mt-0.5 text-[11.5px] leading-snug text-mute">
+                  Your analysis is prioritized and delivered within 24h instead of 72h.
+                </p>
+              </div>
+            </label>
+
+            {rushDelivery && (
+              <div className="mb-2 flex justify-between text-[13px] text-dim">
+                <span>24-hour delivery</span>
+                <span>+$29</span>
               </div>
             )}
 

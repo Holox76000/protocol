@@ -4,7 +4,7 @@
 // + 1 Final Loading = 27 total (loading counted in Section 7)
 // ─────────────────────────────────────────────────────────
 
-export type Answers = Record<string, string | string[]>;
+export type Answers = Record<string, string | string[] | number>;
 
 export type SlideType =
   | "intro"

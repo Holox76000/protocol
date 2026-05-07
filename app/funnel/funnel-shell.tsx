@@ -96,7 +96,7 @@ export default function FunnelShell() {
       const currentSlide = SLIDES[step];
       if (currentSlide.type === "multi" && "stateKey" in currentSlide) {
         const val = answers[currentSlide.stateKey];
-        if (val) trackFunnelAnswer(currentSlide.id, val);
+        if (val && typeof val !== "number") trackFunnelAnswer(currentSlide.id, val);
       } else if (currentSlide.type === "numeric-height") {
         const unit = answers.height_unit as string | undefined;
         const val = unit === "cm"

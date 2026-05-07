@@ -12,7 +12,7 @@ function buildRedirectUrl(answers: Answers, source?: string): string {
     if (Array.isArray(val)) {
       params.set(key, val.join("|"));
     } else if (val) {
-      params.set(key, val);
+      params.set(key, String(val));
     }
   }
   params.set("funnel", "quiz");

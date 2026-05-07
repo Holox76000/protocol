@@ -42,12 +42,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-// 5h refinement window + 2 days review + 3 days delivery = 125 hours
-const DELIVERY_DEADLINE_MS = 125 * 60 * 60 * 1000;
+const DELIVERY_DEADLINE_MS      = 125 * 60 * 60 * 1000; // standard: ~5d
+const RUSH_DELIVERY_DEADLINE_MS =  24 * 60 * 60 * 1000; // rush: 24h
 
-function getDueDate(submittedAt: string | null): Date | null {
+function getDueDate(submittedAt: string | null, rush = false): Date | null {
   if (!submittedAt) return null;
-  return new Date(new Date(submittedAt).getTime() + DELIVERY_DEADLINE_MS);
+  const deadline = rush ? RUSH_DELIVERY_DEADLINE_MS : DELIVERY_DEADLINE_MS;
+  return new Date(new Date(submittedAt).getTime() + deadline);
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -83,7 +84,7 @@ export default async function OrderDetailPage({
   const [userResult, qrResult, protocolResult, messagesResult] = await Promise.all([
     supabaseAdmin
       .from("users")
-      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id, protocol_viewed_at")
+      .select("id, email, first_name, protocol_status, created_at, stripe_customer_id, protocol_viewed_at, rush_delivery")
       .eq("id", userId)
       .maybeSingle(),
     supabaseAdmin
@@ -114,7 +115,8 @@ export default async function OrderDetailPage({
   const messages = (messagesResult.data ?? []) as Message[];
 
   const submittedAt = qr.submitted_at as string | null;
-  const due = getDueDate(submittedAt);
+  const isRush = !!(user as { rush_delivery?: boolean }).rush_delivery;
+  const due = getDueDate(submittedAt, isRush);
   const isDelivered = status === "delivered";
   const isOverdue = due && !isDelivered && due.getTime() < Date.now();
   const hoursLeft = due && !isDelivered ? Math.floor((due.getTime() - Date.now()) / (60 * 60 * 1000)) : null;
@@ -173,6 +175,11 @@ export default async function OrderDetailPage({
             >
               {STATUS_LABELS[status] ?? status}
             </span>
+            {isRush && (
+              <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-700">
+                ⚡ Rush 24h
+              </span>
+            )}
           </div>
         </div>
 

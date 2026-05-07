@@ -133,6 +133,7 @@ export async function POST(request: Request) {
               .update({
                 has_paid: true,
                 paid_amount_cents: pi.amount,
+                rush_delivery: meta.rush_delivery === "true",
                 ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
               })
               .eq("id", existingUser.id);
