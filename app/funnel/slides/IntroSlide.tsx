@@ -1,22 +1,22 @@
 "use client";
 
+import type { AdVariant } from "../../../lib/ad-variants";
+import { DEFAULT_VARIANT } from "../../../lib/ad-variants";
 import styles from "./slides.module.css";
 
 type Props = {
   onNext: () => void;
+  variant?: AdVariant;
 };
 
-export function IntroSlide({ onNext }: Props) {
+export function IntroSlide({ onNext, variant }: Props) {
+  const v = variant ?? DEFAULT_VARIANT;
   return (
     <div className={styles.card}>
       <div className={styles.introInner}>
-        <p className={styles.eyebrow}>Attractiveness Diagnostic</p>
-        <h1 className={styles.introTitle}>
-          Find out exactly where you stand.
-        </h1>
-        <p className={styles.introBody}>
-          A 3-minute science-based assessment that maps your appearance across 18 data points — and tells you what to fix first.
-        </p>
+        {v.badge && <p className={styles.eyebrow}>{v.badge}</p>}
+        <h1 className={styles.introTitle}>{v.headline}</h1>
+        <p className={styles.introBody}>{v.subtext}</p>
         <div className={styles.introStats}>
           <div className={styles.introStatItem}>
             <span className={styles.introStatValue}>2,500+</span>
@@ -37,7 +37,7 @@ export function IntroSlide({ onNext }: Props) {
 
       <div className={styles.actionsFull}>
         <button type="button" className={styles.btnPrimary} onClick={onNext}>
-          Start the assessment →
+          {v.cta ?? "Start the assessment →"}
         </button>
       </div>
     </div>

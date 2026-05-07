@@ -22,12 +22,14 @@ import { PhotoUploadSlide } from "./slides/PhotoUploadSlide";
 import { IntroSlide } from "./slides/IntroSlide";
 import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
+import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
 
 const STORAGE_KEY = "protocol.funnel.v26";
 
 export default function FunnelShell() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
+  const [adVariant, setAdVariant] = useState<AdVariant | undefined>();
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const syncToDb = (data: Answers) => {
@@ -44,6 +46,9 @@ export default function FunnelShell() {
   };
 
   useEffect(() => {
+    const adId = new URLSearchParams(window.location.search).get("ad_id") ?? undefined;
+    if (adId) setAdVariant(getAdVariant(adId));
+
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
@@ -149,7 +154,7 @@ export default function FunnelShell() {
 
         {/* ── Slide ──────────────────────────────────────────── */}
         <div className={styles.shell}>
-          {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack)}
+          {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack, adVariant)}
         </div>
       </div>
     </main>
@@ -162,11 +167,12 @@ function renderSlide(
   onAnswer: (key: string, value: string | string[]) => void,
   onAnswerMulti: (updates: Record<string, string>) => void,
   onNext: () => void,
-  onBack: () => void
+  onBack: () => void,
+  adVariant?: AdVariant
 ) {
   switch (slide.type) {
     case "intro":
-      return <IntroSlide onNext={onNext} />;
+      return <IntroSlide onNext={onNext} variant={adVariant} />;
 
     case "single":
       return (
