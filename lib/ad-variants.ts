@@ -9,7 +9,7 @@ export const DEFAULT_VARIANT: AdVariant = {
   badge: "Attractiveness Diagnostic",
   headline: "Find out exactly where you stand.",
   subtext:
-    "A 3-minute assessment that measures 18 variables in your appearance — and tells you exactly what to fix first.",
+    "A 3-minute assessment that measures 18 variables in your appearance and tells you exactly what to fix first.",
   cta: "Start the assessment →",
 };
 
@@ -23,14 +23,14 @@ const FIXABLE: AdVariant = {
   badge: "Fixability Assessment",
   headline: "Find out if the way people treat you is actually fixable.",
   subtext:
-    "Your body sends signals before you speak. A 3-minute assessment tells you your Body Signal Score — and how high your real potential is.",
+    "Your body sends signals before you speak. A 3-minute assessment tells you your Body Signal Score and how high your real ceiling is.",
   cta: "Take the assessment →",
 };
 
 // "3 reasons you're overlooked in social situations" — iPhone Notes style, 3 bullets
 const OVERLOOKED: AdVariant = {
   badge: "Social Presence Audit",
-  headline: "Find the 3 reasons you're overlooked — none of them are your personality.",
+  headline: "Find the 3 reasons you're overlooked. None of them are your personality.",
   subtext:
     "Your body signals 'average' before you open your mouth. This assessment identifies exactly what to change to stop being invisible in any room.",
   cta: "See my 3 reasons →",
@@ -41,7 +41,7 @@ const FIRST_IMPRESSION_BAR: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "Research found the formula that controls this first impression. Take 3 minutes to find out where you stand — and what it actually takes to change it.",
+    "Research found the formula that controls this first impression. Take 3 minutes to find out where you stand and what it actually takes to change it.",
   cta: "Find out where I stand →",
 };
 
@@ -50,7 +50,7 @@ const FIRST_IMPRESSION_DRESSED: AdVariant = {
   badge: "First Impression Analysis",
   headline: "People decide how they'll treat you before you open your mouth.",
   subtext:
-    "Your body speaks before you do — even fully dressed. 3 minutes to find out what your appearance signals and the exact formula to change it.",
+    "Your body speaks before you do, even fully dressed. 3 minutes to find out what your appearance signals and the exact formula to change it.",
   cta: "Find out where I stand →",
 };
 
@@ -68,7 +68,7 @@ const AVERAGE_MAN: AdVariant = {
   badge: "Attractiveness Diagnostic",
   headline: "Don't be the man who trains for years and nobody notices.",
   subtext:
-    "He thinks the problem is effort. It's not. There is one variable he has never measured — and it drives how people perceive you more than anything else.",
+    "He thinks the problem is effort. It's not. There is one variable he has never measured. It drives how people perceive you more than anything else.",
   cta: "Find out what he should have done →",
 };
 
@@ -84,7 +84,7 @@ const SCORE_UPGRADE: AdVariant = {
 // "What's wrong with this physique?" — massive bodybuilder, "Nothing if strength is your goal"
 const STRENGTH_VS_ATTRACTIVENESS: AdVariant = {
   badge: "Attractiveness vs. Strength",
-  headline: "What's wrong with this physique? Nothing — if your goal is strength.",
+  headline: "What's wrong with this physique? Nothing, if your goal is strength.",
   subtext:
     "But if your goal is attractiveness, you need a completely different formula. One built around what research actually says the eye reads as attractive.",
   cta: "See the formula →",
@@ -104,7 +104,7 @@ const TWELVE_WEEKS_WORK: AdVariant = {
   badge: "12-Week Protocol",
   headline: "12 weeks is how long it takes to change how people perceive you at work.",
   subtext:
-    "Your body speaks before you do. This assessment tells you exactly what's holding your professional presence back — and what to do about it.",
+    "Your body speaks before you do. This assessment tells you exactly what's holding your professional presence back and what to do about it.",
   cta: "Visualize my potential →",
 };
 
@@ -113,7 +113,7 @@ const TWELVE_WEEKS_BAR: AdVariant = {
   badge: "12-Week Protocol",
   headline: "12 weeks is how long it takes to change who approaches you.",
   subtext:
-    "Your body speaks before you do. This assessment tells you exactly what's holding you back socially — and what to do about it.",
+    "Your body speaks before you do. This assessment tells you exactly what's holding you back socially and what to do about it.",
   cta: "Visualize my potential →",
 };
 
@@ -122,7 +122,7 @@ const MIRROR: AdVariant = {
   badge: "Body Scan",
   headline: "What your mirror won't tell you about your appearance.",
   subtext:
-    "One photo. We measure your proportions, posture, and frame — and tell you exactly what to train for attractiveness, not just muscle size.",
+    "One photo. We measure your proportions, posture, and frame. Then tell you exactly what to train for attractiveness, not just muscle size.",
   cta: "Get my body scan →",
 };
 
@@ -147,16 +147,16 @@ const POSTIT: AdVariant = {
 // "Your body analyzed" — body silhouette diagram, Shoulder-to-Waist 59→78, Aesthetic Score 63→81
 const BODY_ANALYZED: AdVariant = {
   badge: "Body Analysis",
-  headline: "See your body analyzed — every proportion, score, and 12-week potential.",
+  headline: "See your body analyzed: every proportion, score, and 12-week potential.",
   subtext:
-    "An assessment that measures your exact proportions and tells you precisely what to change — and what your score looks like in 12 weeks.",
+    "An assessment that measures your exact proportions and tells you precisely what to change and what your score looks like in 12 weeks.",
   cta: "Analyze my body →",
 };
 
 // "Get Your Attractiveness Score" — tablet showing Connor's Protocol interface
 const GET_SCORE: AdVariant = {
   badge: "Attractiveness Score",
-  headline: "Get your attractiveness score — measured scientifically.",
+  headline: "Get your attractiveness score, measured to the number.",
   subtext:
     "3 minutes. 18 variables measured. You get your score, what's pulling it down, and exactly what to do about it.",
   cta: "Get my score →",
@@ -165,7 +165,7 @@ const GET_SCORE: AdVariant = {
 // "Don't be like Donald" — "I look in the mirror and don't know what to fix anymore"
 const DONALD: AdVariant = {
   badge: "Your Body Blueprint",
-  headline: "Don't be like Donald. Your body has a blueprint — are you training on the right one?",
+  headline: "Don't be like Donald. Your body has a blueprint. Are you training on the right one?",
   subtext:
     "Most men train off the wrong blueprint and see no results for years. 3 minutes to find out exactly what your body is actually built for.",
   cta: "See what my body is built for →",
@@ -176,7 +176,7 @@ const THREE_MONTHS: AdVariant = {
   badge: "Protocol Difference",
   headline: "3 months. Same gym. A different protocol changes everything.",
   subtext:
-    "Same gym. Different training targets. Aesthetic Score: 63 → 84. What changed wasn't effort — it was knowing what to train for.",
+    "Same gym. Different training targets. Aesthetic Score: 63 → 84. What changed wasn't effort. It was knowing what to train for.",
   cta: "Build my protocol →",
 };
 

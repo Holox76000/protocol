@@ -5,10 +5,10 @@ import type { AdVariant } from "../../../lib/ad-variants";
 import { DEFAULT_VARIANT } from "../../../lib/ad-variants";
 import styles from "./slides.module.css";
 
-function StarIcon() {
+function TpStar() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
-      <path d="M9 1.5l2.03 4.11 4.53.66-3.28 3.2.77 4.51L9 11.77l-4.05 2.21.77-4.51L2.44 6.27l4.53-.66z" />
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+      <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z" />
     </svg>
   );
 }
@@ -58,11 +58,19 @@ export function IntroSlide({ onNext, variant }: Props) {
           </div>
         </div>
         <div className={styles.introRating}>
-          <div className={styles.introRatingStars}>
-            <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
+          <div className={styles.introRatingRow}>
+            <span className={styles.introRatingLabel}>Excellent</span>
+            <div className={styles.introRatingStars}>
+              <div className={styles.introRatingStar}><TpStar /></div>
+              <div className={styles.introRatingStar}><TpStar /></div>
+              <div className={styles.introRatingStar}><TpStar /></div>
+              <div className={styles.introRatingStar}><TpStar /></div>
+              <div className={`${styles.introRatingStar} ${styles.introRatingStarHalf}`}><TpStar /></div>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/trustpilot-logo.png" alt="Trustpilot" className={styles.introRatingTpLogo} />
           </div>
-          <span className={styles.introRatingScore}>4.9</span>
-          <span className={styles.introRatingCount}>· 2,500+ members</span>
+          <span className={styles.introRatingCount}>4.9 · 2,500+ reviews</span>
         </div>
       </div>
 
