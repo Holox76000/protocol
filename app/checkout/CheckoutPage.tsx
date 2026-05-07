@@ -201,29 +201,16 @@ function CheckoutForm({ displayAmount }: { displayAmount: number }) {
 
 // ── Checkout page ──────────────────────────────────────────────────────────────
 
-type PromoState = {
-  discountLabel: string;
-  newAmount: number;
-  originalAmount: number;
-};
-
 export function CheckoutPage({ email }: { email: string }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Promo code state
-  const [promoInput, setPromoInput] = useState("");
-  const [promoLoading, setPromoLoading] = useState(false);
-  const [promoError, setPromoError] = useState<string | null>(null);
-  const [promoApplied, setPromoApplied] = useState<PromoState | null>(null);
-
   // Rush delivery upsell
   const [rushDelivery, setRushDelivery] = useState(false);
   const [rushLoading, setRushLoading] = useState(false);
 
-  const baseAmount = promoApplied ? promoApplied.newAmount : 8900;
-  const displayAmount = baseAmount + (rushDelivery ? 2900 : 0);
+  const displayAmount = 8900 + (rushDelivery ? 2900 : 0);
 
   const handleRushToggle = async (checked: boolean) => {
     if (!paymentIntentId) return;
@@ -235,7 +222,7 @@ export function CheckoutPage({ email }: { email: string }) {
         body: JSON.stringify({
           paymentIntentId,
           rush_delivery: checked,
-          discountedBase: promoApplied ? promoApplied.newAmount : 8900,
+          discountedBase: 8900,
         }),
       });
       setRushDelivery(checked);
@@ -250,7 +237,6 @@ export function CheckoutPage({ email }: { email: string }) {
     setError(null);
     setClientSecret(null);
     setPaymentIntentId(null);
-    setPromoApplied(null);
     setRushDelivery(false);
 
     const persistedUtms = getPersistedUtmParams();
@@ -288,32 +274,6 @@ export function CheckoutPage({ email }: { email: string }) {
   }, [email]);
 
   useEffect(() => { fetchSecret(); }, [fetchSecret]);
-
-  const handleApplyPromo = async () => {
-    if (!promoInput.trim() || !paymentIntentId) return;
-    setPromoLoading(true);
-    setPromoError(null);
-
-    try {
-      const res = await fetch("/api/apply-promo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: promoInput.trim(), paymentIntentId }),
-      });
-      const data: { valid: boolean; error?: string; discountLabel?: string; newAmount?: number; originalAmount?: number } = await res.json();
-
-      if (data.valid && data.newAmount && data.discountLabel && data.originalAmount) {
-        setPromoApplied({ discountLabel: data.discountLabel, newAmount: data.newAmount, originalAmount: data.originalAmount });
-        setPromoError(null);
-      } else {
-        setPromoError(data.error ?? "Code invalide");
-      }
-    } catch {
-      setPromoError("Unable to validate code. Please try again.");
-    } finally {
-      setPromoLoading(false);
-    }
-  };
 
   return (
     <main className="min-h-screen bg-white">
@@ -467,64 +427,6 @@ export function CheckoutPage({ email }: { email: string }) {
               <span>$89</span>
             </div>
 
-            {/* Promo code input */}
-            <div className="mb-3 lg:mb-4">
-              {promoApplied ? (
-                <div className="flex items-center justify-between rounded-lg bg-green-50 border border-green-200 px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                      <circle cx="7" cy="7" r="6" fill="#22c55e" fillOpacity="0.15" stroke="#22c55e" strokeWidth="1.2" />
-                      <path d="M4.5 7l1.5 1.5L9.5 5" stroke="#22c55e" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-[12px] font-medium text-green-700">
-                      {promoInput.toUpperCase()} · {promoApplied.discountLabel}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => { setPromoApplied(null); setPromoInput(""); }}
-                    className="text-[11px] text-green-600 hover:text-green-800 font-medium"
-                    aria-label="Remove promo code"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoInput}
-                    onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleApplyPromo(); } }}
-                    placeholder="Promo code"
-                    disabled={!paymentIntentId}
-                    className="flex-1 rounded-lg border border-wire bg-white px-3 py-2 text-[13px] text-void placeholder:text-mute focus:border-void focus:outline-none disabled:opacity-50"
-                  />
-                  <button
-                    onClick={handleApplyPromo}
-                    disabled={!promoInput.trim() || promoLoading || !paymentIntentId}
-                    className="rounded-lg border border-wire px-3 py-2 text-[12px] font-semibold text-dim transition-colors hover:border-void hover:text-void disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {promoLoading ? (
-                      <span className="flex items-center gap-1.5">
-                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-dim/25 border-t-dim" />
-                      </span>
-                    ) : "Apply"}
-                  </button>
-                </div>
-              )}
-              {promoError && (
-                <p className="mt-1.5 text-[11px] text-red-500">{promoError}</p>
-              )}
-            </div>
-
-            {/* Discount line */}
-            {promoApplied && (
-              <div className="mb-2 flex justify-between text-[13px] text-green-600">
-                <span>Discount ({promoApplied.discountLabel})</span>
-                <span>-${((promoApplied.originalAmount - promoApplied.newAmount) / 100).toFixed(2)}</span>
-              </div>
-            )}
-
             {/* Rush delivery upsell */}
             <label className={`mb-3 flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${rushDelivery ? "border-void bg-void/[0.03]" : "border-wire hover:border-void/30"} ${rushLoading ? "opacity-60 pointer-events-none" : ""}`}>
               <div
@@ -558,9 +460,6 @@ export function CheckoutPage({ email }: { email: string }) {
             <div className="flex justify-between border-t border-wire pt-2.5 lg:pt-4 text-[15px] font-semibold text-void">
               <span>Due today</span>
               <span className="flex items-center gap-2">
-                {promoApplied && (
-                  <span className="text-[13px] font-normal text-mute line-through">$89</span>
-                )}
                 ${(displayAmount / 100).toFixed(0)}
               </span>
             </div>
