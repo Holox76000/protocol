@@ -100,8 +100,8 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
             <div className={styles.photoDropLabel}>Tap to upload a photo</div>
             <div className={styles.photoDropSub}>Full-body or upper-body · JPEG or PNG</div>
           </div>
-          <button type="button" className={styles.photoSkipLink} onClick={onNext}>
-            Skip this step — I don&apos;t want a preview
+          <button type="button" className={styles.photoSkipBtn} onClick={onNext}>
+            Skip for now — add photo later in dashboard
           </button>
         </>
       )}
