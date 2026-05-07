@@ -159,6 +159,22 @@
   box-shadow: 0 0 0 3px rgba(49, 68, 58, 0.12);
 }
 
+.imageCardText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--q-surface-soft);
+}
+.imageCardText .imageCardLabel {
+  position: static;
+  color: var(--q-strong);
+  text-shadow: none;
+  font-weight: 500;
+}
+.imageCardText.imageCardSelected .imageCardLabel {
+  color: var(--q-accent);
+}
+
 .imageCardGradient {
   position: absolute;
   inset: 0;
@@ -2339,20 +2355,22 @@
   color: var(--q-soft);
 }
 
-.photoSkipLink {
+.photoSkipBtn {
   display: block;
   width: 100%;
   background: none;
-  border: none;
-  padding: 0;
-  margin-bottom: 20px;
-  font-size: 13px;
-  color: var(--q-soft);
+  border: 1px solid var(--q-border-h);
+  border-radius: 999px;
+  padding: 13px 20px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--q-strong);
   text-align: center;
-  text-decoration: underline;
-  text-underline-offset: 3px;
   cursor: pointer;
+  transition: border-color 140ms ease;
 }
+.photoSkipBtn:hover { border-color: var(--q-accent); }
 
 .photoPreviewWrap {
   display: flex;

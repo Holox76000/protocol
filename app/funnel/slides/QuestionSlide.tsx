@@ -64,17 +64,21 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
               <button
                 key={option}
                 type="button"
-                className={`${styles.imageCard} ${isSelected ? styles.imageCardSelected : ""}`}
+                className={`${styles.imageCard} ${isSelected ? styles.imageCardSelected : ""} ${!resolvedImages[i] ? styles.imageCardText : ""}`}
                 onClick={() => handleSelect(option)}
               >
-                <Image
-                  src={resolvedImages[i]}
-                  alt={option}
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-width: 720px) 50vw, 25vw"
-                />
-                <div className={styles.imageCardGradient} />
+                {resolvedImages[i] ? (
+                  <>
+                    <Image
+                      src={resolvedImages[i]}
+                      alt={option}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 720px) 50vw, 25vw"
+                    />
+                    <div className={styles.imageCardGradient} />
+                  </>
+                ) : null}
                 <span className={styles.imageCardLabel}>{option}</span>
                 <span className={styles.imageCardCheck}>✓</span>
               </button>

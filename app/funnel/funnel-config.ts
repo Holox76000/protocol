@@ -190,6 +190,7 @@ function ethnicityImages(answers: Answers): string[] {
     `${base}-south-asian.png`,
     `${base}-hispanic-latino.png`,
     `${base}-mena.png`,
+    "",
   ];
 }
 
@@ -246,6 +247,7 @@ export const SLIDES: SlideConfig[] = [
       "South Asian",
       "Hispanic-Latino",
       "MENA",
+      "Prefer not to say",
     ],
     images: ethnicityImages,
   },
@@ -418,14 +420,6 @@ export const SLIDES: SlideConfig[] = [
   {
     id: "summary",
     type: "summary",
-  },
-
-  {
-    id: "how-it-works",
-    type: "info",
-    variant: "objection",
-    headline: "We build your protocol calculated from research and tailored by aesthetic experts.",
-    body: "Every recommendation is built from two sources: 3,000+ peer-reviewed studies on male attractiveness and a reference dataset of 2,500+ men.",
   },
 
   {
