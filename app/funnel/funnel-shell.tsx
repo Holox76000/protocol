@@ -48,7 +48,7 @@ export default function FunnelShell() {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
       if (!parsed._session_id) {
-        parsed = { ...parsed, _session_id: crypto.randomUUID() };
+        parsed = { ...parsed, _session_id: crypto.randomUUID(), _max_step: 0 };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
       setAnswers(parsed);
@@ -106,7 +106,10 @@ export default function FunnelShell() {
       } else if (currentSlide.type === "numeric-weight") {
         trackFunnelAnswer(currentSlide.id, `${answers.weight_value ?? ""} ${answers.weight_unit ?? ""}`);
       }
-      setStep((s) => s + 1);
+      const nextStep = step + 1;
+      const prevMax = (answers._max_step as number | undefined) ?? 0;
+      if (nextStep > prevMax) saveAnswer({ _max_step: nextStep });
+      setStep(nextStep);
     }
   };
 
