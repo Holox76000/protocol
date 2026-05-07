@@ -163,6 +163,69 @@ export function CardSelect({
   );
 }
 
+// ─── CardMultiSelect ──────────────────────────────────────────────────────────
+
+export function CardMultiSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  options: CardOption[];
+}) {
+  const toggle = (v: string) => {
+    if (value.includes(v)) onChange(value.filter((x) => x !== v));
+    else onChange([...value, v]);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {options.map((opt) => {
+        const selected = value.includes(opt.value);
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => toggle(opt.value)}
+            className={`group w-full rounded-xl border px-4 py-3.5 text-left transition-all duration-150 ${
+              selected
+                ? "border-void bg-void text-white shadow-[0_2px_8px_rgba(12,12,13,0.2)]"
+                : "border-wire bg-white text-void hover:border-void/25 hover:shadow-card"
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <span className="block text-[13.5px] font-semibold leading-snug">{opt.label}</span>
+                {opt.sublabel && (
+                  <span className={`mt-1 block text-[12px] leading-relaxed ${selected ? "text-white/55" : "text-dim"}`}>
+                    {opt.sublabel}
+                  </span>
+                )}
+              </div>
+              {/* Square checkbox indicator */}
+              <div
+                className={`mt-0.5 shrink-0 flex items-center justify-center rounded border transition-all duration-150 ${
+                  selected
+                    ? "border-white/40 bg-white/15"
+                    : "border-wire group-hover:border-void/30"
+                }`}
+                style={{ height: 18, width: 18 }}
+              >
+                {selected && (
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true">
+                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── TagSelect ────────────────────────────────────────────────────────────────
 
 type TagOption = { value: string; label: string };

@@ -60,7 +60,7 @@ export default function ReviewScreen({ answers, onSubmit, onBack, saving, error 
       <SectionSummary title="Identity & Objective">
         <Row label="First name" value={answers.first_name} />
         <Row label="Primary goal" value={answers.goal?.replace(/_/g, " ")} />
-        <Row label="Motivation" value={answers.motivation?.replace(/_/g, " ")} />
+        <Row label="Motivation" value={answers.motivation?.map((m) => m.replace(/_/g, " ")).join(", ")} />
       </SectionSummary>
 
       <SectionSummary title="Social Context">

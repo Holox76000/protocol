@@ -17,7 +17,7 @@ export type Answers = {
   phone?: string;
   city?: string;
   goal?: string;
-  motivation?: string;
+  motivation?: string[];
   age?: number;
   professional_environment?: string;
   professional_environment_other?: string;

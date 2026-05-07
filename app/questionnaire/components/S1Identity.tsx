@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { SectionProps } from "../QuestionnaireFlow";
-import { SectionHeader, Field, SectionFooter, CardSelect } from "./shared";
+import { SectionHeader, Field, SectionFooter, CardSelect, CardMultiSelect } from "./shared";
 
 // City input with native browser autocomplete (geolocation API not needed)
 function CityInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -126,7 +126,7 @@ export default function S1Identity({ answers, setAnswer, onNext, onBack, saving,
     if (!answers.phone?.trim()) return setError("Please enter your phone number.");
     if (!answers.city?.trim()) return setError("Please enter your city.");
     if (!answers.goal) return setError("Please select a primary goal.");
-    if (!answers.motivation) return setError("Please select a motivation.");
+    if (!answers.motivation?.length) return setError("Please select at least one motivation.");
     setError(null);
     onNext();
   };
@@ -173,9 +173,9 @@ export default function S1Identity({ answers, setAnswer, onNext, onBack, saving,
           />
         </Field>
 
-        <Field label="What's driving this for you right now?" sublabel="Be honest — this helps us prioritize what matters in your Protocol." required>
-          <CardSelect
-            value={answers.motivation}
+        <Field label="What's driving this for you right now?" sublabel="Select all that apply — this helps us prioritize what matters in your Protocol." required>
+          <CardMultiSelect
+            value={answers.motivation ?? []}
             onChange={(v) => setAnswer("motivation", v)}
             options={MOTIVATION_OPTIONS}
           />

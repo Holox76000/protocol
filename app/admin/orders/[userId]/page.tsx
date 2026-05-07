@@ -250,7 +250,7 @@ export default async function OrderDetailPage({
             <div className="rounded-2xl border border-wire bg-white p-6">
               <Section title="Identity & Goals">
                 <Field label="Goal" value={qr.goal as string} />
-                <Field label="Motivation" value={qr.motivation as string} />
+                <Field label="Motivation" value={Array.isArray(qr.motivation) ? (qr.motivation as string[]).join(", ") : qr.motivation as string} />
                 <Field label="Sexual orientation" value={qr.sexual_orientation as string} />
               </Section>
             </div>
