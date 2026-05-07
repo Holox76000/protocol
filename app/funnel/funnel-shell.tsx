@@ -137,6 +137,7 @@ export default function FunnelShell() {
             onClick={handleBack}
             disabled={step === 0}
             aria-label="Back"
+            style={step === 0 ? { visibility: "hidden" } : undefined}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
               <path d="M11 14L6 9l5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
