@@ -59,7 +59,7 @@ export function IntroSlide({ onNext, variant }: Props) {
         </div>
         <div className={styles.introRating}>
           <div className={styles.introRatingRow}>
-            <span className={styles.introRatingLabel}>Excellent</span>
+            <span className={styles.introRatingLabel}>Great</span>
             <div className={styles.introRatingStars}>
               <div className={styles.introRatingStar}><TpStar /></div>
               <div className={styles.introRatingStar}><TpStar /></div>
