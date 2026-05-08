@@ -180,7 +180,8 @@ function LineChartSvg({ data }: { data: DayData[] }) {
   );
 }
 
-function FunnelDropoff({ rows }: { rows: DropoffRow[] }) {
+function FunnelDropoff({ rows, from, to }: { rows: DropoffRow[]; from: string; to: string }) {
+  const label = from && to ? `${from} → ${to}` : from || to || "all time";
   if (rows.length === 0) return null;
   const topDrops = [...rows]
     .sort((a, b) => b.dropPct - a.dropPct)
@@ -190,7 +191,7 @@ function FunnelDropoff({ rows }: { rows: DropoffRow[] }) {
   return (
     <div className="bg-white rounded-2xl border border-[#edf0f1] p-6 mt-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f949b] mb-6">
-        Funnel Drop-off — 30 days
+        Funnel Drop-off — {label}
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
@@ -279,10 +280,11 @@ export default function StatsClient({ chartData, funnelSessions }: { chartData: 
     return Array.from(map.values()).reverse();
   }, [filteredData]);
 
+  const dropoffFrom = filteredData.length > 0 ? filteredData[0].date : "";
+  const dropoffTo = filteredData.length > 0 ? filteredData[filteredData.length - 1].date : "";
   const dropoffRows = useMemo(() => {
-    const from = filteredData.length > 0 ? filteredData[0].date : "";
-    const to = filteredData.length > 0 ? filteredData[filteredData.length - 1].date : "";
-    return computeDropoff(funnelSessions, from, to);
+    return computeDropoff(funnelSessions, dropoffFrom, dropoffTo);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [funnelSessions, filteredData]);
 
   const PRESETS: { id: Preset; label: string }[] = [
@@ -415,7 +417,7 @@ export default function StatsClient({ chartData, funnelSessions }: { chartData: 
         </div>
 
         {/* Funnel drop-off */}
-        <FunnelDropoff rows={dropoffRows} />
+        <FunnelDropoff rows={dropoffRows} from={dropoffFrom} to={dropoffTo} />
 
       </div>
     </main>

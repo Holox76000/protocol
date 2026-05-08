@@ -95,7 +95,7 @@ export default async function StatsPage() {
     };
   });
 
-  // Funnel sessions — pass raw to client so drop-off reacts to the date selector
+  // Funnel sessions — all time, passed raw to client so drop-off reacts to the date selector
   const { data: sessions } = await supabaseAdmin
     .from("funnel_sessions")
     .select("created_at, answers")
