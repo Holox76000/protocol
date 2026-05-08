@@ -82,7 +82,7 @@ export function IntroSlide({ onNext, variant }: Props) {
           <div className={styles.introPressLogos}>
             {PRESS_LOGOS.map((logo) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={logo.alt} src={logo.src} alt={logo.alt} className={styles.introPressLogo} />
+              <img key={logo.alt} src={logo.src} alt={logo.alt} width={80} height={32} loading="lazy" className={styles.introPressLogo} />
             ))}
           </div>
         </div>
@@ -96,8 +96,7 @@ export function IntroSlide({ onNext, variant }: Props) {
                 <TpStar key={i} fill={fill} size={20} />
               ))}
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/trustpilot-logo.png" alt="Trustpilot" className={styles.introRatingTpLogo} />
+            <Image src="/assets/trustpilot-logo.png" alt="Trustpilot" width={80} height={20} className={styles.introRatingTpLogo} />
           </div>
           <span className={styles.introTrustReview}>
             <span className={styles.introMono}>4.9</span> · 2,500+ reviews

@@ -8,18 +8,22 @@ import {
   type Answers,
   type SlideConfig,
 } from "./funnel-config";
-import { SingleQuestion, MultiQuestion } from "./slides/QuestionSlide";
-import { HeightSlide, WeightSlide } from "./slides/NumericSlide";
-import { BeliefSlide } from "./slides/BeliefSlide";
-import { InfoSlide } from "./slides/InfoSlide";
-import { StatSlide } from "./slides/StatSlide";
-import { SummarySlide } from "./slides/SummarySlide";
-import { PromiseSlide } from "./slides/PromiseSlide";
-import { YesLadderSlide } from "./slides/YesLadderSlide";
-import { FinalLoadingSlide } from "./slides/FinalLoadingSlide";
-import { ProtocolReadySlide } from "./slides/ProtocolReadySlide";
-import { PhotoUploadSlide } from "./slides/PhotoUploadSlide";
+import dynamic from "next/dynamic";
 import { IntroSlide } from "./slides/IntroSlide";
+
+const SingleQuestion   = dynamic(() => import("./slides/QuestionSlide").then(m => ({ default: m.SingleQuestion })));
+const MultiQuestion    = dynamic(() => import("./slides/QuestionSlide").then(m => ({ default: m.MultiQuestion })));
+const HeightSlide      = dynamic(() => import("./slides/NumericSlide").then(m => ({ default: m.HeightSlide })));
+const WeightSlide      = dynamic(() => import("./slides/NumericSlide").then(m => ({ default: m.WeightSlide })));
+const BeliefSlide      = dynamic(() => import("./slides/BeliefSlide").then(m => ({ default: m.BeliefSlide })));
+const InfoSlide        = dynamic(() => import("./slides/InfoSlide").then(m => ({ default: m.InfoSlide })));
+const StatSlide        = dynamic(() => import("./slides/StatSlide").then(m => ({ default: m.StatSlide })));
+const SummarySlide     = dynamic(() => import("./slides/SummarySlide").then(m => ({ default: m.SummarySlide })));
+const PromiseSlide     = dynamic(() => import("./slides/PromiseSlide").then(m => ({ default: m.PromiseSlide })));
+const YesLadderSlide   = dynamic(() => import("./slides/YesLadderSlide").then(m => ({ default: m.YesLadderSlide })));
+const FinalLoadingSlide = dynamic(() => import("./slides/FinalLoadingSlide").then(m => ({ default: m.FinalLoadingSlide })));
+const ProtocolReadySlide = dynamic(() => import("./slides/ProtocolReadySlide").then(m => ({ default: m.ProtocolReadySlide })));
+const PhotoUploadSlide = dynamic(() => import("./slides/PhotoUploadSlide").then(m => ({ default: m.PhotoUploadSlide })));
 import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
