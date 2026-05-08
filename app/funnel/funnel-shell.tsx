@@ -58,7 +58,15 @@ export default function FunnelShell() {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
       if (!parsed._session_id) {
-        parsed = { ...parsed, _session_id: crypto.randomUUID(), _max_step: 0 };
+        parsed = {
+          ...parsed,
+          _session_id: crypto.randomUUID(),
+          _max_step: 0,
+          ...(utms.utm_source   && { _utm_source:   utms.utm_source }),
+          ...(utms.utm_campaign && { _utm_campaign: utms.utm_campaign }),
+          ...(utms.utm_ad       && { _utm_ad:       utms.utm_ad }),
+          ...(utms.utm_content  && { _utm_content:  utms.utm_content }),
+        };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
       setAnswers(parsed);
