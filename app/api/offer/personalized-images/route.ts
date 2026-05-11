@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { readFile, appendFile } from "fs/promises";
 import path from "path";
-import sharp from "sharp";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
 const LOG_FILE = "/tmp/offer-gen-route.log";
@@ -237,12 +236,8 @@ function extractImage(payload: unknown): string | null {
 async function readPublicImage(filename: string): Promise<{ base64: string; mime: string }> {
   const filePath = path.join(process.cwd(), "public", "assets", filename);
   const buffer = await readFile(filePath);
-  // Resize to max 1024px on longest side to keep payloads manageable for Gemini
-  const resized = await sharp(buffer)
-    .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 85 })
-    .toBuffer();
-  return { base64: resized.toString("base64"), mime: "image/jpeg" };
+  const isPng = filename.toLowerCase().endsWith(".png");
+  return { base64: buffer.toString("base64"), mime: isPng ? "image/png" : "image/jpeg" };
 }
 
 async function generateImage(
@@ -297,62 +292,21 @@ async function dataUrlToUpload(
 ): Promise<boolean> {
   const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
   if (!match) return false;
-  const [, , base64] = match;
-  // Compress to JPEG ~80KB — images are displayed at 200px wide, 2MB PNGs are overkill
-  const compressed = await sharp(Buffer.from(base64, "base64"))
-    .resize(600, 900, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 82 })
-    .toBuffer();
+  const [, mime, base64] = match;
+  const buffer = Buffer.from(base64, "base64");
   const { error } = await supabaseAdmin.storage
     .from(BUCKET)
-    .upload(storagePath, compressed, {
-      contentType: "image/jpeg",
+    .upload(storagePath, buffer, {
+      contentType: mime,
       upsert: true,
     });
   return !error;
 }
 
 async function removeWhiteBackground(buffer: Buffer): Promise<Buffer> {
-  const { data, info } = await sharp(buffer)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  const { width, height } = info;
-  const pixels = new Uint8Array(data);
-  const visited = new Uint8Array(width * height);
-  const stack: number[] = [];
-
-  const enqueue = (x: number, y: number) => {
-    if (x < 0 || x >= width || y < 0 || y >= height) return;
-    const idx = y * width + x;
-    if (visited[idx]) return;
-    visited[idx] = 1;
-    stack.push(idx);
-  };
-
-  // Seed from all 4 edges
-  for (let x = 0; x < width; x++) { enqueue(x, 0); enqueue(x, height - 1); }
-  for (let y = 0; y < height; y++) { enqueue(0, y); enqueue(width - 1, y); }
-
-  const THRESHOLD = 235;
-  while (stack.length > 0) {
-    const idx = stack.pop()!;
-    const px = idx * 4;
-    const r = pixels[px], g = pixels[px + 1], b = pixels[px + 2];
-    if (r >= THRESHOLD && g >= THRESHOLD && b >= THRESHOLD) {
-      pixels[px + 3] = 0; // transparent
-      const x = idx % width, y = Math.floor(idx / width);
-      enqueue(x - 1, y); enqueue(x + 1, y); enqueue(x, y - 1); enqueue(x, y + 1);
-    }
-  }
-
-  return sharp(Buffer.from(pixels), {
-    raw: { width, height, channels: 4 },
-  })
-    .resize(500, 750, { fit: "inside", withoutEnlargement: true })
-    .png({ compressionLevel: 8 })
-    .toBuffer();
+  // Background removal requires sharp (native binary) — skipped to keep bundle lean.
+  // The Gemini model is prompted to use transparent/clean backgrounds instead.
+  return buffer;
 }
 
 async function generatePortraitAndUpload(
