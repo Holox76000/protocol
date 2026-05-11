@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { readFile, appendFile } from "fs/promises";
-import path from "path";
+import { appendFile } from "fs/promises";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
 const LOG_FILE = "/tmp/offer-gen-route.log";
@@ -233,12 +232,6 @@ function extractImage(payload: unknown): string | null {
   return null;
 }
 
-async function readPublicImage(filename: string): Promise<{ base64: string; mime: string }> {
-  const filePath = path.join(process.cwd(), "public", "assets", filename);
-  const buffer = await readFile(filePath);
-  const isPng = filename.toLowerCase().endsWith(".png");
-  return { base64: buffer.toString("base64"), mime: isPng ? "image/png" : "image/jpeg" };
-}
 
 async function generateImage(
   apiKey: string,
@@ -322,26 +315,17 @@ async function generatePortraitAndUpload(
     { type: "text", text: buildPortraitPrompt(ageBracket, ethnicity, morphology) },
   ]);
 
-  let finalBuffer: Buffer;
-
   if (!dataUrl) {
-    await routeLog("[offer-portraits] Gemini returned no image — using static man.png fallback");
-    finalBuffer = await readFile(path.join(process.cwd(), "public", "assets", "man.png"));
-  } else {
-    const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
-    if (!match) {
-      await routeLog("[offer-portraits] malformed dataUrl — using fallback");
-      finalBuffer = await readFile(path.join(process.cwd(), "public", "assets", "man.png"));
-    } else {
-      const rawBuffer = Buffer.from(match[2], "base64");
-      try {
-        finalBuffer = await removeWhiteBackground(rawBuffer);
-      } catch (e) {
-        await routeLog("[offer-portraits] removeWhiteBackground failed:", String(e));
-        finalBuffer = rawBuffer;
-      }
-    }
+    await routeLog("[offer-portraits] Gemini returned no image — skipping portrait");
+    return false;
   }
+  const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
+  if (!match) {
+    await routeLog("[offer-portraits] malformed dataUrl — skipping portrait");
+    return false;
+  }
+  const rawBuffer = Buffer.from(match[2], "base64");
+  const finalBuffer = await removeWhiteBackground(rawBuffer);
 
   const { error } = await supabaseAdmin.storage.from(BUCKET).upload(
     `${dir}/portrait.png`,
