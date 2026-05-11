@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 const SITE_URL = "https://protocol-club.com";
 const EMAIL_1_DELAY_MIN = 10;
 const EMAIL_2_DELAY_HOURS = 4;
+const EMAIL_FEEDBACK_DELAY_HOURS = 6; // 2h after email 2 (email 2 sent at 4h, feedback at 6h)
 const FROM = "Protocol Club <hello@protocol-club.com>";
 const CART_RECOVERY_TOKEN_DAYS = 7;
 const QUESTIONNAIRE_MAGIC_LINK_DAYS = 7;
@@ -187,6 +188,51 @@ const handler = schedule("*/5 * * * *", async () => {
       console.log("[abandoned-cart] email2 sent", { email: user.email });
     } catch (err) {
       console.error("[abandoned-cart] email2 failed", { email: user.email, error: String(err) });
+    }
+  }
+
+  // ── Email feedback: 2h after email 2 (6h total) ──
+  const cutoffFeedback = new Date(now.getTime() - EMAIL_FEEDBACK_DELAY_HOURS * 60 * 60 * 1000).toISOString();
+
+  const { data: usersFeedback } = await sb
+    .from("users")
+    .select("id, email, first_name")
+    .eq("has_paid", false)
+    .is("cart_email_feedback_sent_at", null)
+    .not("cart_email_2_sent_at", "is", null)
+    .lte("cart_email_2_sent_at", cutoffFeedback)
+    .limit(50);
+
+  for (const user of usersFeedback ?? []) {
+    await sb.from("users").update({ cart_email_feedback_sent_at: now.toISOString() }).eq("id", user.id);
+
+    const name = user.first_name ?? "there";
+
+    const text = `Hey ${name},
+
+I noticed you checked out Protocol Club but didn't end up completing your order.
+
+I'm Pierre, one of the founders. We're a small team and honest feedback genuinely helps us improve — so I wanted to ask directly.
+
+Would you mind sharing why you didn't go through with it? No pressure at all, a quick reply is more than enough.
+
+Was it the price? Something wasn't clear? Just bad timing?
+
+Whatever the reason, I'd love to hear it.
+
+Pierre
+Co-founder, Protocol Club`;
+
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: user.email,
+        subject: `Quick question, ${name}`,
+        text,
+      });
+      console.log("[abandoned-cart] feedback sent", { email: user.email });
+    } catch (err) {
+      console.error("[abandoned-cart] feedback failed", { email: user.email, error: String(err) });
     }
   }
 

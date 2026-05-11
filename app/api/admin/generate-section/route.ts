@@ -103,6 +103,10 @@ ${(Object.keys(metrics) as (keyof CalibrationMetrics)[]).map((key) => {
 ${metricsBlock}
 ${d.coach_notes ? `### Coach Notes\n${d.coach_notes}` : ""}
 
+### Generation Instructions
+${d.coach_notes ? `- **Coach notes are mandatory inputs**: adapt the plan's adherence and feasibility to exactly reflect the constraints, observations, or exceptions flagged in the coach notes above. If the notes mention time constraints, availability issues, injuries, lifestyle specifics, or any deviation from the norm — the plan must account for it concretely, not generically.` : ""}
+${d.sexual_orientation && d.sexual_orientation !== "straight" ? `- **Sexual orientation (${a(d.sexual_orientation)})**: frame the aesthetic goals, social motivations, and style recommendations to fit the image and context that matters to this client. The standards of attractiveness, physique ideals, and social environments relevant to a ${a(d.sexual_orientation)} man may differ — reflect this where relevant in the protocol (e.g. physique references, style notes, social confidence framing).` : ""}
+
 ${socialContextBlock({
   professional_environment: d.professional_environment as string | null,
   professional_environment_other: d.professional_environment_other as string | null,

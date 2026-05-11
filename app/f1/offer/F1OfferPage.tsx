@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
@@ -235,7 +236,7 @@ const US_COL: ColDef = {
   label: "Protocol Club",
   personalised: <span className="mo-compare__check"><CheckIcon /> Yes. Your ratios, your plan.</span>,
   research:     <span className="mo-compare__check"><CheckIcon /> Yes. 3,000+ studies.</span>,
-  coach:        <span className="mo-compare__check"><CheckIcon /> WhatsApp · 6h reply</span>,
+  coach:        <span className="mo-compare__check"><CheckIcon /> Direct line · 6h reply</span>,
   refund:       <span className="mo-compare__check"><CheckIcon /> 90-day, no questions</span>,
   commitment:   "One-time · $89",
 };
@@ -354,7 +355,19 @@ function MNav({ href }: { href: string }) {
   );
 }
 
+const WISTIA_VIDEO_ID = "iw5y8ab8qj";
+
 function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
+  const [muted, setMuted] = useState(true);
+
+  const enableSound = () => {
+    const player = document.querySelector("wistia-player") as HTMLElement & { unmute?: () => void; muted?: boolean };
+    if (!player) return;
+    if (typeof player.unmute === "function") player.unmute();
+    else player.muted = false;
+    setMuted(false);
+  };
+
   return (
     <section className="mo-hero mo-hero-v1">
       {/* Left column: copy (desktop only) */}
@@ -388,28 +401,17 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
         </p>
       </div>
 
-      {/* Right column: dark panel with product image */}
+      {/* Right column: VSL Wistia player */}
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
-          <Image
-            className="mo-hero-v1__product"
-            src="/assets/connor-protocol.png"
-            alt="Connor's Protocol"
-            width={460}
-            height={345}
-            priority
-          />
-          {/* Attractiveness score card — white, bottom-right */}
-          <div className="mo-hero-v1__fc mo-hero-v1__fc--ratio">
-            <div className="mo-fc-label">Attractiveness</div>
-            <div className="mo-fc-val">54 <em>→</em> 77</div>
-            <div className="mo-fc-delta">+23</div>
-          </div>
-          {/* Score card — dark, top-left */}
-          <div className="mo-hero-v1__fc mo-hero-v1__fc--score">
-            <div className="mo-sc-label">Torso Index</div>
-            <div className="mo-sc-val">5.1</div>
-            <div className="mo-sc-bar"><i /></div>
+          <div className="mo-hero-v1__wistia">
+            <wistia-player
+              media-id={WISTIA_VIDEO_ID}
+              aspect="1.7777777777777777"
+              autoplay="true"
+              muted-autoplay="always"
+              end-video-behavior="loop"
+            />
           </div>
         </div>
       </div>
@@ -424,6 +426,15 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
           <span>· 90-day guarantee</span>
         </div>
       </div>
+
+      {/* Mobile sticky sound bar */}
+      {muted && (
+        <div className="mo-vsl-sound-bar" onClick={enableSound}>
+          <span className="mo-vsl-sound-bar__icon">🔇</span>
+          <span className="mo-vsl-sound-bar__label">Tap for sound</span>
+          <span className="mo-vsl-sound-bar__cta">Unmute →</span>
+        </div>
+      )}
     </section>
   );
 }
@@ -473,7 +484,26 @@ function MSteps() {
   );
 }
 
+function MResultSkeleton() {
+  return (
+    <div className="mo-result mo-result--skeleton">
+      <div className="mo-result__split">
+        <div className="mo-result__skeleton-img" />
+        <div className="mo-result__skeleton-img" />
+      </div>
+      <div className="mo-result__divider" />
+      <div className="mo-result__labels"><span>Before</span><span>After</span></div>
+      <div className="mo-result__caption">
+        <div className="mo-result__skeleton-name" />
+        <div className="mo-result__skeleton-ratio" />
+      </div>
+    </div>
+  );
+}
+
 function MResults({ href }: { href: string }) {
+  const displayResults = RESULTS;
+
   return (
     <section id="mo-results" className="mo-section">
       <div className="mo-container">
@@ -485,19 +515,19 @@ function MResults({ href }: { href: string }) {
           <div className="mo-section-head__meta">2,500+ men · 13 weeks avg</div>
         </div>
         <div className="mo-results-grid">
-          {RESULTS.map((r, i) => (
-            <div key={i} className="mo-result">
-              <div className="mo-result__split">
-                <Image src={r.before} alt="Before" width={200} height={300} />
-                <Image src={r.after} alt="After" width={200} height={300} />
+          {displayResults.map((r, i) => (
+              <div key={i} className="mo-result">
+                <div className="mo-result__split">
+                  <Image src={r.before} alt="Before" width={200} height={300} unoptimized={r.before.startsWith("https://")} />
+                  <Image src={r.after} alt="After" width={200} height={300} unoptimized={r.after.startsWith("https://")} />
+                </div>
+                <div className="mo-result__divider" />
+                <div className="mo-result__labels"><span>Before</span><span>After</span></div>
+                <div className="mo-result__caption">
+                  <div className="mo-result__name">{r.name}</div>
+                  <div className="mo-result__ratio">{r.ratio}</div>
+                </div>
               </div>
-              <div className="mo-result__divider" />
-              <div className="mo-result__labels"><span>Before</span><span>After</span></div>
-              <div className="mo-result__caption">
-                <div className="mo-result__name">{r.name}</div>
-                <div className="mo-result__ratio">{r.ratio}</div>
-              </div>
-            </div>
           ))}
         </div>
         <div className="mo-results-foot">
@@ -961,6 +991,8 @@ export default function F1OfferPage() {
 
   return (
     <div className="mo-page">
+      <Script src="https://fast.wistia.com/player.js" strategy="afterInteractive" />
+      <Script src={`https://fast.wistia.com/embed/${WISTIA_VIDEO_ID}.js`} strategy="afterInteractive" type="module" />
       <MNav href={signupHref} />
       <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
       <MPress />

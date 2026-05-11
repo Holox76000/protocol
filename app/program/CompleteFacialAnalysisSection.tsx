@@ -31,7 +31,14 @@ const ANALYSIS_CARDS = [
   },
 ];
 
-export default function CompleteFacialAnalysisSection() {
+export default function CompleteFacialAnalysisSection({
+  portraitSrc,
+  portraitLoading,
+}: {
+  portraitSrc?: string;
+  portraitLoading?: boolean;
+} = {}) {
+  const activeSrc = portraitSrc ?? "/assets/man.png";
   return (
     <section className="program-complete-analysis" aria-labelledby="program-complete-analysis-title">
       <div className="program-complete-analysis__shell">
@@ -69,13 +76,14 @@ export default function CompleteFacialAnalysisSection() {
             <Image src={ANALYSIS_CARDS[3].image} alt="" fill className="program-complete-analysis__card-art" sizes="430px" />
           </article>
 
-          <div className="program-complete-analysis__portrait">
+          <div className={`program-complete-analysis__portrait${portraitLoading ? " program-complete-analysis__portrait--loading" : ""}`}>
             <Image
-              src="/assets/man.png"
+              src={activeSrc}
               alt="Body analysis portrait"
               fill
               sizes="760px"
               className="program-complete-analysis__portrait-image"
+              unoptimized={!!portraitSrc}
             />
           </div>
 
@@ -100,14 +108,15 @@ export default function CompleteFacialAnalysisSection() {
           }}
         >
           <div className="program-complete-analysis__portrait-panel">
-            <div className="program-complete-analysis__portrait">
+            <div className={`program-complete-analysis__portrait${portraitLoading ? " program-complete-analysis__portrait--loading" : ""}`}>
               <Image
-                src="/assets/man.png"
+                src={activeSrc}
                 alt="Body analysis portrait"
                 width={1024}
                 height={1024}
                 sizes="(max-width: 767px) 88vw, (max-width: 1280px) 70vw, 760px"
                 className="program-complete-analysis__portrait-image"
+                unoptimized={!!portraitSrc}
               />
             </div>
           </div>
