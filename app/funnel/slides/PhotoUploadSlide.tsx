@@ -5,18 +5,43 @@ import type { Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 import { trackFunnelPhotoUploaded } from "../../../lib/funnel-analytics";
 
+type PhotoType = "body" | "face" | "profile";
+
 type Props = {
   answers: Answers;
   onAnswer: (key: string, value: string) => void;
   onNext: () => void;
   onBack: () => void;
+  photoType?: PhotoType;
+};
+
+const PHOTO_CONFIG: Record<PhotoType, { answerKey: string; title: string; sub: string; hint: string }> = {
+  body: {
+    answerKey: "_photo_path",
+    title: "See yourself transformed.",
+    sub: "Upload a full-body or upper-body photo and we'll generate a personalized preview of what you could look like after your 12-week Protocol.",
+    hint: "Full-body or upper-body · JPEG or PNG",
+  },
+  face: {
+    answerKey: "face_photo_path",
+    title: "Add a face photo.",
+    sub: "Optional — helps us calibrate your projection preview more precisely. A clear, well-lit face photo works best.",
+    hint: "Front-facing, natural light · JPEG or PNG",
+  },
+  profile: {
+    answerKey: "profile_photo_path",
+    title: "Add a side profile.",
+    sub: "Optional — a side-view photo lets us assess posture and silhouette for a more complete projection preview.",
+    hint: "Side view, full height · JPEG or PNG",
+  },
 };
 
 type Status = "idle" | "uploading" | "generating" | "done" | "error";
 
-export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
+export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack, photoType = "body" }: Props) {
+  const cfg = PHOTO_CONFIG[photoType];
   const [status, setStatus] = useState<Status>(() =>
-    answers._photo_path ? "done" : "idle"
+    answers[cfg.answerKey] ? "done" : "idle"
   );
   const [preview, setPreview] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -32,6 +57,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
     const form = new FormData();
     form.append("file", file);
     form.append("session_id", sessionId);
+    form.append("type", photoType);
 
     let path: string;
     let beforeUrl: string | null = null;
@@ -45,25 +71,27 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
       return;
     }
 
-    onAnswer("_photo_path", path);
-    if (beforeUrl) onAnswer("_before_url", beforeUrl);
+    onAnswer(cfg.answerKey, path);
+    if (beforeUrl && photoType === "body") onAnswer("_before_url", beforeUrl);
     trackFunnelPhotoUploaded();
-    setStatus("generating");
 
-    // Fire & forget — generation runs in background
-    fetch("/api/funnel/generate-preview", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session_id: sessionId,
-        photo_path: path,
-        age_bracket: answers.age_bracket,
-        morphology: answers.morphology,
-        ethnicity: answers.ethnicity,
-        social_environment: answers.social_environment,
-        goals: answers.expected_results,
-      }),
-    }).catch(() => {});
+    if (photoType === "body") {
+      setStatus("generating");
+      // Fire & forget — generation runs in background
+      fetch("/api/funnel/generate-preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          photo_path: path,
+          age_bracket: answers.age_bracket,
+          morphology: answers.morphology,
+          ethnicity: answers.ethnicity,
+          social_environment: answers.social_environment,
+          goals: answers.expected_results,
+        }),
+      }).catch(() => {});
+    }
 
     setStatus("done");
   }
@@ -72,11 +100,8 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
     <div className={styles.card}>
       <div className={styles.photoUploadHeader}>
         <p className={styles.eyebrow}>· Optional</p>
-        <h2 className={styles.h2}>See yourself transformed.</h2>
-        <p className={styles.subtext}>
-          Upload a full-body or upper-body photo and we&apos;ll generate a personalized preview
-          of what you could look like after your 12-week Protocol.
-        </p>
+        <h2 className={styles.h2}>{cfg.title}</h2>
+        <p className={styles.subtext}>{cfg.sub}</p>
       </div>
 
       {status === "idle" && (
@@ -98,7 +123,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
               </svg>
             </div>
             <div className={styles.photoDropLabel}>Tap to upload a photo</div>
-            <div className={styles.photoDropSub}>Full-body or upper-body · JPEG or PNG</div>
+            <div className={styles.photoDropSub}>{cfg.hint}</div>
           </div>
         </>
       )}
@@ -116,7 +141,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack }: Props) {
             {status === "generating" && (
               <><span className={styles.photoSpinner} />Generating your preview…</>
             )}
-            {status === "done" && "✓ Preview queued — ready on next page"}
+            {status === "done" && (photoType === "body" ? "✓ Preview queued — ready on next page" : "✓ Photo uploaded")}
           </div>
           {(status === "done" || status === "generating") && (
             <button

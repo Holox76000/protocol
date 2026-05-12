@@ -48,6 +48,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ status: "not_started" });
   }
 
+  const beforePath = data.before_path as string | null;
   const afterPath = data.after_path as string;
 
   if (afterPath === "__generating") {
@@ -58,13 +59,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ status: "error", detail: afterPath.slice(8) });
   }
 
+  if (!beforePath) {
+    return NextResponse.json({ status: "error", detail: "Missing before_path" });
+  }
+
   const [beforeSigned, afterSigned] = await Promise.all([
-    supabaseAdmin.storage.from("user-photos").createSignedUrl(data.before_path, TEN_YEARS),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath, TEN_YEARS),
     supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath, TEN_YEARS),
   ]);
 
   if (!beforeSigned.data?.signedUrl || !afterSigned.data?.signedUrl) {
-    return NextResponse.json({ status: "error", detail: "Could not generate signed URLs" }, { status: 500 });
+    console.error("[session/GET] signed URL error", {
+      beforeError: beforeSigned.error,
+      afterError: afterSigned.error,
+      beforePath,
+      afterPath,
+    });
+    return NextResponse.json({ status: "error", detail: "Could not generate signed URLs" });
   }
 
   return NextResponse.json({

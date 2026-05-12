@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import type { SingleSlide, MultiSlide, Answers } from "../funnel-config";
 import styles from "./slides.module.css";
@@ -34,19 +34,40 @@ const EYEBROWS: Record<string, string> = {
   social_environment: "08 · Context",
 };
 
+const CUSTOM_SENTINEL = "__custom__";
+
 export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: SingleProps) {
   const selected = (answers[slide.stateKey] as string) ?? "";
+  const isCustomSelected = slide.allowCustom && selected !== "" && !slide.options.includes(selected);
+  const [customText, setCustomText] = useState(isCustomSelected ? selected : "");
+  const [showCustom, setShowCustom] = useState(isCustomSelected);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSelect = (option: string) => {
+    if (option === CUSTOM_SENTINEL) {
+      setShowCustom(true);
+      setTimeout(() => inputRef.current?.focus(), 50);
+      return;
+    }
+    setShowCustom(false);
     onAnswer(slide.stateKey, option);
     setTimeout(onNext, 150);
   };
+
+  const handleCustomContinue = () => {
+    const trimmed = customText.trim();
+    if (!trimmed) return;
+    onAnswer(slide.stateKey, trimmed);
+    setTimeout(onNext, 150);
+  };
+
+  const effectiveSelected = showCustom ? CUSTOM_SENTINEL : selected;
 
   const eyebrow = EYEBROWS[slide.stateKey];
   const resolvedImages = typeof slide.images === "function"
     ? slide.images(answers)
     : slide.images;
-  const isYesNo = !resolvedImages && slide.options.length === 2;
+  const isYesNo = !resolvedImages && slide.options.length === 2 && !slide.allowCustom;
 
   return (
     <div className={styles.card}>
@@ -104,12 +125,51 @@ export function SingleQuestion({ slide, answers, onAnswer, onNext, onBack }: Sin
             <button
               key={option}
               type="button"
-              className={`${styles.option} ${selected === option ? styles.optionSelected : ""}`}
+              className={`${styles.option} ${effectiveSelected === option ? styles.optionSelected : ""}`}
               onClick={() => handleSelect(option)}
             >
               {option}
             </button>
           ))}
+          {slide.allowCustom && (
+            <button
+              type="button"
+              className={`${styles.option} ${effectiveSelected === CUSTOM_SENTINEL ? styles.optionSelected : ""}`}
+              onClick={() => handleSelect(CUSTOM_SENTINEL)}
+            >
+              Other — write yours
+            </button>
+          )}
+        </div>
+      )}
+
+      {showCustom && (
+        <div className={styles.customInputWrap}>
+          <textarea
+            ref={inputRef}
+            className={styles.customInput}
+            placeholder="Describe your context…"
+            value={customText}
+            rows={3}
+            onChange={(e) => setCustomText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleCustomContinue();
+              }
+            }}
+          />
+          <div className={styles.actions}>
+            <button type="button" className={styles.btnSecondary} onClick={onBack}>Back</button>
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              onClick={handleCustomContinue}
+              disabled={!customText.trim()}
+            >
+              Continue →
+            </button>
+          </div>
         </div>
       )}
 
@@ -142,14 +202,41 @@ const MULTI_EYEBROWS: Record<string, string> = {
 
 export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: MultiProps) {
   const selected = (answers[slide.stateKey] as string[]) ?? [];
-  const canAdvance = selected.length > 0;
+  // Detect if a previously-saved custom value exists (not in the fixed options list)
+  const savedCustom = selected.find((s) => !slide.options.includes(s)) ?? "";
+  const [showCustom, setShowCustom] = useState(savedCustom !== "");
+  const [customText, setCustomText] = useState(savedCustom);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // The fixed options that are selected (excludes any custom value)
+  const fixedSelected = selected.filter((s) => slide.options.includes(s));
+  const customIsActive = showCustom && customText.trim() !== "";
+  const totalCount = fixedSelected.length + (customIsActive ? 1 : 0);
+  const canAdvance = totalCount > 0;
   const eyebrow = MULTI_EYEBROWS[slide.stateKey];
 
   const toggle = (option: string) => {
-    const next = selected.includes(option)
-      ? selected.filter((o) => o !== option)
-      : [...selected, option];
-    onAnswer(slide.stateKey, next);
+    const next = fixedSelected.includes(option)
+      ? fixedSelected.filter((o) => o !== option)
+      : [...fixedSelected, option];
+    onAnswer(slide.stateKey, customIsActive ? [...next, customText.trim()] : next);
+  };
+
+  const toggleCustom = () => {
+    if (showCustom) {
+      // Deselect: remove custom value from answers
+      setShowCustom(false);
+      setCustomText("");
+      onAnswer(slide.stateKey, fixedSelected);
+    } else {
+      setShowCustom(true);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  };
+
+  const handleCustomChange = (text: string) => {
+    setCustomText(text);
+    onAnswer(slide.stateKey, text.trim() ? [...fixedSelected, text.trim()] : fixedSelected);
   };
 
   return (
@@ -165,17 +252,40 @@ export function MultiQuestion({ slide, answers, onAnswer, onNext, onBack }: Mult
           <button
             key={option}
             type="button"
-            className={`${styles.option} ${selected.includes(option) ? styles.optionSelected : ""}`}
+            className={`${styles.option} ${fixedSelected.includes(option) ? styles.optionSelected : ""}`}
             onClick={() => toggle(option)}
           >
             {option}
-            <span className={`${styles.optionCheck} ${selected.includes(option) ? styles.optionCheckActive : ""}`} aria-hidden="true" />
+            <span className={`${styles.optionCheck} ${fixedSelected.includes(option) ? styles.optionCheckActive : ""}`} aria-hidden="true" />
           </button>
         ))}
+        {slide.allowCustom && (
+          <button
+            type="button"
+            className={`${styles.option} ${showCustom ? styles.optionSelected : ""}`}
+            onClick={toggleCustom}
+          >
+            Other — write yours
+            <span className={`${styles.optionCheck} ${showCustom ? styles.optionCheckActive : ""}`} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
+      {showCustom && (
+        <div className={styles.customInputWrap}>
+          <textarea
+            ref={inputRef}
+            className={styles.customInput}
+            placeholder="Describe the image you want to project…"
+            value={customText}
+            rows={3}
+            onChange={(e) => handleCustomChange(e.target.value)}
+          />
+        </div>
+      )}
+
       <p className={styles.multiCounter}>
-        <strong>{selected.length}</strong> selected · pick at least 1
+        <strong>{totalCount}</strong> selected · pick at least 1
       </p>
 
       {slide.whyWeAsk && (

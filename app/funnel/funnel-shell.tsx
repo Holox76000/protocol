@@ -24,6 +24,7 @@ const YesLadderSlide   = dynamic(() => import("./slides/YesLadderSlide").then(m 
 const FinalLoadingSlide = dynamic(() => import("./slides/FinalLoadingSlide").then(m => ({ default: m.FinalLoadingSlide })));
 const ProtocolReadySlide = dynamic(() => import("./slides/ProtocolReadySlide").then(m => ({ default: m.ProtocolReadySlide })));
 const PhotoUploadSlide = dynamic(() => import("./slides/PhotoUploadSlide").then(m => ({ default: m.PhotoUploadSlide })));
+const MultiPhotoUploadSlide = dynamic(() => import("./slides/MultiPhotoUploadSlide").then(m => ({ default: m.MultiPhotoUploadSlide })));
 import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
@@ -292,15 +293,29 @@ function renderSlide(
         />
       );
 
-    case "photo-upload":
+    case "photo-upload": {
+      const photoSlide = slide as import("./funnel-config").PhotoUploadSlide;
+      if (photoSlide.photoTypes && photoSlide.photoTypes.length > 1) {
+        return (
+          <MultiPhotoUploadSlide
+            photoTypes={photoSlide.photoTypes}
+            answers={answers}
+            onAnswer={onAnswer}
+            onNext={onNext}
+            onBack={onBack}
+          />
+        );
+      }
       return (
         <PhotoUploadSlide
           answers={answers}
           onAnswer={onAnswer}
           onNext={onNext}
           onBack={onBack}
+          photoType={photoSlide.photoType}
         />
       );
+    }
 
     case "protocol-ready":
       return (

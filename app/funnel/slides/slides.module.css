@@ -79,6 +79,108 @@
   gap: 10px;
 }
 
+/* ─── Multi-photo upload grid ────────────────────────────── */
+.multiPhotoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.multiPhotoSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.multiPhotoZone {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 1.5px dashed var(--q-border-h);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--q-text);
+  transition: border-color 140ms, background 140ms;
+  overflow: hidden;
+  position: relative;
+}
+
+.multiPhotoZone:hover {
+  border-color: var(--q-accent);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.multiPhotoZoneDone {
+  border-style: solid;
+  border-color: var(--q-accent);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.multiPhotoZoneError {
+  border-color: #e05c5c;
+}
+
+.multiPhotoThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.multiPhotoCheck {
+  font-size: 22px;
+  color: var(--q-accent);
+}
+
+.multiPhotoLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--q-strong);
+  margin: 0;
+  text-align: center;
+}
+
+.multiPhotoHint {
+  font-size: 11px;
+  color: var(--q-text);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ─── Custom text input (allowCustom) ───────────────────── */
+.customInputWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.customInput {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid rgba(49, 68, 58, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--q-strong);
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  transition: border-color 140ms ease;
+  box-sizing: border-box;
+}
+
+.customInput:focus {
+  border-color: var(--q-accent);
+}
+
 .option {
   display: flex;
   align-items: center;

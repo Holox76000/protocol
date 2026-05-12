@@ -9,11 +9,14 @@ import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../../lib/ut
 import "../f1.css";
 import "./f1-offer.css";
 import "../../program/program.css";
+import "../../home/home.css";
 import CompleteFacialAnalysisSection from "../../program/CompleteFacialAnalysisSection";
 import PersonalizedSection from "../../program/PersonalizedSection";
 import InformativeSection from "../../program/InformativeSection";
 import AestheticTestsSection from "../../program/AestheticTestsSection";
 import ProtocolSection from "../../program/ProtocolSection";
+import ProjectionSection from "../../home/ProjectionSection";
+import { ACTIVE_VARIANT } from "../../../lib/variant";
 
 /* ─── Funnel eyebrow maps ────────────────────────────────────────────────── */
 
@@ -149,22 +152,28 @@ const STEPS = [
   {
     num: "01",
     time: "60 SEC",
-    title: "Upload three photos",
-    desc: "Front, side, back. 60 seconds, stays private. We pull 100+ markers.",
+    title: ACTIVE_VARIANT === "projection" ? "See your full potential" : "Upload three photos",
+    desc: ACTIVE_VARIANT === "projection"
+      ? "You define what image you want to project to others and you preview it."
+      : "Front, side, back. 60 seconds, stays private. We pull 100+ markers.",
     img: "/assets/body-fat-analysis.png",
   },
   {
     num: "02",
     time: "48H",
-    title: "We analyse",
-    desc: "AI benchmarks your ratios against the research, then your coach reviews the output and writes the protocol.",
+    title: ACTIVE_VARIANT === "projection" ? "We analyse your projection" : "We analyse",
+    desc: ACTIVE_VARIANT === "projection"
+      ? "Our team of aesthetic experts analyses your target projection and your physical profile to design the exact protocol that closes the gap."
+      : "AI benchmarks your ratios against the research, then your coach reviews the output and writes the protocol.",
     img: "/assets/analysis-card.png",
   },
   {
     num: "03",
     time: "12 WEEKS",
-    title: "Get your protocol",
-    desc: "A personalised 12-week Protocol built to move your weakest variables.",
+    title: ACTIVE_VARIANT === "projection" ? "Reach your full potential" : "Get your protocol",
+    desc: ACTIVE_VARIANT === "projection"
+      ? "You follow your protocol week by week and watch your transformation target become reality."
+      : "A personalised 12-week Protocol built to move your weakest variables.",
     img: "/assets/connor-protocol.png",
   },
 ];
@@ -345,10 +354,7 @@ function MNav({ href }: { href: string }) {
       <div className="mo-nav__brand">Protocol <em>Club</em></div>
       <div className="mo-nav__links">
         <a href="#mo-method">Method</a>
-        <a href="#mo-results">Results</a>
-        <a href="#mo-science">Science</a>
         <a href="#mo-pricing">Pricing</a>
-        <a href="#">Journal</a>
       </div>
       <a href={href} className="mo-nav__cta">Start — $89</a>
     </nav>
@@ -374,12 +380,18 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
           {eyebrow && <p className="mo-hero__eyebrow">{eyebrow}</p>}
-          <h1 className="mo-hero__title">Reach your full <em>attractiveness potential</em></h1>
+          <h1 className="mo-hero__title">
+            {ACTIVE_VARIANT === "projection"
+              ? <>See yourself at your full <em>peak potential</em> and reach it.</>
+              : <>Reach your full <em>attractiveness potential</em></>}
+          </h1>
           <p className="mo-hero__desc">
-            A 12-week protocol built around the published research on what the eye reads as attractive.
+            {ACTIVE_VARIANT === "projection"
+              ? "See your full potential, then get the exact protocol to reach it."
+              : "A 12-week protocol built around the published research on what the eye reads as attractive."}
           </p>
           <div className="mo-hero__ctas">
-            <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero" href={href} />
+            <CtaButton label="See my potential" className="mo-cta--hero" location="hero" href={href} />
             <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
           </div>
           <div className="mo-hero__meta">
@@ -418,7 +430,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
 
       {/* Mobile-only: CTA strip BELOW the image */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero-mobile" href={href} />
+        <CtaButton label="See my potential" className="mo-cta--hero" location="hero-mobile" href={href} />
         <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
         <div className="mo-hero__meta">
           <span>12 weeks</span>
@@ -535,7 +547,7 @@ function MResults({ href }: { href: string }) {
           <a href="#mo-results" className="mo-results-foot__link">See all 200+ →</a>
         </div>
         <div className="mo-section-cta">
-          <CtaButton label="Start your Protocol — $89" location="results" href={href} />
+          <CtaButton label="See my potential" location="results" href={href} />
         </div>
       </div>
     </section>
@@ -714,7 +726,7 @@ function MPricing({ href }: { href: string }) {
             ))}
           </ul>
           <a href={href} className="mo-pricing-card__cta">
-            Start your Protocol — $89 <ArrowIcon />
+            See my potential <ArrowIcon />
           </a>
           <div className="mo-pricing-card__guarantee">90-day measurable-outcome guarantee</div>
         </div>
@@ -826,7 +838,7 @@ function MSticky({ href, visible }: { href: string; visible: boolean }) {
           <strong>The full Protocol</strong>
           <span>one-time · $89</span>
         </div>
-        <span className="mo-sticky__desktop-btn">Start your Protocol — $89 <ArrowIcon size={14} /></span>
+        <span className="mo-sticky__desktop-btn">See my potential <ArrowIcon size={14} /></span>
       </a>
     </div>
   );
@@ -996,6 +1008,7 @@ export default function F1OfferPage() {
       <MNav href={signupHref} />
       <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
       <MPress />
+      {ACTIVE_VARIANT === "projection" && <ProjectionSection signupHref={signupHref} />}
       {preview.status === "done" && (
         <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
       )}

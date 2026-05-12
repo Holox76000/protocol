@@ -4,6 +4,8 @@
 // + 1 Final Loading = 27 total (loading counted in Section 7)
 // ─────────────────────────────────────────────────────────
 
+import { ACTIVE_VARIANT } from "../../lib/variant";
+
 export type Answers = Record<string, string | string[] | number>;
 
 export type SlideType =
@@ -33,6 +35,7 @@ export type SingleSlide = {
   options: string[];
   images?: string[] | ((answers: Answers) => string[]);
   whyWeAsk?: string;
+  allowCustom?: boolean;
 };
 
 export type MultiSlide = {
@@ -47,6 +50,7 @@ export type MultiSlide = {
   options: string[];
   images?: string[];
   whyWeAsk?: string;
+  allowCustom?: boolean;
 };
 
 export type NumericHeightSlide = {
@@ -132,6 +136,8 @@ export type ProtocolReadySlide = {
 export type PhotoUploadSlide = {
   id: string;
   type: "photo-upload";
+  photoType?: "body" | "face" | "profile";
+  photoTypes?: ("body" | "face" | "profile")[];
 };
 
 export type SlideConfig =
@@ -194,9 +200,54 @@ function ethnicityImages(answers: Answers): string[] {
   ];
 }
 
+// ─── Projection variant slides ────────────────────────────
+
+const PROJECTION_IDENTITY_SLIDE: SlideConfig = {
+  id: "projection_identity",
+  type: "multi",
+  stateKey: "projection_identity",
+  section: 1,
+  sectionLabel: "Your Vision",
+  qNumber: 1,
+  question: "What image do you want to project after your transformation?",
+  subtext: "Choose as many as apply.",
+  options: [
+    "A man who commands respect",
+    "Someone who takes care of himself",
+    "A man who attracts attention",
+    "A high-performer others notice",
+    "An athlete's build",
+  ],
+  allowCustom: true,
+};
+
+const PROJECTION_CONTEXT_SLIDE: SlideConfig = {
+  id: "projection_context",
+  type: "single",
+  stateKey: "projection_context",
+  section: 1,
+  sectionLabel: "Your Vision",
+  qNumber: 2,
+  question: "Where does this change matter most to you?",
+  options: [
+    "Professional / Career",
+    "Social / Relationships",
+    "Dating / Romantic life",
+    "Personal confidence",
+    "Everywhere",
+  ],
+  allowCustom: true,
+};
+
+const COMBINED_PHOTO_SLIDE: SlideConfig = {
+  id: "photo-upload",
+  type: "photo-upload",
+  photoTypes: ["body", "face", "profile"],
+};
+
 // ─── SLIDE SEQUENCE ───────────────────────────────────────
 
-export const SLIDES: SlideConfig[] = [
+const BASE_SLIDES: SlideConfig[] = [
   // ── INTRO ─────────────────────────────────────────────
   {
     id: "intro",
@@ -480,6 +531,27 @@ export const SLIDES: SlideConfig[] = [
     type: "protocol-ready",
   },
 ];
+
+// ─── Computed slide sequence (variant-aware) ──────────────
+
+function buildSlides(): SlideConfig[] {
+  if (ACTIVE_VARIANT !== "projection") return BASE_SLIDES;
+
+  // Insert projection questions after intro
+  const withProjection: SlideConfig[] = [
+    BASE_SLIDES[0],
+    PROJECTION_IDENTITY_SLIDE,
+    PROJECTION_CONTEXT_SLIDE,
+    ...BASE_SLIDES.slice(1),
+  ];
+
+  // Replace the single body photo slide with the combined 3-photo slide
+  return withProjection.map((s) =>
+    s.id === "photo-upload" ? COMBINED_PHOTO_SLIDE : s
+  );
+}
+
+export const SLIDES: SlideConfig[] = buildSlides();
 
 // ─── Helpers ──────────────────────────────────────────────
 

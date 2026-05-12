@@ -5,11 +5,13 @@ import AestheticTestsSection from "../program/AestheticTestsSection";
 import CompleteFacialAnalysisSection from "../program/CompleteFacialAnalysisSection";
 import PersonalizedSection from "../program/PersonalizedSection";
 import InformativeSection from "../program/InformativeSection";
+import ProjectionSection from "./ProjectionSection";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, appendUtmToPath } from "../../lib/utm";
+import { ACTIVE_VARIANT } from "../../lib/variant";
 import TrackedLink from "../tracked-link";
 import "../program/program.css";
 import "../f1/f1.css";
@@ -188,9 +190,11 @@ const INSIDE_RIGHT = [
     desc: "Long-form intake covering your body, lifestyle, and objectives.",
   },
   {
-    label: "BEFORE/AFTER SIMULATION",
-    title: "See your potential result",
-    desc: "Visual projection of your progress at 6 weeks and 12 weeks.",
+    label: ACTIVE_VARIANT === "projection" ? "PROJECTION-CALIBRATED PREVIEW" : "BEFORE/AFTER SIMULATION",
+    title: ACTIVE_VARIANT === "projection" ? "A simulation tailored to the image you want to project" : "See your potential result",
+    desc: ACTIVE_VARIANT === "projection"
+      ? "Not just a body transformation — a preview calibrated to your target social image."
+      : "Visual projection of your progress at 6 weeks and 12 weeks.",
   },
   {
     label: "WHATSAPP COACHING",
@@ -476,6 +480,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ═══ PROJECTION (variant) ═══ */}
+      {ACTIVE_VARIANT === "projection" && (
+        <ProjectionSection signupHref={signupHref} />
+      )}
+
       {/* ═══ HOW IT WORKS ═══ */}
       <section className="program-advice" aria-labelledby="offer-advice-title" style={{ borderTop: "none" }}>
         <div className="program-advice__inner">
@@ -489,7 +498,7 @@ export default function HomePage() {
           <div className="program-advice__steps-shell">
             <div className="program-advice__steps">
               {[
-                { number: "01 /", title: "Upload your photo and answer" },
+                { number: "01 /", title: ACTIVE_VARIANT === "projection" ? "Define the image you want to project" : "Upload your photo and answer" },
                 { number: "02 /", title: "Your protocol lands" },
                 { number: "03 /", title: "You execute. We track." },
                 { number: "04 /", title: "Track your progress and\nsee dramatic results" },
