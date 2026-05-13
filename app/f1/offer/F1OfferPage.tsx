@@ -407,7 +407,11 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
       {/* Mobile-only: title + desc ABOVE the image */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
         {eyebrow && <p className="mo-hero__eyebrow">{eyebrow}</p>}
-        <h1 className="mo-hero__title">Reach your full <em>attractiveness potential</em></h1>
+        <h1 className="mo-hero__title">
+            {ACTIVE_VARIANT === "projection"
+              ? <>See yourself at your full <em>peak potential</em> and reach it.</>
+              : <>Reach your full <em>attractiveness potential</em></>}
+          </h1>
         <p className="mo-hero__desc">
           A 12-week protocol built around the published research on what the eye reads as attractive.
         </p>
