@@ -413,7 +413,9 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
               : <>Reach your full <em>attractiveness potential</em></>}
           </h1>
         <p className="mo-hero__desc">
-          A 12-week protocol built around the published research on what the eye reads as attractive.
+          {ACTIVE_VARIANT === "projection"
+            ? "See your full potential, then get the exact protocol to reach it."
+            : "A 12-week protocol built around the published research on what the eye reads as attractive."}
         </p>
       </div>
 
