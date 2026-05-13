@@ -23,7 +23,7 @@ export default function ProjectionSection({ signupHref }: Props) {
         </div>
 
         <a href={signupHref} className="projection-section__cta">
-          Define my projection →
+          Define my projection — $89 →
         </a>
       </div>
     </section>

@@ -356,7 +356,7 @@ function MNav({ href }: { href: string }) {
         <a href="#mo-method">Method</a>
         <a href="#mo-pricing">Pricing</a>
       </div>
-      <a href={href} className="mo-nav__cta">Start — $89</a>
+      <a href={href} className="mo-nav__cta">See my potential — $89</a>
     </nav>
   );
 }
@@ -836,7 +836,7 @@ function MSticky({ href, visible }: { href: string; visible: boolean }) {
       {/* Mobile version: full bar */}
       <div className="mo-sticky__mobile">
         <div className="mo-sticky__text">Get your full Protocol</div>
-        <a href={href} className="mo-sticky__btn">Start — $89 <ArrowIcon size={12} /></a>
+        <a href={href} className="mo-sticky__btn">See my potential — $89 <ArrowIcon size={12} /></a>
       </div>
       {/* Desktop version: pill */}
       <a href={href} className="mo-sticky__desktop">
