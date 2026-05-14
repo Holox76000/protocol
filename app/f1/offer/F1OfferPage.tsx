@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
 import { trackEvent } from "../../../lib/analytics";
@@ -361,19 +360,7 @@ function MNav({ href }: { href: string }) {
   );
 }
 
-const WISTIA_VIDEO_ID = "iw5y8ab8qj";
-
 function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
-  const [muted, setMuted] = useState(true);
-
-  const enableSound = () => {
-    const player = document.querySelector("wistia-player") as HTMLElement & { unmute?: () => void; muted?: boolean };
-    if (!player) return;
-    if (typeof player.unmute === "function") player.unmute();
-    else player.muted = false;
-    setMuted(false);
-  };
-
   return (
     <section className="mo-hero mo-hero-v1">
       {/* Left column: copy (desktop only) */}
@@ -419,17 +406,28 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
         </p>
       </div>
 
-      {/* Right column: VSL Wistia player */}
+      {/* Right column: dark panel with product image */}
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
-          <div className="mo-hero-v1__wistia">
-            <wistia-player
-              media-id={WISTIA_VIDEO_ID}
-              aspect="1.7777777777777777"
-              autoplay="true"
-              muted-autoplay="always"
-              end-video-behavior="loop"
-            />
+          <Image
+            className="mo-hero-v1__product"
+            src="/assets/connor-protocol.png"
+            alt="Connor's Protocol"
+            width={460}
+            height={345}
+            priority
+          />
+          {/* Attractiveness score card — white, bottom-right */}
+          <div className="mo-hero-v1__fc mo-hero-v1__fc--ratio">
+            <div className="mo-fc-label">Attractiveness</div>
+            <div className="mo-fc-val">54 <em>→</em> 77</div>
+            <div className="mo-fc-delta">+23</div>
+          </div>
+          {/* Score card — dark, top-left */}
+          <div className="mo-hero-v1__fc mo-hero-v1__fc--score">
+            <div className="mo-sc-label">Torso Index</div>
+            <div className="mo-sc-val">5.1</div>
+            <div className="mo-sc-bar"><i /></div>
           </div>
         </div>
       </div>
@@ -444,15 +442,6 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
           <span>· 90-day guarantee</span>
         </div>
       </div>
-
-      {/* Mobile sticky sound bar */}
-      {muted && (
-        <div className="mo-vsl-sound-bar" onClick={enableSound}>
-          <span className="mo-vsl-sound-bar__icon">🔇</span>
-          <span className="mo-vsl-sound-bar__label">Tap for sound</span>
-          <span className="mo-vsl-sound-bar__cta">Unmute →</span>
-        </div>
-      )}
     </section>
   );
 }
@@ -1009,8 +998,6 @@ export default function F1OfferPage() {
 
   return (
     <div className="mo-page">
-      <Script src="https://fast.wistia.com/player.js" strategy="afterInteractive" />
-      <Script src={`https://fast.wistia.com/embed/${WISTIA_VIDEO_ID}.js`} strategy="afterInteractive" type="module" />
       <MNav href={signupHref} />
       <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
       <MPress />
