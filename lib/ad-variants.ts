@@ -216,6 +216,42 @@ const BODY_POTENTIAL: AdVariant = {
   cta: "See my ceiling →",
 };
 
+// "4 steps to improve your attractiveness" — not strength, not endurance, attractiveness is the variable that changes how people treat you
+const FOUR_STEPS_ATTRACTIVENESS: AdVariant = {
+  badge: "Attractiveness Protocol",
+  headline: "4 steps to improve your attractiveness — not your strength, not your endurance.",
+  subtext:
+    "Attractiveness is the one variable that changes how people treat you. Most men have never trained for it. This assessment tells you exactly where you stand on each of the 4 steps.",
+  cta: "See my 4 steps →",
+};
+
+// "Same age. Same clothes. He gets the attention. You don't." — social comparison bar scene, "not charm, not luck, something no one talks about"
+const SAME_ROOM_HE_WINS: AdVariant = {
+  badge: "Social Presence Analysis",
+  headline: "Same age. Same clothes. He gets the attention. You don't. Here's why.",
+  subtext:
+    "It's not charm. It's not luck. We eliminated every obvious answer. There's one variable that explains it — and it shows up before you speak. This assessment measures it.",
+  cta: "Find out what he has →",
+};
+
+// "3 things holding you back & you can't name them" — effort frustration, "it's not discipline, it's 3 things you've never been told to look at"
+const THREE_THINGS_HOLDING_BACK: AdVariant = {
+  badge: "Blind Spot Analysis",
+  headline: "3 things are holding you back. You've been putting in the work. None of them are effort.",
+  subtext:
+    "Training, eating well, staying consistent — and something still isn't clicking. It's not discipline. It's 3 specific variables you've never been told to look at. This assessment names them.",
+  cta: "Name my 3 blind spots →",
+};
+
+// "What makes a man's body attractive?" — research credibility, "Not strong. Not lean. Not big. Attractive."
+const WHAT_MAKES_ATTRACTIVE: AdVariant = {
+  badge: "Attractiveness Research",
+  headline: "What actually makes a man's body attractive? We studied 2,500 men to find out.",
+  subtext:
+    "Not strong. Not lean. Not big. Attractive is a specific formula — one we found after reading 25,000+ papers and measuring 2,500 men. This assessment tells you where you stand.",
+  cta: "See what makes me attractive →",
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
@@ -303,6 +339,18 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
   "120242906468380660": BODY_POTENTIAL,
 
   // "I found an AI tool..." video — falls back to DEFAULT (no variant added)
+
+  // 4 steps to improve your attractiveness (not strength, not endurance)
+  "120246733435030660": FOUR_STEPS_ATTRACTIVENESS,
+
+  // Same age. Same clothes. He gets the attention. You don't. (bar social comparison)
+  "120246741549040660": SAME_ROOM_HE_WINS,
+
+  // 3 things holding you back & you can't name them (effort frustration)
+  "120246744002840660": THREE_THINGS_HOLDING_BACK,
+
+  // What makes a man's body attractive? (research credibility)
+  "120246744499120660": WHAT_MAKES_ATTRACTIVE,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
