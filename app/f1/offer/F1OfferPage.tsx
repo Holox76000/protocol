@@ -355,7 +355,7 @@ function MNav({ href }: { href: string }) {
         <a href="#mo-method">Method</a>
         <a href="#mo-pricing">Pricing</a>
       </div>
-      <a href={href} className="mo-nav__cta">See my potential — $89</a>
+      <a href={href} className="mo-nav__cta">Start your Protocol — $89</a>
     </nav>
   );
 }
@@ -378,7 +378,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
               : "A 12-week protocol built around the published research on what the eye reads as attractive."}
           </p>
           <div className="mo-hero__ctas">
-            <CtaButton label="See my potential — $89" className="mo-cta--hero" location="hero" href={href} />
+            <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero" href={href} />
             <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
           </div>
           <div className="mo-hero__meta">
@@ -434,7 +434,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
 
       {/* Mobile-only: CTA strip BELOW the image */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CtaButton label="See my potential — $89" className="mo-cta--hero" location="hero-mobile" href={href} />
+        <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero-mobile" href={href} />
         <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
         <div className="mo-hero__meta">
           <span>12 weeks</span>
@@ -542,7 +542,7 @@ function MResults({ href }: { href: string }) {
           <a href="#mo-results" className="mo-results-foot__link">See all 200+ →</a>
         </div>
         <div className="mo-section-cta">
-          <CtaButton label="See my potential — $89" location="results" href={href} />
+          <CtaButton label="Start your Protocol — $89" location="results" href={href} />
         </div>
       </div>
     </section>
@@ -721,7 +721,7 @@ function MPricing({ href }: { href: string }) {
             ))}
           </ul>
           <a href={href} className="mo-pricing-card__cta">
-            See my potential — $89 <ArrowIcon />
+            Start your Protocol — $89 <ArrowIcon />
           </a>
           <div className="mo-pricing-card__guarantee">90-day measurable-outcome guarantee</div>
         </div>
@@ -825,7 +825,7 @@ function MSticky({ href, visible }: { href: string; visible: boolean }) {
       {/* Mobile version: full bar */}
       <div className="mo-sticky__mobile">
         <div className="mo-sticky__text">Get your full Protocol</div>
-        <a href={href} className="mo-sticky__btn">See my potential — $89 <ArrowIcon size={12} /></a>
+        <a href={href} className="mo-sticky__btn">Start your Protocol — $89 <ArrowIcon size={12} /></a>
       </div>
       {/* Desktop version: pill */}
       <a href={href} className="mo-sticky__desktop">
@@ -833,7 +833,7 @@ function MSticky({ href, visible }: { href: string; visible: boolean }) {
           <strong>The full Protocol</strong>
           <span>one-time · $89</span>
         </div>
-        <span className="mo-sticky__desktop-btn">See my potential — $89 <ArrowIcon size={14} /></span>
+        <span className="mo-sticky__desktop-btn">Start your Protocol — $89 <ArrowIcon size={14} /></span>
       </a>
     </div>
   );
