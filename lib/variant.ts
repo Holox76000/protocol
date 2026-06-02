@@ -4,4 +4,4 @@
 
 export type Variant = "default" | "projection";
 
-export const ACTIVE_VARIANT: Variant = "projection";
+export const ACTIVE_VARIANT: Variant = "default";
