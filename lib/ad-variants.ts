@@ -243,6 +243,15 @@ const THREE_THINGS_HOLDING_BACK: AdVariant = {
   cta: "Name my 3 blind spots →",
 };
 
+// "You don't look like you lift" — 3 reasons: strength ≠ shape, gym is a guess, wrong variables
+const DONT_LOOK_LIKE_YOU_LIFT: AdVariant = {
+  badge: "Why You Don't Look Like You Lift",
+  headline: "You train. Nothing shows. Here's which of the 3 reasons explains it.",
+  subtext:
+    "Strength ≠ shape. Every hour in the gym without the right targets is a guess. A 3-minute assessment measures the variables that actually control how your body looks — and tells you exactly which one to fix first.",
+  cta: "Find my reason →",
+};
+
 // "What makes a man's body attractive?" — research credibility, "Not strong. Not lean. Not big. Attractive."
 const WHAT_MAKES_ATTRACTIVE: AdVariant = {
   badge: "Attractiveness Research",
@@ -351,6 +360,9 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
 
   // What makes a man's body attractive? (research credibility)
   "120246744499120660": WHAT_MAKES_ATTRACTIVE,
+
+  // "You don't look like you lift" — 3 reasons why (strength ≠ shape, gym is a guess)
+  "287082345723543": DONT_LOOK_LIKE_YOU_LIFT,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
