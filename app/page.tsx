@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HomePage from "./home/HomePage";
+import F1OfferPage from "./f1/offer/F1OfferPage";
 
 export const metadata: Metadata = {
   title: "Protocol Club - Start your body glow up",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomeRoute() {
-  return <HomePage />;
+  return <F1OfferPage />;
 }
