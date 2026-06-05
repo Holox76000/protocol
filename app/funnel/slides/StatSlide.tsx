@@ -38,7 +38,7 @@ export function StatSlide({ slide, answers, onNext, onBack }: Props) {
 
       <div className={styles.actionsFull}>
         <button type="button" className={styles.btnPrimary} onClick={onNext}>
-          I see myself in this →
+          Continue →
         </button>
       </div>
     </div>

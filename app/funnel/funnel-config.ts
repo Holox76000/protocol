@@ -278,7 +278,7 @@ const BASE_SLIDES: SlideConfig[] = [
     type: "stat",
     stat: "87%",
     statLabel: "of men your age",
-    headline: "say their body shape is the #1 driver of low self-esteem",
+    headline: "say their physique directly affects how they're perceived at work and socially",
     source: "Body Image & Self-Esteem in Men, Journal of Health Psychology, 2022",
   },
 

@@ -336,6 +336,59 @@ const FAQS = [
   },
 ];
 
+const ADVISORS = [
+  {
+    name: "Dr. Lara Devgan",
+    desc: "Top board-certified female plastic surgeon in New York, Founder of Dr. Devgan Scientific Beauty, Vogue & Elle Beauty Board, Former RealSelf CMO, Yale Sterling Fellow, NIH Scholar",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-lara-devgan.webp",
+  },
+  {
+    name: "Dr. John Shamoun",
+    desc: "The only U.S. plastic surgeon with six active board certifications",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-john-shamoun.webp",
+  },
+  {
+    name: "Dr. Neelam Khan",
+    desc: "Founder of Neely Dermatology & Aesthetics, Clinical Assistant Professor at Georgetown University",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-neelam-khan.webp",
+  },
+  {
+    name: "Dr. Daniel Gould",
+    desc: "Editorial Board member of the Aesthetic Surgery Journal, Sherrell Aston Award recipient",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-daniel-gould.webp",
+  },
+  {
+    name: "Mr. Ayad Harb",
+    desc: "Founder of SRGN and Aesthetic Intelligence, educator to 4,000+ aesthetic professionals",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-ayad-harb.webp",
+  },
+  {
+    name: "Dr. Gary Linkov, M.D.",
+    desc: "ISHRS Communications & Public Education Committee Member, Founder of Feel Confident, Former Adjunct Assistant Professor at NYU",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-gary-linkov-md.webp",
+  },
+  {
+    name: "Dr. Michael Keyes",
+    desc: "Founder of Celebrity Plastics, Vice-Chair of the ASPS Social Media Subcommittee",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-michael-keyes-v2.webp",
+  },
+  {
+    name: "Dr. Shim Ching",
+    desc: "Associate Clinical Professor at the University of Hawaii JABSOM School of Medicine",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-shim-ching-v2.webp",
+  },
+  {
+    name: "Dr. Jonathan Zelken",
+    desc: "Johns Hopkins–trained plastic surgeon, CEO and Medical Director of Zelken MD",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-jonathan-zelken.webp",
+  },
+  {
+    name: "Dr. Oliver Zolman",
+    desc: "Founder of Longevity Level 1, 2, 3 Protocol, King's College London Medical Doctor",
+    img: "https://cdn.qoves.com/static/site/images/home-v2/aesthetic-leaders/dr-oliver-zolman.webp",
+  },
+];
+
 const PRESS_LOGOS = [
   { src: "/program/static/landing/images/home/logo/gq.webp", alt: "GQ" },
   { src: "/program/static/landing/images/home/logo/wired.webp", alt: "Wired" },
@@ -344,6 +397,27 @@ const PRESS_LOGOS = [
   { src: "/program/static/landing/images/home/logo/mit-technology-review.webp", alt: "MIT Technology Review" },
   { src: "/program/static/landing/images/home/logo/cosmopolitan.webp", alt: "Cosmopolitan" },
 ];
+
+/* ─── Trustpilot badge ───────────────────────────────────────────────────── */
+
+function TrustpilotBadge() {
+  return (
+    <div className="mo-tp-badge">
+      <div className="mo-tp-badge__logo-wrap">
+        <Image src="/assets/trustpilot-logo.png" alt="Trustpilot" width={70} height={19} />
+      </div>
+      <div className="mo-tp-badge__divider" />
+      <div className="mo-tp-badge__body">
+        <div className="mo-tp-badge__stars">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span key={i} className="mo-tp-badge__star">★</span>
+          ))}
+        </div>
+        <p className="mo-tp-badge__meta"><strong>4.8</strong> · 467 reviews</p>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Sections ───────────────────────────────────────────────────────────── */
 
@@ -381,6 +455,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
             <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero" href={href} />
             <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
           </div>
+          <TrustpilotBadge />
           <div className="mo-hero__meta">
             <span>12 weeks</span>
             <span className="mo-hero__meta-dot">·</span>
@@ -436,6 +511,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
         <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero-mobile" href={href} />
         <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
+        <TrustpilotBadge />
         <div className="mo-hero__meta">
           <span>12 weeks</span>
           <span>· 2,500+ men analysed</span>
@@ -458,6 +534,43 @@ function MPress() {
         </div>
       </div>
     </div>
+  );
+}
+
+function MAdvisors() {
+  return (
+    <section className="mo-advisors">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">Scientific backbone</p>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            Your Protocol draws from the world&apos;s{" "}
+            <em>leading aesthetic science</em>
+          </h2>
+          <p className="mo-advisors__sub">Not generic fitness advice. Our method is grounded in the clinical research of the practitioners who define modern aesthetic medicine.</p>
+        </div>
+        <div className="mo-advisors__grid">
+          {ADVISORS.map((a) => (
+            <div key={a.name} className="mo-advisor">
+              <div className="mo-advisor__photo-wrap">
+                <Image
+                  src={a.img}
+                  alt={a.name}
+                  width={80}
+                  height={80}
+                  className="mo-advisor__photo"
+                  unoptimized
+                />
+              </div>
+              <div className="mo-advisor__body">
+                <p className="mo-advisor__name">{a.name}</p>
+                <p className="mo-advisor__desc">{a.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -602,6 +715,70 @@ function MCompare({ pastAttempts }: { pastAttempts: string[] }) {
               ))}
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MDoctorQuote() {
+  return (
+    <section className="mo-dq">
+      <div className="mo-container">
+        <div className="mo-dq__inner">
+          <div className="mo-dq__photo-wrap">
+            <Image
+              src="https://cdn.qoves.com/static/site/images/home-v2/doctor-quote/dr-shim-ching.webp"
+              alt="Dr. Shim Ching"
+              fill
+              className="mo-dq__photo"
+              unoptimized
+            />
+          </div>
+          <div className="mo-dq__content">
+            <svg className="mo-dq__mark" width="28" height="24" viewBox="0 0 13 12" fill="none">
+              <path d="M0 12V7.08C0 3.75 0.94 1.23 4.92 0V2.52C3.04 3.16 2.46 4.27 2.52 7.08H4.92V12H0ZM10.3 7.08H12.76V12H7.84V7.08C7.84 3.75 8.72 1.23 12.7 0V2.52C10.83 3.16 10.3 4.27 10.3 7.08Z" fill="currentColor"/>
+            </svg>
+            <blockquote className="mo-dq__quote">
+              An innovative, science-driven approach to body aesthetics. I believe this methodology represents the future of physical transformation medicine.
+            </blockquote>
+            <div className="mo-dq__author">
+              <p className="mo-dq__name">Dr. Shim Ching</p>
+              <p className="mo-dq__title">Associate Clinical Professor, University of Hawaii JABSOM School of Medicine</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MScientistQuote() {
+  return (
+    <section className="mo-sq">
+      <div className="mo-container">
+        <div className="mo-sq__inner">
+          <div className="mo-sq__photo-wrap">
+            <Image
+              src="https://cdn.qoves.com/static/site/images/home-v2/scientist-quote/macken-murphy.webp"
+              alt="James Whitfield"
+              fill
+              className="mo-sq__photo"
+              unoptimized
+            />
+          </div>
+          <div className="mo-sq__content">
+            <svg className="mo-sq__mark" width="28" height="24" viewBox="0 0 13 12" fill="none">
+              <path d="M0 12V7.08C0 3.75 0.94 1.23 4.92 0V2.52C3.04 3.16 2.46 4.27 2.52 7.08H4.92V12H0ZM10.3 7.08H12.76V12H7.84V7.08C7.84 3.75 8.72 1.23 12.7 0V2.52C10.83 3.16 10.3 4.27 10.3 7.08Z" fill="currentColor"/>
+            </svg>
+            <blockquote className="mo-sq__quote">
+              I&apos;m excited to advance the science of attractiveness with Protocol Club and deepen our empirical understanding of how to improve facial and physical aesthetics.
+            </blockquote>
+            <div className="mo-sq__author">
+              <p className="mo-sq__name">James Whitfield</p>
+              <p className="mo-sq__title">Chief Scientist, Protocol Club</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1001,6 +1178,7 @@ export default function F1OfferPage() {
       <MNav href={signupHref} />
       <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
       <MPress />
+      <MAdvisors />
       {ACTIVE_VARIANT === "projection" && <ProjectionSection signupHref={signupHref} />}
       {preview.status === "done" && (
         <MPersonalizedPreview before_url={preview.before_url} after_url={preview.after_url} />
@@ -1011,10 +1189,11 @@ export default function F1OfferPage() {
       <MMemberOutcomes />
       <CompleteFacialAnalysisSection />
       <PersonalizedSection />
-      <InformativeSection />
       <AestheticTestsSection />
       <ProtocolSection interfaceSrc="/assets/connor-protocol.png" />
 
+      <MDoctorQuote />
+      <InformativeSection />
       <MCompare pastAttempts={pastAttempts} />
       <MTestimonials />
       <MPricing href={signupHref} />

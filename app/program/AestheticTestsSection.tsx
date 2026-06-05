@@ -162,7 +162,7 @@ const TEST_CATEGORIES = [
     ],
   },
   {
-    title: "Skin & Subcutaneous Fat",
+    title: "Subcutaneous Fat",
     image: "/assets/skin.png",
     tests: [
       "Skin tightness baseline",
