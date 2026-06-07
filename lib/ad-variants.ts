@@ -252,6 +252,24 @@ const DONT_LOOK_LIKE_YOU_LIFT: AdVariant = {
   cta: "Find my reason →",
 };
 
+// "The Research — Henry Cavill" — carousel: Cavill analyzed, not the biggest in Hollywood (Rock/Hemsworth bigger), but proportions beat muscle mass, pattern can be engineered
+const CAVILL_RESEARCH: AdVariant = {
+  badge: "The Research",
+  headline: "Henry Cavill isn't the biggest man in Hollywood. The Rock is bigger. Hemsworth is bigger. He just rates higher. Here's why.",
+  subtext:
+    "It's not muscle mass that drives the attractiveness rating — it's how everything lines up. Researchers mapped over 100 of these structural markers. Cavill's body hits most of them. That's a pattern. And patterns can be measured on yours.",
+  cta: "Measure my pattern →",
+};
+
+// "The Research — Michael B. Jordan" — carousel: MBJ analyzed with 100+ markers, not his face, 5/10 face rating, body carries the score, same markers on yours
+const MBJ_RESEARCH: AdVariant = {
+  badge: "The Research",
+  headline: "We ran Michael B. Jordan's body through 100+ attractiveness markers. We can run the same analysis on yours.",
+  subtext:
+    "It's not his face. It's not his muscle mass. It's a specific body structure that triggers attractiveness at a glance — and every man has the same markers. This assessment measures where yours stand.",
+  cta: "Run my analysis →",
+};
+
 // "What makes a man's body attractive?" — research credibility, "Not strong. Not lean. Not big. Attractive."
 const WHAT_MAKES_ATTRACTIVE: AdVariant = {
   badge: "Attractiveness Research",
@@ -363,6 +381,12 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
 
   // "You don't look like you lift" — 3 reasons why (strength ≠ shape, gym is a guess)
   "287082345723543": DONT_LOOK_LIKE_YOU_LIFT,
+
+  // "The Research — Michael B. Jordan" — carousel, 100+ markers, body carries the score
+  "120247400526060660": MBJ_RESEARCH,
+
+  // "The Research — Henry Cavill" — carousel, not muscle mass, it's how everything lines up
+  "120247400517590660": CAVILL_RESEARCH,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
