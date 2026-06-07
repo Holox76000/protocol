@@ -252,6 +252,15 @@ const DONT_LOOK_LIKE_YOU_LIFT: AdVariant = {
   cta: "Find my reason →",
 };
 
+// "The Research — Cristiano Ronaldo" — carousel: thousands of athletes equally fit, only he is one of the most attractive, face rates 6/10 alone, body elevates everything, 100+ markers none genetic
+const RONALDO_RESEARCH: AdVariant = {
+  badge: "The Research",
+  headline: "Thousands of athletes share Ronaldo's fitness level. None share his attractiveness rating. The difference isn't effort — it's structure.",
+  subtext:
+    "His face alone rates a 6/10. Cover his body and show only his face — the rating drops. The 100+ markers that drive his score aren't muscle mass. They're specific proportions that fitness alone doesn't change. And not one of them is genetic.",
+  cta: "Measure my markers →",
+};
+
 // "The Research — Henry Cavill" — carousel: Cavill analyzed, not the biggest in Hollywood (Rock/Hemsworth bigger), but proportions beat muscle mass, pattern can be engineered
 const CAVILL_RESEARCH: AdVariant = {
   badge: "The Research",
@@ -387,6 +396,9 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
 
   // "The Research — Henry Cavill" — carousel, not muscle mass, it's how everything lines up
   "120247400517590660": CAVILL_RESEARCH,
+
+  // "The Research — Cristiano Ronaldo" — carousel, thousands equally fit, only he is most attractive, structural markers
+  "120247400649040660": RONALDO_RESEARCH,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
