@@ -22,7 +22,7 @@ function buildRedirectUrl(answers: Answers, source?: string): string {
   if (sessionId && photoPath) {
     params.set("funnel_sid", sessionId);
   }
-  return `/f1/offer?${params.toString()}`;
+  return `/f1/vsl?${params.toString()}`;
 }
 
 const MORPHOLOGY_LABELS: Record<string, string> = {

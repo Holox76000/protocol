@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+wistia-player[media-id='iw5y8ab8qj']:not(:defined) {
+  background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/iw5y8ab8qj/swatch');
+  display: block;
+  filter: blur(5px);
+  padding-top: 56.25%;
+}
+
 :root {
   color-scheme: light;
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
