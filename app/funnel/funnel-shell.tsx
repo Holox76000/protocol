@@ -143,23 +143,26 @@ export default function FunnelShell() {
   };
 
   const handleOptIn = async (firstName: string, email: string) => {
+    const updatedAnswers = { ...answers, first_name: firstName, email };
     saveAnswer({ first_name: firstName, email });
-    const sessionId = answers._session_id as string | undefined;
-    const utmSource = answers._utm_source as string | undefined;
-    const utmCampaign = answers._utm_campaign as string | undefined;
-    const utmAd = answers._utm_ad as string | undefined;
-    const utmContent = answers._utm_content as string | undefined;
+
+    const quizAnswers: Record<string, string> = { first_name: firstName };
+    for (const [key, val] of Object.entries(updatedAnswers)) {
+      if (key.startsWith("_")) continue;
+      quizAnswers[key] = Array.isArray(val) ? val.join("|") : String(val);
+    }
+
     fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        answers: { first_name: firstName, session_id: sessionId ?? "" },
+        answers: quizAnswers,
         utm: {
-          utm_source: utmSource,
-          utm_campaign: utmCampaign,
-          utm_ad: utmAd,
-          utm_content: utmContent,
+          utm_source: answers._utm_source,
+          utm_campaign: answers._utm_campaign,
+          utm_ad: answers._utm_ad,
+          utm_content: answers._utm_content,
         },
         mode: "merge",
       }),
