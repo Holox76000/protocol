@@ -21,6 +21,7 @@ export type SlideType =
   | "promise"
   | "yes-ladder"
   | "final-loading"
+  | "optin"
   | "photo-upload";
 
 export type SingleSlide = {
@@ -123,6 +124,11 @@ export type FinalLoadingSlide = {
   type: "final-loading";
 };
 
+export type OptInSlide = {
+  id: string;
+  type: "optin";
+};
+
 export type IntroSlide = {
   id: string;
   type: "intro";
@@ -153,6 +159,7 @@ export type SlideConfig =
   | PromiseSlide
   | YesLadderSlide
   | FinalLoadingSlide
+  | OptInSlide
   | ProtocolReadySlide
   | PhotoUploadSlide;
 
@@ -524,6 +531,11 @@ const BASE_SLIDES: SlideConfig[] = [
   {
     id: "final-loading",
     type: "final-loading",
+  },
+
+  {
+    id: "optin",
+    type: "optin",
   },
 
   {

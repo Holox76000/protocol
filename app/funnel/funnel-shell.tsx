@@ -22,6 +22,7 @@ const SummarySlide     = dynamic(() => import("./slides/SummarySlide").then(m =>
 const PromiseSlide     = dynamic(() => import("./slides/PromiseSlide").then(m => ({ default: m.PromiseSlide })));
 const YesLadderSlide   = dynamic(() => import("./slides/YesLadderSlide").then(m => ({ default: m.YesLadderSlide })));
 const FinalLoadingSlide = dynamic(() => import("./slides/FinalLoadingSlide").then(m => ({ default: m.FinalLoadingSlide })));
+const OptInSlide = dynamic(() => import("./slides/OptInSlide").then(m => ({ default: m.OptInSlide })));
 const ProtocolReadySlide = dynamic(() => import("./slides/ProtocolReadySlide").then(m => ({ default: m.ProtocolReadySlide })));
 const PhotoUploadSlide = dynamic(() => import("./slides/PhotoUploadSlide").then(m => ({ default: m.PhotoUploadSlide })));
 const MultiPhotoUploadSlide = dynamic(() => import("./slides/MultiPhotoUploadSlide").then(m => ({ default: m.MultiPhotoUploadSlide })));
@@ -91,7 +92,8 @@ export default function FunnelShell() {
   const isSection7 =
     slide.type === "yes-ladder" ||
     slide.type === "protocol-ready" ||
-    slide.type === "final-loading";
+    slide.type === "final-loading" ||
+    slide.type === "optin";
 
   const saveAnswer = (updates: Answers) => {
     const next = { ...answers, ...updates };
@@ -140,6 +142,31 @@ export default function FunnelShell() {
     if (step > 0) setStep((s) => s - 1);
   };
 
+  const handleOptIn = async (firstName: string, email: string) => {
+    saveAnswer({ first_name: firstName, email });
+    const sessionId = answers._session_id as string | undefined;
+    const utmSource = answers._utm_source as string | undefined;
+    const utmCampaign = answers._utm_campaign as string | undefined;
+    const utmAd = answers._utm_ad as string | undefined;
+    const utmContent = answers._utm_content as string | undefined;
+    fetch("/api/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        answers: { first_name: firstName, session_id: sessionId ?? "" },
+        utm: {
+          utm_source: utmSource,
+          utm_campaign: utmCampaign,
+          utm_ad: utmAd,
+          utm_content: utmContent,
+        },
+        mode: "merge",
+      }),
+    }).catch(() => {});
+    handleNext();
+  };
+
   return (
     <main className={styles.page}>
       <div className={styles.screen}>
@@ -173,7 +200,7 @@ export default function FunnelShell() {
 
         {/* ── Slide ──────────────────────────────────────────── */}
         <div className={styles.shell}>
-          {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack, adVariant)}
+          {renderSlide(slide, answers, handleAnswer, handleAnswerMulti, handleNext, handleBack, handleOptIn, adVariant)}
         </div>
       </div>
     </main>
@@ -187,6 +214,7 @@ function renderSlide(
   onAnswerMulti: (updates: Record<string, string>) => void,
   onNext: () => void,
   onBack: () => void,
+  onOptIn: (firstName: string, email: string) => Promise<void>,
   adVariant?: AdVariant
 ) {
   switch (slide.type) {
@@ -326,5 +354,8 @@ function renderSlide(
 
     case "final-loading":
       return <FinalLoadingSlide answers={answers} onNext={onNext} />;
+
+    case "optin":
+      return <OptInSlide onSubmit={onOptIn} />;
   }
 }
