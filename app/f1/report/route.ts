@@ -116,6 +116,38 @@ function getPatterns(morphology: string): PatternSet {
   };
 }
 
+// ── Age + ethnicity insights ──────────────────────────────
+
+function insight(title: string, body: string): string {
+  return `<div class="insight"><div class="insight-title">${title}</div><div class="insight-body">${body}</div></div>`;
+}
+
+function getAgeInsight(ageBracket: string): string {
+  const map: Record<string, [string, string]> = {
+    "20–29": ["Your 20s: the highest-leverage window", "The delta between where you are and your peak is typically largest in this decade. Hormonal environment is optimal — testosterone peaks around 25 — and the body's response to structured stimulus is faster than at any later stage. The men who take action here tend to lock in structural changes that carry forward for 20+ years. The window is wide, but it won't stay that way."],
+    "30–39": ["Your 30s: prime performance window, closing slowly", "Testosterone is still near peak but beginning a gradual 1–2% annual decline. Metabolism has slowed slightly — which actually makes body composition respond more predictably to precise protocols. The men who make structural changes in their 30s report the most durable results. Your profile is in an optimal window: motivation, resources, and hormonal environment aligned."],
+    "40–49": ["Your 40s: precision matters more than volume", "Undirected effort produces diminishing returns at this stage. Hormonal shifts mean that high-volume, unstructured training often increases cortisol without generating proportional adaptation. The research is clear: men following targeted, structured protocols in their 40s achieve better proportional results than men in their 20s following generic programs. Your protocol is built around precision — not volume."],
+    "50+": ["After 50: methodology changes, potential doesn't", "The narrative that physical attractiveness irreversibly declines after 50 is not supported by the data. What changes is the approach required. The lever shifts from muscle accumulation to proportionality, posture calibration, and metabolic precision — all highly trainable at this stage. Men who commit to a structured protocol after 50 consistently outperform younger men following generic advice."],
+  };
+  const entry = map[ageBracket];
+  if (!entry) return "";
+  return insight(entry[0], entry[1]);
+}
+
+function getEthnicityInsight(ethnicity: string): string {
+  const map: Record<string, [string, string]> = {
+    "Caucasian": ["Your genetic profile: structural advantage, midsection tendency", "European-origin frames typically carry a structural advantage in shoulder width, but tend to store fat preferentially in the abdominal region. This directly compresses the shoulder-to-waist ratio — the primary attractiveness variable. Your protocol prioritizes waist reduction alongside upper body development to maximize this ratio."],
+    "Black": ["Your genetic profile: high muscle density potential", "West African-derived profiles tend to show higher natural muscle density and favorable anabolic hormone profiles. The attractiveness protocol for your type focuses on refining existing structure rather than building from scratch — definition and proportion over raw size. The risk to manage is over-development in non-key muscle groups, which can reduce visual symmetry."],
+    "Asian (East / SE)": ["Your genetic profile: narrow frame, fast-responding proportions", "East and Southeast Asian frames typically feature slimmer bone structure and lower baseline body fat. The primary lever is upper body width — specifically shoulder development — relative to a naturally narrower waist. This ratio responds quickly to targeted training on your profile, and small gains in shoulder width create disproportionate visual impact."],
+    "South Asian": ["Your genetic profile: visceral fat tendency, strong recomposition response", "South Asian profiles frequently show higher visceral fat accumulation despite moderate total body weight — a pattern strongly linked to hormonal factors and metabolic rate. The waist-to-shoulder ratio is the dominant attractiveness variable for your profile. Targeted abdominal protocols combined with upper body structural work produce faster visible results than generic programs."],
+    "Hispanic-Latino": ["Your genetic profile: favorable muscle response, lower abdominal tendency", "Hispanic-Latino frames tend to carry muscle favorably and respond well to hypertrophy protocols. The primary challenge is typically body fat distribution in the lower abdominal region. Sequenced fat reduction combined with targeted structural building produces the most visible results for your profile, and the response timeline is faster than most body types."],
+    "MENA": ["Your genetic profile: strong development potential, recomposition-focused", "Middle Eastern and North African profiles typically combine high muscle development potential with elevated body fat storage tendency — particularly in the abdominal region. The protocol for your type focuses on recomposition: simultaneously increasing muscle density while reducing fat in the areas that most affect your waist-to-shoulder ratio. The response rate to structured protocols is strong."],
+  };
+  const entry = map[ethnicity];
+  if (!entry) return "";
+  return insight(entry[0], entry[1]);
+}
+
 // ── Environment paragraph ─────────────────────────────────
 
 function getEnvParagraph(env: string): string {
@@ -206,6 +238,8 @@ export async function GET(request: NextRequest) {
     "{{CHECKOUT_URL}}": vslUrl,
     "{{BEFORE_PHOTO}}": beforePhoto,
     "{{AFTER_PHOTO}}": afterPhoto,
+    "{{AGE_INSIGHT}}": getAgeInsight(params.get("age_bracket") ?? ""),
+    "{{ETHNICITY_INSIGHT}}": getEthnicityInsight(params.get("ethnicity") ?? ""),
   };
 
   for (const [key, value] of Object.entries(replacements)) {
