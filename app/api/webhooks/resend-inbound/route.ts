@@ -56,22 +56,6 @@ export async function POST(request: Request) {
     if (match) { userId = match[1]; break; }
   }
 
-  if (!userId) {
-    console.warn("[webhook/resend-inbound] No userId found in to addresses", { to });
-    return NextResponse.json({ received: true });
-  }
-
-  const { data: user } = await supabaseAdmin
-    .from("users")
-    .select("id")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (!user) {
-    console.warn("[webhook/resend-inbound] Unknown userId", { userId });
-    return NextResponse.json({ received: true });
-  }
-
   // Fetch email body — webhook payload only contains metadata, not text/html
   let body = "(message body unavailable)";
   try {
@@ -85,6 +69,47 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     console.error("[webhook/resend-inbound] Failed to fetch email body", { error: String(err), emailId });
+  }
+
+  // If no userId match, still forward to admin — just skip DB insert
+  if (!userId) {
+    console.log("[webhook/resend-inbound] No userId — forwarding directly to admin", { to, from: event.data.from });
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: "Protocol Inbound <noreply@protocol-club.com>",
+        to: FORWARD_TO,
+        subject: `[Inbound] ${event.data.subject ?? "(no subject)"}`,
+        replyTo: event.data.from,
+        text: `From: ${event.data.from}\nTo: ${to.join(", ")}\n\n${body}`,
+      });
+    } catch (err) {
+      console.error("[webhook/resend-inbound] Forward failed (no userId)", { error: String(err) });
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  const { data: user } = await supabaseAdmin
+    .from("users")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!user) {
+    console.warn("[webhook/resend-inbound] Unknown userId — forwarding directly to admin", { userId });
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: "Protocol Inbound <noreply@protocol-club.com>",
+        to: FORWARD_TO,
+        subject: `[Inbound] ${event.data.subject ?? "(no subject)"}`,
+        replyTo: event.data.from,
+        text: `From: ${event.data.from}\nUser ID (unknown): ${userId}\n\n${body}`,
+      });
+    } catch (err) {
+      console.error("[webhook/resend-inbound] Forward failed (unknown userId)", { error: String(err) });
+    }
+    return NextResponse.json({ received: true });
   }
 
   const { error: dbError } = await supabaseAdmin
