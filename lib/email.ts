@@ -418,6 +418,55 @@ export async function sendExpertMessage(props: {
 }
 
 // ─────────────────────────────────────────────────────────
+// Report ready — sent after quiz optin with link to analysis
+// ─────────────────────────────────────────────────────────
+export async function sendReportEmail(props: {
+  email: string;
+  firstName?: string;
+  reportUrl: string;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your preliminary report is ready, ${name}.
+    </h1>
+    <p style="margin:8px 0 24px;font-size:13px;color:${C.subtle};line-height:1.5;">
+      Based on your quiz answers — not yet a full personalized analysis.
+    </p>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      We've generated a preliminary report from your profile: body projection, patterns specific to your type, and a complete example of what a personalized analysis looks like.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      The preliminary report is a starting point. The full analysis — built from your actual photos and measurements — goes much deeper.
+    </p>
+
+    ${btn("View my preliminary report →", props.reportUrl)}
+
+    <p style="margin:28px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      This link is yours — bookmark it to come back anytime.<br>
+      Questions? Reply directly to this email.
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: props.email,
+    subject: `${name}, your preliminary report is ready`,
+    html: emailShell(content),
+  });
+
+  if (error) {
+    console.error("[resend] sendReportEmail failed", { error: error.message, email: props.email });
+    return;
+  }
+  console.log("[resend] report email sent", { email: props.email });
+}
+
+// ─────────────────────────────────────────────────────────
 // Questionnaire reminder — J+1, J+3, J+6 post-purchase
 // Only sent if questionnaire not yet submitted
 // ─────────────────────────────────────────────────────────

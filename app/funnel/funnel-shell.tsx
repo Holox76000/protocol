@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   SLIDES,
   TOTAL_QUESTIONS,
@@ -34,6 +35,7 @@ import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib
 const STORAGE_KEY = "protocol.funnel.v26";
 
 export default function FunnelShell() {
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [adVariant, setAdVariant] = useState<AdVariant | undefined>();
@@ -152,6 +154,8 @@ export default function FunnelShell() {
       quizAnswers[key] = Array.isArray(val) ? val.join("|") : String(val);
     }
 
+    const sessionId = answers._session_id as string | undefined;
+
     fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -165,9 +169,26 @@ export default function FunnelShell() {
           utm_content: answers._utm_content,
         },
         mode: "merge",
+        ...(sessionId && { funnel_sid: sessionId }),
       }),
     }).catch(() => {});
-    handleNext();
+
+    // Route via loading page (polls for before/after) → /f1/report/{sid}
+    if (sessionId) {
+      router.push(`/f1/report-loading?funnel_sid=${encodeURIComponent(sessionId)}`);
+    } else {
+      // Fallback: no session, build params-based URL
+      const reportParams = new URLSearchParams();
+      for (const [key, val] of Object.entries(updatedAnswers)) {
+        if (key.startsWith("_")) continue;
+        if (Array.isArray(val)) {
+          reportParams.set(key, val.join("|"));
+        } else if (val) {
+          reportParams.set(key, String(val));
+        }
+      }
+      router.push(`/f1/report?${reportParams.toString()}`);
+    }
   };
 
   return (

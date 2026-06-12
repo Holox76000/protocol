@@ -971,12 +971,6 @@ function MFooter() {
             <a className="mo-footer__link" href="#mo-pricing">Pricing</a>
           </div>
           <div>
-            <div className="mo-footer__col-head">Company</div>
-            <a className="mo-footer__link" href="#">About</a>
-            <a className="mo-footer__link" href="#">Journal</a>
-            <a className="mo-footer__link" href="#">Contact</a>
-          </div>
-          <div>
             <div className="mo-footer__col-head">Legal</div>
             <a className="mo-footer__link" href="/terms-of-service">Terms</a>
             <a className="mo-footer__link" href="/privacy-policy">Privacy</a>

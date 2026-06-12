@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { sendReportEmail } from "../../../lib/email";
 
 type LeadPayload = {
   email: string;
@@ -14,6 +15,7 @@ type LeadPayload = {
   blocker?: string;
   userAgent?: string;
   mode?: "create" | "merge";
+  funnel_sid?: string;
 };
 
 export async function POST(request: Request) {
@@ -101,10 +103,15 @@ export async function POST(request: Request) {
   const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const eventSourceUrl = request.headers.get("referer") ?? request.headers.get("origin") ?? undefined;
 
-  // Use waitUntil so both side-effects complete before the serverless function exits.
+  const firstName = body.answers?.first_name ?? undefined;
+  const funnelSid = body.funnel_sid ?? undefined;
+  const siteUrl = process.env.SITE_URL ?? process.env.URL ?? process.env.NETLIFY_SITE_URL ?? "https://protocol-club.com";
+
+  // Use waitUntil so all side-effects complete before the serverless function exits.
   waitUntil((async () => {
-    try {
-      await sendMetaEvent({
+    await Promise.allSettled([
+      // Meta CAPI
+      sendMetaEvent({
         eventName: "Lead",
         eventTime,
         eventId: `lead:${email}:${createdAt}`,
@@ -113,12 +120,18 @@ export async function POST(request: Request) {
         userAgent,
         ipAddress,
         email
-      });
-      console.log("[lead] meta sent", { email });
-    } catch (err) {
-      console.error("[lead] meta event failed", { error: String(err), email });
-    }
+      }).then(() => console.log("[lead] meta sent", { email }))
+        .catch((err) => console.error("[lead] meta event failed", { error: String(err), email })),
 
+      // Report email
+      funnelSid
+        ? sendReportEmail({
+            email,
+            firstName,
+            reportUrl: `${siteUrl}/f1/report/${encodeURIComponent(funnelSid)}`,
+          })
+        : Promise.resolve(),
+    ]);
   })());
 
   return NextResponse.json({ ok: true });
