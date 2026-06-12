@@ -91,11 +91,23 @@ const SECTION_NAMES = [
   "Photos",
 ];
 
+function parseArrayField(v: unknown): string[] | undefined {
+  if (v === undefined || v === null) return undefined;
+  if (Array.isArray(v)) return v as string[];
+  if (typeof v === "string") {
+    try { const p = JSON.parse(v); return Array.isArray(p) ? p : undefined; } catch { return undefined; }
+  }
+  return undefined;
+}
+
 export default function QuestionnaireFlow({ user, initialAnswers, initialSection }: Props) {
   const [section, setSection] = useState(Math.max(1, Math.min(initialSection, TOTAL_SECTIONS + 1)));
   const [answers, setAnswers] = useState<Answers>({
     first_name: user.first_name,
     ...initialAnswers,
+    // Normalize array fields that may be stored as JSON strings in the DB
+    motivation: parseArrayField((initialAnswers as Record<string, unknown>).motivation) ?? (initialAnswers as Answers).motivation,
+    social_perception: parseArrayField((initialAnswers as Record<string, unknown>).social_perception) ?? (initialAnswers as Answers).social_perception,
   });
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);

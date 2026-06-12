@@ -2,6 +2,15 @@
 
 import type { Answers } from "../QuestionnaireFlow";
 
+// Safely parse fields that may be stored as JSON strings instead of arrays
+function toArray(v: unknown): string[] {
+  if (Array.isArray(v)) return v as string[];
+  if (typeof v === "string") {
+    try { const p = JSON.parse(v); return Array.isArray(p) ? p : [v]; } catch { return [v]; }
+  }
+  return [];
+}
+
 type Props = {
   answers: Answers;
   onSubmit: () => void;
@@ -31,9 +40,10 @@ function SectionSummary({ title, children }: { title: string; children: React.Re
   );
 }
 
-function formatList(arr?: string[]): string {
-  if (!arr?.length) return "—";
-  return arr.join(", ");
+function formatList(arr?: string[] | string | unknown): string {
+  const a = toArray(arr);
+  if (!a.length) return "—";
+  return a.join(", ");
 }
 
 export default function ReviewScreen({ answers, onSubmit, onBack, saving, error }: Props) {
@@ -60,7 +70,7 @@ export default function ReviewScreen({ answers, onSubmit, onBack, saving, error 
       <SectionSummary title="Identity & Objective">
         <Row label="First name" value={answers.first_name} />
         <Row label="Primary goal" value={answers.goal?.replace(/_/g, " ")} />
-        <Row label="Motivation" value={answers.motivation?.map((m) => m.replace(/_/g, " ")).join(", ")} />
+        <Row label="Motivation" value={toArray(answers.motivation).map((m) => m.replace(/_/g, " ")).join(", ")} />
       </SectionSummary>
 
       <SectionSummary title="Social Context">
