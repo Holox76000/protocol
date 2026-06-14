@@ -40,18 +40,20 @@ export default function FunnelShell() {
   const [answers, setAnswers] = useState<Answers>({});
   const [adVariant, setAdVariant] = useState<AdVariant | undefined>();
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Always holds the latest answers — avoids stale React state closures
+  const latestAnswersRef = useRef<Answers>({});
 
-  const syncToDb = (data: Answers) => {
+  const syncToDb = (data: Answers, immediate = false) => {
     const sessionId = data._session_id as string | undefined;
     if (!sessionId) return;
     if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
-    syncTimerRef.current = setTimeout(() => {
-      fetch("/api/funnel/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, answers: data }),
-      }).catch(() => {});
-    }, 1500);
+    const doSync = () => fetch("/api/funnel/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId, answers: data }),
+    }).catch(() => {});
+    if (immediate) { doSync(); return; }
+    syncTimerRef.current = setTimeout(doSync, 1500);
   };
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export default function FunnelShell() {
         };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
+      latestAnswersRef.current = parsed;
       setAnswers(parsed);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -99,7 +102,9 @@ export default function FunnelShell() {
     slide.type === "optin";
 
   const saveAnswer = (updates: Answers) => {
-    const next = { ...answers, ...updates };
+    // Use ref (not state) to avoid stale closure when called in rapid succession
+    const next = { ...latestAnswersRef.current, ...updates };
+    latestAnswersRef.current = next;
     setAnswers(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -122,21 +127,32 @@ export default function FunnelShell() {
   const handleNext = () => {
     if (step < SLIDES.length - 1) {
       const currentSlide = SLIDES[step];
+      const cur = latestAnswersRef.current;
       if (currentSlide.type === "multi" && "stateKey" in currentSlide) {
-        const val = answers[currentSlide.stateKey];
+        const val = cur[currentSlide.stateKey];
         if (val && typeof val !== "number") trackFunnelAnswer(currentSlide.id, val);
       } else if (currentSlide.type === "numeric-height") {
-        const unit = answers.height_unit as string | undefined;
+        const unit = cur.height_unit as string | undefined;
         const val = unit === "cm"
-          ? `${answers.height_cm ?? ""} cm`
-          : `${answers.height_ft ?? ""}ft ${answers.height_in ?? ""}in`;
+          ? `${cur.height_cm ?? ""} cm`
+          : `${cur.height_ft ?? ""}ft ${cur.height_in ?? ""}in`;
         trackFunnelAnswer(currentSlide.id, val);
       } else if (currentSlide.type === "numeric-weight") {
-        trackFunnelAnswer(currentSlide.id, `${answers.weight_value ?? ""} ${answers.weight_unit ?? ""}`);
+        trackFunnelAnswer(currentSlide.id, `${cur.weight_value ?? ""} ${cur.weight_unit ?? ""}`);
       }
       const nextStep = step + 1;
-      const prevMax = (answers._max_step as number | undefined) ?? 0;
-      if (nextStep > prevMax) saveAnswer({ _max_step: nextStep });
+      const prevMax = (cur._max_step as number | undefined) ?? 0;
+      // Build the snapshot to persist — include _max_step update inline (no extra saveAnswer call)
+      const toSync = nextStep > prevMax
+        ? { ...cur, _max_step: nextStep }
+        : cur;
+      if (nextStep > prevMax) {
+        latestAnswersRef.current = toSync;
+        setAnswers(toSync);
+        try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(toSync)); } catch {}
+      }
+      // Guaranteed immediate sync on every slide advance — cancels any pending debounce
+      syncToDb(toSync, true);
       setStep(nextStep);
     }
   };
@@ -146,8 +162,11 @@ export default function FunnelShell() {
   };
 
   const handleOptIn = async (firstName: string, email: string) => {
-    const updatedAnswers = { ...answers, first_name: firstName, email };
+    // Use ref to get latest answers — saveAnswer below will update it further
+    const updatedAnswers = { ...latestAnswersRef.current, first_name: firstName, email };
     saveAnswer({ first_name: firstName, email });
+    // Force immediate sync of the optin data
+    syncToDb(latestAnswersRef.current, true);
 
     const quizAnswers: Record<string, string> = { first_name: firstName };
     for (const [key, val] of Object.entries(updatedAnswers)) {
@@ -155,7 +174,7 @@ export default function FunnelShell() {
       quizAnswers[key] = Array.isArray(val) ? val.join("|") : String(val);
     }
 
-    const sessionId = answers._session_id as string | undefined;
+    const sessionId = latestAnswersRef.current._session_id as string | undefined;
 
     fetch("/api/lead", {
       method: "POST",
@@ -164,11 +183,11 @@ export default function FunnelShell() {
         email,
         answers: quizAnswers,
         utm: {
-          utm_source: answers._utm_source,
-          utm_campaign: answers._utm_campaign,
-          utm_ad: answers._utm_ad,
-          utm_content: answers._utm_content,
-          fbclid: answers._fbclid,
+          utm_source: latestAnswersRef.current._utm_source,
+          utm_campaign: latestAnswersRef.current._utm_campaign,
+          utm_ad: latestAnswersRef.current._utm_ad,
+          utm_content: latestAnswersRef.current._utm_content,
+          fbclid: latestAnswersRef.current._fbclid,
         },
         mode: "merge",
         ...(sessionId && { funnel_sid: sessionId }),
