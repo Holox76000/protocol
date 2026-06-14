@@ -9,7 +9,7 @@ type LeadPayload = {
   answers: Record<string, string>;
   startedAt?: string;
   completedAt?: string;
-  utm?: Record<string, string | undefined>;
+  utm?: Record<string, string | undefined> & { fbclid?: string };
   score?: number;
   segment?: string;
   blocker?: string;
@@ -105,6 +105,7 @@ export async function POST(request: Request) {
 
   const firstName = body.answers?.first_name ?? undefined;
   const funnelSid = body.funnel_sid ?? undefined;
+  const fbclid = body.utm?.fbclid ?? undefined;
   const siteUrl = process.env.SITE_URL ?? process.env.URL ?? process.env.NETLIFY_SITE_URL ?? "https://protocol-club.com";
 
   // Use waitUntil so all side-effects complete before the serverless function exits.
@@ -119,7 +120,8 @@ export async function POST(request: Request) {
         eventSourceUrl,
         userAgent,
         ipAddress,
-        email
+        email,
+        fbclid,
       }).then(() => console.log("[lead] meta sent", { email }))
         .catch((err) => console.error("[lead] meta event failed", { error: String(err), email })),
 
