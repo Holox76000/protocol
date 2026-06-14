@@ -268,26 +268,30 @@ export async function sendAbandonedCartEmail(props: {
   const isSecond = props.emailNumber === 2;
 
   const subject = isSecond
-    ? "Still thinking about it?"
+    ? "What the preliminary report couldn't show you"
     : "Your body analysis is waiting";
 
   const content = isSecond ? `
     <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
-      Still thinking about it, ${name}?
+      The preliminary report was a preview. Your protocol is your path.
     </h1>
 
     <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
-      A few hours ago you started your questionnaire. We've analyzed 100+ attractiveness markers for your profile — but your protocol hasn't been built yet.
+      You've seen the format — the sections, the scoring, the structure.
+    </p>
+
+    <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
+      But the preliminary report runs on your questionnaire answers, not your body. No photos. No real measurements. No actual score.
     </p>
 
     <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
-      Most guys who complete it see exactly what's holding their score back within the first read. It's not guesswork — it's your data.
+      The protocol is different. It starts from your proportions, scores you on the markers that actually move the needle, and builds a roadmap around your specific leverage points.
     </p>
 
     ${btn("Get my protocol — $89 →", props.checkoutUrl)}
 
     <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
-      90-day money-back guarantee. No conditions. This is our last email.
+      90-day money-back guarantee. No conditions.
     </p>
   ` : `
     <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
