@@ -26,14 +26,31 @@ export async function POST(request: Request) {
   const eventSourceUrl =
     request.headers.get("referer") ?? request.headers.get("origin") ?? undefined;
 
-  const { error } = await supabaseAdmin.from("event_sessions").upsert(
+  // If funnel_sid is in the payload, also store with funnel_sid as session_id
+  // so all downstream funnel steps share a common identity key
+  const funnelSid = (body.payload as Record<string, unknown> | undefined)?.funnel_sid as string | undefined;
+
+  const rowsToUpsert = [
     {
       session_id: body.sessionId,
       event: body.event,
       step: typeof body.step === "number" ? body.step : null,
       payload: body.payload ?? null,
-      created_at: createdAt
+      created_at: createdAt,
     },
+    // When a funnel_sid is present and differs from sessionId, also write
+    // a row keyed by funnel_sid so the full chain is queryable by one ID
+    ...(funnelSid && funnelSid !== body.sessionId ? [{
+      session_id: funnelSid,
+      event: body.event,
+      step: typeof body.step === "number" ? body.step : null,
+      payload: body.payload ?? null,
+      created_at: createdAt,
+    }] : []),
+  ];
+
+  const { error } = await supabaseAdmin.from("event_sessions").upsert(
+    rowsToUpsert,
     { onConflict: "session_id,event,step" }
   );
 

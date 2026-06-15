@@ -1174,4 +1174,26 @@
   })();
 </script>
 
+<script>
+  (function(){
+    var sid = '{{FUNNEL_SID}}';
+    if (!sid || sid === '{{FUNNEL_SID}}') return; // param-based fallback, no sid
+    document.querySelectorAll('a[href*="/f1/offer"]').forEach(function(el){
+      el.addEventListener('click', function(){
+        fetch('/api/track', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          keepalive: true,
+          body: JSON.stringify({
+            sessionId: sid,
+            event: 'report_cta_clicked',
+            payload: { funnel_sid: sid },
+            createdAt: new Date().toISOString()
+          })
+        }).catch(function(){});
+      });
+    });
+  })();
+</script>
+
 </body></html>

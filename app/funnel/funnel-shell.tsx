@@ -43,6 +43,20 @@ export default function FunnelShell() {
   // Always holds the latest answers — avoids stale React state closures
   const latestAnswersRef = useRef<Answers>({});
 
+  // Fire-and-forget: logs each slide advance with funnel_sid as the identity key
+  const trackStep = (slideId: string, funnelSid: string) => {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: funnelSid,
+        event: "funnel_step",
+        payload: { slide_id: slideId, funnel_sid: funnelSid },
+        createdAt: new Date().toISOString(),
+      }),
+    }).catch(() => {});
+  };
+
   const syncToDb = (data: Answers, immediate = false) => {
     const sessionId = data._session_id as string | undefined;
     if (!sessionId) return;
@@ -153,6 +167,9 @@ export default function FunnelShell() {
       }
       // Guaranteed immediate sync on every slide advance — cancels any pending debounce
       syncToDb(toSync, true);
+      // Track slide advance with funnel_sid as identity (fire-and-forget)
+      const funnelSid = toSync._session_id as string | undefined;
+      if (funnelSid) trackStep(currentSlide.id, funnelSid);
       setStep(nextStep);
     }
   };

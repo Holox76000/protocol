@@ -235,6 +235,12 @@ export async function GET(
     if (a.data?.signedUrl) afterPhoto = `<img src="${a.data.signedUrl}" alt="Your potential" />`;
   }
 
+  // 2b. Log report_viewed — funnel_sid is the session_id for the full downstream funnel
+  void supabaseAdmin.from("event_sessions").upsert(
+    { session_id: sid, event: "report_viewed", step: null, payload: { funnel_sid: sid }, created_at: new Date().toISOString() },
+    { onConflict: "session_id,event,step" }
+  );
+
   // 3. Load & fill template
   const templatePath = path.join(process.cwd(), "data", "report-template.html");
   let html = fs.readFileSync(templatePath, "utf-8");
@@ -282,6 +288,7 @@ export async function GET(
     "{{AFTER_PHOTO}}": afterPhoto,
     "{{AGE_INSIGHT}}": getAgeInsight((answers.age_bracket as string) ?? ""),
     "{{ETHNICITY_INSIGHT}}": getEthnicityInsight((answers.ethnicity as string) ?? ""),
+    "{{FUNNEL_SID}}": sid,
   };
 
   for (const [key, value] of Object.entries(replacements)) {

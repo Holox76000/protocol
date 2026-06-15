@@ -1103,8 +1103,12 @@ export default function F1OfferPage() {
   const [pastAttempts, setPastAttempts] = useState<string[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const funnelSid = params.get("funnel_sid") ?? undefined;
+
     trackGa4Event("view_offer", { funnel: "f1", page_path: "/f1/offer" });
-    trackEvent("view_offer", { funnel: "f1", page_path: "/f1/offer" });
+    // Pass funnel_sid so this event links back to the quiz session
+    trackEvent("view_offer", { funnel: "f1", page_path: "/f1/offer", funnel_sid: funnelSid });
 
     const utm = getUtmParams();
     persistUtmParams(utm);
@@ -1114,7 +1118,6 @@ export default function F1OfferPage() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // Load personalized preview if funnel_sid present
-    const params = new URLSearchParams(window.location.search);
 
     if (params.get("funnel") === "quiz") {
       const from = params.get("from") ?? "funnel";
