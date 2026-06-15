@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { waitUntil } from "@vercel/functions";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendReportEmail } from "../../../lib/email";
@@ -108,33 +107,31 @@ export async function POST(request: Request) {
   const fbclid = body.utm?.fbclid ?? undefined;
   const siteUrl = process.env.SITE_URL ?? process.env.URL ?? process.env.NETLIFY_SITE_URL ?? "https://protocol-club.com";
 
-  // Use waitUntil so all side-effects complete before the serverless function exits.
-  waitUntil((async () => {
-    await Promise.allSettled([
-      // Meta CAPI
-      sendMetaEvent({
-        eventName: "Lead",
-        eventTime,
-        eventId: `lead:${email}:${createdAt}`,
-        actionSource: "website",
-        eventSourceUrl,
-        userAgent,
-        ipAddress,
-        email,
-        fbclid,
-      }).then(() => console.log("[lead] meta sent", { email }))
-        .catch((err) => console.error("[lead] meta event failed", { error: String(err), email })),
+  // waitUntil from @vercel/functions is a no-op on Netlify (context not injected).
+  // Run side-effects synchronously before returning — ~200ms overhead, invisible since
+  // the client redirects to the report-loading page immediately after.
+  await Promise.allSettled([
+    sendMetaEvent({
+      eventName: "Lead",
+      eventTime,
+      eventId: `lead:${email}:${createdAt}`,
+      actionSource: "website",
+      eventSourceUrl,
+      userAgent,
+      ipAddress,
+      email,
+      fbclid,
+    }).then(() => console.log("[lead] meta sent", { email }))
+      .catch((err) => console.error("[lead] meta event failed", { error: String(err), email })),
 
-      // Report email
-      funnelSid
-        ? sendReportEmail({
-            email,
-            firstName,
-            reportUrl: `${siteUrl}/f1/report/${encodeURIComponent(funnelSid)}`,
-          })
-        : Promise.resolve(),
-    ]);
-  })());
+    funnelSid
+      ? sendReportEmail({
+          email,
+          firstName,
+          reportUrl: `${siteUrl}/f1/report/${encodeURIComponent(funnelSid)}`,
+        })
+      : Promise.resolve(),
+  ]);
 
   return NextResponse.json({ ok: true });
 }
