@@ -18,7 +18,12 @@
 import { createInterface } from "readline";
 
 const URL    = "https://protocol-club.com/api/mcp";
-const SECRET = "0387056255b72674a5f487003d8d806bfc0e21950e1bfd7fc91a765046c66db1";
+const SECRET = process.env.PROTOCOL_KEY;
+
+if (!SECRET) {
+  process.stderr.write("PROTOCOL_KEY manquant. Ajoutez-le dans env de la config Claude.\n");
+  process.exit(1);
+}
 
 const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
 
