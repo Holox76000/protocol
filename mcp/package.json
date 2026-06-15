@@ -1,0 +1,18 @@
+{
+  "name": "protocol-club-mcp",
+  "version": "1.0.0",
+  "description": "Protocol Club data MCP server — leads, funnel, revenue, Meta ads",
+  "type": "module",
+  "bin": {
+    "protocol-club-mcp": "./proxy.mjs"
+  },
+  "files": [
+    "proxy.mjs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["mcp", "protocol-club"],
+  "license": "UNLICENSED",
+  "private": false
+}
