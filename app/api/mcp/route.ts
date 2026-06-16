@@ -127,15 +127,26 @@ const TOOLS = [
   },
   {
     name: "meta_ads",
-    description: "Meta Ads performance — spend, impressions, CPM, CTR, leads and CPL per ad/campaign.",
+    description: "Meta Ads performance — spend, impressions, CPM, CTR, leads, CPL. Use date_preset OR (since + until) for custom ranges. Meta keeps insights for ~37 months.",
     inputSchema: {
       type: "object",
       properties: {
         date_preset: {
           type: "string",
-          enum: ["today", "yesterday", "last_7d", "last_14d", "last_30d", "this_month", "last_month"],
+          enum: [
+            "today", "yesterday",
+            "last_3d", "last_7d", "last_14d", "last_28d", "last_30d", "last_90d",
+            "this_week_mon_today", "last_week_mon_sun",
+            "this_month", "last_month",
+            "this_quarter", "last_quarter",
+            "this_year", "last_year",
+            "maximum",
+          ],
           default: "last_7d",
+          description: "Quick preset. Use 'maximum' for the longest range Meta allows (~37 months).",
         },
+        since: { type: "string", description: "Custom range start date YYYY-MM-DD (overrides date_preset)" },
+        until: { type: "string", description: "Custom range end date YYYY-MM-DD (required with since)" },
         level: {
           type: "string",
           enum: ["campaign", "adset", "ad"],
@@ -408,19 +419,32 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
 
   if (name === "meta_ads") {
     if (!META_ACCOUNT) return "META_AD_ACCOUNT_ID not configured on the server.";
-    const date_preset = String(args.date_preset ?? "last_7d");
     const level = String(args.level ?? "ad");
+    const since = args.since ? String(args.since) : "";
+    const until = args.until ? String(args.until) : "";
 
     const fields = "campaign_name,adset_name,ad_name,spend,impressions,clicks,cpm,ctr,actions";
-    const url = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?fields=${fields}&level=${level}&date_preset=${date_preset}&limit=50&access_token=${META_TOKEN}`;
+    let url = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?fields=${fields}&level=${level}&limit=200&access_token=${META_TOKEN}`;
+
+    let rangeLabel: string;
+    if (since && until) {
+      const range = encodeURIComponent(JSON.stringify({ since, until }));
+      url += `&time_range=${range}`;
+      rangeLabel = `${since} → ${until}`;
+    } else {
+      const preset = String(args.date_preset ?? "last_7d");
+      url += `&date_preset=${preset}`;
+      rangeLabel = preset;
+    }
+
     const res = await fetch(url);
     const json = await res.json() as { data?: Record<string, unknown>[]; error?: { message: string } };
 
     if (json.error) throw new Error(json.error.message);
     const ads = json.data ?? [];
-    if (!ads.length) return "No ad data for this period.";
+    if (!ads.length) return `No ad data for ${rangeLabel}.`;
 
-    const lines = [`Meta Ads — ${date_preset} — by ${level}`, ""];
+    const lines = [`Meta Ads — ${rangeLabel} — by ${level}`, ""];
     for (const ad of ads) {
       const actions = (ad.actions ?? []) as { action_type: string; value: string }[];
       const leads = Number(actions.find(a => a.action_type === "lead")?.value ?? 0);
