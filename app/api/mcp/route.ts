@@ -176,6 +176,60 @@ const TOOLS = [
       },
     },
   },
+
+  // ── Raw / escape hatch tools — full access to underlying APIs ─────────
+
+  {
+    name: "meta_raw",
+    description: "Raw passthrough to the Meta Graph API v22.0. Use any endpoint path under the ad account (insights, ads, campaigns, adsets, adcreatives, adimages, customaudiences, etc.) with any fields and params. Returns the raw JSON. Example: path='/insights', fields='spend,impressions,actions,video_p100_watched_actions,conversions,reach,frequency,unique_clicks,cost_per_action_type'.",
+    inputSchema: {
+      type: "object",
+      required: ["path"],
+      properties: {
+        path: { type: "string", description: "Path appended to the ad account (e.g. '/insights', '/ads', '/campaigns'). Or a full graph path starting with '/' to bypass account scoping." },
+        fields: { type: "string", description: "Comma-separated list of fields to request." },
+        params: { type: "object", description: "Extra query params (date_preset, time_range, level, breakdowns, limit, etc.)", additionalProperties: true },
+      },
+    },
+  },
+  {
+    name: "stripe_raw",
+    description: "Raw access to the Stripe API. Pass any resource name (charges, payment_intents, customers, refunds, disputes, payouts, balance_transactions, subscriptions, invoices, coupons, etc.) with arbitrary list params. Returns the raw Stripe response.",
+    inputSchema: {
+      type: "object",
+      required: ["resource"],
+      properties: {
+        resource: { type: "string", description: "Stripe resource name (e.g. 'charges', 'payment_intents', 'refunds', 'customers')." },
+        params: { type: "object", description: "Query params (limit, created[gte], created[lte], customer, status, etc.)", additionalProperties: true },
+      },
+    },
+  },
+  {
+    name: "supabase_query",
+    description: "Run a read-only query on any Supabase table. Supports select, filters (eq, gte, lte, like, in), order, limit. Tables available: leads, funnel_sessions, users, event_sessions, questionnaire_responses, visualization_previews, client_messages, etc.",
+    inputSchema: {
+      type: "object",
+      required: ["table"],
+      properties: {
+        table: { type: "string", description: "Table name (e.g. 'leads', 'users', 'funnel_sessions', 'event_sessions')." },
+        select: { type: "string", description: "Columns to select. Default '*'." },
+        filters: { type: "object", description: "Object of column → value (eq) or { op: 'gte'|'lte'|'like'|'in', value: ... }", additionalProperties: true },
+        order: { type: "string", description: "Column to order by (prefix with '-' for desc)" },
+        limit: { type: "integer", default: 50, minimum: 1, maximum: 500 },
+      },
+    },
+  },
+  {
+    name: "github_raw",
+    description: "Raw access to the GitHub REST API for the production repo (Holox76000/protocol). Pass any path (commits, commits/SHA, contents/PATH, pulls, issues, etc.) and optional query params. Returns the raw JSON.",
+    inputSchema: {
+      type: "object",
+      required: ["path"],
+      properties: {
+        path: { type: "string", description: "Path under /repos/Holox76000/protocol/ (e.g. 'commits', 'commits/abc123', 'contents/app/api/mcp/route.ts', 'pulls?state=closed')." },
+      },
+    },
+  },
 ];
 
 // ── GitHub helper ────────────────────────────────────────
@@ -545,6 +599,102 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
       lines.push("");
     }
     return lines.join("\n");
+  }
+
+  // ── RAW / ESCAPE HATCH TOOLS ──────────────────────────────
+
+  if (name === "meta_raw") {
+    if (!META_ACCOUNT) return "META_AD_ACCOUNT_ID not configured.";
+    const path   = String(args.path ?? "");
+    const fields = String(args.fields ?? "");
+    const params = (args.params ?? {}) as Record<string, unknown>;
+
+    const fullPath = path.startsWith("/")
+      ? path.slice(1)  // absolute path, no account prefix
+      : `${META_ACCOUNT}${path.startsWith("/") ? "" : "/"}${path}`;
+
+    const qs = new URLSearchParams({ access_token: META_TOKEN });
+    if (fields) qs.set("fields", fields);
+    for (const [k, v] of Object.entries(params)) {
+      if (v == null) continue;
+      qs.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+    }
+
+    const url = `https://graph.facebook.com/v22.0/${fullPath}?${qs.toString()}`;
+    const res = await fetch(url);
+    const json = await res.json();
+    return JSON.stringify(json, null, 2);
+  }
+
+  if (name === "stripe_raw") {
+    const stripe = getStripe();
+    const resource = String(args.resource ?? "");
+    const params = (args.params ?? {}) as Record<string, unknown>;
+
+    // Use stripe.request to hit any list endpoint dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = stripe as any;
+    if (!client[resource] || typeof client[resource].list !== "function") {
+      return `Unknown Stripe resource: ${resource}. Try: charges, payment_intents, customers, refunds, disputes, payouts, balance_transactions, subscriptions, invoices, coupons, products, prices.`;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await client[resource].list(params);
+    return JSON.stringify(result, null, 2);
+  }
+
+  if (name === "supabase_query") {
+    const table   = String(args.table ?? "");
+    const select  = String(args.select ?? "*");
+    const filters = (args.filters ?? {}) as Record<string, unknown>;
+    const order   = args.order ? String(args.order) : null;
+    const limit   = Number(args.limit ?? 50);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let q: any = supabase.from(table).select(select);
+
+    for (const [col, raw] of Object.entries(filters)) {
+      if (raw && typeof raw === "object" && "op" in raw && "value" in raw) {
+        const f = raw as { op: string; value: unknown };
+        const v = f.value;
+        if (f.op === "eq")   q = q.eq(col, v);
+        else if (f.op === "gte")  q = q.gte(col, v);
+        else if (f.op === "lte")  q = q.lte(col, v);
+        else if (f.op === "gt")   q = q.gt(col, v);
+        else if (f.op === "lt")   q = q.lt(col, v);
+        else if (f.op === "like") q = q.like(col, String(v));
+        else if (f.op === "ilike") q = q.ilike(col, String(v));
+        else if (f.op === "in")   q = q.in(col, Array.isArray(v) ? v : [v]);
+        else if (f.op === "is")   q = q.is(col, v as null | boolean);
+        else if (f.op === "not")  q = q.not(col, "eq", v);
+      } else {
+        q = q.eq(col, raw);
+      }
+    }
+
+    if (order) {
+      const desc = order.startsWith("-");
+      q = q.order(desc ? order.slice(1) : order, { ascending: !desc });
+    }
+    q = q.limit(limit);
+
+    const { data, error } = await q;
+    if (error) throw new Error(error.message);
+    return JSON.stringify(data, null, 2);
+  }
+
+  if (name === "github_raw") {
+    const path = String(args.path ?? "");
+    const headers: Record<string, string> = {
+      "Accept": "application/vnd.github+json",
+      "User-Agent": "protocol-club-mcp",
+    };
+    if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    const url = `https://api.github.com/repos/${GH_REPO}/${path.replace(/^\//, "")}`;
+    const res = await fetch(url, { headers });
+    const text = await res.text();
+    try { return JSON.stringify(JSON.parse(text), null, 2); }
+    catch { return text; }
   }
 
   throw new Error(`Unknown tool: ${name}`);
