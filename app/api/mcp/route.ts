@@ -144,7 +144,70 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: "commits",
+    description: "Recent Git commits on the production codebase — date, author, message, and files changed. Use this to find when a feature shipped or correlate funnel changes with code changes.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        days: { type: "integer", default: 14, minimum: 1, maximum: 90, description: "Number of days to look back" },
+        with_files: { type: "boolean", default: false, description: "Include the list of changed files per commit" },
+      },
+    },
+  },
+  {
+    name: "funnel_timeline",
+    description: "Day-by-day timeline correlating Git commits with funnel KPIs (leads, sales, Meta spend). Use this to spot whether a code change moved the needle.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        days: { type: "integer", default: 14, minimum: 1, maximum: 60, description: "Number of days to look back" },
+      },
+    },
+  },
 ];
+
+// ── GitHub helper ────────────────────────────────────────
+
+const GH_REPO = "Holox76000/protocol";
+
+async function ghCommits(days: number, withFiles: boolean) {
+  const since = daysAgo(days);
+  const headers: Record<string, string> = {
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "protocol-club-mcp",
+  };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+
+  const res = await fetch(`https://api.github.com/repos/${GH_REPO}/commits?since=${encodeURIComponent(since)}&per_page=100`, { headers });
+  if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
+  const list = await res.json() as Array<{
+    sha: string;
+    commit: { author: { name: string; date: string }; message: string };
+    html_url: string;
+  }>;
+
+  const out = await Promise.all(list.map(async c => {
+    const base = {
+      sha: c.sha.slice(0, 7),
+      date: c.commit.author.date,
+      author: c.commit.author.name,
+      message: c.commit.message.split("\n")[0],
+      url: c.html_url,
+      files: [] as string[],
+    };
+    if (withFiles) {
+      const r = await fetch(`https://api.github.com/repos/${GH_REPO}/commits/${c.sha}`, { headers });
+      if (r.ok) {
+        const detail = await r.json() as { files?: Array<{ filename: string }> };
+        base.files = (detail.files ?? []).map(f => f.filename);
+      }
+    }
+    return base;
+  }));
+
+  return out;
+}
 
 // ── Tool implementations ──────────────────────────────────
 
@@ -368,6 +431,72 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
         `  Spend: $${parseFloat(String(ad.spend)).toFixed(2)}  |  Impr: ${ad.impressions}  |  CTR: ${parseFloat(String(ad.ctr ?? 0)).toFixed(2)}%  |  Leads: ${leads}  |  CPL: ${cpl}`,
         ""
       );
+    }
+    return lines.join("\n");
+  }
+
+  if (name === "commits") {
+    const days = Number(args.days ?? 14);
+    const withFiles = Boolean(args.with_files ?? false);
+    const commits = await ghCommits(days, withFiles);
+    if (!commits.length) return `No commits in the last ${days} days.`;
+
+    const lines = [`${commits.length} commits — last ${days} days`, ""];
+    for (const c of commits) {
+      lines.push(`${c.date.slice(0, 10)} ${c.date.slice(11, 16)}  ${c.sha}  ${c.author}`);
+      lines.push(`  ${c.message}`);
+      if (withFiles && c.files.length) {
+        lines.push(`  Files (${c.files.length}): ${c.files.slice(0, 8).join(", ")}${c.files.length > 8 ? "…" : ""}`);
+      }
+      lines.push("");
+    }
+    return lines.join("\n");
+  }
+
+  if (name === "funnel_timeline") {
+    const days = Number(args.days ?? 14);
+    const since = daysAgo(days);
+
+    const [commits, leadsRes, usersRes, metaRes] = await Promise.all([
+      ghCommits(days, false).catch(() => []),
+      supabase.from("leads").select("created_at").gte("created_at", since),
+      supabase.from("users").select("created_at,has_paid").eq("has_paid", true).gte("created_at", since),
+      META_ACCOUNT
+        ? fetch(`https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?fields=spend,actions&level=account&time_increment=1&time_range=${encodeURIComponent(JSON.stringify({since: since.slice(0,10), until: new Date().toISOString().slice(0,10)}))}&access_token=${META_TOKEN}`).then(r => r.json()).catch(() => ({}))
+        : Promise.resolve({}),
+    ]);
+
+    // Build per-day buckets
+    const byDay: Record<string, { commits: string[]; leads: number; sales: number; spend: number; lpv: number }> = {};
+    const ensure = (d: string) => byDay[d] ??= { commits: [], leads: 0, sales: 0, spend: 0, lpv: 0 };
+
+    for (const c of commits) ensure(c.date.slice(0, 10)).commits.push(`${c.sha} ${c.message.slice(0, 65)}`);
+    for (const l of leadsRes.data ?? []) ensure((l.created_at as string).slice(0, 10)).leads++;
+    for (const u of usersRes.data ?? []) ensure((u.created_at as string).slice(0, 10)).sales++;
+
+    const metaData = ((metaRes as { data?: Array<{ date_start: string; spend: string; actions?: Array<{ action_type: string; value: string }> }> }).data ?? []);
+    for (const d of metaData) {
+      const b = ensure(d.date_start);
+      b.spend = parseFloat(d.spend);
+      b.lpv = Number((d.actions ?? []).find(a => a.action_type === "landing_page_view")?.value ?? 0);
+    }
+
+    const sortedDays = Object.keys(byDay).sort();
+    if (!sortedDays.length) return `No activity in the last ${days} days.`;
+
+    const lines = [`Funnel timeline — last ${days} days`, ""];
+    for (const day of sortedDays) {
+      const b = byDay[day];
+      lines.push(`── ${day} ${"─".repeat(40)}`);
+      const kpis: string[] = [];
+      if (b.spend > 0)    kpis.push(`Spend $${b.spend.toFixed(2)}`);
+      if (b.lpv > 0)      kpis.push(`LPV ${b.lpv}`);
+      if (b.leads > 0)    kpis.push(`Leads ${b.leads}`);
+      if (b.sales > 0)    kpis.push(`💰 Sales ${b.sales}`);
+      if (kpis.length)    lines.push(`  ${kpis.join(" · ")}`);
+      else                lines.push(`  (no funnel activity)`);
+      for (const c of b.commits) lines.push(`  → ${c}`);
+      lines.push("");
     }
     return lines.join("\n");
   }
