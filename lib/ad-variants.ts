@@ -288,10 +288,10 @@ const WHAT_MAKES_ATTRACTIVE: AdVariant = {
   cta: "See what makes me attractive →",
 };
 
-// "What makes a man's body attractive — 60+" — past 60, the formula shifts but still applies
+// "What makes a man's body attractive — 60+" — past 60, proportion/posture beats size
 const WHAT_MAKES_ATTRACTIVE_60: AdVariant = {
   badge: "Attractiveness Research · 60+",
-  headline: "What makes a man's body attractive past 60? The formula shifts. It still applies.",
+  headline: "What makes a man's body attractive past 60? We studied 2,500 men to find out.",
   subtext:
     "Proportion, posture and structural definition move how you're perceived now — not size. 2 minutes to see where yours stand.",
   cta: "See what makes me attractive →",
