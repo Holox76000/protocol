@@ -324,12 +324,12 @@ const WHAT_MAKES_ATTRACTIVE_DATING: AdVariant = {
   cta: "See what makes me attractive →",
 };
 
-// "What makes a man's body attractive — Gay" — same formula, men responding
+// "What makes a man's body attractive — Gay" — what other men actually look at
 const WHAT_MAKES_ATTRACTIVE_GAY: AdVariant = {
   badge: "Attractiveness Research",
-  headline: "What makes a body attractive? The formula is the same — men's eyes or women's.",
+  headline: "What makes a man's body actually attractive to other men? We studied it.",
   subtext:
-    "Not strong. Not lean. Not big. Attractive is a specific structural formula. 2 minutes to see where yours stands.",
+    "Not strong. Not lean. Not big. Attractive is a specific structural formula — and most generic programs don't target it. 2 minutes to see where yours stands.",
   cta: "See what makes me attractive →",
 };
 
