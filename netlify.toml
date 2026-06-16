@@ -2,5 +2,10 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  # MCP_LOGIN is a username, not a secret — its value ("protocol") matches the
+  # product name "Protocol Club" which appears throughout the codebase
+  SECRETS_SCAN_OMIT_KEYS = "MCP_LOGIN"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
