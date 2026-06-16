@@ -291,45 +291,45 @@ const WHAT_MAKES_ATTRACTIVE: AdVariant = {
 // "What makes a man's body attractive — 60+" — past 60, the formula shifts but still applies
 const WHAT_MAKES_ATTRACTIVE_60: AdVariant = {
   badge: "Attractiveness Research · 60+",
-  headline: "What actually makes a man's body attractive past 60? The formula shifts — but it still applies to you.",
+  headline: "What makes a man's body attractive past 60? The formula shifts. It still applies.",
   subtext:
-    "Past 60, training for size or weight loss is the wrong target. Proportion, posture and structural definition are what move how you're perceived now — and they respond fast to the right plan. This assessment tells you where yours stand.",
+    "Proportion, posture and structural definition move how you're perceived now — not size. 2 minutes to see where yours stand.",
   cta: "See what makes me attractive →",
 };
 
 // "What makes a man's body attractive — Founder" — 80h weeks, presence in pitch rooms, efficient plan
 const WHAT_MAKES_ATTRACTIVE_FOUNDER: AdVariant = {
   badge: "Attractiveness Research · Founders",
-  headline: "What actually makes a man's body attractive when you're running 80-hour weeks? The formula doesn't need more hours — it needs the right hours.",
+  headline: "What makes a body attractive on 80-hour weeks? Not more hours. The right ones.",
   subtext:
-    "Founders don't fail at this for lack of effort. They fail because generic programs were never built around their schedule. The formula that maximizes how you're perceived in pitch rooms, on camera, and in the way people respond to you can be calculated — even at 80 hours a week.",
+    "Founders don't fail for lack of effort — generic programs were never built around their schedule. 2 minutes to find the formula that fits yours.",
   cta: "See what makes me attractive →",
 };
 
 // "What makes a man's body attractive — 20-29" — fastest visible change window, peak adaptation
 const WHAT_MAKES_ATTRACTIVE_20S: AdVariant = {
   badge: "Attractiveness Research · 20s",
-  headline: "What actually makes a man's body attractive in your 20s? The fastest visible-change window you'll have. Don't waste it on the wrong plan.",
+  headline: "Your 20s are the fastest visible-change window you'll have. Don't waste it.",
   subtext:
-    "Testosterone is near peak. Your body adapts to structured training faster than it will at any later stage. Most guys in their 20s burn this window on generic programs built around someone else's genetics. The right formula locks in changes that hold for decades.",
+    "Testosterone is near peak. Your body adapts faster now than it ever will again. 2 minutes to find the formula that locks in changes for decades.",
   cta: "See what makes me attractive →",
 };
 
 // "What makes a man's body attractive — Newly Single" — back in dating market
 const WHAT_MAKES_ATTRACTIVE_DATING: AdVariant = {
   badge: "Attractiveness Research · Dating",
-  headline: "What actually makes a man's body attractive when you're walking back into the dating market? You don't get a learning curve — you get first impressions.",
+  headline: "Back in the dating market? You don't get a learning curve. You get first impressions.",
   subtext:
-    "The body women respond to on a first date isn't built in the gym most guys train in. It's a specific structural formula — one we found after measuring 2,500 men. This assessment tells you exactly where you stand and what to fix first.",
+    "The body women respond to on a first date isn't built in the gym most guys train in. 2 minutes to see where you stand and what to fix first.",
   cta: "See what makes me attractive →",
 };
 
 // "What makes a man's body attractive — Gay" — same formula, men responding
 const WHAT_MAKES_ATTRACTIVE_GAY: AdVariant = {
   badge: "Attractiveness Research",
-  headline: "What actually makes a man's body attractive? We studied 2,500 men to find out — and the formula is the same whether the eyes on you are men's or women's.",
+  headline: "What makes a body attractive? The formula is the same — men's eyes or women's.",
   subtext:
-    "Not strong. Not lean. Not big. Attractive is a specific structural formula — proportion, posture, body composition lining up in a precise way. Most generic programs don't target it. This assessment tells you where yours stands.",
+    "Not strong. Not lean. Not big. Attractive is a specific structural formula. 2 minutes to see where yours stands.",
   cta: "See what makes me attractive →",
 };
 
