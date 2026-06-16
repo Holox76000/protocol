@@ -316,7 +316,7 @@ const TOOLS = [
 
   {
     name: "meta_raw",
-    description: "Raw passthrough to the Meta Graph API v22.0. Use any endpoint path under the ad account (insights, ads, campaigns, adsets, adcreatives, adimages, customaudiences, etc.) with any fields and params. Returns the raw JSON. Example: path='/insights', fields='spend,impressions,actions,video_p100_watched_actions,conversions,reach,frequency,unique_clicks,cost_per_action_type'.",
+    description: "★ ESCAPE HATCH for any Meta Ads question the curated tools don't answer. Direct passthrough to Meta Graph API v22.0. Use ANY endpoint (insights, ads, campaigns, adsets, adcreatives, adimages, customaudiences, customconversions), ANY fields, ANY params (time_increment, time_range, breakdowns, filtering, action_breakdowns, level…). Examples: path='/insights' params={level:'ad', time_increment:1, time_range:{since:'2026-04-01',until:'2026-06-15'}} fields='ad_name,spend,impressions,actions,video_p100_watched_actions,reach,frequency,unique_clicks,cost_per_action_type'. Or path='/ads/120246744499120660' fields='name,creative,status,adset_id' to inspect a specific ad. Or path='/adcreatives' to list creatives. Returns raw JSON.",
     inputSchema: {
       type: "object",
       required: ["path"],
@@ -329,7 +329,7 @@ const TOOLS = [
   },
   {
     name: "stripe_raw",
-    description: "Raw access to the Stripe API. Pass any resource name (charges, payment_intents, customers, refunds, disputes, payouts, balance_transactions, subscriptions, invoices, coupons, etc.) with arbitrary list params. Returns the raw Stripe response.",
+    description: "★ ESCAPE HATCH for any Stripe question. Lists ANY resource: charges, payment_intents, customers, refunds, disputes, payouts, balance_transactions, subscriptions, invoices, coupons, products, prices, checkout sessions. Examples: resource='refunds' params={limit:100} for all refunds. resource='disputes' for chargebacks. resource='balance_transactions' params={type:'charge'} for full cash flow. Filter params support created[gte]/created[lte] (unix ts), customer, status, limit (up to 100). Auto-paginate by calling repeatedly with starting_after.",
     inputSchema: {
       type: "object",
       required: ["resource"],
@@ -341,7 +341,7 @@ const TOOLS = [
   },
   {
     name: "supabase_query",
-    description: "Run a read-only query on any Supabase table. Supports select, filters (eq, gte, lte, like, in), order, limit. Tables available: leads, funnel_sessions, users, event_sessions, questionnaire_responses, visualization_previews, client_messages, etc.",
+    description: "★ ESCAPE HATCH for the production database. Read any table with select+filters+order+limit. Tables: leads (email, payload→answers+utm+funnel_sid), funnel_sessions (session_id, answers→_max_step+all quiz keys), users (email, has_paid, paid_amount_cents, created_at, questionnaire_submitted_at, stripe_customer_id), event_sessions (session_id, event, step, payload), questionnaire_responses, visualization_previews (preview_id, before_path, after_path), client_messages. Filters object: `{column:value}` for eq, OR `{column:{op:'gte'|'lte'|'gt'|'lt'|'like'|'ilike'|'in'|'is'|'not', value:X}}`. Examples: table='leads' filters={created_at:{op:'gte',value:'2026-04-01'}} order='-created_at' limit=500. table='users' filters={has_paid:true} order='-paid_amount_cents'. Returns raw JSON rows.",
     inputSchema: {
       type: "object",
       required: ["table"],
@@ -591,7 +591,7 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
     const limit = Number(args.limit ?? 20);
     const { data, error } = await supabase
       .from("users")
-      .select("email, first_name, has_paid, created_at, questionnaire_submitted_at")
+      .select("email, first_name, has_paid, created_at, paid_amount_cents, protocol_status, protocol_viewed_at")
       .eq("has_paid", true)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -600,17 +600,21 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
     if (!data?.length) return "No paid customers found.";
 
     const rows = data.map(r => ({
-      date:  fmtDate(r.created_at),
-      name:  String(r.first_name ?? "—"),
-      email: r.email,
-      quest: r.questionnaire_submitted_at ? "submitted" : "pending",
+      date:    fmtDate(r.created_at),
+      name:    String(r.first_name ?? "—"),
+      email:   r.email,
+      paid:    r.paid_amount_cents ? `$${(r.paid_amount_cents/100).toFixed(0)}` : "—",
+      status:  String(r.protocol_status ?? "pending"),
+      viewed:  r.protocol_viewed_at ? "yes" : "no",
     }));
 
     return `${data.length} customers\n\n` + table(rows, [
-      { key: "date",  label: "Purchase date", width: 12 },
-      { key: "name",  label: "Name",          width: 14 },
-      { key: "email", label: "Email",         width: 30 },
-      { key: "quest", label: "Questionnaire", width: 13 },
+      { key: "date",   label: "Purchase",  width: 12 },
+      { key: "name",   label: "Name",      width: 14 },
+      { key: "email",  label: "Email",     width: 28 },
+      { key: "paid",   label: "Paid",      width: 7  },
+      { key: "status", label: "Protocol",  width: 12 },
+      { key: "viewed", label: "Viewed",    width: 7  },
     ]);
   }
 
@@ -1056,8 +1060,32 @@ export async function POST(request: NextRequest) {
   if (method === "initialize") {
     return ok(id, {
       protocolVersion: "2024-11-05",
-      serverInfo: { name: "protocol-data", version: "1.0.0" },
+      serverInfo: { name: "protocol-data", version: "2.0.0" },
       capabilities: { tools: {} },
+      instructions: [
+        "Protocol Club data server — full access to Meta Ads, Stripe, Supabase (production DB), and GitHub.",
+        "",
+        "PRINCIPLE: never say 'I can't' before trying. If a curated tool lacks a field or breakdown, fall back to the raw passthrough tools below — they expose the full underlying APIs.",
+        "",
+        "DECISION TREE:",
+        "  • Composed time-series questions (\"how did X evolve weekly\", \"ROAS per week\", \"funnel from April\") → USE `report` FIRST (single call, joins Meta+Stripe+Supabase).",
+        "  • Quick funnel snapshot → `funnel_stats` (supports breakdown=week, utm_source filter, since/until).",
+        "  • Quick Meta perf by creative → `meta_ads` (supports time_increment=1|7|monthly + custom since/until + level=ad|adset|campaign|account).",
+        "  • Quick Stripe → `revenue` or `payments` (auto-paginate, exclude internal tests, exposes UTMs from metadata).",
+        "  • Anything more specific or custom → use the RAW tools — they have no limits:",
+        "      - `meta_raw`: any Meta Graph API endpoint, any fields (breakdowns, video metrics, conversions by type, reach, frequency, etc.)",
+        "      - `stripe_raw`: any Stripe resource (charges, refunds, disputes, payouts, balance_transactions, subscriptions, etc.) with any list params",
+        "      - `supabase_query`: any table (leads, funnel_sessions, users, event_sessions, questionnaire_responses, visualization_previews, client_messages) with eq/gte/lte/like/in/not/is filters",
+        "      - `github_raw`: any GitHub REST endpoint on the production repo (commits, PRs, contents, blame, etc.)",
+        "",
+        "DATE RANGES: every tool accepts custom since/until (YYYY-MM-DD) OR a `days` shortcut. No 90-day cap. Meta keeps ~37 months of insights.",
+        "",
+        "ATTRIBUTION: Stripe payment_intents metadata carries utm_source/utm_campaign/utm_content/fbclid from the funnel. The `payments` tool surfaces these directly. To match a sale to a specific ad, read payment.metadata.utm_content (= Meta ad_id).",
+        "",
+        "INTERNAL TEST FILTERING: `revenue`, `payments`, `report` auto-exclude emails matching patrypierreandre, sofiane.lekfif, thibault.cdn, reddotgrowth and charges <$1. Pass `include_internal: true` to keep them.",
+        "",
+        "If you genuinely can't do something, say WHY (data not in the underlying API, attribution missing, etc.) — never say 'the connector doesn't support it' without first trying the raw tool.",
+      ].join("\n"),
     });
   }
 
