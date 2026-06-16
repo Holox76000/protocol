@@ -445,17 +445,39 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
     if (!ads.length) return `No ad data for ${rangeLabel}.`;
 
     const lines = [`Meta Ads — ${rangeLabel} — by ${level}`, ""];
+    let totSpend = 0, totLpv = 0, totLeads = 0, totClicks = 0, totImpr = 0;
+
     for (const ad of ads) {
       const actions = (ad.actions ?? []) as { action_type: string; value: string }[];
-      const leads = Number(actions.find(a => a.action_type === "lead")?.value ?? 0);
-      const cpl = leads > 0 ? `$${(parseFloat(String(ad.spend)) / leads).toFixed(2)}` : "—";
+      const lpv     = Number(actions.find(a => a.action_type === "landing_page_view")?.value ?? 0);
+      const leads   = Number(actions.find(a => a.action_type === "lead")?.value ?? 0);
+      const spend   = parseFloat(String(ad.spend));
+      const impr    = Number(ad.impressions ?? 0);
+      const clicks  = Number(ad.clicks ?? 0);
+
+      totSpend  += spend;
+      totLpv    += lpv;
+      totLeads  += leads;
+      totClicks += clicks;
+      totImpr   += impr;
+
+      const cpl  = leads > 0 ? `$${(spend / leads).toFixed(2)}` : "—";
+      const cpLpv = lpv > 0  ? `$${(spend / lpv).toFixed(2)}`   : "—";
       const label = String(ad.ad_name ?? ad.adset_name ?? ad.campaign_name ?? "?");
       lines.push(
         label,
-        `  Spend: $${parseFloat(String(ad.spend)).toFixed(2)}  |  Impr: ${ad.impressions}  |  CTR: ${parseFloat(String(ad.ctr ?? 0)).toFixed(2)}%  |  Leads: ${leads}  |  CPL: ${cpl}`,
+        `  Spend: $${spend.toFixed(2)}  |  Impr: ${impr}  |  Clicks: ${clicks}  |  CTR: ${parseFloat(String(ad.ctr ?? 0)).toFixed(2)}%`,
+        `  LPV: ${lpv} (${cpLpv})  |  Leads: ${leads} (${cpl})`,
         ""
       );
     }
+
+    // Totals
+    const totCtr = totImpr > 0 ? (totClicks / totImpr * 100).toFixed(2) : "0";
+    lines.push("─".repeat(60));
+    lines.push(`TOTAL  ·  Spend $${totSpend.toFixed(2)}  ·  Impr ${totImpr}  ·  CTR ${totCtr}%`);
+    lines.push(`        LPV ${totLpv} (${totLpv > 0 ? `$${(totSpend/totLpv).toFixed(2)}` : "—"})  ·  Leads ${totLeads} (${totLeads > 0 ? `$${(totSpend/totLeads).toFixed(2)}` : "—"})`);
+
     return lines.join("\n");
   }
 
