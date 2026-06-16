@@ -235,8 +235,8 @@ export async function GET(
     if (a.data?.signedUrl) afterPhoto = `<img src="${a.data.signedUrl}" alt="Your potential" />`;
   }
 
-  // 2b. Log report_viewed — funnel_sid is the session_id for the full downstream funnel
-  void supabaseAdmin.from("event_sessions").upsert(
+  // 2b. Log report_viewed — awaited before returning HTML (Netlify kills the function on response)
+  await supabaseAdmin.from("event_sessions").upsert(
     { session_id: sid, event: "report_viewed", step: null, payload: { funnel_sid: sid }, created_at: new Date().toISOString() },
     { onConflict: "session_id,event,step" }
   );
