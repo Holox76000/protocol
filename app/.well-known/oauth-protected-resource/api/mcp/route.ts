@@ -13,6 +13,7 @@ export async function GET() {
     resource: `${BASE}/api/mcp`,
     authorization_servers: [BASE],
     bearer_methods_supported: ["header"],
-    scopes_supported: ["mcp"],
+    scopes_supported: ["mcp", "mcp:tools"],
+    resource_documentation: `${BASE}/api/mcp`,
   }));
 }

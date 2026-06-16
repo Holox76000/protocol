@@ -420,7 +420,7 @@ export async function POST(request: NextRequest) {
   if (!isValid) {
     return withCors(NextResponse.json(
       { error: "Unauthorized" },
-      { status: 401, headers: { "WWW-Authenticate": `Bearer resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` } }
+      { status: 401, headers: { "WWW-Authenticate": `Bearer error="invalid_token", resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource/api/mcp"` } }
     ));
   }
 
@@ -470,7 +470,7 @@ export async function GET(request: NextRequest) {
   if (!isValid) {
     return withCors(new NextResponse("Unauthorized", {
       status: 401,
-      headers: { "WWW-Authenticate": `Bearer resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` },
+      headers: { "WWW-Authenticate": `Bearer error="invalid_token", resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource/api/mcp"` },
     }));
   }
   return withCors(new NextResponse("This MCP server uses POST for JSON-RPC.", { status: 405 }));

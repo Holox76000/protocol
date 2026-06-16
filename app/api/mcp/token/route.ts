@@ -20,10 +20,17 @@ export async function POST(req: NextRequest) {
     return withCors(NextResponse.json({ error: "invalid_grant" }, { status: 400 }));
   }
 
+  // Optional: validate `resource` parameter per RFC 8707
+  // We accept any resource that includes our MCP endpoint path
+  const resource = get("resource");
+  if (resource && !resource.includes("/api/mcp")) {
+    return withCors(NextResponse.json({ error: "invalid_target" }, { status: 400 }));
+  }
+
   return withCors(NextResponse.json({
     access_token: makeToken(),
     token_type: "Bearer",
     expires_in: 365 * 24 * 3600,
-    scope: "mcp",
+    scope: get("scope") || "mcp:tools",
   }));
 }
