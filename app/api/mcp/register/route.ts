@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
+import { withCors, corsPreflight } from "../../../../lib/cors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+export async function OPTIONS() { return corsPreflight(); }
 
 // Dynamic Client Registration (RFC 7591)
 // Accepts any client and returns a generated client_id.
@@ -20,7 +23,7 @@ export async function POST(req: NextRequest) {
     ? body.redirect_uris
     : [];
 
-  return NextResponse.json({
+  return withCors(NextResponse.json({
     client_id: clientId,
     client_id_issued_at: Math.floor(Date.now() / 1000),
     redirect_uris: redirectUris,
@@ -28,5 +31,5 @@ export async function POST(req: NextRequest) {
     response_types: ["code"],
     token_endpoint_auth_method: "none",
     client_name: body.client_name ?? "MCP Client",
-  });
+  }, { status: 201 }));
 }

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
+import { withCors, corsPreflight } from "../../../lib/cors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+export async function OPTIONS() { return corsPreflight(); }
+
 export async function GET() {
   const base = process.env.SITE_URL ?? "https://protocol-club.com";
-  return NextResponse.json({
+  return withCors(NextResponse.json({
     issuer: base,
     authorization_endpoint: `${base}/api/mcp/authorize`,
     token_endpoint: `${base}/api/mcp/token`,
@@ -15,5 +18,5 @@ export async function GET() {
     code_challenge_methods_supported: ["S256"],
     token_endpoint_auth_methods_supported: ["none"],
     scopes_supported: ["mcp"],
-  });
+  }));
 }

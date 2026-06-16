@@ -384,15 +384,32 @@ type JsonRpcRequest = {
   id?: number | string | null;
 };
 
+const CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, Mcp-Session-Id, MCP-Protocol-Version, Accept",
+  "Access-Control-Expose-Headers": "WWW-Authenticate, Mcp-Session-Id",
+  "Access-Control-Max-Age": "86400",
+};
+
+function withCors(res: NextResponse): NextResponse {
+  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
+  return res;
+}
+
 function ok(id: unknown, result: unknown) {
-  return NextResponse.json({ jsonrpc: "2.0", id, result });
+  return withCors(NextResponse.json({ jsonrpc: "2.0", id, result }));
 }
 
 function err(id: unknown, code: number, message: string) {
-  return NextResponse.json({ jsonrpc: "2.0", id, error: { code, message } }, { status: 200 });
+  return withCors(NextResponse.json({ jsonrpc: "2.0", id, error: { code, message } }, { status: 200 }));
 }
 
 // ── Route handlers ────────────────────────────────────────
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
 
 export async function POST(request: NextRequest) {
   // Auth — accepts both OAuth token and static Bearer secret
@@ -401,10 +418,10 @@ export async function POST(request: NextRequest) {
   const secret = process.env.MCP_SECRET ?? "";
   const isValid = token === secret || verifyToken(token);
   if (!isValid) {
-    return NextResponse.json(
+    return withCors(NextResponse.json(
       { error: "Unauthorized" },
-      { status: 401, headers: { "WWW-Authenticate": `Bearer realm="Protocol Club MCP", resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` } }
-    );
+      { status: 401, headers: { "WWW-Authenticate": `Bearer resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` } }
+    ));
   }
 
   const body = (await request.json()) as JsonRpcRequest;
@@ -419,7 +436,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (method === "notifications/initialized") {
-    return new NextResponse(null, { status: 204 });
+    return withCors(new NextResponse(null, { status: 204 }));
   }
 
   if (method === "ping") {
@@ -444,7 +461,17 @@ export async function POST(request: NextRequest) {
   return err(id, -32601, `Method not found: ${method}`);
 }
 
-// Claude Desktop probes GET for SSE capability — return 405 (tools-only server)
-export async function GET() {
-  return new NextResponse("This MCP server does not support SSE.", { status: 405 });
+// Some MCP clients probe GET — return same WWW-Authenticate so they can discover OAuth
+export async function GET(request: NextRequest) {
+  const auth  = request.headers.get("authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  const secret = process.env.MCP_SECRET ?? "";
+  const isValid = token === secret || verifyToken(token);
+  if (!isValid) {
+    return withCors(new NextResponse("Unauthorized", {
+      status: 401,
+      headers: { "WWW-Authenticate": `Bearer resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` },
+    }));
+  }
+  return withCors(new NextResponse("This MCP server uses POST for JSON-RPC.", { status: 405 }));
 }
