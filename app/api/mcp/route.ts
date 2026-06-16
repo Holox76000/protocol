@@ -51,6 +51,104 @@ function fmtDate(iso: string | null | undefined) {
   return iso ? iso.slice(0, 10) : "—";
 }
 
+// Resolve since/until into ISO timestamps from a (days | since | until) input
+function resolveWindow(args: Record<string, unknown>): { since: string; until: string; sinceDay: string; untilDay: string } {
+  const today = new Date().toISOString().slice(0, 10);
+  const untilDay = args.until ? String(args.until) : today;
+  let sinceDay: string;
+  if (args.since) {
+    sinceDay = String(args.since);
+  } else {
+    const days = Number(args.days ?? 30);
+    sinceDay = daysAgo(days).slice(0, 10);
+  }
+  return {
+    since: `${sinceDay}T00:00:00Z`,
+    until: `${untilDay}T23:59:59Z`,
+    sinceDay,
+    untilDay,
+  };
+}
+
+// Monday of the ISO week containing this YYYY-MM-DD
+function weekStart(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00Z");
+  const day = d.getUTCDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
+function bucketOf(dateStr: string, breakdown: "day" | "week" | "month"): string {
+  if (breakdown === "day")   return dateStr.slice(0, 10);
+  if (breakdown === "week")  return weekStart(dateStr);
+  return dateStr.slice(0, 7); // month
+}
+
+const INTERNAL_EMAIL_PATTERNS = [
+  "patrypierreandre", "sofiane.lekfif", "thibault.cdn", "reddotgrowth",
+];
+function isInternalEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  const lower = email.toLowerCase();
+  return INTERNAL_EMAIL_PATTERNS.some(p => lower.includes(p));
+}
+
+// Paginate Stripe payment_intents over a window — returns ALL matching
+async function fetchAllPaymentIntents(stripe: Stripe, sinceTs: number, untilTs: number, statusFilter?: string) {
+  const out: Stripe.PaymentIntent[] = [];
+  let startingAfter: string | undefined;
+  while (true) {
+    const page: Stripe.ApiList<Stripe.PaymentIntent> = await stripe.paymentIntents.list({
+      created: { gte: sinceTs, lte: untilTs },
+      limit: 100,
+      starting_after: startingAfter,
+    });
+    for (const p of page.data) {
+      if (statusFilter && statusFilter !== "all" && p.status !== statusFilter) continue;
+      out.push(p);
+    }
+    if (!page.has_more) break;
+    startingAfter = page.data[page.data.length - 1]?.id;
+    if (!startingAfter) break;
+  }
+  return out;
+}
+
+// Fetch Meta insights with time_increment, auto-paginate
+async function fetchMetaInsights(opts: {
+  level: string;
+  fields: string;
+  since?: string;
+  until?: string;
+  date_preset?: string;
+  time_increment?: string;
+}): Promise<Record<string, unknown>[]> {
+  const qs = new URLSearchParams({
+    access_token: META_TOKEN,
+    fields: opts.fields,
+    level: opts.level,
+    limit: "200",
+  });
+  if (opts.since && opts.until) {
+    qs.set("time_range", JSON.stringify({ since: opts.since, until: opts.until }));
+  } else if (opts.date_preset) {
+    qs.set("date_preset", opts.date_preset);
+  }
+  if (opts.time_increment && opts.time_increment !== "all") qs.set("time_increment", opts.time_increment);
+
+  const out: Record<string, unknown>[] = [];
+  let url = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?${qs.toString()}`;
+  while (url) {
+    const res = await fetch(url);
+    const json = await res.json() as { data?: Record<string, unknown>[]; paging?: { next?: string }; error?: { message: string } };
+    if (json.error) throw new Error(json.error.message);
+    for (const row of json.data ?? []) out.push(row);
+    url = json.paging?.next ?? "";
+  }
+  return out;
+}
+
 function table(rows: Record<string, unknown>[], cols: { key: string; label: string; width: number }[]) {
   if (!rows.length) return "(no data)";
   const header = cols.map(c => c.label.padEnd(c.width)).join("  ");
@@ -66,11 +164,17 @@ function table(rows: Record<string, unknown>[], cols: { key: string; label: stri
 const TOOLS = [
   {
     name: "leads",
-    description: "Quiz leads collected over the last N days — name, email, UTM source, body type, past solutions, desired results.",
+    description: "Quiz leads (optin email captured). Returns name, email, date, UTM source/campaign/ad, body type, past solutions, wants. Use `days` OR (`since`+`until`).",
     inputSchema: {
       type: "object",
       properties: {
-        days: { type: "integer", default: 7, minimum: 1, maximum: 90, description: "Number of days to look back" },
+        days:  { type: "integer", default: 30, minimum: 1, description: "Look back N days from today (no upper limit)" },
+        since: { type: "string", description: "Custom start date YYYY-MM-DD (overrides days)" },
+        until: { type: "string", description: "Custom end date YYYY-MM-DD (defaults to today)" },
+        utm_source:   { type: "string", description: "Filter by utm_source (e.g. 'ig', 'fb')" },
+        utm_campaign: { type: "string", description: "Filter by utm_campaign ID" },
+        utm_content:  { type: "string", description: "Filter by utm_content (ad ID)" },
+        exclude_internal: { type: "boolean", default: true, description: "Exclude internal test emails (patrypierreandre, sofiane.lekfif, etc.)" },
       },
     },
   },
@@ -87,11 +191,15 @@ const TOOLS = [
   },
   {
     name: "funnel_stats",
-    description: "Funnel session stats — sessions per day, step completion rates, lead conversion rate.",
+    description: "Funnel drop-off — sessions, step completion (Q1→Q11), optin, leads. Use `days` OR (`since`+`until`). Add `breakdown='week'` for weekly cohorts. Filter by UTM to isolate Meta-attributed sessions.",
     inputSchema: {
       type: "object",
       properties: {
-        days: { type: "integer", default: 7, minimum: 1, maximum: 90, description: "Number of days to look back" },
+        days:  { type: "integer", default: 30, minimum: 1, description: "Look back N days (no upper limit)" },
+        since: { type: "string", description: "Custom start YYYY-MM-DD" },
+        until: { type: "string", description: "Custom end YYYY-MM-DD" },
+        breakdown: { type: "string", enum: ["total", "day", "week"], default: "total", description: "Aggregate level. 'week' returns per-week cohort funnels." },
+        utm_source: { type: "string", description: "Filter to sessions whose lead matched this utm_source" },
       },
     },
   },
@@ -107,21 +215,29 @@ const TOOLS = [
   },
   {
     name: "revenue",
-    description: "Stripe revenue summary — total, number of payments, average ticket, breakdown per day.",
+    description: "Stripe revenue summary (succeeded only by default). Total, average ticket, breakdown by day/week/month. Auto-excludes internal test payments. Auto-paginates — no limit.",
     inputSchema: {
       type: "object",
       properties: {
-        days: { type: "integer", default: 30, minimum: 1, maximum: 365, description: "Number of days to look back" },
+        days:  { type: "integer", default: 30, minimum: 1, description: "Look back N days (no upper limit)" },
+        since: { type: "string", description: "Custom start YYYY-MM-DD" },
+        until: { type: "string", description: "Custom end YYYY-MM-DD" },
+        breakdown: { type: "string", enum: ["day", "week", "month"], default: "day" },
+        include_internal: { type: "boolean", default: false, description: "Include internal test payments (patrypierreandre+...). Default false." },
       },
     },
   },
   {
     name: "payments",
-    description: "Recent Stripe payments — amount, email, date, status.",
+    description: "Stripe payments list (succeeded by default). Auto-paginates over the full window. Returns amount, email, date, status, UTM source/campaign/ad from metadata.",
     inputSchema: {
       type: "object",
       properties: {
-        limit: { type: "integer", default: 10, minimum: 1, maximum: 50 },
+        days:  { type: "integer", default: 30, minimum: 1, description: "Look back N days (no upper limit)" },
+        since: { type: "string", description: "Custom start YYYY-MM-DD" },
+        until: { type: "string", description: "Custom end YYYY-MM-DD" },
+        status: { type: "string", enum: ["succeeded", "requires_payment_method", "all"], default: "succeeded" },
+        include_internal: { type: "boolean", default: false },
       },
     },
   },
@@ -149,10 +265,29 @@ const TOOLS = [
         until: { type: "string", description: "Custom range end date YYYY-MM-DD (required with since)" },
         level: {
           type: "string",
-          enum: ["campaign", "adset", "ad"],
+          enum: ["campaign", "adset", "ad", "account"],
           default: "ad",
         },
+        time_increment: {
+          type: "string",
+          enum: ["all", "1", "7", "monthly"],
+          default: "all",
+          description: "Time-series bucketing: 'all' (single total), '1' (daily), '7' (weekly), 'monthly'. Returns one row per bucket per entity.",
+        },
       },
+    },
+  },
+  {
+    name: "report",
+    description: "ONE-CALL master report: joins Meta spend/LPV + Stripe revenue + Supabase leads on the same time window. Returns weekly cohorts with: spend, LPV, sessions, leads, ventes, CPL, ROAS, conv lead→achat. Use this FIRST when answering questions like 'how did conversion evolve' or 'what's our ROAS by week'.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        since: { type: "string", description: "Start date YYYY-MM-DD (e.g. '2026-04-01')" },
+        until: { type: "string", description: "End date YYYY-MM-DD (defaults to today)" },
+        breakdown: { type: "string", enum: ["day", "week", "month"], default: "week" },
+      },
+      required: ["since"],
     },
   },
   {
@@ -280,34 +415,51 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
   const supabase = getSupabase();
 
   if (name === "leads") {
-    const days = Number(args.days ?? 7);
+    const { since, until, sinceDay, untilDay } = resolveWindow(args);
+    const excludeInternal = args.exclude_internal !== false;
+
     const { data, error } = await supabase
       .from("leads")
       .select("email, payload, created_at")
-      .gte("created_at", daysAgo(days))
+      .gte("created_at", since)
+      .lte("created_at", until)
       .order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
-    if (!data?.length) return `No leads in the last ${days} days.`;
-
-    const rows = data.map(r => {
+    let rows = (data ?? []).map(r => {
       const p = (r.payload ?? {}) as Record<string, unknown>;
       const a = (p.answers ?? {}) as Record<string, unknown>;
       const u = (p.utm ?? {}) as Record<string, unknown>;
-      const past = Array.isArray(a.past_solutions) ? a.past_solutions.join(", ") : String(a.past_solutions ?? "—");
-      const wants = Array.isArray(a.expected_results) ? a.expected_results.slice(0, 2).join(", ") : String(a.expected_results ?? "—");
-      return { date: fmtDate(r.created_at), name: String(a.first_name ?? "—"), email: r.email, src: String(u.utm_source ?? "—"), morpho: String(a.morphology ?? "—"), age: String(a.age_bracket ?? "—"), past, wants };
+      return {
+        date: fmtDate(r.created_at),
+        name: String(a.first_name ?? "—"),
+        email: r.email as string,
+        utm_source:   String(u.utm_source ?? "—"),
+        utm_campaign: String(u.utm_campaign ?? "—"),
+        utm_content:  String(u.utm_content ?? "—"),
+        morpho: String(a.morphology ?? "—"),
+        age:    String(a.age_bracket ?? "—"),
+        past:   Array.isArray(a.past_solutions) ? a.past_solutions.join(", ") : String(a.past_solutions ?? "—"),
+        wants:  Array.isArray(a.expected_results) ? a.expected_results.slice(0, 2).join(", ") : String(a.expected_results ?? "—"),
+      };
     });
 
-    return `${data.length} leads — last ${days} days\n\n` + table(rows, [
-      { key: "date",  label: "Date",     width: 10 },
-      { key: "name",  label: "Name",     width: 12 },
-      { key: "email", label: "Email",    width: 28 },
-      { key: "src",   label: "Src",      width: 6  },
-      { key: "morpho",label: "Body",     width: 11 },
-      { key: "age",   label: "Age",      width: 7  },
-      { key: "past",  label: "Tried",    width: 22 },
-      { key: "wants", label: "Wants",    width: 30 },
+    if (excludeInternal) rows = rows.filter(r => !isInternalEmail(r.email));
+    if (args.utm_source)   rows = rows.filter(r => r.utm_source   === String(args.utm_source));
+    if (args.utm_campaign) rows = rows.filter(r => r.utm_campaign === String(args.utm_campaign));
+    if (args.utm_content)  rows = rows.filter(r => r.utm_content  === String(args.utm_content));
+
+    if (!rows.length) return `No leads ${sinceDay} → ${untilDay}.`;
+
+    return `${rows.length} leads · ${sinceDay} → ${untilDay}\n\n` + table(rows, [
+      { key: "date",         label: "Date",     width: 10 },
+      { key: "name",         label: "Name",     width: 12 },
+      { key: "email",        label: "Email",    width: 28 },
+      { key: "utm_source",   label: "Src",      width: 6  },
+      { key: "utm_campaign", label: "Campaign", width: 20 },
+      { key: "morpho",       label: "Body",     width: 11 },
+      { key: "age",          label: "Age",      width: 7  },
+      { key: "past",         label: "Tried",    width: 22 },
     ]);
   }
 
@@ -355,51 +507,84 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
   }
 
   if (name === "funnel_stats") {
-    const days = Number(args.days ?? 7);
-    const { data, error } = await supabase
+    const { since, until, sinceDay, untilDay } = resolveWindow(args);
+    const breakdown = String(args.breakdown ?? "total") as "total" | "day" | "week";
+
+    const { data: sessions, error } = await supabase
       .from("funnel_sessions")
-      .select("answers, created_at")
-      .gte("created_at", daysAgo(days))
-      .limit(1000);
-
+      .select("session_id, answers, created_at")
+      .gte("created_at", since)
+      .lte("created_at", until);
     if (error) throw new Error(error.message);
-    const total = data?.length ?? 0;
-    if (!total) return `No funnel sessions in the last ${days} days.`;
 
-    const byDay: Record<string, number> = {};
-    for (const r of data!) {
-      const d = fmtDate(r.created_at);
-      byDay[d] = (byDay[d] ?? 0) + 1;
+    const { data: leadsData } = await supabase
+      .from("leads")
+      .select("email, payload, created_at")
+      .gte("created_at", since)
+      .lte("created_at", until);
+
+    // Filter leads by UTM if requested
+    let leads = (leadsData ?? []);
+    if (args.utm_source) {
+      leads = leads.filter(l => String(((l.payload as Record<string, unknown>)?.utm as Record<string, unknown>)?.utm_source ?? "") === String(args.utm_source));
     }
+    // Match sessions to leads via funnel_sid (when UTM filter is applied)
+    const leadSids = new Set(leads.map(l => String(((l.payload as Record<string, unknown>)?.funnel_sid ?? ""))).filter(Boolean));
+    const filteredSessions = args.utm_source
+      ? (sessions ?? []).filter(s => leadSids.has(s.session_id as string))
+      : (sessions ?? []);
 
     const steps = [
-      { key: "age_bracket",       label: "Q1  Âge" },
-      { key: "morphology",        label: "Q3  Body type" },
-      { key: "expected_results",  label: "Q6  What to change" },
-      { key: "height_unit",       label: "Q7  Height" },
-      { key: "weight_value",      label: "Q8  Weight" },
-      { key: "weekly_time",       label: "Q9  Time/week" },
-      { key: "social_environment",label: "Q10 Environment" },
-      { key: "past_solutions",    label: "Q11 Past solutions" },
-      { key: "email",             label: "OPTIN Email" },
+      { key: "age_bracket",        label: "Q1  Âge" },
+      { key: "morphology",         label: "Q3  Body type" },
+      { key: "expected_results",   label: "Q6  Goals" },
+      { key: "height_unit",        label: "Q7  Height" },
+      { key: "weight_value",       label: "Q8  Weight" },
+      { key: "weekly_time",        label: "Q9  Time/week" },
+      { key: "social_environment", label: "Q10 Environment" },
+      { key: "past_solutions",     label: "Q11 Past solutions" },
+      { key: "email",              label: "OPTIN Email" },
     ];
 
-    const { data: leads } = await supabase.from("leads").select("created_at").gte("created_at", daysAgo(days));
-    const leadCount = leads?.length ?? 0;
+    function funnelOf(rows: typeof filteredSessions, leadsCnt: number): string[] {
+      const total = rows.length;
+      if (!total) return ["  (no sessions)"];
+      const out = [`  Sessions: ${total}  ·  Leads: ${leadsCnt}  ·  Lead rate: ${total ? Math.round(leadsCnt/total*100) : 0}%`];
+      for (const s of steps) {
+        const cnt = rows.filter(r => r.answers && typeof r.answers === "object" && (r.answers as Record<string, unknown>)[s.key]).length;
+        out.push(`  ${String(total ? Math.round(cnt/total*100) : 0).padStart(3)}%  (${String(cnt).padStart(3)}/${total})  ${s.label}`);
+      }
+      return out;
+    }
 
-    return [
-      `Funnel — last ${days} days`,
-      `Sessions: ${total}  |  Leads: ${leadCount}  |  Lead rate: ${Math.round(leadCount / total * 100)}%`,
-      ``,
-      `── Sessions per day ─────────────────`,
-      ...Object.entries(byDay).sort().map(([d, n]) => `${d}: ${n}`),
-      ``,
-      `── Step completion ──────────────────`,
-      ...steps.map(s => {
-        const cnt = data!.filter(r => r.answers && typeof r.answers === "object" && (r.answers as Record<string, unknown>)[s.key]).length;
-        return `${String(Math.round(cnt / total * 100)).padStart(3)}%  (${String(cnt).padStart(3)}/${total})  ${s.label}`;
-      }),
-    ].join("\n");
+    if (breakdown === "total") {
+      return [
+        `Funnel · ${sinceDay} → ${untilDay}${args.utm_source ? ` · utm_source=${args.utm_source}` : ""}`,
+        "",
+        ...funnelOf(filteredSessions, leads.length),
+      ].join("\n");
+    }
+
+    // Bucket by day or week
+    const buckets: Record<string, { sessions: typeof filteredSessions; leads: number }> = {};
+    for (const s of filteredSessions) {
+      const b = bucketOf(s.created_at as string, breakdown === "day" ? "day" : "week");
+      buckets[b] ??= { sessions: [], leads: 0 };
+      buckets[b].sessions.push(s);
+    }
+    for (const l of leads) {
+      const b = bucketOf(l.created_at as string, breakdown === "day" ? "day" : "week");
+      buckets[b] ??= { sessions: [], leads: 0 };
+      buckets[b].leads++;
+    }
+
+    const lines = [`Funnel · ${sinceDay} → ${untilDay} · by ${breakdown}${args.utm_source ? ` · utm_source=${args.utm_source}` : ""}`, ""];
+    for (const day of Object.keys(buckets).sort()) {
+      lines.push(`── ${day} ${"─".repeat(40)}`);
+      lines.push(...funnelOf(buckets[day].sessions, buckets[day].leads));
+      lines.push("");
+    }
+    return lines.join("\n");
   }
 
   if (name === "customers") {
@@ -430,109 +615,225 @@ async function runTool(name: string, args: Record<string, unknown>): Promise<str
   }
 
   if (name === "revenue") {
-    const days = Number(args.days ?? 30);
+    const { sinceDay, untilDay } = resolveWindow(args);
+    const sinceTs = Math.floor(new Date(`${sinceDay}T00:00:00Z`).getTime() / 1000);
+    const untilTs = Math.floor(new Date(`${untilDay}T23:59:59Z`).getTime() / 1000);
     const stripe = getStripe();
-    const since = Math.floor(Date.now() / 1000) - days * 86400;
-    const charges = await stripe.paymentIntents.list({ created: { gte: since }, limit: 100 });
-    const succeeded = charges.data.filter(p => p.status === "succeeded");
+    const breakdown = String(args.breakdown ?? "day") as "day" | "week" | "month";
+    const excludeInternal = args.include_internal !== true;
+
+    const intents = await fetchAllPaymentIntents(stripe, sinceTs, untilTs, "succeeded");
+    const succeeded = intents
+      .filter(p => p.amount_received > 100) // exclude $0.x test charges
+      .filter(p => excludeInternal ? !isInternalEmail(p.receipt_email ?? (p.metadata as Record<string,string>)?.customer_email) : true);
+
     const total = succeeded.reduce((s, p) => s + p.amount_received, 0);
     const avg = succeeded.length ? Math.round(total / succeeded.length) : 0;
 
-    const byDay: Record<string, number> = {};
+    const buckets: Record<string, number> = {};
     for (const p of succeeded) {
-      const d = new Date(p.created * 1000).toISOString().slice(0, 10);
-      byDay[d] = (byDay[d] ?? 0) + p.amount_received;
+      const d = new Date(p.created * 1000).toISOString();
+      const b = bucketOf(d, breakdown);
+      buckets[b] = (buckets[b] ?? 0) + p.amount_received;
     }
 
     return [
-      `Revenue — last ${days} days`,
-      `Total: $${(total / 100).toFixed(2)}  |  Payments: ${succeeded.length}  |  Avg: $${(avg / 100).toFixed(2)}`,
+      `Revenue · ${sinceDay} → ${untilDay} · succeeded only${excludeInternal ? " (internal excluded)" : ""}`,
+      `Total: $${(total/100).toFixed(2)}  ·  Payments: ${succeeded.length}  ·  Avg ticket: $${(avg/100).toFixed(2)}`,
       ``,
-      `── Per day ──────────────────────────`,
-      ...Object.entries(byDay).sort().map(([d, amt]) => `${d}: $${(amt / 100).toFixed(2)}`),
+      `── Per ${breakdown} ────────────────────`,
+      ...Object.entries(buckets).sort().map(([b, amt]) => `${b}: $${(amt/100).toFixed(2)}`),
     ].join("\n");
   }
 
   if (name === "payments") {
-    const limit = Number(args.limit ?? 10);
+    const { sinceDay, untilDay } = resolveWindow(args);
+    const sinceTs = Math.floor(new Date(`${sinceDay}T00:00:00Z`).getTime() / 1000);
+    const untilTs = Math.floor(new Date(`${untilDay}T23:59:59Z`).getTime() / 1000);
     const stripe = getStripe();
-    const intents = await stripe.paymentIntents.list({ limit });
-    const rows = intents.data.map(p => ({
-      date:   new Date(p.created * 1000).toISOString().slice(0, 10),
-      amount: `$${(p.amount_received / 100).toFixed(2)}`,
-      status: p.status,
-      email:  String(p.receipt_email ?? (p.metadata as Record<string, string>)?.email ?? "—"),
-    }));
-    return table(rows, [
-      { key: "date",   label: "Date",   width: 12 },
-      { key: "amount", label: "Amount", width: 8  },
-      { key: "status", label: "Status", width: 12 },
-      { key: "email",  label: "Email",  width: 30 },
+    const status = String(args.status ?? "succeeded");
+    const excludeInternal = args.include_internal !== true;
+
+    const intents = await fetchAllPaymentIntents(stripe, sinceTs, untilTs, status === "all" ? undefined : status);
+
+    const rows = intents
+      .filter(p => excludeInternal ? !isInternalEmail(p.receipt_email ?? (p.metadata as Record<string,string>)?.customer_email) : true)
+      .map(p => {
+        const m = (p.metadata ?? {}) as Record<string, string>;
+        return {
+          date:    new Date(p.created * 1000).toISOString().slice(0, 10),
+          amount:  `$${((p.amount_received || p.amount) / 100).toFixed(2)}`,
+          status:  p.status,
+          email:   String(p.receipt_email ?? m.customer_email ?? "—"),
+          src:     m.utm_source ?? "—",
+          campaign: m.utm_campaign ?? "—",
+          ad:      m.utm_content ?? "—",
+        };
+      });
+
+    return `${rows.length} payments · ${sinceDay} → ${untilDay} · status=${status}\n\n` + table(rows, [
+      { key: "date",     label: "Date",     width: 11 },
+      { key: "amount",   label: "Amount",   width: 8  },
+      { key: "status",   label: "Status",   width: 12 },
+      { key: "email",    label: "Email",    width: 28 },
+      { key: "src",      label: "Src",      width: 6  },
+      { key: "campaign", label: "Campaign", width: 20 },
     ]);
   }
 
   if (name === "meta_ads") {
     if (!META_ACCOUNT) return "META_AD_ACCOUNT_ID not configured on the server.";
     const level = String(args.level ?? "ad");
+    const ti    = String(args.time_increment ?? "all");
     const since = args.since ? String(args.since) : "";
     const until = args.until ? String(args.until) : "";
 
-    const fields = "campaign_name,adset_name,ad_name,spend,impressions,clicks,cpm,ctr,actions";
-    let url = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?fields=${fields}&level=${level}&limit=200&access_token=${META_TOKEN}`;
+    const fields = "campaign_name,adset_name,ad_name,spend,impressions,clicks,cpm,ctr,actions,reach,frequency,unique_clicks,cost_per_action_type,date_start,date_stop";
+    const ads = await fetchMetaInsights({
+      level,
+      fields,
+      since: since || undefined,
+      until: until || undefined,
+      date_preset: since && until ? undefined : String(args.date_preset ?? "last_7d"),
+      time_increment: ti,
+    });
+    if (!ads.length) return `No ad data for the requested window.`;
 
-    let rangeLabel: string;
-    if (since && until) {
-      const range = encodeURIComponent(JSON.stringify({ since, until }));
-      url += `&time_range=${range}`;
-      rangeLabel = `${since} → ${until}`;
-    } else {
-      const preset = String(args.date_preset ?? "last_7d");
-      url += `&date_preset=${preset}`;
-      rangeLabel = preset;
-    }
-
-    const res = await fetch(url);
-    const json = await res.json() as { data?: Record<string, unknown>[]; error?: { message: string } };
-
-    if (json.error) throw new Error(json.error.message);
-    const ads = json.data ?? [];
-    if (!ads.length) return `No ad data for ${rangeLabel}.`;
-
-    const lines = [`Meta Ads — ${rangeLabel} — by ${level}`, ""];
+    const rangeLabel = since && until ? `${since} → ${until}` : String(args.date_preset ?? "last_7d");
+    const lines = [`Meta Ads · ${rangeLabel} · by ${level} · time_increment=${ti}`, ""];
     let totSpend = 0, totLpv = 0, totLeads = 0, totClicks = 0, totImpr = 0;
 
     for (const ad of ads) {
       const actions = (ad.actions ?? []) as { action_type: string; value: string }[];
       const lpv     = Number(actions.find(a => a.action_type === "landing_page_view")?.value ?? 0);
       const leads   = Number(actions.find(a => a.action_type === "lead")?.value ?? 0);
+      const purch   = Number(actions.find(a => a.action_type === "purchase" || a.action_type === "omni_purchase")?.value ?? 0);
       const spend   = parseFloat(String(ad.spend));
       const impr    = Number(ad.impressions ?? 0);
       const clicks  = Number(ad.clicks ?? 0);
 
-      totSpend  += spend;
-      totLpv    += lpv;
-      totLeads  += leads;
-      totClicks += clicks;
-      totImpr   += impr;
+      totSpend += spend; totLpv += lpv; totLeads += leads; totClicks += clicks; totImpr += impr;
 
-      const cpl  = leads > 0 ? `$${(spend / leads).toFixed(2)}` : "—";
-      const cpLpv = lpv > 0  ? `$${(spend / lpv).toFixed(2)}`   : "—";
-      const label = String(ad.ad_name ?? ad.adset_name ?? ad.campaign_name ?? "?");
+      const cpl   = leads > 0 ? `$${(spend / leads).toFixed(2)}` : "—";
+      const cpLpv = lpv > 0   ? `$${(spend / lpv).toFixed(2)}`   : "—";
+      const label = String(ad.ad_name ?? ad.adset_name ?? ad.campaign_name ?? "account");
+      const dateLabel = ad.date_start ? ` [${String(ad.date_start)}${ad.date_stop && ad.date_stop !== ad.date_start ? ` → ${String(ad.date_stop)}` : ""}]` : "";
+
       lines.push(
-        label,
-        `  Spend: $${spend.toFixed(2)}  |  Impr: ${impr}  |  Clicks: ${clicks}  |  CTR: ${parseFloat(String(ad.ctr ?? 0)).toFixed(2)}%`,
-        `  LPV: ${lpv} (${cpLpv})  |  Leads: ${leads} (${cpl})`,
+        `${label}${dateLabel}`,
+        `  Spend $${spend.toFixed(2)}  ·  Impr ${impr}  ·  Clicks ${clicks}  ·  CTR ${parseFloat(String(ad.ctr ?? 0)).toFixed(2)}%`,
+        `  LPV ${lpv} (${cpLpv})  ·  Leads ${leads} (${cpl})  ·  Purchases ${purch}`,
         ""
       );
     }
 
-    // Totals
     const totCtr = totImpr > 0 ? (totClicks / totImpr * 100).toFixed(2) : "0";
     lines.push("─".repeat(60));
-    lines.push(`TOTAL  ·  Spend $${totSpend.toFixed(2)}  ·  Impr ${totImpr}  ·  CTR ${totCtr}%`);
-    lines.push(`        LPV ${totLpv} (${totLpv > 0 ? `$${(totSpend/totLpv).toFixed(2)}` : "—"})  ·  Leads ${totLeads} (${totLeads > 0 ? `$${(totSpend/totLeads).toFixed(2)}` : "—"})`);
+    lines.push(`TOTAL · Spend $${totSpend.toFixed(2)} · Impr ${totImpr} · CTR ${totCtr}%`);
+    lines.push(`        LPV ${totLpv} (${totLpv>0?`$${(totSpend/totLpv).toFixed(2)}`:"—"}) · Leads ${totLeads} (${totLeads>0?`$${(totSpend/totLeads).toFixed(2)}`:"—"})`);
 
     return lines.join("\n");
+  }
+
+  // ── REPORT — one-call master answer for "how did X evolve" questions ──
+  if (name === "report") {
+    const { sinceDay, untilDay } = resolveWindow(args);
+    const breakdown = String(args.breakdown ?? "week") as "day" | "week" | "month";
+
+    const stripe = getStripe();
+    const sinceTs = Math.floor(new Date(`${sinceDay}T00:00:00Z`).getTime() / 1000);
+    const untilTs = Math.floor(new Date(`${untilDay}T23:59:59Z`).getTime() / 1000);
+
+    const [metaRows, intents, leadsRes, sessionsRes] = await Promise.all([
+      META_ACCOUNT ? fetchMetaInsights({
+        level: "account",
+        fields: "spend,impressions,clicks,actions,date_start",
+        since: sinceDay,
+        until: untilDay,
+        time_increment: "1",
+      }).catch(e => { console.error("meta failed", e); return []; }) : Promise.resolve([]),
+      fetchAllPaymentIntents(stripe, sinceTs, untilTs, "succeeded").catch(() => []),
+      supabase.from("leads").select("email, payload, created_at").gte("created_at", `${sinceDay}T00:00:00Z`).lte("created_at", `${untilDay}T23:59:59Z`),
+      supabase.from("funnel_sessions").select("created_at").gte("created_at", `${sinceDay}T00:00:00Z`).lte("created_at", `${untilDay}T23:59:59Z`),
+    ]);
+
+    // Bucket everything
+    type Bucket = { spend: number; lpv: number; impr: number; clicks: number; sessions: number; leads: number; revenue_cents: number; sales: number };
+    const buckets: Record<string, Bucket> = {};
+    const ensure = (d: string): Bucket => buckets[d] ??= { spend:0, lpv:0, impr:0, clicks:0, sessions:0, leads:0, revenue_cents:0, sales:0 };
+
+    for (const m of metaRows) {
+      const b = ensure(bucketOf(String(m.date_start), breakdown));
+      const actions = (m.actions ?? []) as { action_type: string; value: string }[];
+      b.spend  += parseFloat(String(m.spend ?? 0));
+      b.lpv    += Number(actions.find(a => a.action_type === "landing_page_view")?.value ?? 0);
+      b.impr   += Number(m.impressions ?? 0);
+      b.clicks += Number(m.clicks ?? 0);
+    }
+    for (const s of sessionsRes.data ?? []) ensure(bucketOf(s.created_at as string, breakdown)).sessions++;
+    for (const l of leadsRes.data ?? []) {
+      if (isInternalEmail(l.email as string)) continue;
+      ensure(bucketOf(l.created_at as string, breakdown)).leads++;
+    }
+    for (const p of intents) {
+      if (isInternalEmail(p.receipt_email ?? (p.metadata as Record<string,string>)?.customer_email)) continue;
+      if (p.amount_received < 100) continue; // skip $0.x tests
+      const b = ensure(bucketOf(new Date(p.created*1000).toISOString(), breakdown));
+      b.revenue_cents += p.amount_received;
+      b.sales++;
+    }
+
+    const days = Object.keys(buckets).sort();
+    if (!days.length) return `No data ${sinceDay} → ${untilDay}.`;
+
+    // Totals
+    const T: Bucket = { spend:0, lpv:0, impr:0, clicks:0, sessions:0, leads:0, revenue_cents:0, sales:0 };
+    for (const b of Object.values(buckets)) {
+      T.spend += b.spend; T.lpv += b.lpv; T.impr += b.impr; T.clicks += b.clicks;
+      T.sessions += b.sessions; T.leads += b.leads; T.revenue_cents += b.revenue_cents; T.sales += b.sales;
+    }
+
+    const rows = days.map(d => {
+      const b = buckets[d];
+      const rev = b.revenue_cents/100;
+      return {
+        bucket:   d,
+        spend:    `$${b.spend.toFixed(0)}`,
+        lpv:      String(b.lpv),
+        sessions: String(b.sessions),
+        leads:    String(b.leads),
+        sales:    String(b.sales),
+        revenue:  `$${rev.toFixed(0)}`,
+        cpl:      b.leads ? `$${(b.spend/b.leads).toFixed(2)}` : "—",
+        roas:     b.spend>0 ? (rev/b.spend).toFixed(2) : "—",
+        conv:     b.leads ? `${(b.sales/b.leads*100).toFixed(1)}%` : "—",
+      };
+    });
+
+    const tableStr = table(rows, [
+      { key: "bucket",   label: "Period",     width: 12 },
+      { key: "spend",    label: "Spend",      width: 8  },
+      { key: "lpv",      label: "LPV",        width: 5  },
+      { key: "sessions", label: "Sessions",   width: 9  },
+      { key: "leads",    label: "Leads",      width: 6  },
+      { key: "sales",    label: "Sales",      width: 6  },
+      { key: "revenue",  label: "Revenue",    width: 9  },
+      { key: "cpl",      label: "CPL",        width: 7  },
+      { key: "roas",     label: "ROAS",       width: 6  },
+      { key: "conv",     label: "L→Sale",     width: 7  },
+    ]);
+
+    const totalRev = T.revenue_cents/100;
+    return [
+      `Master report · ${sinceDay} → ${untilDay} · by ${breakdown}`,
+      `Excludes internal test emails and <$1 charges. Revenue = succeeded Stripe payments. ROAS = revenue ÷ Meta spend.`,
+      ``,
+      tableStr,
+      ``,
+      `── TOTAL ─────────────────────────────`,
+      `Spend $${T.spend.toFixed(2)} · LPV ${T.lpv} · Sessions ${T.sessions} · Leads ${T.leads} · Sales ${T.sales} · Revenue $${totalRev.toFixed(2)}`,
+      `Global ROAS: ${T.spend > 0 ? (totalRev/T.spend).toFixed(2) : "—"}  ·  CPL: ${T.leads > 0 ? `$${(T.spend/T.leads).toFixed(2)}` : "—"}  ·  Lead→Sale: ${T.leads > 0 ? `${(T.sales/T.leads*100).toFixed(1)}%` : "—"}`,
+    ].join("\n");
   }
 
   if (name === "commits") {
