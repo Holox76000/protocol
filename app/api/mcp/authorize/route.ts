@@ -4,8 +4,8 @@ import { makeCode } from "../../../../lib/mcp-auth";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const LOGIN    = () => process.env.MCP_LOGIN    ?? "protocol";
-const PASSWORD = () => process.env.MCP_PASSWORD ?? "fhEtyIIAz-UgoBrgR07-dXkplz10P46L";
+const LOGIN    = () => process.env.MCP_LOGIN    ?? "";
+const PASSWORD = () => process.env.MCP_PASSWORD ?? "";
 
 // ── GET — show login form ──────────────────────────────────
 
@@ -72,7 +72,9 @@ export async function POST(req: NextRequest) {
   const state         = String(body.get("state") ?? "");
   const codeChallenge = String(body.get("code_challenge") ?? "");
 
-  if (username !== LOGIN() || password !== PASSWORD()) {
+  const validLogin    = LOGIN();
+  const validPassword = PASSWORD();
+  if (!validLogin || !validPassword || username !== validLogin || password !== validPassword) {
     // Re-render form with error
     const html = `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
