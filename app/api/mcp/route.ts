@@ -403,7 +403,7 @@ export async function POST(request: NextRequest) {
   if (!isValid) {
     return NextResponse.json(
       { error: "Unauthorized" },
-      { status: 401, headers: { "WWW-Authenticate": `Bearer realm="Protocol Club MCP", resource_metadata="https://protocol-club.com/.well-known/oauth-authorization-server"` } }
+      { status: 401, headers: { "WWW-Authenticate": `Bearer realm="Protocol Club MCP", resource_metadata="https://protocol-club.com/.well-known/oauth-protected-resource"` } }
     );
   }
 
