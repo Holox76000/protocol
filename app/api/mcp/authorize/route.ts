@@ -1,23 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { makeCode } from "../../../../lib/mcp-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const LOGIN    = process.env.MCP_LOGIN    ?? "protocol";
-const PASSWORD = process.env.MCP_PASSWORD ?? "fhEtyIIAz-UgoBrgR07-dXkplz10P46L";
-const SECRET   = process.env.MCP_SECRET   ?? "";
-
-function signCode(payload: string): string {
-  return createHmac("sha256", SECRET).update(payload).digest("base64url");
-}
-
-function makeCode(redirectUri: string, codeChallenge: string): string {
-  const exp = Date.now() + 5 * 60 * 1000; // 5 min
-  const data = `${exp}|${redirectUri}|${codeChallenge}`;
-  const sig = signCode(data);
-  return Buffer.from(`${data}|${sig}`).toString("base64url");
-}
+const LOGIN    = () => process.env.MCP_LOGIN    ?? "protocol";
+const PASSWORD = () => process.env.MCP_PASSWORD ?? "fhEtyIIAz-UgoBrgR07-dXkplz10P46L";
 
 // ── GET — show login form ──────────────────────────────────
 
@@ -84,7 +72,7 @@ export async function POST(req: NextRequest) {
   const state         = String(body.get("state") ?? "");
   const codeChallenge = String(body.get("code_challenge") ?? "");
 
-  if (username !== LOGIN || password !== PASSWORD) {
+  if (username !== LOGIN() || password !== PASSWORD()) {
     // Re-render form with error
     const html = `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">

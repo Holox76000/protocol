@@ -18,7 +18,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import { verifyToken } from "./token/route";
+import { verifyToken } from "../../../lib/mcp-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
