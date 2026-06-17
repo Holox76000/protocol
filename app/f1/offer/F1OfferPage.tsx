@@ -434,7 +434,13 @@ function MNav({ href }: { href: string }) {
   );
 }
 
-function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
+function MHeroV1({ href, eyebrow, attractsMen }: { href: string; eyebrow: string | null; attractsMen: boolean }) {
+  const desc = ACTIVE_VARIANT === "projection"
+    ? "See your full potential, then get the exact protocol to reach it."
+    : attractsMen
+      ? "A 12-week protocol built around the published research on what attracts the men you want."
+      : "A 12-week protocol built around the published research on what the eye reads as attractive.";
+
   return (
     <section className="mo-hero mo-hero-v1">
       {/* Left column: copy (desktop only) */}
@@ -446,11 +452,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
               ? <>See yourself at your full <em>peak potential</em> and reach it.</>
               : <>Reach your full <em>attractiveness potential</em></>}
           </h1>
-          <p className="mo-hero__desc">
-            {ACTIVE_VARIANT === "projection"
-              ? "See your full potential, then get the exact protocol to reach it."
-              : "A 12-week protocol built around the published research on what the eye reads as attractive."}
-          </p>
+          <p className="mo-hero__desc">{desc}</p>
           <div className="mo-hero__ctas">
             <CtaButton label="Start your Protocol — $89" className="mo-cta--hero" location="hero" href={href} />
             <a href="#mo-method" className="mo-hero__cta-ghost">See the method</a>
@@ -474,11 +476,7 @@ function MHeroV1({ href, eyebrow }: { href: string; eyebrow: string | null }) {
               ? <>See yourself at your full <em>peak potential</em> and reach it.</>
               : <>Reach your full <em>attractiveness potential</em></>}
           </h1>
-        <p className="mo-hero__desc">
-          {ACTIVE_VARIANT === "projection"
-            ? "See your full potential, then get the exact protocol to reach it."
-            : "A 12-week protocol built around the published research on what the eye reads as attractive."}
-        </p>
+        <p className="mo-hero__desc">{desc}</p>
       </div>
 
       {/* Right column: dark panel with product image */}
@@ -1101,6 +1099,7 @@ export default function F1OfferPage() {
   const [preview, setPreview] = useState<PreviewState>({ status: "idle" });
   const [heroEyebrow, setHeroEyebrow] = useState<string | null>(null);
   const [pastAttempts, setPastAttempts] = useState<string[]>([]);
+  const [attractsMen, setAttractsMen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1139,6 +1138,9 @@ export default function F1OfferPage() {
     const rawAttempts = params.get("past_solutions");
     if (rawAttempts) setPastAttempts(rawAttempts.split("|"));
 
+    const orientation = params.get("sexual_orientation");
+    if (orientation === "gay" || orientation === "bisexual") setAttractsMen(true);
+
     const sid = params.get("funnel_sid");
     if (sid) {
       setPreview({ status: "loading" });
@@ -1173,7 +1175,7 @@ export default function F1OfferPage() {
   return (
     <div className="mo-page">
       <MNav href={signupHref} />
-      <MHeroV1 href={signupHref} eyebrow={heroEyebrow} />
+      <MHeroV1 href={signupHref} eyebrow={heroEyebrow} attractsMen={attractsMen} />
       <MPress />
       <MAdvisors />
       {ACTIVE_VARIANT === "projection" && <ProjectionSection signupHref={signupHref} />}

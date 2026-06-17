@@ -254,6 +254,7 @@ export async function GET(
   const quizKeys = [
     "morphology", "ethnicity", "age_bracket", "past_solutions",
     "expected_results", "social_environment", "weekly_time",
+    "sexual_orientation",
     "height_unit", "height_ft", "height_in", "height_cm",
     "weight_value", "weight_unit", "weight_kg", "first_name",
   ];
