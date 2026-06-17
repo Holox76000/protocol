@@ -67,9 +67,10 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
     const reportCtaSids     = new Set(filteredEvents.filter(e => e.event === "report_cta_clicked").map(e => e.sid));
     const offerViewedSids   = new Set(filteredEvents.filter(e => e.event === "view_offer" && e.funnelSid).map(e => e.funnelSid));
 
-    // Purchases cross-ref
-    const leadEmailSet = new Set(optinLeads.map(l => l.email.toLowerCase()));
-    const purchases = users.filter(u => inRange(u.date) && leadEmailSet.has(u.email.toLowerCase()));
+    // All paid users in range — count every purchase, whether or not the user
+    // went through the F1 lead optin (some come from retargeting, direct links,
+    // or had a failed lead insert).
+    const purchases = users.filter(u => inRange(u.date));
 
     const rows = [
       { key: "quiz_started",       label: "Quiz démarré",            n: quizCounts.quiz_started    ?? 0 },
