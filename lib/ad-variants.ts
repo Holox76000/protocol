@@ -334,6 +334,66 @@ const WHAT_MAKES_ATTRACTIVE_GAY: AdVariant = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Persona-tuned "4 steps to improve your attractiveness" carousels (2026-06-17)
+// Carousel cards: 4-steps hook → "what's killing it" → reframe → "work on what's
+// visible" → "a protocol for your body" → "get your free analysis" CTA
+// ─────────────────────────────────────────────────────────────────────────────
+
+// "4 steps — Bi" — response from men and women, chasing feed trends
+const FOUR_STEPS_BI: AdVariant = {
+  badge: "Attractiveness Protocol",
+  headline: "4 steps to a body that lands — with men and women alike.",
+  subtext:
+    "Most bi guys chase whichever physique trend pops up in their feed. The combination that maximizes how you're perceived can be calculated. This assessment tells you exactly where you stand on each of the 4 steps that move it for your body.",
+  cta: "Get my free analysis →",
+};
+
+// "4 steps — 60+" — variables shift past 60, the formula adapts
+const FOUR_STEPS_60: AdVariant = {
+  badge: "Attractiveness Protocol · 60+",
+  headline: "4 steps to improve your attractiveness past 60 — the variables shift, the formula adapts.",
+  subtext:
+    "The program you used at 40 wasn't built for your body now. Your current proportions, your weak points, your shape need their own protocol. This assessment tells you where you stand on each of the 4 steps.",
+  cta: "Get my free analysis →",
+};
+
+// "4 steps — Gay" — body other men actually respond to
+const FOUR_STEPS_GAY: AdVariant = {
+  badge: "Attractiveness Protocol",
+  headline: "4 steps to a body other men actually respond to.",
+  subtext:
+    "Most generic programs aren't built around what other men read as attractive. Your proportions, your weak points, your specific shape need their own protocol. This assessment tells you exactly where you stand on each of the 4 steps.",
+  cta: "Get my free analysis →",
+};
+
+// "4 steps — Newly Single" — dating market, first impressions
+const FOUR_STEPS_DATING: AdVariant = {
+  badge: "Attractiveness Protocol · Dating",
+  headline: "4 steps to a body that wins first impressions — back in the dating market.",
+  subtext:
+    "You don't get a learning curve. You get first impressions. The body that lands on a first date isn't built in the gym most guys train in. This assessment tells you exactly where you stand on each of the 4 steps.",
+  cta: "Get my free analysis →",
+};
+
+// "4 steps — 20-29" — peak adaptation, fastest visible-change window
+const FOUR_STEPS_20S: AdVariant = {
+  badge: "Attractiveness Protocol · 20s",
+  headline: "4 steps to lock in your peak — your 20s are the fastest visible-change window you'll have.",
+  subtext:
+    "Testosterone is near peak. Your body adapts faster now than it ever will again. The 4 steps that maximize how you're perceived can be calculated for your structure. This assessment tells you where you stand on each.",
+  cta: "Get my free analysis →",
+};
+
+// "4 steps — Entrepreneur" — efficient protocol for 80h weeks
+const FOUR_STEPS_FOUNDER: AdVariant = {
+  badge: "Attractiveness Protocol · Founders",
+  headline: "4 steps to a body that lands in pitch rooms — on 80-hour weeks.",
+  subtext:
+    "Generic programs squeezed between flights don't change how people treat you. Your proportions, your weak points, your schedule need their own protocol. This assessment tells you exactly where you stand on each of the 4 steps.",
+  cta: "Get my free analysis →",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -459,6 +519,20 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
 
   // "What makes a man's body attractive — Gay" persona (same formula, men responding)
   "120248216509890660": WHAT_MAKES_ATTRACTIVE_GAY,
+
+  // ── Persona-tuned "4 steps to improve your attractiveness" carousels (2026-06-17)
+  // "4 steps — Bi" persona
+  "120248288425140660": FOUR_STEPS_BI,
+  // "4 steps — 60+" persona
+  "120248288263620660": FOUR_STEPS_60,
+  // "4 steps — Gay" persona
+  "120248288381920660": FOUR_STEPS_GAY,
+  // "4 steps — Newly Single" persona
+  "120248288344720660": FOUR_STEPS_DATING,
+  // "4 steps — 20-29" persona
+  "120248288300030660": FOUR_STEPS_20S,
+  // "4 steps — Entrepreneur" persona
+  "120248288276690660": FOUR_STEPS_FOUNDER,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
