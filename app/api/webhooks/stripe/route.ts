@@ -103,7 +103,16 @@ export async function POST(request: Request) {
           },
         });
       } catch (err) {
-        console.error("[webhook/stripe] Purchase CAPI failed (pi)", { error: String(err), piId: pi.id });
+        console.error("[CAPI-FAIL-ALERT] Purchase CAPI failed (pi)", {
+          error:    String(err),
+          piId:     pi.id,
+          email:    customerEmail,
+          amount:   pi.amount,
+          currency: pi.currency,
+          utm_campaign: meta.utm_campaign ?? null,
+          utm_content:  meta.utm_content ?? null,
+          fbclid:   meta.fbclid ?? null,
+        });
       }
 
       // GA4 Measurement Protocol Purchase
@@ -246,9 +255,15 @@ export async function POST(request: Request) {
       });
       console.log("[webhook/stripe] Purchase CAPI sent", { sessionId: session.id });
     } catch (err) {
-      console.error("[webhook/stripe] Purchase CAPI failed", {
-        error: String(err),
+      console.error("[CAPI-FAIL-ALERT] Purchase CAPI failed (session)", {
+        error:     String(err),
         sessionId: session.id,
+        email:     customerEmail,
+        amount:    session.amount_total,
+        currency:  session.currency,
+        utm_campaign: meta.utm_campaign ?? null,
+        utm_content:  meta.utm_content ?? null,
+        fbclid:    meta.fbclid ?? null,
       });
     }
 
