@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────
 // PROTOCOL CLUB — ATTRACTIVENESS DIAGNOSTIC V2.6
-// 26 slides: 18 Q · 4 Belief-Shifts · 2 Info · 2 Summary/Promise
-// + 1 Final Loading = 27 total (loading counted in Section 7)
+// 27 slides: 19 Q · 4 Belief-Shifts · 2 Info · 2 Summary/Promise
+// + 1 Final Loading = 28 total (loading counted in Section 7)
 // ─────────────────────────────────────────────────────────
 
 import { ACTIVE_VARIANT } from "../../lib/variant";
@@ -373,6 +373,24 @@ const BASE_SLIDES: SlideConfig[] = [
       "A more defined waist",
       "Broader shoulders",
       "A better overall silhouette",
+    ],
+  },
+
+  {
+    id: "q5b",
+    type: "single",
+    stateKey: "sexual_orientation",
+    section: 1,
+    sectionLabel: "Current Situation",
+    qNumber: 6,
+    question: "What's your sexual orientation?",
+    whyWeAsk: "Standards of attractiveness, physique ideals, and style references differ depending on who you're optimizing for. Your protocol is calibrated accordingly.",
+    options: [
+      "Straight",
+      "Gay",
+      "Bisexual",
+      "Other",
+      "Prefer not to say",
     ],
   },
 

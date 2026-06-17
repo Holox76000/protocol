@@ -28,9 +28,9 @@ const today = new Date().toISOString().slice(0, 10);
 const QUIZ_STEPS = [
   { key: "quiz_started",     label: "Quiz démarré",            threshold: 0  },
   { key: "quiz_goals",       label: "Q6 — Objectifs",          threshold: 7  },
-  { key: "quiz_biometrics",  label: "Q8 — Biométriques",       threshold: 10 },
-  { key: "quiz_past",        label: "Q11 — Solutions passées",  threshold: 14 },
-  { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 18 },
+  { key: "quiz_biometrics",  label: "Q8 — Biométriques",       threshold: 11 },
+  { key: "quiz_past",        label: "Q11 — Solutions passées",  threshold: 15 },
+  { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 19 },
 ];
 
 export default function FunnelClient({ sessions, leads, events, users, since }: Props) {
