@@ -98,97 +98,24 @@ const handler = schedule("*/5 * * * *", async () => {
   const resend = new Resend(process.env.RESEND_API_KEY!);
   const now = new Date();
 
-  // ── Email 1: 10 min after registration ──
-  const cutoff1 = new Date(now.getTime() - EMAIL_1_DELAY_MIN * 60 * 1000).toISOString();
-
-  const { data: users1 } = await sb
-    .from("users")
-    .select("id, email, first_name")
-    .eq("has_paid", false)
-    .is("cart_email_1_sent_at", null)
-    .lte("created_at", cutoff1)
-    .limit(50);
-
-  for (const user of users1 ?? []) {
-    await sb.from("users").update({ cart_email_1_sent_at: now.toISOString() }).eq("id", user.id);
-
-    const name = user.first_name ?? "there";
-    const checkoutUrl = await getCartRecoveryUrl(sb, user.id);
-
-    const content = `
-      <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
-        Your body analysis is waiting, ${name}.
-      </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
-        You started your questionnaire — which means we already have enough data to build your personalized Attractiveness Protocol.
-      </p>
-      <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
-        Your protocol covers 15+ body proportions, your attractiveness score, and a science-backed roadmap built around your specific goals and body type.
-      </p>
-      ${btn("Complete my order — $89 →", checkoutUrl)}
-      <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
-        90-day money-back guarantee. No conditions.
-      </p>
-    `;
-
-    try {
-      await resend.emails.send({
-        from: FROM,
-        to: user.email,
-        subject: "Your body analysis is waiting",
-        html: emailShell(content),
+  // ── Cart emails 1 (+10min) and 2 (+4h) ──
+  // Delegated to the Next.js route which reuses lib/email.ts + report-content
+  // for personalized copies. The route handles suppression, idempotence,
+  // and CartRecovery token generation in one place.
+  try {
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret) {
+      const res = await fetch(`${SITE_URL}/api/cron/abandoned-cart`, {
+        method: "GET",
+        headers: { authorization: `Bearer ${cronSecret}` },
       });
-      console.log("[abandoned-cart] email1 sent", { email: user.email });
-    } catch (err) {
-      console.error("[abandoned-cart] email1 failed", { email: user.email, error: String(err) });
+      const body = await res.text();
+      console.log("[abandoned-cart] cart route response", { status: res.status, body });
+    } else {
+      console.error("[abandoned-cart] CRON_SECRET not set — skipping cart emails");
     }
-  }
-
-  // ── Email 2: 4h after registration ──
-  const cutoff2 = new Date(now.getTime() - EMAIL_2_DELAY_HOURS * 60 * 60 * 1000).toISOString();
-
-  const { data: users2 } = await sb
-    .from("users")
-    .select("id, email, first_name")
-    .eq("has_paid", false)
-    .is("cart_email_2_sent_at", null)
-    .not("cart_email_1_sent_at", "is", null)
-    .lte("created_at", cutoff2)
-    .limit(50);
-
-  for (const user of users2 ?? []) {
-    await sb.from("users").update({ cart_email_2_sent_at: now.toISOString() }).eq("id", user.id);
-
-    const name = user.first_name ?? "there";
-    const checkoutUrl = await getCartRecoveryUrl(sb, user.id);
-
-    const content = `
-      <h1 style="margin:0 0 24px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
-        Still thinking about it, ${name}?
-      </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:${C.muted};line-height:1.65;">
-        A few hours ago you started your questionnaire. We've analyzed 100+ attractiveness markers for your profile — but your protocol hasn't been built yet.
-      </p>
-      <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
-        Most guys who complete it see exactly what's holding their score back within the first read. It's not guesswork — it's your data.
-      </p>
-      ${btn("Get my protocol — $89 →", checkoutUrl)}
-      <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
-        90-day money-back guarantee. No conditions. This is our last email.
-      </p>
-    `;
-
-    try {
-      await resend.emails.send({
-        from: FROM,
-        to: user.email,
-        subject: "Still thinking about it?",
-        html: emailShell(content),
-      });
-      console.log("[abandoned-cart] email2 sent", { email: user.email });
-    } catch (err) {
-      console.error("[abandoned-cart] email2 failed", { email: user.email, error: String(err) });
-    }
+  } catch (err) {
+    console.error("[abandoned-cart] cart route fetch failed", { error: String(err) });
   }
 
   // ── Email feedback: 2h after email 2 (6h total) ──

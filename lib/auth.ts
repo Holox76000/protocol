@@ -339,6 +339,45 @@ export async function deleteCartRecoveryTokens(userId: string): Promise<void> {
 }
 
 // ──────────────────────────────────────────────
+// Unsubscribe tokens (multi-use, 1-year TTL)
+// One-click unsub per RFC 8058 — token is verifier-only, no auth state.
+// ──────────────────────────────────────────────
+const UNSUBSCRIBE_TOKEN_DURATION_DAYS = 365;
+
+export async function createUnsubscribeToken(email: string): Promise<string> {
+  const token = generateRandomToken();
+  const tokenHash = hashToken(token);
+  const expiresAt = new Date(
+    Date.now() + UNSUBSCRIBE_TOKEN_DURATION_DAYS * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const { error } = await supabaseAdmin.from("unsubscribe_tokens").insert({
+    token_hash: tokenHash,
+    email: email.toLowerCase(),
+    expires_at: expiresAt,
+  });
+
+  if (error) throw new Error(`Unsubscribe token creation failed: ${error.message}`);
+
+  return token;
+}
+
+export async function verifyUnsubscribeToken(token: string): Promise<{ email: string } | null> {
+  const tokenHash = hashToken(token);
+
+  const { data, error } = await supabaseAdmin
+    .from("unsubscribe_tokens")
+    .select("email")
+    .eq("token_hash", tokenHash)
+    .gt("expires_at", new Date().toISOString())
+    .single();
+
+  if (error || !data) return null;
+
+  return { email: data.email as string };
+}
+
+// ──────────────────────────────────────────────
 // Cookie config (used by API routes via NextResponse)
 // ──────────────────────────────────────────────
 export const SESSION_COOKIE_OPTIONS = {

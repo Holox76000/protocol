@@ -13,12 +13,14 @@ type Props = {
   registrationToken?: string;
   prefillEmail?: string;
   prefillFirstName?: string;
+  funnelSid?: string;
 };
 
 export default function RegisterPage({
   registrationToken = "",
   prefillEmail = "",
   prefillFirstName = "",
+  funnelSid = "",
 }: Props) {
   const [email, setEmail] = useState(prefillEmail);
   const [firstName, setFirstName] = useState(prefillFirstName);
@@ -54,6 +56,7 @@ export default function RegisterPage({
             email: email.trim(),
             first_name: firstName.trim(),
             registration_token: registrationToken || undefined,
+            funnel_sid: funnelSid || undefined,
           }),
         });
 
@@ -82,7 +85,7 @@ export default function RegisterPage({
         setLoading(false);
       }
     },
-    [email, firstName, registrationToken]
+    [email, firstName, registrationToken, funnelSid]
   );
 
   return (

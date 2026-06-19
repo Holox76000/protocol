@@ -16,3 +16,7 @@ www.qoves.com
 *.swo
 .env*.swp
 .gstack/
+bulldozer.json
+
+# Local Netlify folder
+.netlify

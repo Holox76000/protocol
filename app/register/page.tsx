@@ -30,11 +30,14 @@ export default async function Register({
     }
   }
 
+  const funnelSid = searchParams?.funnel_sid ?? "";
+
   return (
     <RegisterPage
       registrationToken={rawToken}
       prefillEmail={prefillEmail}
       prefillFirstName={prefillFirstName}
+      funnelSid={funnelSid}
     />
   );
 }

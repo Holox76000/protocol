@@ -232,6 +232,7 @@ async function runFunnelGenerationInline(
     preview_id: sessionId,
     before_path: photoPath,
     after_path: afterPath,
+    analysis_text: analysis,
   });
 }
 

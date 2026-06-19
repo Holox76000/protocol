@@ -17,6 +17,7 @@ type Body = {
   email?: string;
   first_name?: string;
   registration_token?: string;
+  funnel_sid?: string;
 };
 
 function isValidEmail(email: string): boolean {
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
   const email = (body.email ?? "").trim().toLowerCase();
   const firstName = (body.first_name ?? "").trim();
   const registrationToken = body.registration_token ?? "";
+  const funnelSid = (body.funnel_sid ?? "").trim() || null;
 
   // ── Validation ──────────────────────────────
   if (!isValidEmail(email)) {
@@ -100,7 +102,9 @@ export async function POST(request: Request) {
       first_name: firstName,
       stripe_customer_id: stripeCustomerId,
       has_paid: hasPaid,
+      paid_at: hasPaid ? new Date().toISOString() : null,
       protocol_status: "not_started",
+      funnel_sid: funnelSid,
     })
     .select("id, email, first_name, has_paid, protocol_status")
     .single();

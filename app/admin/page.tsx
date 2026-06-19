@@ -55,6 +55,9 @@ export default async function AdminPage() {
             <a href="/admin/funnel" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
               Funnel →
             </a>
+            <a href="/admin/emails" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
+              Emails →
+            </a>
           </div>
         </div>
         <OrderListClient orders={orders} />

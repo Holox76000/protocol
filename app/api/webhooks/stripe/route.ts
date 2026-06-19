@@ -129,6 +129,12 @@ export async function POST(request: Request) {
       }
 
       if (customerEmail) {
+        // Pause the lead nurture sequence regardless of whether a user row exists yet.
+        await supabaseAdmin
+          .from("leads")
+          .update({ nurture_paused_at: new Date().toISOString() })
+          .eq("email", customerEmail.toLowerCase());
+
         try {
           const { data: existingUser } = await supabaseAdmin
             .from("users")
@@ -142,6 +148,7 @@ export async function POST(request: Request) {
               .update({
                 has_paid: true,
                 paid_amount_cents: pi.amount,
+                paid_at: new Date().toISOString(),
                 rush_delivery: meta.rush_delivery === "true",
                 ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
               })
@@ -282,6 +289,12 @@ export async function POST(request: Request) {
 
     // ── Customer portal: registration token + welcome email ──
     if (customerEmail) {
+      // Pause the lead nurture sequence regardless of whether a user row exists yet.
+      await supabaseAdmin
+        .from("leads")
+        .update({ nurture_paused_at: new Date().toISOString() })
+        .eq("email", customerEmail.toLowerCase());
+
       try {
         // If the user already has an account, mark them as paid
         const { data: existingUser } = await supabaseAdmin
@@ -296,6 +309,7 @@ export async function POST(request: Request) {
             .update({
               has_paid: true,
               paid_amount_cents: typeof session.amount_total === "number" ? session.amount_total : 8900,
+              paid_at: new Date().toISOString(),
               ...(stripeCustomerId && { stripe_customer_id: stripeCustomerId }),
             })
             .eq("id", existingUser.id);

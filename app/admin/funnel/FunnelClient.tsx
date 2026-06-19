@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 
 type Session = { sid: string; maxStep: number; date: string };
 type Lead    = { email: string; funnelSid: string; date: string };
@@ -64,7 +64,6 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
     // Downstream events
     const filteredEvents = events.filter(e => inRange(e.date));
     const reportViewedSids  = new Set(filteredEvents.filter(e => e.event === "report_viewed").map(e => e.sid));
-    const reportCtaSids     = new Set(filteredEvents.filter(e => e.event === "report_cta_clicked").map(e => e.sid));
     const offerViewedSids   = new Set(filteredEvents.filter(e => e.event === "view_offer" && e.funnelSid).map(e => e.funnelSid));
 
     // All paid users in range — count every purchase, whether or not the user
@@ -80,7 +79,6 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
       { key: "quiz_yes_ladders",   label: "Yes-ladders",             n: quizCounts.quiz_yes_ladders ?? 0 },
       { key: "optin",              label: "Optin email",             n: optinSids.size                  },
       { key: "report_viewed",      label: "Rapport vu",              n: reportViewedSids.size           },
-      { key: "report_cta_clicked", label: "CTA rapport cliqué",      n: reportCtaSids.size              },
       { key: "offer_viewed",       label: "Offer page vue",          n: offerViewedSids.size            },
       { key: "purchased",          label: "Achat",                   n: purchases.length                },
     ];
@@ -173,15 +171,15 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
                 const isPostQuiz = row.key === "optin";
 
                 return (
-                  <>
+                  <Fragment key={row.key}>
                     {isPostQuiz && (
-                      <tr key="divider">
+                      <tr>
                         <td colSpan={5} className="px-5 py-1.5 text-[10px] text-mute bg-ash/70 uppercase tracking-[0.1em] font-semibold border-t-2 border-wire">
                           Post-quiz
                         </td>
                       </tr>
                     )}
-                    <tr key={row.key} className="border-b border-wire/60 last:border-0 hover:bg-ash/40 transition">
+                    <tr className="border-b border-wire/60 last:border-0 hover:bg-ash/40 transition">
                       <td className="px-5 py-3.5 font-medium text-void">{row.label}</td>
                       <td className="px-5 py-3.5 text-right font-mono font-semibold text-void">
                         {row.n > 0 ? row.n : <span className="text-mute font-sans text-xs">—</span>}
@@ -209,7 +207,7 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
                         </div>
                       </td>
                     </tr>
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
