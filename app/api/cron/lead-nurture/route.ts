@@ -100,12 +100,14 @@ async function fetchDueLeads(step: StepKey, now: Date): Promise<LeadRow[]> {
   const col = STEP_COL[step];
   const cutoff = new Date(now.getTime() - DELAYS[step]).toISOString();
 
+  // Use nurture_starts_at (not created_at) so legacy leads onboarded after
+  // the sequence shipped progress at the same 24h cadence as fresh leads.
   const query = supabaseAdmin
     .from("leads")
     .select("email, payload, created_at")
     .is("nurture_paused_at", null)
     .is(col, null)
-    .lte("created_at", cutoff)
+    .lte("nurture_starts_at", cutoff)
     .limit(BATCH_LIMIT);
 
   // For steps after E2, only consider leads that already received the previous step.
