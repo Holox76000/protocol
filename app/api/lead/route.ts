@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 import { sendReportEmail } from "../../../lib/email";
 
 type LeadPayload = {
@@ -8,7 +9,7 @@ type LeadPayload = {
   answers: Record<string, string>;
   startedAt?: string;
   completedAt?: string;
-  utm?: Record<string, string | undefined> & { fbclid?: string };
+  utm?: Record<string, string | undefined> & { fbclid?: string; ttclid?: string };
   score?: number;
   segment?: string;
   blocker?: string;
@@ -105,16 +106,19 @@ export async function POST(request: Request) {
   const firstName = body.answers?.first_name ?? undefined;
   const funnelSid = body.funnel_sid ?? undefined;
   const fbclid = body.utm?.fbclid ?? undefined;
+  const ttclid = body.utm?.ttclid ?? undefined;
+  const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
   const siteUrl = process.env.SITE_URL ?? process.env.URL ?? process.env.NETLIFY_SITE_URL ?? "https://protocol-club.com";
 
   // waitUntil from @vercel/functions is a no-op on Netlify (context not injected).
   // Run side-effects synchronously before returning — ~200ms overhead, invisible since
   // the client redirects to the report-loading page immediately after.
+  const eventId = `lead:${email}:${createdAt}`;
   await Promise.allSettled([
     sendMetaEvent({
       eventName: "Lead",
       eventTime,
-      eventId: `lead:${email}:${createdAt}`,
+      eventId,
       actionSource: "website",
       eventSourceUrl,
       userAgent,
@@ -123,6 +127,29 @@ export async function POST(request: Request) {
       fbclid,
     }).then(() => console.log("[lead] meta sent", { email }))
       .catch((err) => console.error("[lead] meta event failed", { error: String(err), email })),
+
+    sendTiktokEvent({
+      eventName: "CompleteRegistration",
+      eventTime,
+      eventId,
+      eventSourceUrl,
+      userAgent,
+      ipAddress,
+      email,
+      externalId: funnelSid,
+      ttclid,
+      ttp,
+      properties: {
+        value: 89,
+        currency: "USD",
+        contents: [{
+          content_id: "f1-attractiveness-protocol",
+          content_type: "product",
+          content_name: "Attractiveness Protocol",
+        }],
+      },
+    }).then(() => console.log("[lead] tiktok sent", { email }))
+      .catch((err) => console.error("[lead] tiktok event failed", { error: String(err), email })),
 
     funnelSid
       ? sendReportEmail({

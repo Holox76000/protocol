@@ -8,6 +8,7 @@ export type UtmParams = {
   utm_ad?: string;
   utm_id?: string;
   fbclid?: string;
+  ttclid?: string;
 };
 
 const UTM_STORAGE_KEY = "prtcl_utm";
@@ -21,6 +22,7 @@ const UTM_KEYS: (keyof UtmParams)[] = [
   "utm_ad",
   "utm_id",
   "fbclid",
+  "ttclid",
 ];
 
 /** Read UTM params from the current URL (client-side only). */

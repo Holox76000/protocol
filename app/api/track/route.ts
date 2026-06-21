@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 
 type TrackPayload = {
   sessionId: string;
@@ -60,23 +61,49 @@ export async function POST(request: Request) {
   }
 
   if (body.event === "view_offer") {
-    await sendMetaEvent({
-      eventName: "ViewContent",
-      eventTime,
-      eventId: body.eventId ?? `${body.sessionId}:view_offer:${eventTime}`,
-      actionSource: "website",
-      eventSourceUrl,
-      userAgent,
-      ipAddress,
-      customData: {
-        content_name: "F1 Offer",
-        content_ids: ["f1-attractiveness-protocol"],
-        content_type: "product",
-        value: 89,
-        currency: "USD",
-      }
-    });
-    console.log("[track] meta sent", { event: "ViewContent", sessionId: body.sessionId });
+    const eventId = body.eventId ?? `${body.sessionId}:view_offer:${eventTime}`;
+    const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+    const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
+
+    await Promise.allSettled([
+      sendMetaEvent({
+        eventName: "ViewContent",
+        eventTime,
+        eventId,
+        actionSource: "website",
+        eventSourceUrl,
+        userAgent,
+        ipAddress,
+        customData: {
+          content_name: "F1 Offer",
+          content_ids: ["f1-attractiveness-protocol"],
+          content_type: "product",
+          value: 89,
+          currency: "USD",
+        }
+      }),
+      sendTiktokEvent({
+        eventName: "ViewContent",
+        eventTime,
+        eventId,
+        eventSourceUrl,
+        userAgent,
+        ipAddress,
+        externalId: funnelSid ?? body.sessionId,
+        ttclid,
+        ttp,
+        properties: {
+          value: 89,
+          currency: "USD",
+          contents: [{
+            content_id: "f1-attractiveness-protocol",
+            content_type: "product",
+            content_name: "F1 Offer",
+          }],
+        },
+      }),
+    ]);
+    console.log("[track] meta+tiktok sent", { event: "ViewContent", sessionId: body.sessionId });
   }
 
   if (body.event === "quiz_started") {

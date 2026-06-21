@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCheckoutLineItems, getPublicSiteUrl, getStripeServerClient } from "../../../lib/stripe";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,7 @@ type Body = {
   utm_term?: string;
   utm_id?: string;
   fbclid?: string;
+  ttclid?: string;
   embedded?: boolean;
   ga_client_id?: string;
 };
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
     ...(body.utm_term && { utm_term: body.utm_term }),
     ...(body.utm_id && { utm_id: body.utm_id }),
     ...(body.fbclid && { fbclid: body.fbclid }),
+    ...(body.ttclid && { ttclid: body.ttclid }),
     ...(body.ga_client_id && { ga_client_id: body.ga_client_id }),
     ...(body.from && { from: body.from }),
   };
@@ -117,10 +120,12 @@ export async function POST(request: Request) {
   const userAgent = request.headers.get("user-agent") ?? undefined;
   const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const referer = request.headers.get("referer") ?? undefined;
+  const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+  const eventTime = Math.floor(Date.now() / 1000);
 
   void sendMetaEvent({
     eventName: "InitiateCheckout",
-    eventTime: Math.floor(Date.now() / 1000),
+    eventTime,
     eventId: session.id,
     actionSource: "website",
     eventSourceUrl: referer ?? `${siteUrl}/checkout`,
@@ -140,6 +145,30 @@ export async function POST(request: Request) {
     },
   }).catch((err) => {
     console.error("[create-checkout-session] CAPI failed", { error: String(err), sessionId: session.id });
+  });
+
+  void sendTiktokEvent({
+    eventName: "InitiateCheckout",
+    eventTime,
+    eventId: session.id,
+    eventSourceUrl: referer ?? `${siteUrl}/checkout`,
+    userAgent,
+    ipAddress,
+    email: customerEmail,
+    externalId: session.id,
+    ttclid: body.ttclid || null,
+    ttp,
+    properties: {
+      value: 89,
+      currency: "USD",
+      contents: [{
+        content_id: "f1-attractiveness-protocol",
+        content_type: "product",
+        content_name: "Attractiveness Protocol",
+      }],
+    },
+  }).catch((err) => {
+    console.error("[create-checkout-session] TikTok Events API failed", { error: String(err), sessionId: session.id });
   });
 
   if (embedded) {

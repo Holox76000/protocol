@@ -215,7 +215,7 @@ export function CheckoutPage({ email }: { email: string }) {
 
     const persistedUtms = getPersistedUtmParams();
     const sp = new URLSearchParams(window.location.search);
-    const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid"] as const;
+    const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid", "ttclid"] as const;
     const utms: Record<string, string> = { ...persistedUtms };
     for (const key of utmFields) {
       const val = sp.get(key);

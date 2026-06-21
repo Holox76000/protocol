@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripeServerClient, getPublicSiteUrl } from "../../../lib/stripe";
 import { sendMetaEvent } from "../../../lib/metaCapi";
+import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,7 @@ type Body = {
   utm_term?: string;
   utm_id?: string;
   fbclid?: string;
+  ttclid?: string;
   ga_client_id?: string;
 };
 
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
   const email = (body.customer_email ?? "").trim().toLowerCase() || null;
   const funnel = body.funnel ?? "f1";
   const utmMetadata: Record<string, string> = {};
-  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid", "ga_client_id"] as const) {
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id", "fbclid", "ttclid", "ga_client_id"] as const) {
     if (body[key]) utmMetadata[key] = body[key]!;
   }
   if (body.from) utmMetadata.from = body.from;
@@ -72,11 +74,13 @@ export async function POST(request: Request) {
   const userAgent = request.headers.get("user-agent") ?? undefined;
   const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const referer = request.headers.get("referer") ?? undefined;
+  const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
   const siteUrl = getPublicSiteUrl(request.headers.get("origin"));
+  const eventTime = Math.floor(Date.now() / 1000);
 
   void sendMetaEvent({
     eventName: "InitiateCheckout",
-    eventTime: Math.floor(Date.now() / 1000),
+    eventTime,
     eventId: paymentIntent.id,
     actionSource: "website",
     eventSourceUrl: referer ?? `${siteUrl}/dashboard`,
@@ -93,6 +97,30 @@ export async function POST(request: Request) {
     },
   }).catch((err) =>
     console.error("[create-payment-intent] CAPI failed", { error: String(err) })
+  );
+
+  void sendTiktokEvent({
+    eventName: "InitiateCheckout",
+    eventTime,
+    eventId: paymentIntent.id,
+    eventSourceUrl: referer ?? `${siteUrl}/dashboard`,
+    userAgent,
+    ipAddress,
+    email,
+    externalId: paymentIntent.id,
+    ttclid: body.ttclid || null,
+    ttp,
+    properties: {
+      value: 89,
+      currency: "USD",
+      contents: [{
+        content_id: "f1-attractiveness-protocol",
+        content_type: "product",
+        content_name: "Attractiveness Protocol",
+      }],
+    },
+  }).catch((err) =>
+    console.error("[create-payment-intent] TikTok Events API failed", { error: String(err) })
   );
 
   return NextResponse.json({

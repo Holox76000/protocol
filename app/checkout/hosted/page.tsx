@@ -16,7 +16,7 @@ export default function CheckoutHostedPage({
   const forward = [
     "funnel_type", "customer_email", "landing_page",
     "utm_source", "utm_medium", "utm_campaign",
-    "utm_content", "utm_term", "utm_id", "fbclid", "from",
+    "utm_content", "utm_term", "utm_id", "fbclid", "ttclid", "from",
   ];
   for (const key of forward) {
     const val = searchParams?.[key];

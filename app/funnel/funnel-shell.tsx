@@ -92,6 +92,7 @@ export default function FunnelShell() {
           ...(utms.utm_ad       && { _utm_ad:       utms.utm_ad }),
           ...(utms.utm_content  && { _utm_content:  utms.utm_content }),
           ...(utms.fbclid       && { _fbclid:       utms.fbclid }),
+          ...(utms.ttclid       && { _ttclid:       utms.ttclid }),
         };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
       }
@@ -206,6 +207,7 @@ export default function FunnelShell() {
           utm_ad: latestAnswersRef.current._utm_ad,
           utm_content: latestAnswersRef.current._utm_content,
           fbclid: latestAnswersRef.current._fbclid,
+          ttclid: latestAnswersRef.current._ttclid,
         },
         mode: "merge",
         ...(sessionId && { funnel_sid: sessionId }),

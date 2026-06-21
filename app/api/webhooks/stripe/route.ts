@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
+import { sendTiktokEvent } from "../../../../lib/tiktokEventsApi";
 import { sendGA4Purchase, extractGa4ClientId } from "../../../../lib/ga4";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
@@ -79,10 +80,11 @@ export async function POST(request: Request) {
       }
 
       // Meta CAPI Purchase
+      const purchaseEventTime = pi.created ?? Math.floor(Date.now() / 1000);
       try {
         await sendMetaEvent({
           eventName: "Purchase",
-          eventTime: pi.created ?? Math.floor(Date.now() / 1000),
+          eventTime: purchaseEventTime,
           eventId: pi.id,
           actionSource: "website",
           eventSourceUrl: "https://protocol-club.com/dashboard",
@@ -112,6 +114,38 @@ export async function POST(request: Request) {
           utm_campaign: meta.utm_campaign ?? null,
           utm_content:  meta.utm_content ?? null,
           fbclid:   meta.fbclid ?? null,
+        });
+      }
+
+      // TikTok Events API Purchase (event_id matches browser pixel for dedup)
+      try {
+        await sendTiktokEvent({
+          eventName: "Purchase",
+          eventTime: purchaseEventTime,
+          eventId: pi.id,
+          eventSourceUrl: "https://protocol-club.com/dashboard",
+          email: customerEmail,
+          externalId: pi.id,
+          ttclid: meta.ttclid || null,
+          properties: {
+            value: pi.amount / 100,
+            currency: (pi.currency ?? "usd").toUpperCase(),
+            contents: [{
+              content_id: "f1-attractiveness-protocol",
+              content_type: "product",
+              content_name: "Attractiveness Protocol",
+            }],
+          },
+        });
+      } catch (err) {
+        console.error("[TIKTOK-FAIL-ALERT] Purchase TikTok API failed (pi)", {
+          error:    String(err),
+          piId:     pi.id,
+          email:    customerEmail,
+          amount:   pi.amount,
+          currency: pi.currency,
+          utm_campaign: meta.utm_campaign ?? null,
+          ttclid:   meta.ttclid ?? null,
         });
       }
 
@@ -236,18 +270,21 @@ export async function POST(request: Request) {
     });
 
     // ── Meta CAPI Purchase ────────────────────────────────
+    const sessionPurchaseEventTime = session.created ?? Math.floor(Date.now() / 1000);
+    const sessionPurchaseValue = typeof session.amount_total === "number" ? session.amount_total / 100 : 89;
+    const sessionPurchaseCurrency = (session.currency ?? "usd").toUpperCase();
     try {
       await sendMetaEvent({
         eventName: "Purchase",
-        eventTime: session.created ?? Math.floor(Date.now() / 1000),
+        eventTime: sessionPurchaseEventTime,
         eventId: session.id,
         actionSource: "website",
         eventSourceUrl: "https://protocol-club.com/checkout",
         email: customerEmail,
         fbclid: meta.fbclid || null,
         customData: {
-          value: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
-          currency: (session.currency ?? "usd").toUpperCase(),
+          value: sessionPurchaseValue,
+          currency: sessionPurchaseCurrency,
           content_name: "Attractiveness Protocol",
           content_ids: ["f1-attractiveness-protocol"],
           content_type: "product",
@@ -271,6 +308,39 @@ export async function POST(request: Request) {
         utm_campaign: meta.utm_campaign ?? null,
         utm_content:  meta.utm_content ?? null,
         fbclid:    meta.fbclid ?? null,
+      });
+    }
+
+    // ── TikTok Events API Purchase ────────────────────────
+    try {
+      await sendTiktokEvent({
+        eventName: "Purchase",
+        eventTime: sessionPurchaseEventTime,
+        eventId: session.id,
+        eventSourceUrl: "https://protocol-club.com/checkout",
+        email: customerEmail,
+        externalId: session.id,
+        ttclid: meta.ttclid || null,
+        properties: {
+          value: sessionPurchaseValue,
+          currency: sessionPurchaseCurrency,
+          contents: [{
+            content_id: "f1-attractiveness-protocol",
+            content_type: "product",
+            content_name: "Attractiveness Protocol",
+          }],
+        },
+      });
+      console.log("[webhook/stripe] Purchase TikTok API sent", { sessionId: session.id });
+    } catch (err) {
+      console.error("[TIKTOK-FAIL-ALERT] Purchase TikTok API failed (session)", {
+        error:     String(err),
+        sessionId: session.id,
+        email:     customerEmail,
+        amount:    session.amount_total,
+        currency:  session.currency,
+        utm_campaign: meta.utm_campaign ?? null,
+        ttclid:    meta.ttclid ?? null,
       });
     }
 
