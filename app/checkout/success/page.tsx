@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CheckoutStatusEvent from "../checkout-status-event";
+import { tiktokIdentify, tiktokTrackPurchase } from "../../../lib/tiktokPixel";
 
 const MAX_POLLS = 20; // 20 × 1.5s = 30s max
 const POLL_INTERVAL = 1500;
@@ -36,6 +37,13 @@ export default function CheckoutSuccessPage({
 
         if (data.email) {
           setStatus("redirecting");
+
+          // TikTok Purchase: identify with hashed email, then track. event_id =
+          // Stripe session_id so future server-side dedup (Events API) can match.
+          void tiktokIdentify({ email: data.email, externalId: sessionId }).then(() => {
+            tiktokTrackPurchase(sessionId);
+          });
+
           const params = new URLSearchParams();
           params.set("email", data.email);
           if (data.firstName) params.set("firstName", data.firstName);

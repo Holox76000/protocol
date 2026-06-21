@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
+import { tiktokTrackInitiateCheckout } from "../../lib/tiktokPixel";
 
 type Props = {
   funnel: string;
@@ -54,6 +55,8 @@ export default function CheckoutClient({ funnel, params }: Props) {
         } catch {
           // Never block the redirect for tracking errors.
         }
+
+        tiktokTrackInitiateCheckout(sessionId);
 
         trackGa4Event("checkout_started", { funnel, destination: "stripe" });
         setState({ status: "redirecting", url, sessionId });

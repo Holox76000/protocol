@@ -31,6 +31,7 @@ import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
+import { tiktokIdentify, tiktokTrackCompleteRegistration } from "../../lib/tiktokPixel";
 
 const STORAGE_KEY = "protocol.funnel.v26";
 
@@ -210,6 +211,12 @@ export default function FunnelShell() {
         ...(sessionId && { funnel_sid: sessionId }),
       }),
     }).catch(() => {});
+
+    // TikTok Pixel: identify the lead, then fire CompleteRegistration.
+    // identify() must run before track() so PII propagates onto the event.
+    void tiktokIdentify({ email, externalId: sessionId }).then(() => {
+      tiktokTrackCompleteRegistration();
+    });
 
     // Route via loading page (polls for before/after) → /f1/report/{sid}
     if (sessionId) {

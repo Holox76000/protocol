@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { getGa4PageTitle } from "../lib/ga4PageTitle";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../lib/utm";
+import { tiktokTrackViewContent } from "../lib/tiktokPixel";
 
 declare global {
   interface Window {
@@ -77,6 +78,9 @@ export default function Ga4RouteTracker({ isAdmin = false }: { isAdmin?: boolean
 
       // Meta Pixel pageview (stays client-side)
       window.fbq?.("track", "PageView");
+
+      // TikTok Pixel ViewContent (LPV equivalent — fires on every route change)
+      tiktokTrackViewContent(pagePath, pageTitle);
     };
 
     const originalPushState = window.history.pushState.bind(window.history);
