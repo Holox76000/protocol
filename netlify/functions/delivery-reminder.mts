@@ -27,4 +27,4 @@ const handler = schedule("15 * * * *", async () => {
   }
 });
 
-export default handler;
+export { handler };
