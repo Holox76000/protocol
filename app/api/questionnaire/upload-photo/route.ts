@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateSession, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { normalizePhotoForStorage } from "../../../../lib/photoUpload";
 import { randomUUID } from "node:crypto";
+
+export const runtime = "nodejs";
 
 const VALID_SLOTS = ["front", "side", "back", "face"] as const;
 type Slot = (typeof VALID_SLOTS)[number];
@@ -37,16 +40,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid format. Use JPG, PNG, or HEIC." }, { status: 400 });
   }
 
-  const ext = file.type.includes("png") ? "png" : "jpg";
-  const path = `${user.id}/${slot}-${randomUUID()}.${ext}`;
-
   const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+
+  let normalized;
+  try {
+    normalized = await normalizePhotoForStorage(Buffer.from(bytes), file.type);
+  } catch (err) {
+    console.error("[questionnaire/upload-photo] normalize failed", { error: String(err) });
+    return NextResponse.json({ error: "Could not process image. Please try a different photo." }, { status: 400 });
+  }
+
+  const path = `${user.id}/${slot}-${randomUUID()}.${normalized.ext}`;
 
   const { error: uploadError } = await supabaseAdmin.storage
     .from("user-photos")
-    .upload(path, buffer, {
-      contentType: file.type,
+    .upload(path, normalized.buffer, {
+      contentType: normalized.contentType,
       upsert: true,
     });
 

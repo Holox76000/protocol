@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { normalizePhotoForStorage } from "../../../../lib/photoUpload";
 
 export const runtime = "nodejs";
 
@@ -30,14 +31,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
   }
 
-  const ext = file.type === "image/png" ? "png" : "jpg";
-  const filename = photoType === "body" ? `photo.${ext}` : `photo-${photoType}.${ext}`;
+  let normalized;
+  try {
+    normalized = await normalizePhotoForStorage(Buffer.from(await file.arrayBuffer()), file.type);
+  } catch (err) {
+    console.error("[funnel/upload-photo] normalize failed", { error: String(err) });
+    return NextResponse.json({ error: "Could not process image" }, { status: 400 });
+  }
+
+  const filename = photoType === "body" ? `photo.${normalized.ext}` : `photo-${photoType}.${normalized.ext}`;
   const path = `funnel/${sessionId}/${filename}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error } = await supabaseAdmin.storage
     .from("user-photos")
-    .upload(path, buffer, { contentType: file.type, upsert: true });
+    .upload(path, normalized.buffer, { contentType: normalized.contentType, upsert: true });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
