@@ -86,19 +86,61 @@ export async function GET(
     .eq("preview_id", sid)
     .single();
 
-  let beforePhoto = "[ Your current photo ]";
-  let afterPhoto = "[ Your projected potential ]";
-
   const afterPath = preview?.after_path as string | null;
   const beforePath = preview?.before_path as string | null;
+  const hasPhotos = Boolean(beforePath && afterPath && !afterPath.startsWith("__"));
 
-  if (beforePath && afterPath && !afterPath.startsWith("__")) {
+  let projectionBlock = "";
+  if (hasPhotos) {
     const [b, a] = await Promise.all([
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath, TEN_YEARS),
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath, TEN_YEARS),
+      supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath!, TEN_YEARS),
+      supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath!, TEN_YEARS),
     ]);
-    if (b.data?.signedUrl) beforePhoto = `<img src="${b.data.signedUrl}" alt="You now" />`;
-    if (a.data?.signedUrl) afterPhoto = `<img src="${a.data.signedUrl}" alt="Your potential" />`;
+    const beforeImg = b.data?.signedUrl
+      ? `<img src="${b.data.signedUrl}" alt="You now" />`
+      : `<span>You now</span>`;
+    const afterImg = a.data?.signedUrl
+      ? `<img src="${a.data.signedUrl}" alt="Your potential" />`
+      : `<span>Your potential</span>`;
+    projectionBlock = `
+<section class="sec">
+  <div class="lb">Your projection</div>
+  <h2 class="tt">This is what your body could look like at <em>your peak.</em></h2>
+  <p class="st">Generated from your photo using our attractiveness model, trained on 2,500+ analyzed male bodies.</p>
+  <div class="proj">
+    <div class="proj-c"><div class="proj-img">${beforeImg}</div><div class="proj-lb">You now</div></div>
+    <div class="proj-c"><div class="proj-img">${afterImg}</div><div class="proj-lb">Your <strong>potential</strong></div></div>
+  </div>
+</section>`;
+  } else {
+    // No photo: stats card with the three top-20% targets, plus a soft CTA
+    // inviting the user to add their photo (drives back to the funnel).
+    const bodyType = (answers.morphology as string) ?? "your build";
+    projectionBlock = `
+<section class="sec">
+  <div class="lb">Your projection</div>
+  <h2 class="tt">Three numbers separate your build from <em>the top 20%.</em></h2>
+  <p class="st">Built from the measurements you gave us and 2,500+ analyzed male bodies of the same type.</p>
+  <div class="proj-stats">
+    <div class="proj-stats-c">
+      <div class="proj-stats-h">You now</div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Build</span><span class="proj-stats-v">${bodyType}</span></div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Proportions</span><span class="proj-stats-v">Average range</span></div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Position</span><span class="proj-stats-v">Below the top 20%</span></div>
+    </div>
+    <div class="proj-stats-c proj-stats-c-acc">
+      <div class="proj-stats-h">Your potential</div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Shoulder/waist</span><span class="proj-stats-v">&gt; 1.52</span></div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Body fat</span><span class="proj-stats-v">&lt; 12%</span></div>
+      <div class="proj-stats-row"><span class="proj-stats-l">Shoulder/chest</span><span class="proj-stats-v">&gt; 1.15</span></div>
+    </div>
+  </div>
+  <div class="proj-upload">
+    <div class="proj-upload-h">Want this rendered on your actual body?</div>
+    <p class="proj-upload-d">Add your photo and the visualization runs in two minutes. Same link, same answers.</p>
+    <a href="/funnel?resume=photo&amp;funnel_sid=${encodeURIComponent(sid)}" class="proj-upload-btn">Add my photo</a>
+  </div>
+</section>`;
   }
 
   // 2b. Log report_viewed — awaited before returning HTML (Netlify kills the function on response)
@@ -151,8 +193,7 @@ export async function GET(
     "{{ENVIRONMENT_PARAGRAPH}}": getEnvParagraph(env),
     "{{HISTORY_PARAGRAPH}}": getHistoryParagraph((answers.past_solutions as string) ?? ""),
     "{{CHECKOUT_URL}}": offerUrl,
-    "{{BEFORE_PHOTO}}": beforePhoto,
-    "{{AFTER_PHOTO}}": afterPhoto,
+    "{{PROJECTION_BLOCK}}": projectionBlock,
     "{{AGE_INSIGHT}}": getAgeInsight((answers.age_bracket as string) ?? ""),
     "{{ETHNICITY_INSIGHT}}": getEthnicityInsight((answers.ethnicity as string) ?? ""),
     "{{FUNNEL_SID}}": sid,

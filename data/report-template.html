@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Preliminary Report — Protocol Club</title>
+<title>Your Preliminary Report, Protocol Club</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
@@ -35,6 +35,27 @@
   .proj-img img{width:100%;height:100%;object-fit:cover;display:block}
   .proj-lb{padding:12px 16px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--tm)}
   .proj-lb strong{color:var(--tx)}
+  /* No-photo projection: stats card + soft photo upload CTA */
+  .proj-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px}
+  .proj-stats-c{border:1px solid var(--bd);border-radius:8px;padding:20px 22px;background:var(--bg)}
+  .proj-stats-c-acc{background:var(--sf);border-color:var(--ac)}
+  .proj-stats-h{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tm);margin-bottom:14px}
+  .proj-stats-c-acc .proj-stats-h{color:var(--ac)}
+  .proj-stats-row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-top:1px solid var(--bd);font-size:13px}
+  .proj-stats-row:first-of-type{border-top:none;padding-top:2px}
+  .proj-stats-l{color:var(--tm);font-size:12px}
+  .proj-stats-v{font-family:var(--se);font-weight:600;color:var(--tx)}
+  .proj-stats-c-acc .proj-stats-v{color:var(--ac)}
+  .proj-upload{margin-top:24px;padding:22px 24px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;text-align:center}
+  .proj-upload-h{font-family:var(--se);font-size:18px;font-weight:600;color:var(--tx);margin-bottom:6px}
+  .proj-upload-d{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.55}
+  .proj-upload-btn{display:inline-block;font-family:var(--sa);font-size:13px;font-weight:600;background:var(--tx);color:#fff;padding:11px 22px;border-radius:6px;text-decoration:none}
+  .proj-upload-btn:hover{opacity:.88}
+  /* Mid-page inline CTAs */
+  .cta-inline{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:40px 0;padding:18px 22px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;flex-wrap:wrap}
+  .cta-inline-t{font-size:14px;color:var(--tx);font-weight:500;flex:1;min-width:200px}
+  .cta-inline-btn{font-family:var(--sa);font-size:13px;font-weight:600;background:var(--dk);color:#fff;padding:11px 20px;border-radius:6px;text-decoration:none;white-space:nowrap}
+  .cta-inline-btn:hover{opacity:.88}
 
   /* PATTERNS */
   .pattern{margin-bottom:36px}
@@ -47,7 +68,7 @@
   .insight-title{font-family:var(--se);font-size:16px;font-weight:600;margin-bottom:8px}
   .insight-body{font-size:14px;color:var(--t2);line-height:1.7}
 
-  /* BRIDGE — full-bleed dark separator */
+  /* BRIDGE, full-bleed dark separator */
   .bridge{margin:56px calc(-50vw + 50%);background:var(--dk);color:#fff;padding:72px 24px;text-align:center}
   .bridge .lb{color:rgba(255,255,255,.35);margin-bottom:14px}
   .bridge .tt{color:#fff;font-size:30px;margin-bottom:12px}
@@ -291,7 +312,7 @@
   .footer-t{font-size:11px;color:var(--tm);line-height:1.7;max-width:480px;margin:0 auto}
 
   @media(max-width:600px){
-    .hero .tt{font-size:26px}.hg{grid-template-columns:repeat(3,1fr)}.proj{grid-template-columns:1fr}
+    .hero .tt{font-size:26px}.hg{grid-template-columns:repeat(3,1fr)}.proj,.proj-stats{grid-template-columns:1fr}.cta-inline{flex-direction:column;text-align:center}.cta-inline-btn{width:100%}
     .score-pair{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}.targets{grid-template-columns:repeat(2,1fr)}
     .levers{grid-template-columns:1fr}.ba-stats{grid-template-columns:repeat(2,1fr)}.sticky{flex-direction:column;gap:8px}
     .report-content{padding:24px 18px}
@@ -324,22 +345,14 @@
   </div>
 </section>
 
-<!-- BEFORE / AFTER PROJECTION -->
-<section class="sec">
-  <div class="lb">Your projection</div>
-  <h2 class="tt">This is what your body could look like at <em>your peak.</em></h2>
-  <p class="st">Generated from your photo using our attractiveness model, trained on 2,500+ analyzed male bodies.</p>
-  <div class="proj">
-    <div class="proj-c"><div class="proj-img">{{BEFORE_PHOTO}}</div><div class="proj-lb">You now</div></div>
-    <div class="proj-c"><div class="proj-img">{{AFTER_PHOTO}}</div><div class="proj-lb">Your <strong>potential</strong></div></div>
-  </div>
-</section>
+<!-- BEFORE / AFTER PROJECTION (built server-side: photo block or stats fallback) -->
+{{PROJECTION_BLOCK}}
 
 <!-- ARCHETYPE PATTERNS -->
 <section class="sec">
   <div class="lb">Based on your quiz answers</div>
   <h2 class="tt">What we typically see in <em>your profile type.</em></h2>
-  <p class="st" style="margin-bottom:40px">{{BODY_TYPE}} build. {{AGE}} years old. {{ENV}} environment. Training {{FREQUENCY}} per week. These patterns repeat across our dataset of 2,500+ men — they're not your individual analysis, but they're almost certainly relevant to you.</p>
+  <p class="st" style="margin-bottom:40px">{{BODY_TYPE}} build. {{AGE}} years old. {{ENV}} environment. Training {{FREQUENCY}} per week. These patterns repeat across our dataset of 2,500+ men, they're not your individual analysis, but they're almost certainly relevant to you.</p>
 
   <div class="pattern"><div class="pattern-num">Pattern 01</div><div class="pattern-title">{{PATTERN_1_TITLE}}</div><div class="pattern-body">{{PATTERN_1_BODY}}</div></div>
   <div class="pattern"><div class="pattern-num">Pattern 02</div><div class="pattern-title">{{PATTERN_2_TITLE}}</div><div class="pattern-body">{{PATTERN_2_BODY}}</div></div>
@@ -348,6 +361,14 @@
 
 {{AGE_INSIGHT}}
 {{ETHNICITY_INSIGHT}}
+</section>
+
+<!-- Mid-report CTA #1: after the user has seen their personalized patterns -->
+<section class="sec">
+  <div class="cta-inline">
+    <span class="cta-inline-t">Your patterns above are the diagnostic. The Protocol is the exact plan to move them.</span>
+    <a href="{{CHECKOUT_URL}}" class="cta-inline-btn">See the full Protocol</a>
+  </div>
 </section>
 
 <!-- ENVIRONMENT + HISTORY -->
@@ -360,6 +381,12 @@
     <div class="insight-title">Why what you've tried hasn't worked</div>
     <div class="insight-body">{{HISTORY_PARAGRAPH}}</div>
   </div>
+
+  <!-- Mid-report CTA #2: after the user understands why generic plans miss -->
+  <div class="cta-inline">
+    <span class="cta-inline-t">The Protocol is built for your specific build, environment, and history.</span>
+    <a href="{{CHECKOUT_URL}}" class="cta-inline-btn">Get my Protocol</a>
+  </div>
 </section>
 
 <!-- ═══════════════════════════════════════ -->
@@ -369,7 +396,7 @@
 <div class="bridge">
   <div class="lb">Above: your preliminary analysis</div>
   <h2 class="tt">Now see what the <em>full Protocol</em><br>actually contains.</h2>
-  <p class="st">Everything above was generated from your profile. What follows is Tom's actual report — a real client, 30, skinny-fat, entrepreneur. This is exactly the level of detail you'd receive for your body.</p>
+  <p class="st">Everything above was generated from your profile. What follows is Tom's actual report, a real client, 30, skinny-fat, entrepreneur. This is exactly the level of detail you'd receive for your body.</p>
   <div class="bridge-arrow">↓</div>
 </div>
 
@@ -381,7 +408,7 @@
 
   <div class="ex-banner">
     <span class="ex-badge">Example</span>
-    <span class="ex-banner-text">Tom's report — 30, skinny-fat, entrepreneur. Tap a section to open it.</span>
+    <span class="ex-banner-text">Tom's report, 30, skinny-fat, entrepreneur. Tap a section to open it.</span>
   </div>
 
   <div class="report-frame" id="reportFrame">
@@ -483,7 +510,7 @@
         <div class="analysis">
           <div class="analysis-header">
             <div class="analysis-initial">T</div>
-            <div><div class="analysis-title">Summary Report — Tom</div><div class="analysis-meta">Written for Tom</div></div>
+            <div><div class="analysis-title">Summary Report, Tom</div><div class="analysis-meta">Written for Tom</div></div>
           </div>
           <div class="analysis-body">
             <p>A score of 25/100 at age 30 reflects a physique that is currently well below what the research identifies as optimal for your age group. This is not a cosmetic judgment. Studies consistently show that the physical cues driving attractiveness assessments, including body composition, torso shape, and proportional development, operate as reliable signals of health and physical capacity [Sell, Lukaszewski &amp; Townsley, 2017; Lassek &amp; Gaulin, 2009]. At your current composition, those signals are largely obscured. The good news is that the score reflects a starting point with significant structural room to move, and your posture is already within the optimal range, which is a genuine foundation to build from.</p>
@@ -704,7 +731,7 @@
             <div class="food-col-label">Prioritize</div>
             <div class="food-item plus">Spinach</div><div class="food-item plus">Broccoli</div><div class="food-item plus">Bell peppers</div><div class="food-item plus">Zucchini</div><div class="food-item plus">Cherry tomatoes</div>
             <div class="food-col-label">Limit</div>
-            <div class="food-item" style="color:var(--tm)">None — all non-starchy vegetables unlimited</div>
+            <div class="food-item" style="color:var(--tm)">None, all non-starchy vegetables unlimited</div>
           </div>
         </div>
 
@@ -796,7 +823,7 @@
         <div class="panel-divider">Sessions<span class="pd-r">6 templates</span></div>
 
         <div class="session">
-          <div class="session-name">Push A — chest &amp; shoulder width priority</div>
+          <div class="session-name">Push A, chest &amp; shoulder width priority</div>
           <div class="table-scroll"><table class="rtable">
             <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Load</th><th>Rest</th><th>Focus</th></tr></thead>
             <tbody>
@@ -813,7 +840,7 @@
         </div>
 
         <div class="session">
-          <div class="session-name">Pull A — back width &amp; posture</div>
+          <div class="session-name">Pull A, back width &amp; posture</div>
           <div class="table-scroll"><table class="rtable">
             <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Load</th><th>Rest</th><th>Focus</th></tr></thead>
             <tbody>
@@ -823,14 +850,14 @@
               <tr><td>Face pull (band)</td><td class="num">4 × 15–20</td><td>Light–med band</td><td>60s</td><td>Activation</td></tr>
               <tr><td>Dumbbell shrug</td><td class="num">3 × 12–15</td><td>RPE 7</td><td>60s</td><td>Hypertrophy</td></tr>
               <tr><td>Band pull-apart (overhand)</td><td class="num">3 × 20</td><td>Light band</td><td>45s</td><td>Activation</td></tr>
-              <tr><td>Doorframe pec stretch</td><td class="num">2 × 30s/side</td><td>BW</td><td>—</td><td>Mobility</td></tr>
+              <tr><td>Doorframe pec stretch</td><td class="num">2 × 30s/side</td><td>BW</td><td>·</td><td>Mobility</td></tr>
             </tbody>
           </table></div>
           <p class="session-note">Lat width and rear-delt thickness feed the V-taper that drives CWR perception. Face pulls and pull-aparts address forward shoulder positioning, the primary postural issue.</p>
         </div>
 
         <div class="session">
-          <div class="session-name">Lower A — posterior chain &amp; metabolic work</div>
+          <div class="session-name">Lower A, posterior chain &amp; metabolic work</div>
           <div class="table-scroll"><table class="rtable">
             <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Load</th><th>Rest</th><th>Focus</th></tr></thead>
             <tbody>
@@ -846,7 +873,7 @@
         </div>
 
         <div class="session">
-          <div class="session-name">Push B — shoulder volume &amp; upper chest</div>
+          <div class="session-name">Push B, shoulder volume &amp; upper chest</div>
           <div class="table-scroll"><table class="rtable">
             <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Load</th><th>Rest</th><th>Focus</th></tr></thead>
             <tbody>
@@ -856,14 +883,14 @@
               <tr><td>Push-up (hands elevated)</td><td class="num">3 × 12–15</td><td>BW</td><td>60s</td><td>Hypertrophy</td></tr>
               <tr><td>Dumbbell incline fly</td><td class="num">3 × 12–15</td><td>RPE 6</td><td>60s</td><td>Hypertrophy</td></tr>
               <tr><td>Rear delt fly (bent-over)</td><td class="num">3 × 12–15</td><td>RPE 6</td><td>60s</td><td>Hypertrophy</td></tr>
-              <tr><td>Cat-cow / thoracic extension</td><td class="num">2 × 10</td><td>BW</td><td>—</td><td>Mobility</td></tr>
+              <tr><td>Cat-cow / thoracic extension</td><td class="num">2 × 10</td><td>BW</td><td>·</td><td>Mobility</td></tr>
             </tbody>
           </table></div>
           <p class="session-note">The leaning lateral raise increases medial-deltoid stretch at the bottom, producing greater mechanical tension than the standard version [Sell 2017].</p>
         </div>
 
         <div class="session">
-          <div class="session-name">Pull B — vertical pull &amp; trap development</div>
+          <div class="session-name">Pull B, vertical pull &amp; trap development</div>
           <div class="table-scroll"><table class="rtable">
             <thead><tr><th>Exercise</th><th>Sets × reps</th><th>Load</th><th>Rest</th><th>Focus</th></tr></thead>
             <tbody>
@@ -873,7 +900,7 @@
               <tr><td>Band face pull (high anchor)</td><td class="num">4 × 15</td><td>Medium band</td><td>60s</td><td>Activation</td></tr>
               <tr><td>Dumbbell rear delt row</td><td class="num">3 × 12–15</td><td>RPE 6</td><td>60s</td><td>Hypertrophy</td></tr>
               <tr><td>Chin-up negative (or band-assisted)</td><td class="num">3 × 5–6</td><td>BW / band</td><td>2min</td><td>Strength</td></tr>
-              <tr><td>Neck + levator scapulae stretch</td><td class="num">2 × 30s/side</td><td>BW</td><td>—</td><td>Mobility</td></tr>
+              <tr><td>Neck + levator scapulae stretch</td><td class="num">2 × 30s/side</td><td>BW</td><td>·</td><td>Mobility</td></tr>
             </tbody>
           </table></div>
           <p class="session-note">The pullover targets serratus and lat insertion simultaneously, contributing to a wider, deeper back. Neck work addresses the cervical tension Tom flagged.</p>
@@ -897,12 +924,12 @@
         <div class="table-scroll"><table class="rtable">
           <thead><tr><th>Day</th><th>Session</th></tr></thead>
           <tbody>
-            <tr><td><strong>Monday</strong></td><td>Push A — chest &amp; shoulder width priority</td></tr>
-            <tr><td><strong>Tuesday</strong></td><td>Pull A — back width &amp; posture</td></tr>
-            <tr><td><strong>Wednesday</strong></td><td>Lower A — posterior chain &amp; metabolic</td></tr>
+            <tr><td><strong>Monday</strong></td><td>Push A, chest &amp; shoulder width priority</td></tr>
+            <tr><td><strong>Tuesday</strong></td><td>Pull A, back width &amp; posture</td></tr>
+            <tr><td><strong>Wednesday</strong></td><td>Lower A, posterior chain &amp; metabolic</td></tr>
             <tr><td><strong>Thursday</strong></td><td>Cardio / active recovery</td></tr>
-            <tr><td><strong>Friday</strong></td><td>Push B — shoulder volume &amp; upper chest</td></tr>
-            <tr><td><strong>Saturday</strong></td><td>Pull B — vertical pull &amp; trap development</td></tr>
+            <tr><td><strong>Friday</strong></td><td>Push B, shoulder volume &amp; upper chest</td></tr>
+            <tr><td><strong>Saturday</strong></td><td>Pull B, vertical pull &amp; trap development</td></tr>
             <tr><td><strong>Sunday</strong></td><td>Rest</td></tr>
           </tbody>
         </table></div>
@@ -920,7 +947,7 @@
 
         <div class="panel-divider">Key rules</div>
         <div class="rules">
-          <div class="rule"><span class="rule-n">1</span><span class="rule-t"><strong>Train upper-body compounds in the 6–12 rep range</strong> — the primary stimulus for the shoulder and chest development the proportions require.</span></div>
+          <div class="rule"><span class="rule-n">1</span><span class="rule-t"><strong>Train upper-body compounds in the 6–12 rep range</strong>, the primary stimulus for the shoulder and chest development the proportions require.</span></div>
           <div class="rule"><span class="rule-n">2</span><span class="rule-t"><strong>Never skip horizontal and vertical pulling.</strong> Posture and an underdeveloped SWR both depend on a back that matches pressing volume.</span></div>
           <div class="rule"><span class="rule-n">3</span><span class="rule-t"><strong>Cap each session at 45 minutes</strong> with 4–5 exercises and 60–90s rest. Home-gym training fails through sprawl, not lack of equipment.</span></div>
           <div class="rule"><span class="rule-n">4</span><span class="rule-t"><strong>Add 5 kg to compound lifts every two weeks while form holds.</strong> At this training age, linear progression is the fastest route to structural change.</span></div>
@@ -942,7 +969,7 @@
           <thead><tr><th>Time</th><th>Action</th><th>Purpose</th></tr></thead>
           <tbody>
             <tr><td class="num">8:30 PM</td><td>Last meal or final snack</td><td>Digestion largely complete before sleep onset</td></tr>
-            <tr><td class="num">9:00 PM</td><td>Screens off — phone, laptop, TV</td><td>Blue light suppresses melatonin secretion</td></tr>
+            <tr><td class="num">9:00 PM</td><td>Screens off, phone, laptop, TV</td><td>Blue light suppresses melatonin secretion</td></tr>
             <tr><td class="num">9:00 PM</td><td>Dim indoor lighting</td><td>Signals the scotopic shift, prepares sleep drive</td></tr>
             <tr><td class="num">9:15 PM</td><td>Creatine + evening supplements</td><td>Consistent timing improves absorption and habit</td></tr>
             <tr><td class="num">9:15 PM</td><td>Hot shower or bath (15 min)</td><td>Vasodilation accelerates core-temp drop, triggering onset</td></tr>
@@ -997,7 +1024,7 @@
         <p class="panel-intro">Supplement protocols fail most often not from what is missing, but from what is misdirected. Tom currently takes one supplement: creatine. Every item below earns its place against his specific metrics. Nothing is included for completeness.</p>
 
         <div class="insight" style="margin:20px 0">
-          <div class="insight-title">Current stack — creatine · keep, with dosing clarification</div>
+          <div class="insight-title">Current stack, creatine · keep, with dosing clarification</div>
           <div class="insight-body">Creatine monohydrate is the most consistently validated performance supplement in the literature. The question is not whether to take it, but how: a flat 3–5 g daily reaches saturation within 3–4 weeks (no loading phase required). Take it daily, at the same time, with food. Consistency matters more than precision.</div>
         </div>
 
@@ -1076,11 +1103,11 @@
         <div class="table-scroll"><table class="rtable">
           <thead><tr><th>Day</th><th>Session</th><th>Nutrition focus</th></tr></thead>
           <tbody>
-            <tr><td><strong>Monday</strong></td><td>Upper body strength — push</td><td>Deficit intake, high protein</td></tr>
-            <tr><td><strong>Tuesday</strong></td><td>Active recovery — posture work</td><td>Deficit intake, high protein</td></tr>
-            <tr><td><strong>Wednesday</strong></td><td>Upper body strength — pull</td><td>Deficit intake, high protein</td></tr>
-            <tr><td><strong>Thursday</strong></td><td>Active recovery — posture work</td><td>Deficit intake, high protein</td></tr>
-            <tr><td><strong>Friday</strong></td><td>Upper body strength — push/pull</td><td>Deficit intake, high protein</td></tr>
+            <tr><td><strong>Monday</strong></td><td>Upper body strength, push</td><td>Deficit intake, high protein</td></tr>
+            <tr><td><strong>Tuesday</strong></td><td>Active recovery, posture work</td><td>Deficit intake, high protein</td></tr>
+            <tr><td><strong>Wednesday</strong></td><td>Upper body strength, pull</td><td>Deficit intake, high protein</td></tr>
+            <tr><td><strong>Thursday</strong></td><td>Active recovery, posture work</td><td>Deficit intake, high protein</td></tr>
+            <tr><td><strong>Friday</strong></td><td>Upper body strength, push/pull</td><td>Deficit intake, high protein</td></tr>
             <tr><td><strong>Saturday</strong></td><td>Optional carry / core finisher</td><td>Maintenance or slight deficit</td></tr>
             <tr><td><strong>Sunday</strong></td><td>Full rest</td><td>Maintenance, prioritize sleep</td></tr>
           </tbody>
@@ -1089,10 +1116,10 @@
         <div class="panel-divider">Daily targets</div>
         <div class="checklist">
           <div class="check-item"><span class="check-box"></span><span>Hit ~185 g protein today</span></div>
-          <div class="check-item"><span class="check-box"></span><span>Stay at or under ~2,262 kcal — the active fat-loss ceiling</span></div>
+          <div class="check-item"><span class="check-box"></span><span>Stay at or under ~2,262 kcal, the active fat-loss ceiling</span></div>
           <div class="check-item"><span class="check-box"></span><span>Take 5 g creatine monohydrate</span></div>
-          <div class="check-item"><span class="check-box"></span><span>Complete today's strength session — shoulders &amp; upper back, 45 min cap</span></div>
-          <div class="check-item"><span class="check-box"></span><span>8 hours in bed — lights out by 10:30 pm if the alarm is at 6:30 am</span></div>
+          <div class="check-item"><span class="check-box"></span><span>Complete today's strength session, shoulders &amp; upper back, 45 min cap</span></div>
+          <div class="check-item"><span class="check-box"></span><span>8 hours in bed, lights out by 10:30 pm if the alarm is at 6:30 am</span></div>
           <div class="check-item"><span class="check-box"></span><span>30 minutes of low-intensity movement outside training</span></div>
           <div class="check-item"><span class="check-box"></span><span>Check posture twice at the desk: shoulders back, chest open, neck neutral</span></div>
           <div class="check-item"><span class="check-box"></span><span>Log food before eating, not after</span></div>
@@ -1137,9 +1164,9 @@
 <section class="sec" style="text-align:center;padding:64px 0">
   <div class="lb">Get your personalized analysis</div>
   <h2 class="tt">What you just read was <em>preliminary.</em><br>This is the real thing.</h2>
-  <p class="st" style="max-width:500px;margin:0 auto 12px">Your preliminary report is based on your quiz answers and profile type. Tom's report above shows what a fully personalized analysis looks like — built from your actual photos, measurements, and body composition data.</p>
+  <p class="st" style="max-width:500px;margin:0 auto 12px">Your preliminary report is based on your quiz answers and profile type. Tom's report above shows what a fully personalized analysis looks like, built from your actual photos, measurements, and body composition data.</p>
   <p class="st" style="max-width:500px;margin:0 auto 32px">You complete a detailed body assessment. Our team analyzes your photos and measurements. Your protocol is delivered within 72–96 hours.</p>
-  <a href="{{CHECKOUT_URL}}" class="ubtn">Get my personalized analysis — $89</a>
+  <a href="{{CHECKOUT_URL}}" class="ubtn">Get my personalized analysis, $89</a>
   <div class="uf">One-time payment · No subscription<br>90-day guarantee. If your proportions don't move, full refund.</div>
 </section>
 
@@ -1147,7 +1174,7 @@
 
 </div>
 
-<div class="sticky"><span class="sticky-t">This is a preliminary report. Get your personalized analysis.</span><a href="{{CHECKOUT_URL}}" class="sticky-b">Get my analysis — $89</a></div>
+<div class="sticky"><span class="sticky-t">This is a preliminary report. Get your personalized analysis.</span><a href="{{CHECKOUT_URL}}" class="sticky-b">Get my analysis, $89</a></div>
 
 <script>
   (function(){
