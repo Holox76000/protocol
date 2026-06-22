@@ -3,6 +3,7 @@ import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 import { sendReportEmail } from "../../../lib/email";
+import { computeNurtureStartsAt } from "../../../lib/sendWindow";
 
 type LeadPayload = {
   email: string;
@@ -33,6 +34,9 @@ export async function POST(request: Request) {
   };
 
   const createdAt = new Date().toISOString();
+  // Anchor the nurture sequence on the next US peak window so every step
+  // (E2..E7) lands at 14:00 UTC = 10am ET / 7am PT.
+  const nurtureStartsAt = computeNurtureStartsAt(new Date(createdAt));
   if (body.mode === "merge") {
     const { data: existingRows, error: selectError } = await supabaseAdmin
       .from("leads")
@@ -77,7 +81,8 @@ export async function POST(request: Request) {
       const { error: insertError } = await supabaseAdmin.from("leads").insert({
         email,
         payload: mergedPayload,
-        created_at: createdAt
+        created_at: createdAt,
+        nurture_starts_at: nurtureStartsAt,
       });
 
       if (insertError) {
@@ -89,7 +94,8 @@ export async function POST(request: Request) {
     const { error } = await supabaseAdmin.from("leads").insert({
       email,
       payload,
-      created_at: createdAt
+      created_at: createdAt,
+      nurture_starts_at: nurtureStartsAt,
     });
     if (error) {
       console.error("[lead] db error", error);
