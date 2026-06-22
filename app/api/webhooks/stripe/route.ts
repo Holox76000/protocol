@@ -117,16 +117,21 @@ export async function POST(request: Request) {
         });
       }
 
-      // TikTok Events API Purchase (event_id matches browser pixel for dedup)
+      // TikTok Events API Purchase (event_id matches browser pixel for dedup).
+      // Customer signals (UA, IP, ttp) were stashed in metadata at PI creation —
+      // the webhook is server-to-server so we can't read them from headers.
       try {
         await sendTiktokEvent({
           eventName: "Purchase",
           eventTime: purchaseEventTime,
           eventId: pi.id,
           eventSourceUrl: "https://protocol-club.com/dashboard",
+          userAgent: meta.customer_user_agent || undefined,
+          ipAddress: meta.customer_ip || undefined,
           email: customerEmail,
-          externalId: pi.id,
+          externalId: customerEmail || stripeCustomerId,
           ttclid: meta.ttclid || null,
+          ttp: meta.customer_ttp || null,
           properties: {
             value: pi.amount / 100,
             currency: (pi.currency ?? "usd").toUpperCase(),
@@ -312,15 +317,21 @@ export async function POST(request: Request) {
     }
 
     // ── TikTok Events API Purchase ────────────────────────
+    // Customer signals (UA, IP, ttp) stashed in metadata at session creation.
+    // Phone comes from Stripe Checkout phone_number_collection (E.164 format).
     try {
       await sendTiktokEvent({
         eventName: "Purchase",
         eventTime: sessionPurchaseEventTime,
         eventId: session.id,
         eventSourceUrl: "https://protocol-club.com/checkout",
+        userAgent: meta.customer_user_agent || undefined,
+        ipAddress: meta.customer_ip || undefined,
         email: customerEmail,
-        externalId: session.id,
+        phone: session.customer_details?.phone ?? null,
+        externalId: customerEmail || stripeCustomerId,
         ttclid: meta.ttclid || null,
+        ttp: meta.customer_ttp || null,
         properties: {
           value: sessionPurchaseValue,
           currency: sessionPurchaseCurrency,

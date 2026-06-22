@@ -136,7 +136,7 @@ export async function POST(request: Request) {
       userAgent,
       ipAddress,
       email,
-      externalId: funnelSid,
+      externalId: email,
       ttclid,
       ttp,
       properties: {

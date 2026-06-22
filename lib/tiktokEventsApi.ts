@@ -37,11 +37,21 @@ type TiktokEvent = {
   userAgent?: string;
   ipAddress?: string;
   email?: string | null;
+  phone?: string | null; // E.164 format ("+33612345678"), hashed here
   externalId?: string | null;
   ttclid?: string | null;
   ttp?: string | null;
   properties?: TiktokProperties;
 };
+
+function normalizePhoneE164(phone: string): string | null {
+  const trimmed = phone.trim();
+  if (!trimmed) return null;
+  // Strip every non-digit except a leading + (E.164 requires +<countrycode><number>).
+  const digits = trimmed.replace(/(?!^\+)[^\d]/g, "");
+  if (!digits.startsWith("+") || digits.length < 8) return null;
+  return digits;
+}
 
 function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");
@@ -64,6 +74,10 @@ export async function sendTiktokEvent(event: TiktokEvent) {
   if (event.email) {
     const normalized = normalizeEmail(event.email);
     if (normalized) user.email = sha256(normalized);
+  }
+  if (event.phone) {
+    const normalized = normalizePhoneE164(event.phone);
+    if (normalized) user.phone = sha256(normalized);
   }
   if (event.externalId) user.external_id = sha256(event.externalId);
   if (event.userAgent) user.user_agent = event.userAgent;

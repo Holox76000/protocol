@@ -44,6 +44,12 @@ export async function POST(request: Request) {
   const origin = request.headers.get("origin");
   const siteUrl = getPublicSiteUrl(origin);
 
+  // Capture customer signals here — the Stripe webhook is server-to-server,
+  // so we stash these in session.metadata to lift Purchase EMQ later.
+  const customerUserAgent = request.headers.get("user-agent")?.slice(0, 500);
+  const customerIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const customerTtp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+
   const sharedMetadata = {
     funnel: internalFunnel,
     funnel_type: funnelType,
@@ -60,6 +66,9 @@ export async function POST(request: Request) {
     ...(body.ttclid && { ttclid: body.ttclid }),
     ...(body.ga_client_id && { ga_client_id: body.ga_client_id }),
     ...(body.from && { from: body.from }),
+    ...(customerUserAgent && { customer_user_agent: customerUserAgent }),
+    ...(customerIp && { customer_ip: customerIp }),
+    ...(customerTtp && { customer_ttp: customerTtp }),
   };
 
   let session;
@@ -69,6 +78,7 @@ export async function POST(request: Request) {
         mode: "payment",
         ui_mode: "embedded",
         billing_address_collection: "auto",
+        phone_number_collection: { enabled: true },
         allow_promotion_codes: true,
         line_items: getCheckoutLineItems(internalFunnel),
         ...(customerEmail && { customer_email: customerEmail }),
@@ -80,6 +90,7 @@ export async function POST(request: Request) {
       session = await stripe.checkout.sessions.create({
         mode: "payment",
         billing_address_collection: "auto",
+        phone_number_collection: { enabled: true },
         allow_promotion_codes: true,
         line_items: getCheckoutLineItems(internalFunnel),
         ...(customerEmail && { customer_email: customerEmail }),
@@ -116,11 +127,12 @@ export async function POST(request: Request) {
 
   // ✅ CAPI InitiateCheckout — fires exactly once, here in the API route.
   // The client will fire fbq('track', 'InitiateCheckout') with the same session.id
-  // so Meta can deduplicate the two signals.
-  const userAgent = request.headers.get("user-agent") ?? undefined;
-  const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  // so Meta can deduplicate the two signals. Reuse the customer signals already
+  // captured above (stashed in metadata for the Purchase webhook downstream).
+  const userAgent = customerUserAgent;
+  const ipAddress = customerIp;
   const referer = request.headers.get("referer") ?? undefined;
-  const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+  const ttp = customerTtp;
   const eventTime = Math.floor(Date.now() / 1000);
 
   void sendMetaEvent({
@@ -155,7 +167,7 @@ export async function POST(request: Request) {
     userAgent,
     ipAddress,
     email: customerEmail,
-    externalId: session.id,
+    externalId: customerEmail,
     ttclid: body.ttclid || null,
     ttp,
     properties: {

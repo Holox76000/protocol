@@ -33,6 +33,17 @@ export async function POST(request: Request) {
   }
   if (body.from) utmMetadata.from = body.from;
 
+  // Capture customer signals here — the Stripe webhook can't see them later
+  // (Stripe → us = server-to-server, headers are Stripe's). Stashing in
+  // payment_intent.metadata so the Purchase event can use them for EMQ.
+  const customerUserAgent = request.headers.get("user-agent")?.slice(0, 500);
+  const customerIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const customerTtp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+  const customerSignalsMetadata: Record<string, string> = {};
+  if (customerUserAgent) customerSignalsMetadata.customer_user_agent = customerUserAgent;
+  if (customerIp) customerSignalsMetadata.customer_ip = customerIp;
+  if (customerTtp) customerSignalsMetadata.customer_ttp = customerTtp;
+
   // Find or create Stripe customer so the payment is linked to them
   let customerId: string | undefined;
   if (email) {
@@ -62,6 +73,7 @@ export async function POST(request: Request) {
         source: "app_checkout",
         capi_purchase_source: "payment_intent",
         ...utmMetadata,
+        ...customerSignalsMetadata,
       },
     });
   } catch (err) {
@@ -70,11 +82,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to create payment intent" }, { status: 500 });
   }
 
-  // CAPI InitiateCheckout
-  const userAgent = request.headers.get("user-agent") ?? undefined;
-  const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  // CAPI InitiateCheckout — reuse the customer signals already captured above.
+  const userAgent = customerUserAgent;
+  const ipAddress = customerIp;
   const referer = request.headers.get("referer") ?? undefined;
-  const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+  const ttp = customerTtp;
   const siteUrl = getPublicSiteUrl(request.headers.get("origin"));
   const eventTime = Math.floor(Date.now() / 1000);
 
@@ -107,7 +119,7 @@ export async function POST(request: Request) {
     userAgent,
     ipAddress,
     email,
-    externalId: paymentIntent.id,
+    externalId: email,
     ttclid: body.ttclid || null,
     ttp,
     properties: {
