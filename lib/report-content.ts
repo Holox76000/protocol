@@ -20,46 +20,46 @@ export function getPatterns(morphology: string): PatternSet {
 
   if (m === "skinny") return {
     p1t: "Training harder won't change what you see in the mirror",
-    p1b: "Men with your build almost always hit the same wall: more effort, same reflection. Without hitting the right structural targets first, shoulder width relative to waist, specifically, added size stays invisible. The issue isn't effort. It's which muscles, in what order.",
+    p1b: "More effort gives the same reflection without the right structural targets. Shoulder width relative to waist is the variable. Not effort. Order.",
     p2t: "Your clothes are working against you",
-    p2b: "Skinny frames cause most garments to hang flat. At the same weight, the same person can read as confident or forgettable based on how fabric sits across their shoulders and chest. Clothes don't fix a frame problem, structure does.",
+    p2b: "Skinny frames hang flat in most clothes. At the same weight, structure across shoulders and chest decides whether you read as confident or invisible.",
     p3t: "High-volume training was built for someone else",
-    p3b: "High-volume programs are designed around average body types. On your frame, they produce fatigue without the visible changes that move your score. What matters isn't total volume, it's which muscles you train, and in what order.",
+    p3b: "High-volume programs were built for average bodies. On your frame they produce fatigue without visible change. Which muscles, in what order: that's what matters.",
     p4t: "The target numbers are closer than most people think",
-    p4b: "For your build, shoulder-to-waist ratio and upper body density are the two variables that matter most. Both respond fast to focused work. Most men with your profile see visible changes in 4–6 weeks when the plan is right.",
+    p4b: "Shoulder-to-waist ratio and upper body density are your two levers. Both respond fast. Most skinny builds see visible change in 4 to 6 weeks.",
   };
 
   if (m === "skinny-fat") return {
     p1t: "Your body is gaining fat and losing muscle at the same time",
-    p1b: "Skinny-fat is the most misunderstood body type. It typically signals a cortisol-insulin imbalance that causes your body to store fat in the midsection while losing muscle in the limbs. Standard gym programs were designed for other body types and often make this worse.",
+    p1b: "Skinny-fat is a cortisol-insulin imbalance: fat in the midsection, muscle loss in the limbs. Standard gym programs were built for other bodies and often make it worse.",
     p2t: "Your waist is what's controlling your silhouette",
-    p2b: "For your build, waist measurement drives your attractiveness score more than any other variable. A 2–3cm reduction in perceived waist circumference moves your shoulder-to-waist ratio significantly, and that ratio is the strongest single predictor of male physical attractiveness in the data.",
+    p2b: "Waist drives your score more than any other variable on your build. A 2 to 3cm reduction shifts your shoulder-to-waist ratio enough to move you out of the middle.",
     p3t: "Cutting and bulking both make your body type worse",
-    p3b: "Aggressive caloric deficits accelerate muscle loss on skinny-fat frames. Caloric surpluses increase fat storage first. The right path is recomposition, building muscle while losing fat simultaneously, in the right sequence.",
+    p3b: "Aggressive cuts accelerate muscle loss. Surpluses store fat first. Recomposition is the only path: build and burn at once, in the right order.",
     p4t: "Sleep and stress matter as much as training",
-    p4b: "Skinny-fat profiles are almost always cortisol-driven. Sleep quality, stress, and training intensity are as important as the sessions themselves. Fixing one without the others produces partial results at best.",
+    p4b: "Skinny-fat is cortisol-driven. Sleep, stress, and training are the same variable. Fix one without the others and you get partial results.",
   };
 
   if (m === "overweight") return {
     p1t: "Where fat sits matters more than how much you carry",
-    p1b: "Your attractiveness score isn't primarily about total body weight, it's about your waist-to-shoulder ratio. Two men at the same weight can score very differently based on fat distribution alone. The plan targets your specific distribution, not just overall fat loss.",
+    p1b: "Your score isn't about total weight. It's about where fat sits. Two men at the same weight can score very differently.",
     p2t: "Visceral fat is flattening your V-taper",
-    p2b: "Visceral fat (deep abdominal fat) pushes your waist outward, compressing the shoulder-to-waist ratio. It also happens to be the first type to respond to sequenced diet and exercise, it moves faster than subcutaneous fat.",
+    p2b: "Visceral fat pushes your waist out and compresses your V-taper. It's also the first fat to respond. Faster than subcutaneous.",
     p3t: "Standard diets shrink you without improving your shape",
-    p3b: "Cut calories, run more, it works for the scale but not for attractiveness. Losing lean mass alongside fat makes you smaller but no more defined. Body composition matters. Scale weight doesn't.",
+    p3b: "Cut calories, run more: works for the scale, not for shape. Losing muscle alongside fat makes you smaller without making you defined.",
     p4t: "The structure is already there, it just needs uncovering",
-    p4b: "Most men with your build have a strong structural base. It's just covered. The right sequence uncovers it predictably: waist first, then upper body density. That order matters more than total effort.",
+    p4b: "Your structural base is already there. It's covered. Waist first, then upper body density: that order matters more than total effort.",
   };
 
   return {
     p1t: "Average is invisible, and most men stay there",
-    p1b: "Men who reach average body composition hit a plateau with no obvious reason to push further. 'Acceptable' and 'memorable' are separated by a small physical gap, one most men never close because they're never shown exactly what to aim at.",
+    p1b: "Average bodies hit a plateau because there's no obvious reason to push. The gap between 'acceptable' and 'memorable' is small. Most men never close it because no one shows them what to aim at.",
     p2t: "Proportions move the score. Weight barely does.",
-    p2b: "At average body composition, losing 5kg changes very little about how you're perceived. Shifting your shoulder-to-waist ratio by 0.15 changes a lot. Proportions are the variable. Weight is mostly noise.",
+    p2b: "At average composition, losing 5kg changes little. Shifting your shoulder-to-waist ratio by 0.15 changes a lot. Proportions are the variable. Weight is noise.",
     p3t: "Your environment pays back more than you put in",
-    p3b: "In your specific context, looking noticeably above average returns more than the physical effort required to get there. Men who move above their peer group's baseline see social and professional returns well beyond what the physical change alone would suggest.",
+    p3b: "Looking noticeably above average returns more than the work it takes. Men who move past their peer baseline see social and professional returns well beyond the physical change.",
     p4t: "The top 20% is a smaller jump than it appears",
-    p4b: "Moving from average to the top 20% means hitting specific targets: SWR > 1.52, body fat under 12%, shoulder-to-chest ratio > 1.15. These are measurable and achievable. That's what a real protocol is built around.",
+    p4b: "Top 20% is three concrete targets: SWR > 1.52, body fat under 12%, shoulder-to-chest > 1.15. Measurable. Achievable. That's what the protocol is built around.",
   };
 }
 
@@ -69,19 +69,19 @@ export function getAgeContent(ageBracket: string): InsightContent | null {
   const map: Record<string, InsightContent> = {
     "20–29": {
       title: "Your 20s: the best window you'll have",
-      body: "The gap between where you are and your peak is typically largest right now. Testosterone is near its highest point, around 25, and your body adapts to structured training faster than it will at any later stage. Men who act in this window lock in structural changes that hold for 20+ years. The window is wide, but it narrows every year.",
+      body: "The gap between you and your peak is largest right now. Testosterone peaks around 25 and your body adapts to structured training faster than it ever will. Men who act in this window lock in changes that hold for 20+ years.",
     },
     "30–39": {
       title: "Your 30s: the window is still open",
-      body: "Testosterone is still near peak but dropping about 1–2% per year. Metabolism has slowed slightly, which actually makes body composition more predictable when the plan is precise. Men who make structural changes in their 30s tend to hold them longer than men who start earlier but follow generic programs. Motivation, resources, and hormonal environment rarely align this well again.",
+      body: "Testosterone drops 1 to 2% per year but stays near peak. Slower metabolism makes body composition more predictable when the plan is precise. Most men get one shot at this alignment of motivation, resources, and biology.",
     },
     "40–49": {
-      title: "Your 40s: random training stops working here",
-      body: "High-volume, unfocused training at this stage often increases cortisol without producing visible adaptation. Men on targeted protocols in their 40s see better proportional results than men half their age following generic programs. Precision matters more than effort now.",
+      title: "Your 40s: unfocused training stops working",
+      body: "High-volume training raises cortisol without producing adaptation. Men on targeted protocols here often outpace men half their age on generic programs. Precision beats effort.",
     },
     "50+": {
       title: "After 50: the approach changes, the potential doesn't",
-      body: "Men who look worse at 55 than at 45 almost always followed the wrong program, not an inevitable biology. What changes after 50 is the work: less about adding mass, more about proportions, posture, and metabolic precision. Men on structured plans at this stage often look better than they did at 40 on generic advice.",
+      body: "Men who look worse at 55 than 45 followed the wrong program, not an inevitable biology. After 50 the work shifts: less mass, more proportions and posture. On the right plan you can look better than at 40.",
     },
   };
   return map[ageBracket] ?? null;
@@ -91,27 +91,27 @@ export function getEthnicityContent(ethnicity: string): InsightContent | null {
   const map: Record<string, InsightContent> = {
     "Caucasian": {
       title: "Your build: wide frame, midsection tendency",
-      body: "European-origin frames often carry natural width in the shoulders, but tend to store fat in the abdominal region first. That fat directly compresses your shoulder-to-waist ratio, the main attractiveness variable. The plan prioritizes waist reduction alongside upper body work to widen that gap.",
+      body: "European frames carry natural shoulder width but store fat in the abdomen first. That fat compresses your shoulder-to-waist ratio, the main score variable. Waist reduction alongside upper body work widens the gap.",
     },
     "Black": {
       title: "Your build: high natural muscle density",
-      body: "West African-derived profiles tend toward higher natural muscle density. The focus here is refining what's already there, definition and proportion over raw size. Watch out for over-developing non-key muscle groups; it can reduce visual symmetry rather than improve it.",
+      body: "West African-derived profiles tend toward high natural muscle density. Focus on refining what's there: definition and proportion over raw size. Over-developing non-key muscles can flatten visual symmetry.",
     },
     "Asian (East / SE)": {
       title: "Your build: narrow frame, fast-moving proportions",
-      body: "East and Southeast Asian frames typically feature slimmer bone structure and lower body fat. The main variable is shoulder width relative to your naturally narrow waist. Small gains in shoulder development create a large visible change on this build, faster than most profiles.",
+      body: "Slimmer bone structure, lower body fat. The main lever is shoulder width relative to your naturally narrow waist. Small shoulder gains produce large visible change here, faster than most profiles.",
     },
     "South Asian": {
-      title: "Your build: visceral fat tendency, strong recomposition response",
-      body: "South Asian profiles often show higher visceral fat despite moderate total weight, linked to hormonal and metabolic factors. The waist-to-shoulder ratio is what drives the score here. Targeted abdominal work combined with upper body development produces faster visible results on this build than generic programs.",
+      title: "Your build: visceral fat tendency, strong recomp response",
+      body: "Higher visceral fat despite moderate total weight is common on this build, tied to hormonal and metabolic factors. Waist-to-shoulder drives the score. Targeted abdominal work plus upper body building moves the needle faster than generic programs.",
     },
     "Hispanic-Latino": {
-      title: "Your build: responds well to muscle work, lower-abdominal tendency",
-      body: "Hispanic-Latino frames tend to carry muscle well and adapt quickly to hypertrophy training. The main challenge is typically fat distribution in the lower abdominal region. Sequenced fat reduction followed by targeted structural building works well here, results come faster than most profiles.",
+      title: "Your build: strong muscle response, lower-ab tendency",
+      body: "Hispanic-Latino frames carry muscle well and adapt fast to hypertrophy. Main challenge: fat distribution in the lower abdomen. Sequenced fat loss followed by structural building moves quickly here.",
     },
     "MENA": {
-      title: "Your build: high development potential, recomposition-focused",
-      body: "Middle Eastern and North African profiles often combine strong muscle development potential with elevated abdominal fat storage. The approach here is recomposition: build muscle density while reducing fat in the areas that most affect the waist-to-shoulder ratio. Your build responds well to this kind of structured work.",
+      title: "Your build: high development potential, recomp-focused",
+      body: "Strong muscle development potential combined with elevated abdominal fat storage. The approach: recomp. Build density while reducing fat in the areas that drive your waist-to-shoulder ratio.",
     },
   };
   return map[ethnicity] ?? null;
@@ -135,14 +135,14 @@ export function getEthnicityInsight(ethnicity: string): string {
 
 export function getEnvParagraph(env: string): string {
   const map: Record<string, string> = {
-    "Corporate": "In corporate settings, body composition affects perceived authority, separate from actual performance. Research on executive presence shows the effect is real and consistent. The visual markers that matter here are posture, shoulder width relative to frame, and the signal of a lean, defined physique. Those are the targets.",
-    "Entrepreneur / Startup": "In startup and entrepreneurial environments, physical presence reads as a social signal in meetings, pitches, and rooms where you're being assessed quickly. The look associated with high-performers here, lean, composed, slightly above average, is closer than most men expect. We focus on what moves fastest for your profile.",
-    "Manual / Trade work": "Your work already signals physical strength. The targets here are the visual markers that register outside of that context, proportionality, a defined waist, upper body shape that reads well socially and personally, not just professionally.",
-    "Student": "Peer comparison in student environments is constant, and physical attractiveness affects social dynamics and confidence more directly at this stage than at most others. The plan produces visible results in 12 weeks, one academic term, with a schedule that fits around full-time study.",
-    "Creative / Freelance": "No dress code means physical presence stands out more, not less. In creative environments, the men who read as high-performers tend to look composed and healthy, not muscular. That's a different target than most programs are built for.",
-    "Medical / Healthcare": "You already understand the physiology. The studies behind this plan are the same literature you're familiar with, applied to attractiveness specifically, not clinical health. The goal is different, and so is the approach.",
+    "Corporate": "In corporate settings, body composition shifts how authority reads, separate from actual performance. Posture, shoulder width, lean definition: that's what registers in the room.",
+    "Entrepreneur / Startup": "In startup environments, physical presence reads as a social signal in every pitch and meeting. The look tied to high-performers here, lean and composed, is closer than most men expect.",
+    "Manual / Trade work": "Your work already signals strength. The targets here are the visual markers that read outside that context: proportions, defined waist, upper body shape.",
+    "Student": "Peer comparison at this stage is constant and affects social dynamics directly. The plan produces visible results in 12 weeks, one academic term, with a schedule that fits full-time study.",
+    "Creative / Freelance": "No dress code means presence stands out more, not less. High-performers in creative environments read as composed and healthy, not muscular. Different target than most programs are built for.",
+    "Medical / Healthcare": "You already understand the physiology. Same literature you're trained on, applied to attractiveness specifically. Different goal, different approach.",
   };
-  return map[env] ?? "Your environment shapes which changes produce the most visible return. The plan focuses on the proportional improvements, shoulder-to-waist ratio, body fat, and structural definition, that register well in most social contexts.";
+  return map[env] ?? "Your environment shapes which changes return the most. The plan focuses on shoulder-to-waist ratio, body fat, and structural definition: what reads well in most social contexts.";
 }
 
 // ── History paragraph ────────────────────────────────────
@@ -152,19 +152,19 @@ export function getHistoryParagraph(pastSolutions: string | string[] | unknown):
   const solutions = raw.toLowerCase();
 
   if (solutions.includes("nothing")) {
-    return "Starting from zero is an advantage. Men who've tried things before often have patterns to undo. You don't. The fitness industry is built for size and weight loss, not attractiveness. Building the right approach from the start is faster than unbuilding the wrong one.";
+    return "Starting from zero is an advantage. No patterns to undo. The fitness industry is built for size and weight loss, not attractiveness. Building the right approach is faster than unbuilding the wrong one.";
   }
   if (solutions.includes("personal trainer")) {
-    return "Personal trainers build programs for fitness, performance, or body composition, not attractiveness. The goal is different, and so is the work. Attractiveness optimization isn't covered in trainer certifications. What you've done isn't wasted, it just wasn't aimed at the right target.";
+    return "Trainers build for fitness, performance, or weight loss, not attractiveness. The goal is different, the work is different. What you've done wasn't wasted, it just wasn't aimed here.";
   }
   if (solutions.includes("youtube")) {
-    return "YouTube is optimized for views, not results for your specific build. The people with millions of views are genetic outliers making their personal experience look like universal advice. Your actual variables are specific enough that no general video covers them.";
+    return "YouTube is optimized for views, not your build. The high-view creators are genetic outliers selling personal experience as universal advice. Your variables are specific enough that no general video covers them.";
   }
   if (solutions.includes("diet")) {
-    return "Diets produce weight changes, not necessarily attractiveness changes. Losing weight without structure often removes muscle alongside fat, which can make you smaller without making you look better. What you lose matters as much as how much you lose.";
+    return "Diets produce weight changes, not attractiveness changes. Losing muscle alongside fat makes you smaller without making you look better. What you lose matters as much as how much.";
   }
   if (solutions.includes("surgery")) {
-    return "Medical interventions target single variables. They can work for specific changes, but attractiveness is driven by the interaction between body composition, proportions, and lifestyle, not any one factor in isolation.";
+    return "Medical interventions target single variables. They work for specific changes, but attractiveness is the interaction between composition, proportions, and lifestyle, not any one factor.";
   }
-  return "What you've tried wasn't built for this goal. Fitness programs, nutrition plans, and generic advice are designed for health or weight management. None of them target what actually drives attractiveness.";
+  return "What you've tried wasn't built for this goal. Fitness programs and nutrition plans are designed for health or weight. None of them target what drives attractiveness.";
 }
