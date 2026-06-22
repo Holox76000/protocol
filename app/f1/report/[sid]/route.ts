@@ -9,6 +9,7 @@ import {
   getEnvParagraph,
   getHistoryParagraph,
 } from "../../../../lib/report-content";
+import { computePreliminaryScore } from "../../../../lib/preliminaryScore";
 
 const TEN_YEARS = 315_360_000;
 
@@ -156,6 +157,7 @@ export async function GET(
   const morphology = (answers.morphology as string) ?? "Average";
   const env = (answers.social_environment as string) ?? "";
   const patterns = getPatterns(morphology);
+  const score = computePreliminaryScore(answers);
 
   // Build offer URL with all quiz params so the offer page can personalize
   const offerParams = new URLSearchParams({ funnel_sid: sid, funnel: "quiz" });
@@ -194,6 +196,11 @@ export async function GET(
     "{{HISTORY_PARAGRAPH}}": getHistoryParagraph((answers.past_solutions as string) ?? ""),
     "{{CHECKOUT_URL}}": offerUrl,
     "{{PROJECTION_BLOCK}}": projectionBlock,
+    "{{SCORE_NOW}}": String(score.current),
+    "{{SCORE_NOW_LABEL}}": score.currentLabel,
+    "{{SCORE_POTENTIAL}}": String(score.potential),
+    "{{SCORE_POTENTIAL_LABEL}}": score.potentialLabel,
+    "{{SCORE_GAIN}}": String(score.potential - score.current),
     "{{AGE_INSIGHT}}": getAgeInsight((answers.age_bracket as string) ?? ""),
     "{{ETHNICITY_INSIGHT}}": getEthnicityInsight((answers.ethnicity as string) ?? ""),
     "{{FUNNEL_SID}}": sid,

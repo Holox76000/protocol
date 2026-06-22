@@ -363,17 +363,36 @@
 <!-- ═══════════════════════════════════════ -->
 
 <section class="hero">
-  <div class="lb">Preliminary report</div>
-  <h1 class="tt">{{FIRST_NAME}}'s <em>Preliminary Report</em></h1>
-  <div class="hero-d">Generated {{DATE}} · Based on your quiz answers</div>
-  <div class="hg">
+  <div class="lb">Your preliminary analysis</div>
+  <h1 class="tt">{{FIRST_NAME}}, here's where <em>you stand.</em></h1>
+  <div class="hero-d">Estimated from your quiz answers. Confirmed by the photo analysis in your full Protocol.</div>
+
+  <div class="score-pair" style="max-width:540px;margin:32px auto 12px">
+    <div class="score-card">
+      <div class="score-card-label">Today <span style="font-size:10px;border:1px solid var(--bd);padding:2px 6px;border-radius:4px;margin-left:4px">Age {{AGE}}</span></div>
+      <div class="score-card-num">{{SCORE_NOW}}</div>
+      <div class="score-card-max">/ 100</div>
+      <div class="score-card-tag red">{{SCORE_NOW_LABEL}}</div>
+      <div class="score-card-note">Composite: SWR, body fat, posture, presentation.</div>
+    </div>
+    <div class="score-card dark">
+      <div class="score-card-label">Your potential <span style="font-size:10px;border:1px solid #333;padding:2px 6px;border-radius:4px;margin-left:4px">12 weeks</span></div>
+      <div class="score-card-num">{{SCORE_POTENTIAL}}</div>
+      <div class="score-card-max">/ 100</div>
+      <div class="score-card-tag green">{{SCORE_POTENTIAL_LABEL}}</div>
+      <div class="score-card-note">Achievable with the Protocol over 84 days.</div>
+      <div class="score-card-gain">Projected gain +{{SCORE_GAIN}}</div>
+    </div>
+  </div>
+
+  <div class="hg" style="margin-top:28px">
     <div class="hg-i"><div class="hg-v">{{AGE}}</div><div class="hg-l">Age</div></div>
     <div class="hg-i"><div class="hg-v">{{HEIGHT}}</div><div class="hg-l">Height</div></div>
     <div class="hg-i"><div class="hg-v">{{WEIGHT}}</div><div class="hg-l">Weight</div></div>
     <div class="hg-i"><div class="hg-v">{{BODY_TYPE}}</div><div class="hg-l">Type</div></div>
     <div class="hg-i"><div class="hg-v">{{ENV}}</div><div class="hg-l">Context</div></div>
   </div>
-  <a href="{{CHECKOUT_URL}}" class="skip-cta">Already convinced? See my Protocol</a>
+  <a href="{{CHECKOUT_URL}}" class="skip-cta">Already convinced? Get my Protocol for $89</a>
 </section>
 
 <!-- BEFORE / AFTER PROJECTION (built server-side: photo block or stats fallback) -->
