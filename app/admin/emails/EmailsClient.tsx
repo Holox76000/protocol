@@ -7,7 +7,14 @@ type Props = {
   metrics: RoleMetrics[];
   suppressions: { email: string; reason: string; when: string }[];
   leads: { total: number; paused: number; stepCounts: Record<"e2" | "e3" | "e4" | "e5" | "e6" | "e7", number> };
-  sales: { paidCount: number; revenueCents: number };
+  sales: {
+    paidCount: number;
+    revenueCents: number;
+    uniquePaidCount: number;
+    uniqueRevenueCents: number;
+    uniquePaidAfterCount: number;
+    uniqueRevenueAfterCents: number;
+  };
 };
 
 function pct(n: number): string {
@@ -32,12 +39,6 @@ export default function EmailsClient({ range, metrics, suppressions, leads, sale
   const complaintRate = totalDelivered > 0 ? totalComplained / totalDelivered : 0;
   const complaintAlert = complaintRate >= 0.001;
 
-  // Revenue attributed across all email roles (sum of "paid recipients" per row × ticket).
-  // Will double-count if a paid user received multiple emails — that's by design here:
-  // each row shows "recipients-of-this-email who paid", not strict last-touch attribution.
-  const attributedRevenueCents = metrics.reduce((s, m) => s + m.revenueCents, 0);
-  const attributedPaidCount = metrics.reduce((s, m) => s + m.paid, 0);
-
   return (
     <main className="min-h-screen bg-ash px-6 py-10">
       <div className="mx-auto max-w-5xl">
@@ -48,7 +49,7 @@ export default function EmailsClient({ range, metrics, suppressions, leads, sale
             Email — performance & monitoring
           </h1>
           <p className="text-xs text-mute mt-1">
-            Resend events agrégés par rôle d'email · Période : {range}
+            Resend events agrégés par rôle d'email · Période : {range} · Internes exclus
           </p>
         </div>
 
@@ -82,57 +83,69 @@ export default function EmailsClient({ range, metrics, suppressions, leads, sale
         </div>
 
         {/* Sales KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          <Kpi label="Achats totaux"        value={sales.paidCount.toString()} sub="all-time"/>
-          <Kpi label="Revenu total"         value={dollars(sales.revenueCents)} sub="all-time"/>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+          <Kpi label="Achats totaux"   value={sales.paidCount.toString()} sub="all-time"/>
+          <Kpi label="Revenu total"    value={dollars(sales.revenueCents)} sub="all-time"/>
           <Kpi
-            label="Achats touchés email"
-            value={attributedPaidCount.toString()}
-            sub={`${pct(sales.paidCount > 0 ? attributedPaidCount / (sales.paidCount * metrics.length) : 0)} reach moyen`}
+            label="Acheteurs touchés"
+            value={sales.uniquePaidCount.toString()}
+            sub={`${dollars(sales.uniqueRevenueCents)} · unique, pas de double-count`}
           />
           <Kpi
-            label="Revenu attribué"
-            value={dollars(attributedRevenueCents)}
-            sub="somme par email (double comptage si multi-touch)"
+            label="Revenu post-email"
+            value={dollars(sales.uniqueRevenueAfterCents)}
+            sub={`${sales.uniquePaidAfterCount} acheteur(s) · paid après réception`}
+            highlight
           />
         </div>
+
+        {/* Legend */}
+        <p className="text-[10px] text-mute mb-6">
+          <strong className="text-void">Paid après</strong> = acheteur a payé APRÈS avoir reçu cet email (causal).
+          <span className="mx-1.5">·</span>
+          <strong className="text-void">Paid (loose)</strong> = a reçu cet email ET a payé (toute date) — double-compté multi-touch.
+        </p>
 
         {/* Per-email metrics table */}
         <div className="bg-white border border-wire rounded-xl overflow-hidden mb-8">
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-ash border-b border-wire">
-                <th className="text-left  px-4 py-3 font-semibold text-void">Email</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Sent</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Delivered</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Opened</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Open %</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Clicked</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">CTR</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Bounce</th>
-                <th className="text-right px-4 py-3 font-semibold text-void">Complaint</th>
-                <th className="text-right px-4 py-3 font-semibold text-void bg-ash/40 border-l border-wire">Paid</th>
-                <th className="text-right px-4 py-3 font-semibold text-void bg-ash/40">Conv %</th>
-                <th className="text-right px-4 py-3 font-semibold text-void bg-ash/40">Revenu</th>
+                <th className="text-left  px-3 py-3 font-semibold text-void">Email</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Sent</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Deliv</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Open</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Open%</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Click</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">CTR</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Bnc</th>
+                <th className="text-right px-2 py-3 font-semibold text-void">Cmplt</th>
+                <th className="text-right px-2 py-3 font-semibold text-void bg-emerald-50/40 border-l border-wire">Paid après</th>
+                <th className="text-right px-2 py-3 font-semibold text-void bg-emerald-50/40">Conv%</th>
+                <th className="text-right px-2 py-3 font-semibold text-void bg-emerald-50/40">Revenu</th>
+                <th className="text-right px-2 py-3 font-semibold text-mute bg-ash/40 border-l border-wire">Paid (loose)</th>
+                <th className="text-right px-2 py-3 font-semibold text-mute bg-ash/40">Revenu (loose)</th>
               </tr>
             </thead>
             <tbody>
               {metrics.map(m => (
                 <tr key={m.role} className="border-b border-wire/60 last:border-0 hover:bg-ash/40 transition">
-                  <td className="px-4 py-3 font-medium text-void">{m.label}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{m.sent || "—"}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{m.delivered || "—"}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{m.opened || "—"}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{pct(m.openRate)}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{m.clicked || "—"}</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-void">{pct(m.ctr)}</td>
-                  <td className="px-4 py-3 text-right font-mono text-dim">{m.bounced || "—"}</td>
-                  <td className={`px-4 py-3 text-right font-mono ${m.complained > 0 ? "text-red-500 font-semibold" : "text-dim"}`}>
+                  <td className="px-3 py-3 font-medium text-void">{m.label}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{m.sent || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{m.delivered || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{m.opened || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{pct(m.openRate)}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{m.clicked || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono font-semibold text-void">{pct(m.ctr)}</td>
+                  <td className="px-2 py-3 text-right font-mono text-dim">{m.bounced || "—"}</td>
+                  <td className={`px-2 py-3 text-right font-mono ${m.complained > 0 ? "text-red-500 font-semibold" : "text-dim"}`}>
                     {m.complained || "—"}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-void border-l border-wire">{m.paid || "—"}</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-void">{pct(m.conversionRate)}</td>
-                  <td className="px-4 py-3 text-right font-mono text-void">{m.revenueCents > 0 ? dollars(m.revenueCents) : "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-void border-l border-wire">{m.paidAfter || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono font-semibold text-void">{pct(m.conversionRate)}</td>
+                  <td className="px-2 py-3 text-right font-mono text-void">{m.revenueCentsAfter > 0 ? dollars(m.revenueCentsAfter) : "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-mute border-l border-wire">{m.paid || "—"}</td>
+                  <td className="px-2 py-3 text-right font-mono text-mute">{m.revenueCents > 0 ? dollars(m.revenueCents) : "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -175,12 +188,19 @@ export default function EmailsClient({ range, metrics, suppressions, leads, sale
   );
 }
 
-function Kpi({ label, value, sub, alert }: { label: string; value: string; sub?: string; alert?: boolean }) {
+function Kpi({ label, value, sub, alert, highlight }: { label: string; value: string; sub?: string; alert?: boolean; highlight?: boolean }) {
+  const cls = alert
+    ? "bg-red-50 border-red-200"
+    : highlight
+    ? "bg-emerald-50 border-emerald-200"
+    : "bg-white border-wire";
+  const valueCls = alert ? "text-red-600" : highlight ? "text-emerald-700" : "text-void";
+  const subCls = alert ? "text-red-500" : highlight ? "text-emerald-600" : "text-mute";
   return (
-    <div className={`p-4 rounded-xl border ${alert ? "bg-red-50 border-red-200" : "bg-white border-wire"}`}>
+    <div className={`p-4 rounded-xl border ${cls}`}>
       <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">{label}</p>
-      <p className={`mt-1 text-xl font-mono font-semibold ${alert ? "text-red-600" : "text-void"}`}>{value}</p>
-      {sub && <p className={`mt-0.5 text-[10px] ${alert ? "text-red-500" : "text-mute"}`}>{sub}</p>}
+      <p className={`mt-1 text-xl font-mono font-semibold ${valueCls}`}>{value}</p>
+      {sub && <p className={`mt-0.5 text-[10px] ${subCls}`}>{sub}</p>}
     </div>
   );
 }
