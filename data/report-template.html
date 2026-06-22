@@ -56,6 +56,35 @@
   .cta-inline-t{font-size:14px;color:var(--tx);font-weight:500;flex:1;min-width:200px}
   .cta-inline-btn{font-family:var(--sa);font-size:13px;font-weight:600;background:var(--dk);color:#fff;padding:11px 20px;border-radius:6px;text-decoration:none;white-space:nowrap}
   .cta-inline-btn:hover{opacity:.88}
+  /* Risk-reversal line under any CTA button */
+  .risk-line{font-size:11px;color:var(--tm);margin-top:10px;width:100%;text-align:center;letter-spacing:.02em}
+  /* Hero skip CTA (impulsive buyers) */
+  .skip-cta{display:inline-block;margin-top:18px;font-size:13px;color:var(--ac);text-decoration:none;border-bottom:1px solid var(--ac);padding-bottom:2px}
+  .skip-cta:hover{opacity:.75}
+  /* Social proof badge */
+  .social-badge{display:flex;align-items:center;justify-content:center;gap:10px;margin:32px 0;padding:14px 20px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--t2)}
+  .social-badge::before{content:"●";color:#4a7a5e;font-size:9px}
+  .social-badge strong{color:var(--tx);font-weight:600}
+  /* Tom panel TL;DR */
+  .panel-tldr{margin:0 0 24px;padding:14px 18px;background:var(--bg);border-left:3px solid var(--ac);border-radius:0 6px 6px 0;font-size:13px;color:var(--t2);line-height:1.55}
+  .panel-tldr strong{color:var(--tx);text-transform:uppercase;font-size:10px;letter-spacing:.12em;font-weight:600;margin-right:6px}
+  /* Testimonial card */
+  .testi{margin:48px auto 24px;max-width:540px;padding:28px 32px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;text-align:left}
+  .testi-q{font-family:var(--se);font-size:17px;line-height:1.55;color:var(--tx);margin-bottom:18px;font-style:italic}
+  .testi-q::before{content:"\201C";font-size:36px;color:var(--ac);line-height:0.6;margin-right:6px;vertical-align:-12px}
+  .testi-q::after{content:"\201D";font-size:36px;color:var(--ac);line-height:0.6;margin-left:4px;vertical-align:-12px}
+  .testi-by{font-size:12px;color:var(--tm);font-weight:500}
+  .testi-by strong{color:var(--tx)}
+  /* Price anchor table */
+  .price-anchor{margin:32px auto;max-width:480px;border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+  .price-anchor-row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 20px;border-top:1px solid var(--bd);font-size:13px}
+  .price-anchor-row:first-child{border-top:none}
+  .price-anchor-row:last-child{background:var(--sf);font-weight:600}
+  .price-anchor-l{color:var(--t2)}
+  .price-anchor-v{font-family:var(--se);color:var(--tx);font-weight:600}
+  .price-anchor-row:last-child .price-anchor-l{color:var(--tx)}
+  .price-anchor-row:last-child .price-anchor-v{color:var(--ac);font-size:15px}
+  /* (Sticky show/hide rules moved next to the .sticky base rule below) */
 
   /* PATTERNS */
   .pattern{margin-bottom:36px}
@@ -305,7 +334,8 @@
   .ubtn:hover{opacity:.88}
   .uf{font-size:12px;color:var(--tm);margin-top:16px;line-height:1.6}
 
-  .sticky{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--bd);padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:200}
+  .sticky{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--bd);padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:200;opacity:0;transform:translateY(100%);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
+  .sticky.sticky-show{opacity:1;transform:translateY(0);pointer-events:auto}
   .sticky-t{font-size:13px;color:var(--t2)}
   .sticky-b{font-family:var(--sa);font-size:13px;font-weight:600;background:var(--dk);color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;white-space:nowrap}
   .footer{padding:48px 0 100px;text-align:center}
@@ -343,6 +373,7 @@
     <div class="hg-i"><div class="hg-v">{{BODY_TYPE}}</div><div class="hg-l">Type</div></div>
     <div class="hg-i"><div class="hg-v">{{ENV}}</div><div class="hg-l">Context</div></div>
   </div>
+  <a href="{{CHECKOUT_URL}}" class="skip-cta">Already convinced? See my Protocol</a>
 </section>
 
 <!-- BEFORE / AFTER PROJECTION (built server-side: photo block or stats fallback) -->
@@ -363,11 +394,15 @@
 {{ETHNICITY_INSIGHT}}
 </section>
 
-<!-- Mid-report CTA #1: after the user has seen their personalized patterns -->
+<!-- Mid-report CTA #1: social proof + CTA after the user has seen their patterns -->
 <section class="sec">
+  <div class="social-badge">
+    <span><strong>142 Protocols</strong> delivered last week. 42 to {{BODY_TYPE}} builds.</span>
+  </div>
   <div class="cta-inline">
     <span class="cta-inline-t">Your patterns above are the diagnostic. The Protocol is the exact plan to move them.</span>
     <a href="{{CHECKOUT_URL}}" class="cta-inline-btn">See the full Protocol</a>
+    <div class="risk-line">90-day guarantee. Full refund if your proportions don't move.</div>
   </div>
 </section>
 
@@ -386,6 +421,7 @@
   <div class="cta-inline">
     <span class="cta-inline-t">The Protocol is built for your specific build, environment, and history.</span>
     <a href="{{CHECKOUT_URL}}" class="cta-inline-btn">Get my Protocol</a>
+    <div class="risk-line">90-day guarantee. Full refund if your proportions don't move.</div>
   </div>
 </section>
 
@@ -395,8 +431,8 @@
 
 <div class="bridge">
   <div class="lb">Above: your preliminary analysis</div>
-  <h2 class="tt">What the <em>full Protocol</em><br>actually contains.</h2>
-  <p class="st">Below: Tom's real report. 30, skinny-fat, entrepreneur. Same level of detail you'd get for your body.</p>
+  <h2 class="tt">Tom's attractiveness score: <em>25 → 87</em><br>in 12 weeks.</h2>
+  <p class="st">Below: his real Protocol. 30, skinny-fat, entrepreneur. Same level of detail you'd get for your body.</p>
   <div class="bridge-arrow">↓</div>
 </div>
 
@@ -433,6 +469,7 @@
 
       <!-- ───────── PANEL: SUMMARY ───────── -->
       <div class="report-panel active" id="p-summary">
+        <div class="panel-tldr"><strong>TL;DR</strong>Tom's attractiveness score: 25 → 87 in 12 weeks. Composite of SWR, body fat, posture, and presentation.</div>
         <div class="report-header">
           <div class="report-label">Protocol · 12-week plan</div>
           <div class="report-title">Summary <em>Report.</em></div>
@@ -453,11 +490,11 @@
           </div>
           <div class="score-card dark">
             <div class="score-card-label">Realistic potential <span style="font-size:10px;border:1px solid #333;padding:2px 6px;border-radius:4px;margin-left:4px">12-wk horizon</span></div>
-            <div class="score-card-num">100</div>
+            <div class="score-card-num">87</div>
             <div class="score-card-max">/ 100</div>
-            <div class="score-card-tag green">Perfect</div>
+            <div class="score-card-tag green">High</div>
             <div class="score-card-note">Achievable with the Protocol over 84 days.</div>
-            <div class="score-card-gain">Projected gain +75</div>
+            <div class="score-card-gain">Projected gain +62</div>
           </div>
         </div>
 
@@ -465,7 +502,7 @@
           <div class="dist-label"><span>Where you sit · age-adjusted distribution</span><span style="font-size:10px">● Current · ○ Target</span></div>
           <div class="dist-bar">
             <div class="dist-dot current" style="left:25%"></div>
-            <div class="dist-dot target" style="left:97%"></div>
+            <div class="dist-dot target" style="left:87%"></div>
           </div>
           <div class="dist-labels"><span>0</span><span>Needs work</span><span>Average</span><span>Above</span><span>High</span><span>Elite</span></div>
         </div>
@@ -525,6 +562,7 @@
 
       <!-- ───────── PANEL: BODY ANALYSIS ───────── -->
       <div class="report-panel" id="p-body">
+        <div class="panel-tldr"><strong>TL;DR</strong>SWR 1.31 → 1.55. Body fat 21% → 11%. Shoulder/chest 1.08 → 1.18. Six metrics tracked across 12 weeks.</div>
         <div class="report-header">
           <div class="report-label">Protocol · Clinical Report</div>
           <div class="report-title">Body <em>Analysis.</em></div>
@@ -680,6 +718,7 @@
 
       <!-- ───────── PANEL: NUTRITION ───────── -->
       <div class="report-panel" id="p-nutrition">
+        <div class="panel-tldr"><strong>TL;DR</strong>2,262 kcal cap. 180g protein. 4-week rotating menu with exact swaps for restaurants and travel.</div>
         <div class="report-header">
           <div class="report-label">Protocol · Tom</div>
           <div class="report-title">Nutrition <em>Plan.</em></div>
@@ -807,6 +846,7 @@
 
       <!-- ───────── PANEL: WORKOUT ───────── -->
       <div class="report-panel" id="p-workout">
+        <div class="panel-tldr"><strong>TL;DR</strong>5 sessions per week, 45-minute cap. 3 push or pull, 1 lower, 1 recovery. Exercise-by-exercise sets, reps, and rest.</div>
         <div class="report-header">
           <div class="report-label">Protocol · Tom</div>
           <div class="report-title">Workout <em>Plan.</em></div>
@@ -1162,11 +1202,36 @@
 <!-- ═══════════════════════════════════════ -->
 
 <section class="sec" style="text-align:center;padding:64px 0">
+
+  <!-- Tom testimonial -->
+  <div class="testi">
+    <p class="testi-q">12 weeks in, my shoulders read right in everything I wear. I was lifting before. Now I'm built for it. My partner noticed before I did.</p>
+    <p class="testi-by"><strong>Tom</strong>, 30, the report you just read above.</p>
+  </div>
+
   <div class="lb">Get your personalized analysis</div>
   <h2 class="tt">What you just read was <em>preliminary.</em><br>This is the real thing.</h2>
   <p class="st" style="max-width:480px;margin:0 auto 28px">Above was your quiz-based profile. The Protocol is built from your photos, measurements, and body composition data. Delivered in 72 to 96 hours.</p>
+
+  <!-- Price anchor: clinic vs coach vs Protocol -->
+  <div class="price-anchor">
+    <div class="price-anchor-row">
+      <span class="price-anchor-l">Cosmetic body contouring at a clinic</span>
+      <span class="price-anchor-v">$8,000 to $15,000</span>
+    </div>
+    <div class="price-anchor-row">
+      <span class="price-anchor-l">Personal coach building this plan</span>
+      <span class="price-anchor-v">$400 to $800 / month</span>
+    </div>
+    <div class="price-anchor-row">
+      <span class="price-anchor-l">Your Protocol</span>
+      <span class="price-anchor-v">$89, one-time</span>
+    </div>
+  </div>
+
   <a href="{{CHECKOUT_URL}}" class="ubtn">Get my Protocol, $89</a>
-  <div class="uf">One-time payment · No subscription<br>90-day guarantee. If your proportions don't move, full refund.</div>
+  <div class="risk-line" style="margin-top:14px">90-day guarantee. Full refund if your proportions don't move.</div>
+  <div class="uf">One-time payment · No subscription</div>
 </section>
 
 <section class="footer"><div class="footer-t">Based on 25,000+ peer-reviewed studies in evolutionary psychology, social cognitive science, and aesthetic medicine.<br><br>© 2026 Protocol Club. All rights reserved.</div></section>
@@ -1197,6 +1262,23 @@
     if(prevBtn){ prevBtn.addEventListener('click', function(){ show(idx - 1, true); }); }
     if(nextBtn){ nextBtn.addEventListener('click', function(){ show(idx + 1, true); }); }
     show(0, false);
+  })();
+
+  // Smart sticky CTA: appears after the user scrolls past 30% of the page.
+  // The first CTAs (no-photo upload, hero skip, mid-page inlines) carry the
+  // early intent. The sticky only kicks in once the reader is committed.
+  (function(){
+    var sticky = document.querySelector('.sticky');
+    if(!sticky) return;
+    var threshold = 0.3;
+    function update(){
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      if(max <= 0) return;
+      var progress = window.scrollY / max;
+      sticky.classList.toggle('sticky-show', progress > threshold);
+    }
+    window.addEventListener('scroll', update, {passive:true});
+    update();
   })();
 </script>
 
