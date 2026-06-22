@@ -113,10 +113,19 @@ function ReportLoadingContent() {
         <p style={{
           fontSize: 14,
           color: "rgba(255,255,255,0.4)",
-          margin: "0 0 48px",
+          margin: "0 0 8px",
           lineHeight: 1.6,
         }}>
           We're generating your body projection from your photo.
+        </p>
+        <p style={{
+          fontSize: 13,
+          color: "rgba(255,255,255,0.6)",
+          margin: "0 0 48px",
+          lineHeight: 1.6,
+        }}>
+          This usually takes 30 to 60 seconds.<br />
+          <strong style={{ color: "#fff", fontWeight: 600 }}>Please don't close or leave this page</strong> until your report is ready.
         </p>
 
         {/* Checklist */}
@@ -152,6 +161,34 @@ function ReportLoadingContent() {
               </div>
             );
           })}
+        </div>
+
+        {/* Email backup notice — reduces drop-off if the user closes the tab */}
+        <div style={{
+          marginTop: 40,
+          padding: "14px 18px",
+          background: "rgba(138,172,184,0.08)",
+          border: "1px solid rgba(138,172,184,0.18)",
+          borderRadius: 10,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 12,
+          textAlign: "left",
+        }}>
+          <span style={{
+            fontSize: 16,
+            lineHeight: 1.4,
+            flexShrink: 0,
+            color: "#8AACB8",
+          }} aria-hidden="true">✉</span>
+          <p style={{
+            margin: 0,
+            fontSize: 12.5,
+            lineHeight: 1.55,
+            color: "rgba(255,255,255,0.75)",
+          }}>
+            We're also sending your report to your email. If something interrupts you, the link will be waiting in your inbox.
+          </p>
         </div>
 
       </div>
