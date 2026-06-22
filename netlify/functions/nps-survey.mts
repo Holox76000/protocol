@@ -4,10 +4,26 @@ import { Resend } from "resend";
 import crypto from "node:crypto";
 
 const SITE_URL = "https://protocol-club.com";
-const NPS_DELAY_MIN = 30;
+const NPS_DELAY_MIN = 120; // 2h after first protocol view — lets the user actually read it
 const NPS_30D_DELAY_DAYS = 30;
 const NPS_REMINDER_DELAY_H = 24;
 const FROM = "Protocol Club <hello@protocol-club.com>";
+
+// Internal/team accounts — never send NPS to them (matches the email dashboard
+// filter so noise stays out of response-rate stats).
+const INTERNAL_EMAIL_PATTERNS = [
+  "patrypierreandre",
+  "sofiane.lekfif",
+  "sofiane@reddotgrowth",
+  "thibault.cdn",
+  "reddotgrowth",
+];
+
+function isInternalEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  const lc = email.toLowerCase();
+  return INTERNAL_EMAIL_PATTERNS.some((p) => lc.includes(p));
+}
 
 const C = {
   bg: "#f9fbfb",
@@ -81,7 +97,7 @@ const handler = schedule("*/5 * * * *", async () => {
   const resend = new Resend(process.env.RESEND_API_KEY!);
   const now = new Date();
 
-  // ── Pass 1: Initial NPS — 30 min after first protocol view ──
+  // ── Pass 1: Initial NPS — 2h after first protocol view ──
   const npsDelayCutoff = new Date(now.getTime() - NPS_DELAY_MIN * 60 * 1000).toISOString();
 
   const { data: npsUsers, error: npsErr } = await sb
@@ -95,17 +111,17 @@ const handler = schedule("*/5 * * * *", async () => {
 
   if (npsErr) console.error("[nps-survey] initial query failed", npsErr.message);
 
-  for (const user of npsUsers ?? []) {
+  for (const user of (npsUsers ?? []).filter((u) => !isInternalEmail(u.email))) {
     const token = crypto.randomUUID();
     await sb.from("users").update({ nps_token: token, nps_sent_at: now.toISOString() }).eq("id", user.id);
 
     const name = user.first_name ?? "there";
     const content = `
       <h1 style="margin:0 0 8px;font-size:24px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
-        A quick question, ${name}.
+        Would you recommend Protocol Club, ${name}?
       </h1>
       <p style="margin:0 0 28px;font-size:15px;color:${C.muted};line-height:1.65;">
-        You've had 30 minutes with your protocol. One question:
+        You've had a couple of hours with your protocol. One question:
       </p>
       <p style="margin:0 0 20px;font-size:15px;font-weight:600;color:${C.brand};line-height:1.5;">
         How likely are you to recommend Protocol Club to a friend?
@@ -120,7 +136,7 @@ const handler = schedule("*/5 * * * *", async () => {
       await resend.emails.send({
         from: FROM,
         to: user.email,
-        subject: `A quick question, ${name}`,
+        subject: `${name}, would you recommend Protocol Club?`,
         html: emailShell(content),
       });
       console.log("[nps-survey] initial sent", { email: user.email });
@@ -145,7 +161,7 @@ const handler = schedule("*/5 * * * *", async () => {
 
   if (nps30dErr) console.error("[nps-survey] 30d query failed", nps30dErr.message);
 
-  for (const user of nps30dUsers ?? []) {
+  for (const user of (nps30dUsers ?? []).filter((u) => !isInternalEmail(u.email))) {
     // Check delivered_at from protocols relation
     const protocol = Array.isArray(user.protocols) ? user.protocols[0] : user.protocols;
     const deliveredAt = (protocol as { delivered_at?: string } | null)?.delivered_at;
@@ -175,7 +191,7 @@ const handler = schedule("*/5 * * * *", async () => {
       await resend.emails.send({
         from: FROM,
         to: user.email,
-        subject: "30 days in — how's it going?",
+        subject: `${name}, 30 days in — would you recommend Protocol Club now?`,
         html: emailShell(content),
       });
       console.log("[nps-survey] 30d sent", { email: user.email });
@@ -193,21 +209,21 @@ const handler = schedule("*/5 * * * *", async () => {
       sentAtField:  "nps_reminder_1_sent_at" as const,
       prevField:    "nps_sent_at" as const,
       day:          1,
-      subject:      (name: string) => `Still 30 seconds, ${name}`,
+      subject:      (name: string) => `${name}, would you recommend us? (30 sec)`,
       intro:        (name: string) => `You haven't shared your thoughts on your Protocol yet, ${name}. One question — 30 seconds.`,
     },
     {
       sentAtField:  "nps_reminder_2_sent_at" as const,
       prevField:    "nps_reminder_1_sent_at" as const,
       day:          2,
-      subject:      (name: string) => `Quick check-in, ${name}`,
+      subject:      (name: string) => `Still curious about your Protocol score, ${name}`,
       intro:        (name: string) => `Two days in — how's your Protocol holding up, ${name}?`,
     },
     {
       sentAtField:  "nps_reminder_3_sent_at" as const,
       prevField:    "nps_reminder_2_sent_at" as const,
       day:          3,
-      subject:      (name: string) => `Last time we'll ask, ${name}`,
+      subject:      (name: string) => `Last ask, ${name} — would you recommend Protocol Club?`,
       intro:        (name: string) => `This is the last time we'll reach out about this. One question on your Protocol, ${name}.`,
     },
   ] as const;
@@ -229,7 +245,7 @@ const handler = schedule("*/5 * * * *", async () => {
       continue;
     }
 
-    for (const user of reminderUsers ?? []) {
+    for (const user of (reminderUsers ?? []).filter((u) => !isInternalEmail(u.email))) {
       await sb.from("users").update({ [reminder.sentAtField]: now.toISOString() }).eq("id", user.id);
 
       const name = user.first_name ?? "there";
