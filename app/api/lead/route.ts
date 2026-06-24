@@ -4,6 +4,7 @@ import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 import { sendReportEmail } from "../../../lib/email";
 import { computeNurtureStartsAt } from "../../../lib/sendWindow";
+import { getOrGeneratePersonalization } from "../../../lib/personalization";
 
 type LeadPayload = {
   email: string;
@@ -163,6 +164,21 @@ export async function POST(request: Request) {
           firstName,
           reportUrl: `${siteUrl}/f1/report/${encodeURIComponent(funnelSid)}`,
         })
+      : Promise.resolve(),
+
+    // Warm the personalization cache so the report renders instantly when the
+    // user lands on it. Hard 7s timeout: if the LLM is slow, we fall back to
+    // the report route's lazy generation instead of blocking the lead response.
+    funnelSid
+      ? Promise.race([
+          getOrGeneratePersonalization(funnelSid, body.answers ?? {})
+            .then(() => console.log("[lead] personalization warmed", { funnelSid }))
+            .catch((err) => console.error("[lead] personalization failed", { error: String(err), funnelSid })),
+          new Promise<void>((resolve) => setTimeout(() => {
+            console.log("[lead] personalization timeout (>7s)", { funnelSid });
+            resolve();
+          }, 7000)),
+        ])
       : Promise.resolve(),
   ]);
 
