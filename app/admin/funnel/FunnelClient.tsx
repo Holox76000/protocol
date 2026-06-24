@@ -30,7 +30,7 @@ const QUIZ_STEPS = [
   { key: "quiz_goals",       label: "Q6 — Objectifs",          threshold: 7  },
   { key: "quiz_biometrics",  label: "Q8 — Biométriques",       threshold: 11 },
   { key: "quiz_past",        label: "Q11 — Solutions passées",  threshold: 15 },
-  { key: "quiz_dream",       label: "Q16 — Dream outcome",     threshold: 19 },
+  { key: "quiz_dream",       label: "Q13 — Dream outcome",     threshold: 16 },
   { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 20 },
 ];
 
