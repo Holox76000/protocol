@@ -41,15 +41,17 @@ export function DreamOutcomeSlide({ slide, answers, onAnswer, onNext, onBack }: 
           autoFocus
         />
 
-        <div className={styles.dreamMeta}>
-          {trimmed.length === 0 ? (
-            <span>Take your time. Honest beats clever.</span>
-          ) : trimmed.length < slide.minChars ? (
-            <span>{slide.minChars - trimmed.length} more characters to continue.</span>
-          ) : (
-            <span>{trimmed.length} characters · ready</span>
-          )}
-        </div>
+        {!slide.hideCounter && (
+          <div className={styles.dreamMeta}>
+            {trimmed.length === 0 ? (
+              <span>Take your time. Honest beats clever.</span>
+            ) : trimmed.length < slide.minChars ? (
+              <span>{slide.minChars - trimmed.length} more characters to continue.</span>
+            ) : (
+              <span>{trimmed.length} characters · ready</span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.actions}>
