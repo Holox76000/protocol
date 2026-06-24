@@ -10,6 +10,8 @@ import {
   getHistoryParagraph,
 } from "../../../../lib/report-content";
 import { computePreliminaryScore } from "../../../../lib/preliminaryScore";
+import { getOrGeneratePersonalization, patternsEyebrowFor } from "../../../../lib/personalization";
+import { getTestimonialById } from "../../../../lib/testimonials";
 
 const TEN_YEARS = 315_360_000;
 
@@ -159,6 +161,15 @@ export async function GET(
   const patterns = getPatterns(morphology);
   const score = computePreliminaryScore(answers);
 
+  // Personalization (lazy LLM generation, cached in answers._personalization)
+  let personalization = null;
+  try {
+    personalization = await getOrGeneratePersonalization(sid, answers);
+  } catch {
+    // Silently fall back to generic. Never break the report on LLM failure.
+  }
+  const testimonial = getTestimonialById(personalization?.testimonial_id);
+
   // Build offer URL with all quiz params so the offer page can personalize
   const offerParams = new URLSearchParams({ funnel_sid: sid, funnel: "quiz" });
   const quizKeys = [
@@ -204,6 +215,14 @@ export async function GET(
     "{{AGE_INSIGHT}}": getAgeInsight((answers.age_bracket as string) ?? ""),
     "{{ETHNICITY_INSIGHT}}": getEthnicityInsight((answers.ethnicity as string) ?? ""),
     "{{FUNNEL_SID}}": sid,
+    "{{HERO_SUBTITLE}}": personalization?.hero_subtitle ?? "",
+    "{{PATTERNS_EYEBROW}}": patternsEyebrowFor(personalization?.persona_tag),
+    "{{PATTERNS_INTRO}}":
+      personalization?.patterns_intro ??
+      `${morphology} build, ${formatAge((answers.age_bracket as string) ?? "")}, ${formatEnv(env)}, ${formatFrequency((answers.weekly_time as string) ?? "")}. Not your individual analysis, but four patterns that repeat across 2,500+ men with your profile.`,
+    "{{TESTIMONIAL_QUOTE}}": testimonial.quote,
+    "{{TESTIMONIAL_NAME}}": testimonial.name,
+    "{{TESTIMONIAL_META}}": testimonial.meta,
   };
 
   for (const [key, value] of Object.entries(replacements)) {

@@ -23,6 +23,10 @@
   .hero{text-align:center;padding:64px 0 56px;border-bottom:1px solid var(--bd)}
   .hero .tt{font-size:32px;margin-bottom:4px}
   .hero-d{font-size:13px;color:var(--tm);margin-bottom:32px}
+  .hero-subtitle{font-family:var(--se);font-size:21px;font-style:italic;color:var(--tx);max-width:580px;margin:12px auto 8px;line-height:1.4;font-weight:500}
+  .hero-subtitle::before{content:"";display:block;width:32px;height:2px;background:var(--ac);margin:0 auto 18px}
+  .hero-subtitle:empty{display:none}
+  .hero-subtitle:empty::before{display:none}
   .hg{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:8px;overflow:hidden;max-width:520px;margin:0 auto}
   .hg-i{background:var(--bg);padding:16px 12px;text-align:center}
   .hg-v{font-family:var(--se);font-size:17px;font-weight:600;margin-bottom:2px}
@@ -363,9 +367,9 @@
 <!-- ═══════════════════════════════════════ -->
 
 <section class="hero">
-  <div class="lb">Your preliminary analysis</div>
   <h1 class="tt">{{FIRST_NAME}}, here's where <em>you stand.</em></h1>
-  <div class="hero-d">Estimated from your quiz answers. Confirmed by the photo analysis in your full Protocol.</div>
+  <p class="hero-subtitle">{{HERO_SUBTITLE}}</p>
+  <div class="hero-d">Estimated from your quiz answers.</div>
 
   <div class="score-pair" style="max-width:540px;margin:32px auto 12px">
     <div class="score-card">
@@ -373,7 +377,6 @@
       <div class="score-card-num">{{SCORE_NOW}}</div>
       <div class="score-card-max">/ 100</div>
       <div class="score-card-tag red">{{SCORE_NOW_LABEL}}</div>
-      <div class="score-card-note">Composite: SWR, body fat, posture, presentation.</div>
     </div>
     <div class="score-card dark">
       <div class="score-card-label">Your potential <span style="font-size:10px;border:1px solid #333;padding:2px 6px;border-radius:4px;margin-left:4px">12 weeks</span></div>
@@ -400,9 +403,9 @@
 
 <!-- ARCHETYPE PATTERNS -->
 <section class="sec">
-  <div class="lb">Based on your quiz answers</div>
+  <div class="lb">{{PATTERNS_EYEBROW}}</div>
   <h2 class="tt">Patterns we see in <em>your profile.</em></h2>
-  <p class="st" style="margin-bottom:40px">{{BODY_TYPE}} build, {{AGE}}, {{ENV}}, {{FREQUENCY}}. Not your individual analysis, but four patterns that repeat across 2,500+ men with your profile.</p>
+  <p class="st" style="margin-bottom:40px">{{PATTERNS_INTRO}}</p>
 
   <div class="pattern"><div class="pattern-num">Pattern 01</div><div class="pattern-title">{{PATTERN_1_TITLE}}</div><div class="pattern-body">{{PATTERN_1_BODY}}</div></div>
   <div class="pattern"><div class="pattern-num">Pattern 02</div><div class="pattern-title">{{PATTERN_2_TITLE}}</div><div class="pattern-body">{{PATTERN_2_BODY}}</div></div>
@@ -1222,10 +1225,10 @@
 
 <section class="sec" style="text-align:center;padding:64px 0">
 
-  <!-- Tom testimonial -->
+  <!-- Testimonial (matched by persona, fallback to Tom) -->
   <div class="testi">
-    <p class="testi-q">12 weeks in, my shoulders read right in everything I wear. I was lifting before. Now I'm built for it. My partner noticed before I did.</p>
-    <p class="testi-by"><strong>Tom</strong>, 30, the report you just read above.</p>
+    <p class="testi-q">{{TESTIMONIAL_QUOTE}}</p>
+    <p class="testi-by"><strong>{{TESTIMONIAL_NAME}}</strong>, {{TESTIMONIAL_META}}</p>
   </div>
 
   <div class="lb">Get your personalized analysis</div>
@@ -1257,7 +1260,7 @@
 
 </div>
 
-<div class="sticky"><span class="sticky-t">This is a preliminary report. Get your personalized analysis.</span><a href="{{CHECKOUT_URL}}" class="sticky-b">Get my analysis, $89</a></div>
+<div class="sticky"><span class="sticky-t">This is a preliminary report. Get your personalized analysis.</span><a href="{{CHECKOUT_URL}}" class="sticky-b">Get my full analysis - $89</a></div>
 
 <script>
   (function(){
