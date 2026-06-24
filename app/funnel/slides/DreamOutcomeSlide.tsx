@@ -43,11 +43,11 @@ export function DreamOutcomeSlide({ slide, answers, onAnswer, onNext, onBack }: 
 
         <div className={styles.dreamMeta}>
           {trimmed.length === 0 ? (
-            <span>Take 30 seconds. The more specific, the better the Protocol.</span>
+            <span>Take your time. Honest beats clever.</span>
           ) : trimmed.length < slide.minChars ? (
             <span>{slide.minChars - trimmed.length} more characters to continue.</span>
           ) : (
-            <span>{trimmed.length} characters · ready to continue</span>
+            <span>{trimmed.length} characters · ready</span>
           )}
         </div>
       </div>

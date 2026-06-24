@@ -298,9 +298,9 @@ const BASE_SLIDES: SlideConfig[] = [
     type: "dream-outcome",
     stateKey: "dream_outcome",
     qNumber: 30,
-    headline: "In your own words: what does \"better\" actually look like?",
-    subtext: "Picture yourself 12 weeks from now. The mirror, the clothes, the rooms you walk into. Tell me what would actually be worth it. Your Protocol is built around what you say here.",
-    placeholder: "Example: I want my shoulders to read confident in any t-shirt. I want to stop pulling at my waist when I sit. I want photos I don't delete.",
+    headline: "Physically, what are you really trying to achieve in your life?",
+    subtext: "Not a quick fix. Not a number on a scale. The version of yourself you actually want to grow into. Take a minute and put it into words honestly.",
+    placeholder: "Example: To stop seeing myself in photos and wanting to delete them. To feel like the body I'm in matches who I am inside. To walk into a room without feeling like I'm hiding.",
     minChars: 15,
   },
 
