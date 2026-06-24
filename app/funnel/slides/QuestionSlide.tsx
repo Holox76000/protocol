@@ -28,10 +28,9 @@ const EYEBROWS: Record<string, string> = {
   age_bracket: "01 · Profile",
   ethnicity: "02 · Reference points",
   morphology: "03 · Composition",
-  shape_impact: "04 · Impact",
-  pain_timeline: "05 · Duration",
-  weekly_time: "07 · Schedule",
-  social_environment: "08 · Context",
+  pain_timeline: "04 · Duration",
+  weekly_time: "06 · Schedule",
+  social_environment: "07 · Context",
 };
 
 const CUSTOM_SENTINEL = "__custom__";

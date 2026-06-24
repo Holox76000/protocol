@@ -352,20 +352,6 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
-    id: "q3",
-    type: "single",
-    stateKey: "shape_impact",
-    section: 1,
-    sectionLabel: "Current Situation",
-    qNumber: 3,
-    question: "Has your body shape affected your confidence?",
-    options: [
-      "Yes",
-      "No",
-    ],
-  },
-
-  {
     id: "pain-friction",
     type: "dream-outcome",
     stateKey: "pain_friction",
