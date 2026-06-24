@@ -355,6 +355,17 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
+    id: "pain-friction",
+    type: "dream-outcome",
+    stateKey: "pain_friction",
+    qNumber: 31,
+    headline: "What does your body stop you from doing today?",
+    subtext: "Be specific. The small things, the moments, the situations you avoid.",
+    placeholder: "Example: Taking off my shirt at the pool. Tucking in a t-shirt. Photos at events. Approaching someone at the bar.",
+    minChars: 15,
+  },
+
+  {
     id: "q4",
     type: "single",
     stateKey: "pain_timeline",
@@ -450,6 +461,17 @@ const BASE_SLIDES: SlideConfig[] = [
       "3 to 5 hours",
       "More than 5 hours",
     ],
+  },
+
+  {
+    id: "trigger-moment",
+    type: "dream-outcome",
+    stateKey: "trigger_moment",
+    qNumber: 32,
+    headline: "What's the moment you decided to actually fix this?",
+    subtext: "A photo, a comment, a doctor, a date you saw on the calendar. The thing that made today different.",
+    placeholder: "Example: A photo someone tagged me in last weekend. A health check at the doctor. My 30th birthday next month. A wedding I'm in this fall.",
+    minChars: 15,
   },
 
   {
