@@ -394,6 +394,57 @@ const FOUR_STEPS_FOUNDER: AdVariant = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Gay-targeted carousels (2026-06-24) — beauty standard + dating apps
+// ─────────────────────────────────────────────────────────────────────────────
+
+// "Gay standard beauty" carousel — the gay attractiveness standard is specific
+// and measurable; here's the formula
+const GAY_STANDARD_BEAUTY: AdVariant = {
+  badge: "Gay Attractiveness Research",
+  headline: "The gay beauty standard is more specific than most men realize. We measured it.",
+  subtext:
+    "It's not generic muscle. It's a precise structural formula — shoulder-to-waist, body fat, posture, proportions — that the men at the top of the rating all share. 2 minutes to see exactly where yours stands.",
+  cta: "Measure my proportions →",
+};
+
+// "Gay dating app" carousel — Grindr/Hinge reward a specific structure, not
+// just gym shape
+const GAY_DATING_APP: AdVariant = {
+  badge: "Dating App Attractiveness",
+  headline: "What gets you swiped on gay dating apps comes down to a measurable structure.",
+  subtext:
+    "Not the gym shape most guys train for. A specific set of proportions — shoulders, waist, posture, body fat — that the top profiles share. 2 minutes to see your score and what to fix first.",
+  cta: "Get my dating-app score →",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// New video angles (2026-06-24) — gay skinny-fat + ADHD
+// ─────────────────────────────────────────────────────────────────────────────
+
+// "Gay Skinny-Fat" video — opens on Hinge profile getting skipped, "90% get
+// skipped on sight", 4-step protocol (Assess / Sort noise / Sustainable /
+// Autopilot), markers exposed (shoulder-to-waist 1.12, body fat 27%), payoff
+// is a match on a gay dating app
+const GAY_SKINNY_FAT: AdVariant = {
+  badge: "4 Steps · Gay Skinny-Fat",
+  headline: "90% of skinny-fat profiles get skipped on sight. 4 steps change which side you're on.",
+  subtext:
+    "Assess your body. Sort the noise from the signal. Sustainable beats aggressive. Run it on autopilot. The 4-step protocol that moves shoulder-to-waist, body fat, and the structural markers other men actually read. 2 minutes to map yours.",
+  cta: "Get my 4-step protocol →",
+};
+
+// "ADHD" video — opens on SAVED 47 · TRIED 0 fitness IG posts (dopamine
+// trap of saving without doing), reframes pain as structure not discipline,
+// 4-step protocol replaces willpower with a system (63-day streak)
+const ADHD_PROTOCOL: AdVariant = {
+  badge: "4 Steps · ADHD",
+  headline: "Saved 47 fitness videos. Tried zero. That's not a discipline problem — it's a structure problem.",
+  subtext:
+    "Saving gives the dopamine hit. Doing requires a system. Assess your body. Sort the noise from the signal. Sustainable beats aggressive. Run it on autopilot. The 4-step protocol designed for brains that don't follow generic plans. 2 minutes to map yours.",
+  cta: "Get my 4-step protocol →",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -533,6 +584,20 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
   "120248288300030660": FOUR_STEPS_20S,
   // "4 steps — Entrepreneur" persona
   "120248288276690660": FOUR_STEPS_FOUNDER,
+
+  // ── Gay-targeted carousels (2026-06-24) — mapping inferred from
+  // sexual_orientation distribution of funnel_sessions; verify in Meta and
+  // swap the two IDs if the carousels don't match.
+  // "Gay standard beauty" carousel
+  "120248679211410660": GAY_STANDARD_BEAUTY,
+  // "Gay dating app" carousel
+  "120247854090160660": GAY_DATING_APP,
+
+  // ── New video angles (2026-06-24)
+  // "Gay Skinny-Fat" video
+  "120248765221560660": GAY_SKINNY_FAT,
+  // "ADHD" video
+  "120248765404440660": ADHD_PROTOCOL,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
