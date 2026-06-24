@@ -153,7 +153,7 @@ export type DreamOutcomeSlide = {
   stateKey: string;
   qNumber: number;
   headline: string;
-  subtext: string;
+  subtext?: string;
   placeholder: string;
   minChars: number;
 };
@@ -299,7 +299,6 @@ const BASE_SLIDES: SlideConfig[] = [
     stateKey: "dream_outcome",
     qNumber: 30,
     headline: "What are you really trying to achieve in your life?",
-    subtext: "Not a quick fix. Not a number on a scale. The version of yourself you actually want to grow into. Take a minute and put it into words honestly.",
     placeholder: "Example: To stop seeing myself in photos and wanting to delete them. To feel like the body I'm in matches who I am inside. To walk into a room without feeling like I'm hiding.",
     minChars: 15,
   },

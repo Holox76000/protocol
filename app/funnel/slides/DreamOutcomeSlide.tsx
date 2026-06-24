@@ -29,7 +29,7 @@ export function DreamOutcomeSlide({ slide, answers, onAnswer, onNext, onBack }: 
     <div className={styles.card}>
       <div className={styles.dreamInner}>
         <h2 className={styles.dreamHeadline}>{slide.headline}</h2>
-        <p className={styles.dreamSubtext}>{slide.subtext}</p>
+        {slide.subtext && <p className={styles.dreamSubtext}>{slide.subtext}</p>}
 
         <textarea
           className={styles.dreamTextarea}
