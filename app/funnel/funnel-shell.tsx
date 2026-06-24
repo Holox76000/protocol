@@ -27,13 +27,14 @@ const OptInSlide = dynamic(() => import("./slides/OptInSlide").then(m => ({ defa
 const ProtocolReadySlide = dynamic(() => import("./slides/ProtocolReadySlide").then(m => ({ default: m.ProtocolReadySlide })));
 const PhotoUploadSlide = dynamic(() => import("./slides/PhotoUploadSlide").then(m => ({ default: m.PhotoUploadSlide })));
 const MultiPhotoUploadSlide = dynamic(() => import("./slides/MultiPhotoUploadSlide").then(m => ({ default: m.MultiPhotoUploadSlide })));
+const DreamOutcomeSlide = dynamic(() => import("./slides/DreamOutcomeSlide").then(m => ({ default: m.DreamOutcomeSlide })));
 import styles from "./funnel.module.css";
 import { trackFunnelPageView, trackFunnelAnswer } from "../../lib/funnel-analytics";
 import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { tiktokIdentify, tiktokTrackCompleteRegistration } from "../../lib/tiktokPixel";
 
-const STORAGE_KEY = "protocol.funnel.v26";
+const STORAGE_KEY = "protocol.funnel.v27";
 
 export default function FunnelShell() {
   const router = useRouter();
@@ -384,6 +385,17 @@ function renderSlide(
     case "yes-ladder":
       return (
         <YesLadderSlide
+          slide={slide}
+          answers={answers}
+          onAnswer={onAnswer}
+          onNext={onNext}
+          onBack={onBack}
+        />
+      );
+
+    case "dream-outcome":
+      return (
+        <DreamOutcomeSlide
           slide={slide}
           answers={answers}
           onAnswer={onAnswer}

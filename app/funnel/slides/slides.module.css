@@ -2620,3 +2620,61 @@
   font-size: 14px;
   color: var(--q-soft);
 }
+
+/* ─── Dream Outcome slide (free-text dream / goal) ─────────── */
+.dreamInner {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px 0;
+  text-align: left;
+}
+
+.dreamHeadline {
+  font-family: var(--q-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--q-strong);
+  margin: 0;
+}
+
+.dreamSubtext {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--q-mid);
+  margin: 0;
+}
+
+.dreamTextarea {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--q-strong);
+  background: var(--q-surface);
+  border: 1.5px solid var(--q-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-height: 120px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dreamTextarea:focus {
+  outline: none;
+  border-color: var(--q-strong);
+  box-shadow: 0 0 0 3px rgba(37, 50, 57, 0.08);
+}
+
+.dreamTextarea::placeholder {
+  color: var(--q-soft);
+}
+
+.dreamMeta {
+  font-size: 12px;
+  color: var(--q-soft);
+  text-align: right;
+  min-height: 16px;
+}

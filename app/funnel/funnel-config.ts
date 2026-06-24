@@ -22,7 +22,8 @@ export type SlideType =
   | "yes-ladder"
   | "final-loading"
   | "optin"
-  | "photo-upload";
+  | "photo-upload"
+  | "dream-outcome";
 
 export type SingleSlide = {
   id: string;
@@ -146,6 +147,17 @@ export type PhotoUploadSlide = {
   photoTypes?: ("body" | "face" | "profile")[];
 };
 
+export type DreamOutcomeSlide = {
+  id: string;
+  type: "dream-outcome";
+  stateKey: string;
+  qNumber: number;
+  headline: string;
+  subtext: string;
+  placeholder: string;
+  minChars: number;
+};
+
 export type SlideConfig =
   | IntroSlide
   | SingleSlide
@@ -161,7 +173,8 @@ export type SlideConfig =
   | FinalLoadingSlide
   | OptInSlide
   | ProtocolReadySlide
-  | PhotoUploadSlide;
+  | PhotoUploadSlide
+  | DreamOutcomeSlide;
 
 // ─── Dynamic image resolver ───────────────────────────────
 
@@ -514,10 +527,21 @@ const BASE_SLIDES: SlideConfig[] = [
   // ── SECTION 7 — SOLUTION FRAMING ──────────────────────
 
   {
+    id: "dream-outcome",
+    type: "dream-outcome",
+    stateKey: "dream_outcome",
+    qNumber: 16,
+    headline: "In your own words: what does \"better\" actually look like?",
+    subtext: "Picture yourself 12 weeks from now. The mirror, the clothes, the rooms you walk into. Tell me what would actually be worth it. Your Protocol is built around what you say here.",
+    placeholder: "Example: I want my shoulders to read confident in any t-shirt. I want to stop pulling at my waist when I sit. I want photos I don't delete.",
+    minChars: 15,
+  },
+
+  {
     id: "q16b",
     type: "yes-ladder",
     stateKey: "yes_uniqueness",
-    qNumber: 16,
+    qNumber: 17,
     loaderStep: 1,
     loaderLabel: "Analyzing your profile...",
     question: "Did you know attractiveness is unique to each person, shaped by age, face, social context, and genetics?",
@@ -528,7 +552,7 @@ const BASE_SLIDES: SlideConfig[] = [
     id: "q17",
     type: "yes-ladder",
     stateKey: "yes_determination",
-    qNumber: 17,
+    qNumber: 18,
     loaderStep: 2,
     loaderLabel: "Generating your personalized protocol...",
     question: "Are you ready to improve your attractiveness using science?",
@@ -539,7 +563,7 @@ const BASE_SLIDES: SlideConfig[] = [
     id: "q18",
     type: "yes-ladder",
     stateKey: "yes_protocol",
-    qNumber: 18,
+    qNumber: 19,
     loaderStep: 3,
     loaderLabel: "Generating your 12-week protocol...",
     question: "Would a simple, science-backed protocol built specifically for your body interest you?",
@@ -591,7 +615,8 @@ export function isQuestion(slide: SlideConfig): boolean {
     slide.type === "multi" ||
     slide.type === "numeric-height" ||
     slide.type === "numeric-weight" ||
-    slide.type === "yes-ladder"
+    slide.type === "yes-ladder" ||
+    slide.type === "dream-outcome"
   );
 }
 
