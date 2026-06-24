@@ -294,6 +294,17 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
+    id: "dream-outcome",
+    type: "dream-outcome",
+    stateKey: "dream_outcome",
+    qNumber: 30,
+    headline: "In your own words: what does \"better\" actually look like?",
+    subtext: "Picture yourself 12 weeks from now. The mirror, the clothes, the rooms you walk into. Tell me what would actually be worth it. Your Protocol is built around what you say here.",
+    placeholder: "Example: I want my shoulders to read confident in any t-shirt. I want to stop pulling at my waist when I sit. I want photos I don't delete.",
+    minChars: 15,
+  },
+
+  {
     id: "stat-age",
     type: "stat",
     stat: "87%",
@@ -522,17 +533,6 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   // ── SECTION 6 — SUMMARY + PROMISE ─────────────────────
-
-  {
-    id: "dream-outcome",
-    type: "dream-outcome",
-    stateKey: "dream_outcome",
-    qNumber: 13,
-    headline: "In your own words: what does \"better\" actually look like?",
-    subtext: "Picture yourself 12 weeks from now. The mirror, the clothes, the rooms you walk into. Tell me what would actually be worth it. Your Protocol is built around what you say here.",
-    placeholder: "Example: I want my shoulders to read confident in any t-shirt. I want to stop pulling at my waist when I sit. I want photos I don't delete.",
-    minChars: 15,
-  },
 
   {
     id: "photo-upload",
