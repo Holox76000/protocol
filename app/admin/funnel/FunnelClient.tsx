@@ -28,7 +28,7 @@ const today = new Date().toISOString().slice(0, 10);
 const QUIZ_STEPS = [
   { key: "quiz_started",     label: "Quiz démarré",            threshold: 0  },
   { key: "quiz_dream",       label: "Dream — free text",       threshold: 2  },
-  { key: "quiz_pain",        label: "Pain — free text",        threshold: 6  },
+  { key: "quiz_pain",        label: "Pain — multi choice",     threshold: 6  },
   { key: "quiz_goals",       label: "Objectifs",               threshold: 8  },
   { key: "quiz_biometrics",  label: "Biométriques",            threshold: 13 },
   { key: "quiz_trigger",     label: "Trigger — free text",     threshold: 14 },

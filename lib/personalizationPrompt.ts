@@ -56,12 +56,15 @@ const PERSONA_KEYWORDS: Record<PersonaTag, string[]> = {
 
 export function detectPersona(answers: {
   dream_outcome?: string;
-  pain_friction?: string;
+  pain_friction?: string | string[];
   trigger_moment?: string;
 }): PersonaTag {
+  const painText = Array.isArray(answers.pain_friction)
+    ? answers.pain_friction.join(" ")
+    : answers.pain_friction ?? "";
   const text = [
     answers.dream_outcome ?? "",
-    answers.pain_friction ?? "",
+    painText,
     answers.trigger_moment ?? "",
   ].join(" ").toLowerCase();
 

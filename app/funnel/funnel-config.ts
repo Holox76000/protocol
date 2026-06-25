@@ -354,13 +354,23 @@ const BASE_SLIDES: SlideConfig[] = [
 
   {
     id: "pain-friction",
-    type: "dream-outcome",
+    type: "multi",
     stateKey: "pain_friction",
+    section: 1,
+    sectionLabel: "Current Situation",
     qNumber: 31,
-    headline: "What does your body stop you from doing today?",
-    subtext: "Be specific. The small things, the moments, the situations you avoid.",
-    placeholder: "Example: Taking off my shirt at the pool. Tucking in a t-shirt. Photos at events. Approaching someone at the bar.",
-    minChars: 15,
+    question: "What does your body stop you from doing today?",
+    subtext: "Select all that apply.",
+    options: [
+      "Taking my shirt off in public",
+      "Wearing tight or revealing clothes (speedo, tank top, crop top)",
+      "Beach or pool moments",
+      "Photos of myself",
+      "Going to events or social scenes",
+      "Approaching or interacting with people I'm attracted to",
+      "Nothing specific, it's more a general feeling",
+    ],
+    allowCustom: true,
   },
 
   {

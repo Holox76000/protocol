@@ -226,7 +226,9 @@ function extractInputFromAnswers(answers: Record<string, unknown>): LlmInput {
       ? (answers.expected_results as string[]).join(", ")
       : (answers.expected_results as string | undefined),
     dream_outcome: answers.dream_outcome as string | undefined,
-    pain_friction: answers.pain_friction as string | undefined,
+    pain_friction: Array.isArray(answers.pain_friction)
+      ? (answers.pain_friction as string[]).join(", ")
+      : (answers.pain_friction as string | undefined),
     trigger_moment: answers.trigger_moment as string | undefined,
   };
 }
