@@ -126,8 +126,11 @@ export default function FunnelShell() {
             .then((r) => r.ok ? r.json() : { answers: null })
             .then((data) => {
               const remote = data?.answers as Answers | null;
-              if (remote && remote._session_id) {
-                applyResume(remote);
+              if (remote) {
+                // Some legacy rows lost _session_id when answers were rewritten
+                // by the opt-in flow that strips _-prefixed keys. Re-inject it
+                // so the photo-upload slide can reach the right session.
+                applyResume({ ...remote, _session_id: urlFunnelSid });
               }
             })
             .catch(() => {});
