@@ -80,6 +80,13 @@ export default function FunnelShell() {
     const adId = utms.utm_ad ?? utms.utm_content ?? undefined;
     if (adId) setAdVariant(getAdVariant(adId));
 
+    // Detect resume deep-links such as ?resume=photo&funnel_sid=... coming
+    // from the "Add my photo" CTA on the report. We rehydrate from Supabase
+    // when localStorage doesn't match (different device, cleared cache).
+    const urlParams = new URLSearchParams(window.location.search);
+    const resume = urlParams.get("resume");
+    const urlFunnelSid = urlParams.get("funnel_sid");
+
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
@@ -99,6 +106,35 @@ export default function FunnelShell() {
       }
       latestAnswersRef.current = parsed;
       setAnswers(parsed);
+
+      // Resume flow: if URL targets a different session than localStorage,
+      // refetch its answers from Supabase. Then jump to the requested slide.
+      if (resume && urlFunnelSid) {
+        const needsRehydrate = parsed._session_id !== urlFunnelSid;
+        const applyResume = (a: Answers) => {
+          latestAnswersRef.current = a;
+          setAnswers(a);
+          try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(a)); } catch {}
+          if (resume === "photo") {
+            const idx = SLIDES.findIndex((s) => s.id === "photo-upload");
+            if (idx >= 0) setStep(idx);
+          }
+        };
+
+        if (needsRehydrate) {
+          fetch(`/api/funnel/session/answers?sid=${encodeURIComponent(urlFunnelSid)}`)
+            .then((r) => r.ok ? r.json() : { answers: null })
+            .then((data) => {
+              const remote = data?.answers as Answers | null;
+              if (remote && remote._session_id) {
+                applyResume(remote);
+              }
+            })
+            .catch(() => {});
+        } else {
+          applyResume(parsed);
+        }
+      }
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
