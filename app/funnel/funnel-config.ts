@@ -302,13 +302,12 @@ const BASE_SLIDES: SlideConfig[] = [
 
   {
     id: "dream-outcome",
-    type: "multi",
+    type: "single",
     stateKey: "dream_outcome",
     section: 1,
     sectionLabel: "Your Vision",
     qNumber: 30,
     question: "What are you trying to achieve with your body?",
-    subtext: "Select all that apply.",
     options: [
       "Feel confident and desirable to others",
       "A specific physical transformation (less fat, more muscle, defined shape)",
