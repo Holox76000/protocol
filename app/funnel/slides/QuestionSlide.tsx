@@ -195,7 +195,6 @@ type MultiProps = {
 };
 
 const MULTI_EYEBROWS: Record<string, string> = {
-  expected_results: "06 · Targets",
   past_solutions: "14 · Background",
 };
 

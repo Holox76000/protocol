@@ -34,7 +34,7 @@ import { getAdVariant, type AdVariant } from "../../lib/ad-variants";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { tiktokIdentify, tiktokTrackCompleteRegistration } from "../../lib/tiktokPixel";
 
-const STORAGE_KEY = "protocol.funnel.v32";
+const STORAGE_KEY = "protocol.funnel.v33";
 
 export default function FunnelShell() {
   const router = useRouter();

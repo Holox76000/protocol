@@ -88,7 +88,7 @@ export function PhotoUploadSlide({ answers, onAnswer, onNext, onBack, photoType 
           morphology: answers.morphology,
           ethnicity: answers.ethnicity,
           social_environment: answers.social_environment,
-          goals: answers.expected_results,
+          goals: answers.expected_results ?? answers.dream_outcome,
         }),
       }).catch(() => {});
     }

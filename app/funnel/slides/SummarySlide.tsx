@@ -71,8 +71,10 @@ export function SummarySlide({ answers, onNext, onBack }: Props) {
   const photoPath = answers._photo_path as string | undefined;
   const beforeUrl = photoPath ? (answers._before_url as string | undefined) : undefined;
   const [imgSrc, setImgSrc] = useState(beforeUrl ?? morphologySrc);
-  const goals = (answers.expected_results as string[]) ?? [];
-  const primaryGoal = goals[0] ?? "—";
+  const dreamGoals = answers.dream_outcome as string | undefined;
+  const primaryGoal = dreamGoals && dreamGoals.trim().length > 0
+    ? (dreamGoals.length > 60 ? `${dreamGoals.slice(0, 57)}...` : dreamGoals)
+    : "Recomposition";
 
   const chips = [
     { label: "Age", value: answers.age_bracket as string },

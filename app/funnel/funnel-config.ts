@@ -390,25 +390,6 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
-    id: "q5",
-    type: "multi",
-    stateKey: "expected_results",
-    section: 1,
-    sectionLabel: "Current Situation",
-    qNumber: 5,
-    question: "What do you want to change?",
-    subtext: "Choose as many as you'd like.",
-    options: [
-      "Less body fat",
-      "Better shape visible with clothes",
-      "To look stronger",
-      "A more defined waist",
-      "Broader shoulders",
-      "A better overall silhouette",
-    ],
-  },
-
-  {
     id: "q5b",
     type: "single",
     stateKey: "sexual_orientation",

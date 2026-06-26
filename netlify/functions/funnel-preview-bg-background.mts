@@ -48,7 +48,7 @@ ${BODY_ANALYSIS_RESEARCH}
 ## Client Profile
 - Age range: ${ageBracket} (representative age: ~${age})
 - Self-reported body type: ${morphology} — ${morphDesc}
-- Transformation goals: ${goals.join(", ")}
+- Transformation goals: ${goals.length > 0 ? goals.join(", ") : "general body recomposition and proportional improvement"}
 - Social environment: ${socialEnv || "unspecified"}
 - ${ageContextLine(age)}
 
