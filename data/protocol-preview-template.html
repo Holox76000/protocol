@@ -378,8 +378,21 @@ body{background:#eceeef}
 /* One panel at a time, navigate via sidebar nav OR pager */
 .report-panel{display:none}
 .report-panel.active{display:block}
-.report-sidebar-nav{display:flex !important;flex-wrap:wrap;gap:6px;margin-top:14px}
+
+/* Sidebar nav: single column on mobile (clean TOC), 2-col on tablet+, 4-col on desktop */
+.report-sidebar-nav{display:grid !important;grid-template-columns:1fr;gap:6px;margin-top:12px}
+.report-sidebar-item{display:flex !important;align-items:center;justify-content:space-between;width:100%;font:500 13px 'Avenir Next',sans-serif;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:13px 14px;cursor:pointer;user-select:none;box-shadow:none;transition:border-color .12s,background .12s,color .12s}
+.report-sidebar-item::after{content:"→";color:var(--ac);font-weight:600;font-size:14px;line-height:1}
+.report-sidebar-item:hover{border-color:var(--ac);background:var(--sf)}
+.report-sidebar-item.active{background:var(--dk);color:#fff;border-color:var(--dk)}
+.report-sidebar-item.active::after{content:"●";color:#fff;font-size:8px}
 .report-navcap{display:block;font-size:11px;color:var(--tm);margin-top:14px}
+@media (min-width:768px){
+  .report-sidebar-nav{grid-template-columns:1fr 1fr;gap:8px}
+}
+@media (min-width:1100px){
+  .report-sidebar-nav{grid-template-columns:repeat(4,1fr)}
+}
 .report-pager{display:flex !important;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;margin-top:24px;border-top:1px solid var(--bd)}
 .pager-btn{font:600 12px 'Avenir Next',sans-serif;color:#253239;background:#f9fbfb;border:1px solid #dfe4e6;border-radius:7px;padding:9px 14px;cursor:pointer}
 .pager-btn:disabled{opacity:.35;cursor:not-allowed}
