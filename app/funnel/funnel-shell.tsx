@@ -389,6 +389,7 @@ function renderSlide(
       return (
         <InfoSlide
           slide={slide}
+          answers={answers}
           onNext={onNext}
           onBack={onBack}
         />

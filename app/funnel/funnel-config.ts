@@ -88,6 +88,12 @@ export type InfoSlide = {
   variant: "social-proof" | "objection";
   headline: string;
   body: string;
+  // Optional copy overrides resolved from later answers (sexual_orientation).
+  // The first matching key wins.
+  byOrientation?: Partial<Record<
+    "Gay" | "Bisexual" | "Straight" | "Prefer not to say",
+    { headline?: string; body?: string }
+  >>;
 };
 
 export type StatSlide = {
@@ -413,6 +419,16 @@ const BASE_SLIDES: SlideConfig[] = [
     variant: "social-proof",
     headline: "2,500+ men have already taken this assessment.",
     body: "Built on 4 years of R&D and a dataset of 2,500+ men who have reached their peak potential.",
+    byOrientation: {
+      Gay: {
+        headline: "2,500+ men assessed. Calibrated to how attractiveness actually reads in gay contexts.",
+        body: "Built on 4 years of R&D and a dataset of 2,500+ men. The analysis accounts for the visual markers that read strongest in dating apps, gay nightlife, and same-sex social settings.",
+      },
+      Bisexual: {
+        headline: "2,500+ men assessed. Calibrated for both men and women's instinctive read on a male body.",
+        body: "Built on 4 years of R&D and a dataset of 2,500+ men. The analysis accounts for what reads attractive across both straight and same-sex contexts.",
+      },
+    },
   },
 
 
@@ -458,6 +474,16 @@ const BASE_SLIDES: SlideConfig[] = [
     variant: "objection",
     headline: "A busy schedule won't make your transformation harder.",
     body: "Looking and feeling your best doesn't require hours a day. Based on your answers, we'll build a Protocol that fits into your life: precise, efficient, and designed around your actual schedule.",
+    byOrientation: {
+      Gay: {
+        headline: "Confidence in gay spaces doesn't take hours a day to build.",
+        body: "Looking and feeling at home in your body, whether it's the gym, the beach, a date, or a Saturday night out, doesn't require hours a day. Based on your answers, we'll build a Protocol that fits into your life: precise, efficient, and designed around your actual schedule.",
+      },
+      Bisexual: {
+        headline: "Confidence with both men and women doesn't take hours a day to build.",
+        body: "Looking and feeling at home in your body, whether it's the gym, a date, or any social setting, doesn't require hours a day. Based on your answers, we'll build a Protocol that fits into your life: precise, efficient, and designed around your actual schedule.",
+      },
+    },
   },
 
   {

@@ -212,7 +212,7 @@ function renderSlide(
       return <BeliefSlide slide={slide} onNext={onNext} onBack={onBack} />;
 
     case "info":
-      return <InfoSlide slide={slide} onNext={onNext} onBack={onBack} />;
+      return <InfoSlide slide={slide} answers={answers} onNext={onNext} onBack={onBack} />;
 
     case "stat":
       return <StatSlide slide={slide} answers={answers} onNext={onNext} onBack={onBack} />;

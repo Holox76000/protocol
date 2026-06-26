@@ -1,19 +1,27 @@
 "use client";
 
-import type { InfoSlide as InfoSlideConfig } from "../funnel-config";
+import type { InfoSlide as InfoSlideConfig, Answers } from "../funnel-config";
 import styles from "./slides.module.css";
 
 const AVATARS = Array.from({ length: 7 });
 
 type Props = {
   slide: InfoSlideConfig;
+  answers: Answers;
   onNext: () => void;
   onBack: () => void;
 };
 
-export function InfoSlide({ slide, onNext, onBack }: Props) {
+type OrientationKey = "Gay" | "Bisexual" | "Straight" | "Prefer not to say";
+
+export function InfoSlide({ slide, answers, onNext, onBack }: Props) {
   const isSocialProof = slide.variant === "social-proof";
   const isObjection = slide.variant === "objection";
+
+  const orientation = answers.sexual_orientation as OrientationKey | undefined;
+  const override = orientation && slide.byOrientation ? slide.byOrientation[orientation] : undefined;
+  const headline = override?.headline ?? slide.headline;
+  const body = override?.body ?? slide.body;
 
   return (
     <div className={styles.card}>
@@ -41,9 +49,9 @@ export function InfoSlide({ slide, onNext, onBack }: Props) {
           </div>
         )}
 
-        <h2 className={styles.infoHeadline}>{slide.headline}</h2>
+        <h2 className={styles.infoHeadline}>{headline}</h2>
         <p className={styles.infoBody}>
-          {slide.body.split("\n").map((line, i, arr) => (
+          {body.split("\n").map((line, i, arr) => (
             <span key={i}>
               {line}
               {i < arr.length - 1 && <br />}
