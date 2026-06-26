@@ -670,11 +670,12 @@ export default function HomePage() {
 
             <ul className="f1-offer-price__includes">
               {[
-                "+100 Body Attractiveness markers analysed",
-                "Deep assessment questionnaire",
-                "Personalized 3-month protocol",
-                "Ask anything to the experts",
-                "Lifetime access to your analysis and protocol",
+                "100+ structural variables analysed by AI + coach review",
+                "Personalised 12-week protocol",
+                "Direct line to our experts — reply within 6 hours",
+                "Weekly check-ins, weekly adjustments",
+                "Full refund if your attractiveness hasn't moved",
+                "90-day measurable-outcome guarantee",
               ].map((item) => (
                 <li key={item}>
                   <span className="f1-offer-price__check"><CheckIcon /></span>
