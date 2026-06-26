@@ -30,7 +30,11 @@ export function InfoSlide({ slide, answers, onNext, onBack }: Props) {
           <>
             <div className={styles.infoStat}>
               <span className={styles.infoStatNumber}>2,500+</span>
-              <span className={styles.infoStatLabel}>men assessed</span>
+              <span className={styles.infoStatLabel}>
+                {orientation === "Gay" ? "gay men assessed"
+                  : orientation === "Bisexual" ? "bisexual men assessed"
+                  : "men assessed"}
+              </span>
             </div>
             <div className={styles.infoAvatarRow}>
               {AVATARS.map((_, i) => (
