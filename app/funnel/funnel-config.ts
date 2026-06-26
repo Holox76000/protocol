@@ -453,17 +453,6 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
-    id: "trigger-moment",
-    type: "dream-outcome",
-    stateKey: "trigger_moment",
-    qNumber: 32,
-    headline: "What's the moment you decided to actually fix this?",
-    subtext: "A photo, a comment, a doctor, a date you saw on the calendar. The thing that made today different.",
-    placeholder: "Example: A photo someone tagged me in last weekend. A health check at the doctor. My 30th birthday next month. A wedding I'm in this fall.",
-    minChars: 15,
-  },
-
-  {
     id: "info_time",
     type: "info",
     variant: "objection",
