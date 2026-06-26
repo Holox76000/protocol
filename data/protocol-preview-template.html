@@ -375,16 +375,15 @@ body{background:#eceeef}
 .report-frame{max-width:none;margin:0 22px;border-radius:14px}
 .report-content{padding:22px}
 
-/* All panels visible at once (no JS toggle) */
-.report-panel{display:block !important;margin-bottom:38px}
-.report-panel:last-child{margin-bottom:0}
-
-/* Hide tab nav since all panels are open */
-.report-sidebar-nav{display:none}
-.report-navcap{display:none}
-
-/* Hide the pager controls */
-.pager{display:none !important}
+/* One panel at a time, navigate via sidebar nav OR pager */
+.report-panel{display:none}
+.report-panel.active{display:block}
+.report-sidebar-nav{display:flex !important;flex-wrap:wrap;gap:6px;margin-top:14px}
+.report-navcap{display:block;font-size:11px;color:var(--tm);margin-top:14px}
+.report-pager{display:flex !important;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;margin-top:24px;border-top:1px solid var(--bd)}
+.pager-btn{font:600 12px 'Avenir Next',sans-serif;color:#253239;background:#f9fbfb;border:1px solid #dfe4e6;border-radius:7px;padding:9px 14px;cursor:pointer}
+.pager-btn:disabled{opacity:.35;cursor:not-allowed}
+.pager-pos{font:500 11px/1.2 'Avenir Next',sans-serif;color:#7f949b;text-align:center;flex:1}
 
 /* THE BLUR — by default everything visible. Only data-heavy elements blurred for privacy. */
 .report-panel .table-scroll,
@@ -1306,9 +1305,32 @@ body{background:#eceeef}
 
 
   <div class="preview-sticky">
-    <span class="preview-sticky-l">Tom's example · $89 builds yours</span>
-    <a href="{{CHECKOUT_URL}}" class="preview-sticky-b">Build mine — $89</a>
+    <a href="{{CHECKOUT_URL}}" class="preview-sticky-b" style="margin-left:auto">Build mine — $89</a>
   </div>
 </div>
+<script>
+  (function(){
+    var items = Array.prototype.slice.call(document.querySelectorAll('.report-sidebar-item'));
+    var panels = items.map(function(i){ return document.getElementById(i.getAttribute('data-target')); });
+    var frame = document.getElementById('reportFrame');
+    var prevBtn = document.getElementById('pagerPrev');
+    var nextBtn = document.getElementById('pagerNext');
+    var posEl = document.getElementById('pagerPos');
+    var idx = 0;
+    function show(n, doScroll){
+      idx = Math.max(0, Math.min(panels.length - 1, n));
+      items.forEach(function(it, i){ it.classList.toggle('active', i === idx); });
+      panels.forEach(function(p, i){ if(p){ p.classList.toggle('active', i === idx); } });
+      if(posEl){ posEl.textContent = (idx + 1) + ' / ' + panels.length + ' · ' + items[idx].textContent; }
+      if(prevBtn){ prevBtn.disabled = (idx === 0); }
+      if(nextBtn){ nextBtn.disabled = (idx === panels.length - 1); }
+      if(doScroll && frame){ frame.scrollIntoView({behavior:'smooth', block:'start'}); }
+    }
+    items.forEach(function(it, i){ it.addEventListener('click', function(){ show(i, true); }); });
+    if(prevBtn){ prevBtn.addEventListener('click', function(){ show(idx - 1, true); }); }
+    if(nextBtn){ nextBtn.addEventListener('click', function(){ show(idx + 1, true); }); }
+    show(0, false);
+  })();
+</script>
 </body>
 </html>
