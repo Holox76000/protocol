@@ -307,6 +307,7 @@ const PRICING_BULLETS = [
   "Direct line to our experts — reply within 6 hours",
   "Weekly check-ins, weekly adjustments",
   "Full refund if your attractiveness hasn't moved",
+  "90-day measurable-outcome guarantee",
 ];
 
 const FAQS = [
