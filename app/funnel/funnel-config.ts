@@ -302,13 +302,21 @@ const BASE_SLIDES: SlideConfig[] = [
 
   {
     id: "dream-outcome",
-    type: "dream-outcome",
+    type: "multi",
     stateKey: "dream_outcome",
+    section: 1,
+    sectionLabel: "Your Vision",
     qNumber: 30,
-    headline: "What are you really trying to achieve in your personal life?",
-    placeholder: "",
-    minChars: 15,
-    hideCounter: true,
+    question: "What are you really trying to achieve in your personal life?",
+    subtext: "Select all that apply.",
+    options: [
+      "Feel confident and desirable to others",
+      "A specific physical transformation (less fat, more muscle, defined shape)",
+      "Inner peace, confidence and self-respect",
+      "A healthier body that ages well",
+      "More freedom and success in other areas of my life",
+    ],
+    allowCustom: true,
   },
 
   {
