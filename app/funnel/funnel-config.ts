@@ -307,7 +307,7 @@ const BASE_SLIDES: SlideConfig[] = [
     section: 1,
     sectionLabel: "Your Vision",
     qNumber: 30,
-    question: "What are you really trying to achieve in your personal life?",
+    question: "What are you trying to achieve with your body?",
     subtext: "Select all that apply.",
     options: [
       "Feel confident and desirable to others",
