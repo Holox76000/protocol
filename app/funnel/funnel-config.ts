@@ -314,7 +314,6 @@ const BASE_SLIDES: SlideConfig[] = [
       "A specific physical transformation (less fat, more muscle, defined shape)",
       "Inner peace, confidence and self-respect",
       "A healthier body that ages well",
-      "More freedom and success in other areas of my life",
     ],
     allowCustom: true,
   },
