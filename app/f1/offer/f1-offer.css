@@ -2084,3 +2084,21 @@ wistia-player[media-id='iw5y8ab8qj']:not(:defined) {
     font-size: 12px;
   }
 }
+
+/* ─── What you get ───────────────────────────────────────── */
+.mo-wyg{padding:60px 0;background:#fff}
+.mo-wyg__sub{max-width:520px;margin:14px auto 32px;font-size:14px;color:var(--mute,#6b7480);text-align:center;line-height:1.55}
+.mo-wyg__grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+.mo-wyg__card{border:1px solid var(--wire,#e3e8ea);border-radius:12px;padding:18px 18px 20px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.mo-wyg__card:hover{border-color:var(--accent,#8aacb8);box-shadow:0 4px 14px rgba(37,50,57,.06)}
+.mo-wyg__icon{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;border-radius:10px;background:#f3f7f8;color:var(--accent,#8aacb8);margin-bottom:12px}
+.mo-wyg__label{font-family:var(--serif,'Source Serif 4',Georgia,serif);font-size:18px;font-weight:600;color:var(--void,#1a1a18);margin-bottom:6px;letter-spacing:-.01em}
+.mo-wyg__desc{font-size:13.5px;line-height:1.55;color:var(--dim,#515255);margin:0}
+
+@media (min-width:680px){
+  .mo-wyg__grid{grid-template-columns:1fr 1fr;gap:16px}
+}
+@media (min-width:1000px){
+  .mo-wyg__grid{grid-template-columns:repeat(4,1fr);gap:18px}
+  .mo-wyg{padding:90px 0}
+}

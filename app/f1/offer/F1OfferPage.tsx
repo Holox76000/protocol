@@ -179,7 +179,7 @@ const STEPS = [
 
 const RESULTS = [
   { name: "Ryan, 27", ratio: "ATTRACTIVENESS SCORE 45 → 67", before: "/assets/5-before.png", after: "/assets/5-after.png" },
-  { name: "Jake, 34", ratio: "ATTRACTIVENESS SCORE 45 → 67", before: "/assets/2-before.png", after: "/assets/2-after.png" },
+  { name: "Jake, 34", ratio: "ATTRACTIVENESS SCORE 45 → 67", before: "/assets/jake-real-before.png", after: "/assets/jake-real-after.png" },
   { name: "Marcus, 31", ratio: "ATTRACTIVENESS SCORE 45 → 67", before: "/assets/14-before.png", after: "/assets/14-after.png" },
 ];
 
@@ -288,15 +288,15 @@ function resolveCompareCols(pastAttempts: string[]): { col1: ColDef; col2: ColDe
 
 const TESTIMONIALS = [
   {
-    quote: ["I didn't lose weight. ", { em: "I changed shape." }] as TitlePart[],
+    quote: ["Crop top, no overthinking. ", { em: "Side seam sits clean." }] as TitlePart[],
     name: "Ryan, 27", meta: "13 weeks",
   },
   {
-    quote: ["Same suit. ", { em: "Different fit." }] as TitlePart[],
+    quote: ["Booked the shirtless shoot. ", { em: "Showed up this time." }] as TitlePart[],
     name: "Jake, 34", meta: "12 weeks",
   },
   {
-    quote: ["First thing that named the actual problem."] as TitlePart[],
+    quote: ["Speedo by week 10. ", { em: "Towel stays on the chair." }] as TitlePart[],
     name: "Marcus, 31", meta: "16 weeks",
   },
 ];
@@ -880,6 +880,88 @@ function MMemberOutcomes() {
   );
 }
 
+function MWhatYouGet() {
+  const items = [
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+      ),
+      label: "Summary Report",
+      desc: "Your situation, scored. The 3 markers that drive your attractiveness, your current position, your target.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="6" r="2.5"/><path d="M12 8.5V16M12 11l-5 3M12 11l5 3M9 21l3-5 3 5"/></svg>
+      ),
+      label: "Body Analysis",
+      desc: "Full read of your proportions, posture, body fat distribution, presentation. What reads attractive on you specifically.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v7a3 3 0 0 0 6 0V3M9 3v18M18 3c-1.5 1-2 3-2 5s.5 4 2 5v8"/></svg>
+      ),
+      label: "Nutrition Plan",
+      desc: "Calorie + macro targets. Meal frameworks. Grocery lists. Built around your body type, schedule and dietary preferences.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 8.5v7M17.5 8.5v7M4 10v3M20 10v3M6.5 12h11"/></svg>
+      ),
+      label: "Workout Plan",
+      desc: "12-week training split engineered to move your weakest proportions. Exercise sequence, sets, reps, progression.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 14a8 8 0 1 1-9.5-9.8A6.5 6.5 0 0 0 20 14z"/></svg>
+      ),
+      label: "Sleeping Advice",
+      desc: "Recovery is where your body actually changes. Sleep architecture, blue light, room temp, supplements that work.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></svg>
+      ),
+      label: "Supplement Protocol",
+      desc: "What to take, how much, when. Evidence-backed only. No magic pills, no overpriced powder. The 4 to 6 that matter.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="13" height="18" rx="2"/><circle cx="10.5" cy="9" r="2.5"/><path d="M6 17c1-2.5 3-3.5 4.5-3.5S14 14.5 15 17"/><path d="M19 7l2 1-2 1M19 11l2 1-2 1"/></svg>
+      ),
+      label: "Dating App Profile Audit",
+      desc: "Photo selection, bio rewrite, opener templates. Calibrated to your body type and the people you want to attract.",
+    },
+    {
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4h14v12H8l-3 3z"/><path d="M9 9h6M9 12h4"/></svg>
+      ),
+      label: "Action Plan + WhatsApp",
+      desc: "Daily steps for 84 days. Weekly check-in from your coach on WhatsApp. No app to download.",
+    },
+  ];
+
+  return (
+    <section className="mo-section mo-wyg">
+      <div className="mo-container">
+        <p className="mo-section-eyebrow mo-section-eyebrow--center">What you get</p>
+        <h2 className="mo-section-title" style={{ marginTop: 12, textAlign: "center" }}>
+          Eight deliverables, <em>built for your body.</em>
+        </h2>
+        <p className="mo-wyg__sub">Roughly 40 pages of personalized analysis and planning. Delivered in 72 to 96 hours.</p>
+        <div className="mo-wyg__grid">
+          {items.map((it) => (
+            <div key={it.label} className="mo-wyg__card">
+              <span className="mo-wyg__icon">{it.icon}</span>
+              <div className="mo-wyg__label">{it.label}</div>
+              <p className="mo-wyg__desc">{it.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function MPricing({ href }: { href: string }) {
   return (
     <section id="mo-pricing" className="mo-section mo-section--ink">
@@ -1217,6 +1299,7 @@ export default function F1OfferPage() {
       <InformativeSection />
       <MCompare pastAttempts={pastAttempts} />
       <MTestimonials />
+      <MWhatYouGet />
       <MPricing href={signupHref} />
       <MGuarantee />
       <MFaq />
