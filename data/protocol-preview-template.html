@@ -386,13 +386,40 @@ body{background:#eceeef}
 /* Hide the pager controls */
 .pager{display:none !important}
 
-/* THE BLUR — content blurred for privacy, but teaser elements stay sharp */
+/* THE BLUR — by default everything visible. Only data-heavy elements blurred for privacy. */
+.report-panel .table-scroll,
+.report-panel .checklist,
+.report-panel .rules,
+.report-panel .pbody,
+.report-panel .insight,
+.report-panel .food-grid,
+.report-panel .supp-grid,
+.report-panel .levers,
+.report-panel .ba-tabs,
+.report-panel .annex,
+.report-panel .analysis-body,
+.report-panel .session,
+.report-panel .scale-block,
+.report-panel .lever{filter:blur(4px);opacity:.75;pointer-events:none;user-select:none}
+
+/* Force visible — strong visual hooks that create desire */
 .report-panel .report-header,
 .report-panel .panel-tldr,
 .report-panel .score-pair,
 .report-panel .panel-divider,
-.report-panel .psub{filter:none;opacity:1;pointer-events:auto;user-select:auto}
-.report-panel > *:not(.report-header):not(.panel-tldr):not(.score-pair):not(.panel-divider):not(.psub){filter:blur(4px);opacity:.7;pointer-events:none;user-select:none}
+.report-panel .psub,
+.report-panel .dist,
+.report-panel .metrics,
+.report-panel .targets,
+.report-panel .composite,
+.report-panel .ba-header,
+.report-panel .ba-photos,
+.report-panel .ba-stats,
+.report-panel .scan-img,
+.report-panel .scan-cap,
+.report-panel .macro-grid,
+.report-panel .target-card,
+.report-panel .analysis-header{filter:none !important;opacity:1 !important;pointer-events:auto !important;user-select:auto !important}
 
 /* Big floating CTA banner across content */
 .preview-overlay{position:sticky;top:54px;margin:0 22px 18px;background:#253239;color:#fff;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:7;box-shadow:0 8px 24px rgba(37,50,57,.18)}
