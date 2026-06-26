@@ -88,11 +88,9 @@
 
   /* Pattern cards */
   .ptn{border:1px solid #edf0f1;border-radius:12px;padding:16px;margin-bottom:10px;}
-  .ptn-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
-  .ptn-metric{font:600 27px/1 'JetBrains Mono',ui-monospace,monospace;color:#253239;letter-spacing:-.02em;}
-  .ptn-metric .small{font-size:13px;color:#9eb1b8;}
-  .ptn-tag{font:500 9px/1.2 'Avenir Next',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#9eb1b8;text-align:right;}
-  .ptn-title{font:600 15px/1.3 'Avenir Next',sans-serif;color:#253239;margin:11px 0 4px;}
+  .ptn-badge{display:inline-block;font:500 11px/1 'Avenir Next',sans-serif;letter-spacing:.06em;color:#9eb1b8;background:#f9fbfb;border:1px solid #dfe4e6;border-radius:999px;padding:8px 12px;margin-bottom:14px;}
+  .ptn-badge strong{color:#253239;font-weight:700;}
+  .ptn-title{font:600 16px/1.35 'Avenir Next',sans-serif;color:#253239;margin:0 0 6px;}
   .ptn-body{font:400 13px/1.5 'Avenir Next',sans-serif;color:#515255;margin:0;}
   .ptn-bar{height:4px;border-radius:2px;background:#edf0f1;margin-top:13px;overflow:hidden;}
   .ptn-bar > div{height:100%;background:#9eb1b8;}
@@ -196,43 +194,32 @@
     <p class="sec-intro">{{PATTERNS_INTRO}}</p>
 
     <div class="ptn">
-      <div class="ptn-head">
-        <span class="ptn-metric">{{SCORE_NOW}}<span class="small">/100</span></span>
-        <span class="ptn-tag">where most<br>men stop</span>
-      </div>
+      <div class="ptn-badge"><strong>Stuck</strong> in the middle</div>
       <h3 class="ptn-title">{{PATTERN_1_TITLE}}</h3>
       <p class="ptn-body">{{PATTERN_1_BODY}}</p>
       <div class="ptn-bar"><div style="width:{{SCORE_NOW}}%"></div></div>
     </div>
 
     <div class="ptn">
-      <div class="ptn-head">
-        <span class="ptn-metric">+0.15</span>
-        <span class="ptn-tag">SWR shift<br>&gt; 5 kg lost</span>
-      </div>
+      <div class="ptn-badge"><strong>Shape</strong> beats weight loss</div>
       <h3 class="ptn-title">{{PATTERN_2_TITLE}}</h3>
       <p class="ptn-body">{{PATTERN_2_BODY}}</p>
     </div>
 
     <div class="ptn">
-      <div class="ptn-head">
-        <span class="ptn-metric">3×</span>
-        <span class="ptn-tag">social<br>return</span>
-      </div>
+      <div class="ptn-badge"><strong>Cascade</strong> effect</div>
       <h3 class="ptn-title">{{PATTERN_3_TITLE}}</h3>
       <p class="ptn-body">{{PATTERN_3_BODY}}</p>
     </div>
 
     <div class="ptn" style="margin-bottom:18px">
-      <div class="ptn-head">
-        <span class="ptn-metric">3</span>
-        <span class="ptn-tag">concrete<br>targets</span>
-      </div>
+      <div class="ptn-badge"><strong>3 specific</strong> wins</div>
       <h3 class="ptn-title">{{PATTERN_4_TITLE}}</h3>
-      <div class="pill-row" style="margin-top:8px">
-        <span class="pill">SWR &gt; 1.52</span>
-        <span class="pill">BF &lt; 12%</span>
-        <span class="pill">S2C &gt; 1.15</span>
+      <p class="ptn-body">{{PATTERN_4_BODY}}</p>
+      <div class="pill-row" style="margin-top:12px">
+        <span class="pill">Wear a fitted shirt</span>
+        <span class="pill">Take it off without thinking</span>
+        <span class="pill">Feel desired in the room</span>
       </div>
     </div>
 
@@ -242,8 +229,8 @@
   <!-- WHAT YOU GET -->
   <section class="wyg">
     <p class="wyg-eyebrow">What you get</p>
-    <h2 class="wyg-title">Eight deliverables, <em>built for you.</em></h2>
-    <p class="wyg-sub">≈ 40 pages + weekly WhatsApp coaching.</p>
+    <h2 class="wyg-title">Everything you need <em>to actually change.</em></h2>
+    <p class="wyg-sub">8 sections, 40 pages, built around your body and your goals. Updated weekly.</p>
 
     <div class="wyg-grid">
       <div class="wyg-card">
@@ -286,8 +273,8 @@
   <!-- TOM TEASER -->
   <section class="tom-teaser">
     <p class="tom-teaser-eyebrow">A real Protocol</p>
-    <h2 class="tom-teaser-h2">Tom: <em>25 → 87</em> in 12 weeks.</h2>
-    <p class="tom-teaser-sub">30, skinny-fat, entrepreneur. See his full Protocol — blurred for privacy, structure unlocked.</p>
+    <h2 class="tom-teaser-h2">Tom went from avoiding the mirror to <em>taking his shirt off without thinking.</em></h2>
+    <p class="tom-teaser-sub">30, skinny-fat, entrepreneur. He hated pool moments, beach moments, photos of himself. 12 weeks later he stopped hiding. See his full Protocol below.</p>
     <a href="{{PREVIEW_URL}}" class="tom-teaser-cta">View Tom's Protocol →</a>
   </section>
 

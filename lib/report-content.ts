@@ -15,51 +15,21 @@ export interface InsightContent {
 
 // ── Patterns by morphology ───────────────────────────────
 
-export function getPatterns(morphology: string): PatternSet {
-  const m = morphology?.toLowerCase();
-
-  if (m === "skinny") return {
-    p1t: "Training harder won't change what you see in the mirror",
-    p1b: "More effort gives the same reflection without the right structural targets. Shoulder width relative to waist is the variable. Not effort. Order.",
-    p2t: "Your clothes are working against you",
-    p2b: "Skinny frames hang flat in most clothes. At the same weight, structure across shoulders and chest decides whether you read as confident or invisible.",
-    p3t: "High-volume training was built for someone else",
-    p3b: "High-volume programs were built for average bodies. On your frame they produce fatigue without visible change. Which muscles, in what order: that's what matters.",
-    p4t: "The target numbers are closer than most people think",
-    p4b: "Shoulder-to-waist ratio and upper body density are your two levers. Both respond fast. Most skinny builds see visible change in 4 to 6 weeks.",
-  };
-
-  if (m === "skinny-fat") return {
-    p1t: "Your body is gaining fat and losing muscle at the same time",
-    p1b: "Skinny-fat is a cortisol-insulin imbalance: fat in the midsection, muscle loss in the limbs. Standard gym programs were built for other bodies and often make it worse.",
-    p2t: "Your waist is what's controlling your silhouette",
-    p2b: "Waist drives your score more than any other variable on your build. A 2 to 3cm reduction shifts your shoulder-to-waist ratio enough to move you out of the middle.",
-    p3t: "Cutting and bulking both make your body type worse",
-    p3b: "Aggressive cuts accelerate muscle loss. Surpluses store fat first. Recomposition is the only path: build and burn at once, in the right order.",
-    p4t: "Sleep and stress matter as much as training",
-    p4b: "Skinny-fat is cortisol-driven. Sleep, stress, and training are the same variable. Fix one without the others and you get partial results.",
-  };
-
-  if (m === "overweight") return {
-    p1t: "Where fat sits matters more than how much you carry",
-    p1b: "Your score isn't about total weight. It's about where fat sits. Two men at the same weight can score very differently.",
-    p2t: "Visceral fat is flattening your V-taper",
-    p2b: "Visceral fat pushes your waist out and compresses your V-taper. It's also the first fat to respond. Faster than subcutaneous.",
-    p3t: "Standard diets shrink you without improving your shape",
-    p3b: "Cut calories, run more: works for the scale, not for shape. Losing muscle alongside fat makes you smaller without making you defined.",
-    p4t: "The structure is already there, it just needs uncovering",
-    p4b: "Your structural base is already there. It's covered. Waist first, then upper body density: that order matters more than total effort.",
-  };
-
+export function getPatterns(_morphology: string): PatternSet {
+  // Universal pattern copy — outcome-first, not technical.
+  // We used to vary text by morphology, but the emotional drivers (being
+  // noticed, taking your shirt off, wearing what you want, feeling desired)
+  // are the same across all builds. The morphology shows up later in the
+  // actual deliverable, not in this preliminary frame.
   return {
-    p1t: "Average is invisible, and most men stay there",
-    p1b: "Average bodies hit a plateau because there's no obvious reason to push. The gap between 'acceptable' and 'memorable' is small. Most men never close it because no one shows them what to aim at.",
-    p2t: "Proportions move the score. Weight barely does.",
-    p2b: "At average composition, losing 5kg changes little. Shifting your shoulder-to-waist ratio by 0.15 changes a lot. Proportions are the variable. Weight is noise.",
-    p3t: "Your environment pays back more than you put in",
-    p3b: "Looking noticeably above average returns more than the work it takes. Men who move past their peer baseline see social and professional returns well beyond the physical change.",
-    p4t: "The top 20% is a smaller jump than it appears",
-    p4b: "Top 20% is three concrete targets: SWR > 1.52, body fat under 12%, shoulder-to-chest > 1.15. Measurable. Achievable. That's what the protocol is built around.",
+    p1t: "Average doesn't get noticed",
+    p1b: "The body that gets you noticed isn't a slightly better version of the one you have. It's a different category. Most men spend years chasing 'a little better' and stay invisible. Walking into a room and feeling different is one specific change, not ten.",
+    p2t: "Losing weight won't make you feel sexy. The right shape will.",
+    p2b: "5kg off the scale changes very little about how you look in a fitted shirt. The width of your shoulders, the line of your waist, the way clothes drape across your chest — that's what people see. And what you see in the mirror when you take your shirt off.",
+    p3t: "Confidence in your body shows up everywhere else",
+    p3b: "Men who change how they look in their own skin change the rest of their life within months. Dating apps. The way they hold themselves at work. Holiday photos. Beach moments. The body has been the bottleneck. Once you move it, everything downstream moves with it.",
+    p4t: "Being someone other men want to be is closer than it feels",
+    p4b: "Three specific wins close the gap. Wearing the fitted shirt you've been avoiding. Taking it off at the pool without thinking. Feeling desired in the room. Concrete. Measurable. That's what the Protocol is built around.",
   };
 }
 
