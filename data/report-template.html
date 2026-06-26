@@ -87,10 +87,10 @@
   .sec-intro{font:400 13px/1.5 'Avenir Next',sans-serif;color:#7f949b;margin:0 0 18px;}
 
   /* Pattern cards */
-  .ptn{border:1px solid #edf0f1;border-radius:12px;padding:16px;margin-bottom:10px;}
-  .ptn-badge{display:inline-block;font:500 11px/1 'Avenir Next',sans-serif;letter-spacing:.06em;color:#9eb1b8;background:#f9fbfb;border:1px solid #dfe4e6;border-radius:999px;padding:8px 12px;margin-bottom:14px;}
-  .ptn-badge strong{color:#253239;font-weight:700;}
-  .ptn-title{font:600 16px/1.35 'Avenir Next',sans-serif;color:#253239;margin:0 0 6px;}
+  .ptn{border:1px solid #edf0f1;border-radius:12px;padding:20px 18px;margin-bottom:10px;}
+  .ptn-badge{font:500 10px/1 'Avenir Next',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9eb1b8;margin-bottom:10px;}
+  .ptn-title{font:400 22px/1.18 'Iowan Old Style','Palatino Linotype',Georgia,serif;letter-spacing:-.02em;color:#253239;margin:0 0 10px;}
+  .ptn-title em{font-style:italic;color:#9eb1b8;}
   .ptn-body{font:400 13px/1.5 'Avenir Next',sans-serif;color:#515255;margin:0;}
   .ptn-bar{height:4px;border-radius:2px;background:#edf0f1;margin-top:13px;overflow:hidden;}
   .ptn-bar > div{height:100%;background:#9eb1b8;}
@@ -194,29 +194,28 @@
     <p class="sec-intro">{{PATTERNS_INTRO}}</p>
 
     <div class="ptn">
-      <div class="ptn-badge"><strong>Stuck</strong> in the middle</div>
-      <h3 class="ptn-title">{{PATTERN_1_TITLE}}</h3>
-      <p class="ptn-body">{{PATTERN_1_BODY}}</p>
+      <div class="ptn-badge">Stuck in the middle</div>
+      <h3 class="ptn-title">Average <em>doesn't get noticed.</em></h3>
+      <p class="ptn-body">The body that gets noticed isn't a slightly better version of yours. It's a different category most men never reach.</p>
       <div class="ptn-bar"><div style="width:{{SCORE_NOW}}%"></div></div>
     </div>
 
     <div class="ptn">
-      <div class="ptn-badge"><strong>Shape</strong> beats weight loss</div>
-      <h3 class="ptn-title">{{PATTERN_2_TITLE}}</h3>
-      <p class="ptn-body">{{PATTERN_2_BODY}}</p>
+      <div class="ptn-badge">Shape beats weight loss</div>
+      <h3 class="ptn-title">5kg off the scale won't <em>make you feel sexy.</em></h3>
+      <p class="ptn-body">The width of your shoulders and the line of your waist are what people see. And what you see in the mirror when you take your shirt off.</p>
     </div>
 
     <div class="ptn">
-      <div class="ptn-badge"><strong>Cascade</strong> effect</div>
-      <h3 class="ptn-title">{{PATTERN_3_TITLE}}</h3>
-      <p class="ptn-body">{{PATTERN_3_BODY}}</p>
+      <div class="ptn-badge">The cascade effect</div>
+      <h3 class="ptn-title">Confidence in your body <em>shows up everywhere else.</em></h3>
+      <p class="ptn-body">Dating apps. How you hold yourself at work. Holiday photos. Beach moments. Once the body moves, everything downstream moves with it.</p>
     </div>
 
     <div class="ptn" style="margin-bottom:18px">
-      <div class="ptn-badge"><strong>3 specific</strong> wins</div>
-      <h3 class="ptn-title">{{PATTERN_4_TITLE}}</h3>
-      <p class="ptn-body">{{PATTERN_4_BODY}}</p>
-      <div class="pill-row" style="margin-top:12px">
+      <div class="ptn-badge">Three specific wins</div>
+      <h3 class="ptn-title">Closer to <em>desired</em> than it feels.</h3>
+      <div class="pill-row" style="margin-top:10px">
         <span class="pill">Wear a fitted shirt</span>
         <span class="pill">Take it off without thinking</span>
         <span class="pill">Feel desired in the room</span>
@@ -291,7 +290,7 @@
       <div class="price-row"><span class="price-row-l">Personal coach</span><span class="price-row-v">$400–800/mo</span></div>
       <div class="price-row"><span class="price-row-l">Your Protocol</span><span class="price-row-v">$89, one-time</span></div>
     </div>
-    <a href="{{CHECKOUT_URL}}" class="ubtn">Get my Protocol, $89</a>
+    <a href="{{PREVIEW_URL}}" class="ubtn">Get my Protocol, $89</a>
     <p class="micro">90-day guarantee · One-time payment · No subscription</p>
   </section>
 
@@ -303,7 +302,7 @@
   <!-- STICKY CTA -->
   <div class="sticky">
     <span class="sticky-l">Preliminary report</span>
-    <a href="{{CHECKOUT_URL}}" class="sticky-b">Get my full analysis — $89</a>
+    <a href="{{PREVIEW_URL}}" class="sticky-b">Get my full analysis — $89</a>
   </div>
 
 </div>

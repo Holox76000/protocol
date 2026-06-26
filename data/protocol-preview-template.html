@@ -432,8 +432,16 @@ body{background:#eceeef}
 .preview-sticky-b{font:600 12px 'Avenir Next',sans-serif;color:#fff;background:#253239;padding:11px 16px;border-radius:6px;text-decoration:none;white-space:nowrap}
 .ex-banner{display:none}
 
+/* Bottom-of-page jump-to nav (mirror of the top sidebar) */
+.preview-bottom-nav{margin:24px 22px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:22px 18px}
+.preview-bottom-nav .report-sidebar-name{font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;font-size:16px;font-weight:600;margin-bottom:4px;color:#253239}
+.preview-bottom-nav .report-sidebar-date{font-size:11px;color:#9eb1b8;margin-bottom:10px}
+.preview-bottom-nav .report-navcap{font-size:11px;color:#7f949b;margin-bottom:14px}
+.preview-bottom-nav .report-navcap .navcap-arrow{display:inline-block;margin-left:4px;color:#9eb1b8}
+
 /* Responsive — scale up beyond mobile */
 @media (min-width:768px){
+  .preview-bottom-nav{margin:32px 36px 12px;padding:28px 24px}
   .preview-wrap{max-width:720px;padding-bottom:96px}
   .preview-nav{padding:18px 36px}
   .preview-nav-logo{font-size:22px}
@@ -454,6 +462,7 @@ body{background:#eceeef}
   .preview-sticky-b{padding:13px 22px;font-size:13px}
 }
 @media (min-width:1100px){
+  .preview-bottom-nav{margin:40px 56px 16px;padding:32px 28px}
   .preview-wrap{max-width:960px;padding-bottom:110px}
   .preview-nav{padding:22px 56px}
   .preview-hero{padding:64px 72px 44px}
@@ -1303,6 +1312,22 @@ body{background:#eceeef}
   </div><!-- /report-frame -->
 </section>
 
+  <!-- Bottom nav: jump to any section without scrolling back to the top -->
+  <div class="report-sidebar preview-bottom-nav">
+    <div class="report-sidebar-name">Tom's Protocol</div>
+    <div class="report-sidebar-date">May 8, 2026</div>
+    <div class="report-navcap">Tap a section below to open it <span class="navcap-arrow">↓</span></div>
+    <div class="report-sidebar-nav">
+      <span class="report-sidebar-item" data-target="p-summary">Summary Report</span>
+      <span class="report-sidebar-item" data-target="p-body">Body Analysis</span>
+      <span class="report-sidebar-item" data-target="p-nutrition">Nutrition Plan</span>
+      <span class="report-sidebar-item" data-target="p-workout">Workout Plan</span>
+      <span class="report-sidebar-item" data-target="p-sleep">Sleeping Advices</span>
+      <span class="report-sidebar-item" data-target="p-supp">Supplement Protocol</span>
+      <span class="report-sidebar-item" data-target="p-action">Action Plan</span>
+      <span class="report-sidebar-item" data-target="p-dating">Dating App Profile Audit</span>
+    </div>
+  </div>
 
   <div class="preview-sticky">
     <a href="{{CHECKOUT_URL}}" class="preview-sticky-b" style="margin-left:auto">Build mine — $89</a>
@@ -1310,8 +1335,22 @@ body{background:#eceeef}
 </div>
 <script>
   (function(){
-    var items = Array.prototype.slice.call(document.querySelectorAll('.report-sidebar-item'));
-    var panels = items.map(function(i){ return document.getElementById(i.getAttribute('data-target')); });
+    // The same sidebar nav is rendered at the top of the frame AND at the bottom
+    // of the page so users can jump without scrolling back up. De-dupe panel IDs
+    // by data-target so the pager position label still reads 1 / 8, not 1 / 16.
+    var allItems = Array.prototype.slice.call(document.querySelectorAll('.report-sidebar-item'));
+    var seen = {};
+    var panelIds = [];
+    var panelLabels = [];
+    allItems.forEach(function(it){
+      var id = it.getAttribute('data-target');
+      if (!seen[id]) {
+        seen[id] = true;
+        panelIds.push(id);
+        panelLabels.push(it.textContent.trim());
+      }
+    });
+    var panels = panelIds.map(function(id){ return document.getElementById(id); });
     var frame = document.getElementById('reportFrame');
     var prevBtn = document.getElementById('pagerPrev');
     var nextBtn = document.getElementById('pagerNext');
@@ -1319,14 +1358,22 @@ body{background:#eceeef}
     var idx = 0;
     function show(n, doScroll){
       idx = Math.max(0, Math.min(panels.length - 1, n));
-      items.forEach(function(it, i){ it.classList.toggle('active', i === idx); });
+      var currentId = panelIds[idx];
+      allItems.forEach(function(it){
+        it.classList.toggle('active', it.getAttribute('data-target') === currentId);
+      });
       panels.forEach(function(p, i){ if(p){ p.classList.toggle('active', i === idx); } });
-      if(posEl){ posEl.textContent = (idx + 1) + ' / ' + panels.length + ' · ' + items[idx].textContent; }
+      if(posEl){ posEl.textContent = (idx + 1) + ' / ' + panels.length + ' · ' + panelLabels[idx]; }
       if(prevBtn){ prevBtn.disabled = (idx === 0); }
       if(nextBtn){ nextBtn.disabled = (idx === panels.length - 1); }
       if(doScroll && frame){ frame.scrollIntoView({behavior:'smooth', block:'start'}); }
     }
-    items.forEach(function(it, i){ it.addEventListener('click', function(){ show(i, true); }); });
+    allItems.forEach(function(it){
+      it.addEventListener('click', function(){
+        var i = panelIds.indexOf(it.getAttribute('data-target'));
+        if (i >= 0) show(i, true);
+      });
+    });
     if(prevBtn){ prevBtn.addEventListener('click', function(){ show(idx - 1, true); }); }
     if(nextBtn){ nextBtn.addEventListener('click', function(){ show(idx + 1, true); }); }
     show(0, false);
