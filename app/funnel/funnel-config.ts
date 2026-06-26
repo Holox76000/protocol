@@ -472,26 +472,6 @@ const BASE_SLIDES: SlideConfig[] = [
   },
 
   {
-    id: "q_social_env",
-    type: "single",
-    stateKey: "social_environment",
-    section: 1,
-    sectionLabel: "Current Situation",
-    qNumber: 11,
-    question: "What's your social environment?",
-    whyWeAsk: "Attractiveness isn't one-size-fits-all. A doctor and a lumberjack don't project the same image, and they shouldn't. We calibrate your protocol to the context where it matters most.",
-    options: [
-      "Corporate",
-      "Entrepreneur / Startup",
-      "Manual / Trade work",
-      "Student",
-      "Creative / Freelance",
-      "Medical / Healthcare",
-      "Other",
-    ],
-  },
-
-  {
     id: "q_past_solutions",
     type: "multi",
     stateKey: "past_solutions",

@@ -6,7 +6,6 @@ import {
   getPatterns,
   getAgeInsight,
   getEthnicityInsight,
-  getEnvParagraph,
   getHistoryParagraph,
 } from "../../../../lib/report-content";
 import { computePreliminaryScore } from "../../../../lib/preliminaryScore";
@@ -36,18 +35,6 @@ function formatAge(ageBracket: string): string {
     "20–29": "20s", "30–39": "30s", "40–49": "40s", "50+": "50s+",
   };
   return map[ageBracket] ?? ageBracket;
-}
-
-function formatEnv(env: string): string {
-  const map: Record<string, string> = {
-    "Corporate": "Corporate",
-    "Entrepreneur / Startup": "Startup",
-    "Manual / Trade work": "Trade",
-    "Student": "Student",
-    "Creative / Freelance": "Creative",
-    "Medical / Healthcare": "Medical",
-  };
-  return map[env] ?? (env || "—");
 }
 
 function formatFrequency(weekly: string): string {
@@ -157,7 +144,6 @@ export async function GET(
   let html = fs.readFileSync(templatePath, "utf-8");
 
   const morphology = (answers.morphology as string) ?? "Average";
-  const env = (answers.social_environment as string) ?? "";
   const patterns = getPatterns(morphology);
   const score = computePreliminaryScore(answers);
 
@@ -174,8 +160,7 @@ export async function GET(
   const offerParams = new URLSearchParams({ funnel_sid: sid, funnel: "quiz" });
   const quizKeys = [
     "morphology", "ethnicity", "age_bracket", "past_solutions",
-    "expected_results", "social_environment", "weekly_time",
-    "sexual_orientation",
+    "weekly_time", "sexual_orientation",
     "height_unit", "height_ft", "height_in", "height_cm",
     "weight_value", "weight_unit", "weight_kg", "first_name",
   ];
@@ -193,7 +178,6 @@ export async function GET(
     "{{HEIGHT}}": formatHeight(answers),
     "{{WEIGHT}}": formatWeight(answers),
     "{{BODY_TYPE}}": morphology,
-    "{{ENV}}": formatEnv(env),
     "{{FREQUENCY}}": formatFrequency((answers.weekly_time as string) ?? ""),
     "{{PATTERN_1_TITLE}}": patterns.p1t,
     "{{PATTERN_1_BODY}}": patterns.p1b,
@@ -203,7 +187,6 @@ export async function GET(
     "{{PATTERN_3_BODY}}": patterns.p3b,
     "{{PATTERN_4_TITLE}}": patterns.p4t,
     "{{PATTERN_4_BODY}}": patterns.p4b,
-    "{{ENVIRONMENT_PARAGRAPH}}": getEnvParagraph(env),
     "{{HISTORY_PARAGRAPH}}": getHistoryParagraph((answers.past_solutions as string) ?? ""),
     "{{CHECKOUT_URL}}": offerUrl,
     "{{PROJECTION_BLOCK}}": projectionBlock,
@@ -219,7 +202,7 @@ export async function GET(
     "{{PATTERNS_EYEBROW}}": patternsEyebrowFor(personalization?.persona_tag),
     "{{PATTERNS_INTRO}}":
       personalization?.patterns_intro ??
-      `${morphology} build, ${formatAge((answers.age_bracket as string) ?? "")}, ${formatEnv(env)}, ${formatFrequency((answers.weekly_time as string) ?? "")}. Not your individual analysis, but four patterns that repeat across 2,500+ men with your profile.`,
+      `${morphology} build, ${formatAge((answers.age_bracket as string) ?? "")}, ${formatFrequency((answers.weekly_time as string) ?? "")}. Not your individual analysis, but four patterns that repeat across 2,500+ men with your profile.`,
     "{{TESTIMONIAL_QUOTE}}": testimonial.quote,
     "{{TESTIMONIAL_NAME}}": testimonial.name,
     "{{TESTIMONIAL_META}}": testimonial.meta,

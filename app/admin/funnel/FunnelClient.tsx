@@ -31,8 +31,8 @@ const QUIZ_STEPS = [
   { key: "quiz_pain",        label: "Pain — multi choice",     threshold: 6  },
   { key: "quiz_biometrics",  label: "Biométriques",            threshold: 11 },
   { key: "quiz_trigger",     label: "Trigger — free text",     threshold: 13 },
-  { key: "quiz_past",        label: "Solutions passées",       threshold: 16 },
-  { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 20 },
+  { key: "quiz_past",        label: "Solutions passées",       threshold: 15 },
+  { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 19 },
 ];
 
 export default function FunnelClient({ sessions, leads, events, users, since }: Props) {
