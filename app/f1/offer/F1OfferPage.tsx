@@ -154,7 +154,7 @@ const STEPS = [
     title: ACTIVE_VARIANT === "projection" ? "See your full potential" : "Upload three photos",
     desc: ACTIVE_VARIANT === "projection"
       ? "You define what image you want to project to others and you preview it."
-      : "Front, side, back. 60 seconds, stays private. We pull 100+ markers.",
+      : "Front, side, back. Stays private. We read 100+ markers your mirror and your phone camera don't show.",
     img: "/assets/body-fat-analysis.png",
   },
   {
@@ -163,7 +163,7 @@ const STEPS = [
     title: ACTIVE_VARIANT === "projection" ? "We analyse your projection" : "We analyse",
     desc: ACTIVE_VARIANT === "projection"
       ? "Our team of aesthetic experts analyses your target projection and your physical profile to design the exact protocol that closes the gap."
-      : "AI benchmarks your ratios against the research, then your coach reviews the output and writes the protocol.",
+      : "We benchmark your ratios against the research, then your coach writes the 90-day plan to close the gap you can see in photos.",
     img: "/assets/analysis-card.png",
   },
   {
@@ -552,8 +552,8 @@ function MAdvisors() {
         <div className="mo-section-head--center">
           <p className="mo-section-eyebrow mo-section-eyebrow--center">Scientific backbone</p>
           <h2 className="mo-section-title" style={{ marginTop: 12 }}>
-            Your Protocol draws from the world&apos;s{" "}
-            <em>leading aesthetic science</em>
+            Built on the research that defines{" "}
+            <em>modern aesthetic medicine.</em>
           </h2>
           <p className="mo-advisors__sub">Not generic fitness advice. Our method is grounded in the clinical research of the practitioners who define modern aesthetic medicine.</p>
         </div>
@@ -638,7 +638,7 @@ function MResults({ href }: { href: string }) {
         <div className="mo-section-head--rule">
           <div>
             <div className="mo-section-eyebrow">Members, 13 weeks in</div>
-            <h2 className="mo-section-title" style={{ marginTop: 4 }}>Real people. <em>Real confidence.</em></h2>
+            <h2 className="mo-section-title" style={{ marginTop: 4 }}>They followed the plan. <em>Now they get noticed.</em></h2>
           </div>
           <div className="mo-section-head__meta">2,500+ men · 13 weeks avg</div>
         </div>
@@ -684,9 +684,9 @@ function MCompare({ pastAttempts }: { pastAttempts: string[] }) {
     <section className="mo-section">
       <div className="mo-container">
         <div className="mo-section-head--center">
-          <div className="mo-section-eyebrow mo-section-eyebrow--center">Why this works</div>
+          <div className="mo-section-eyebrow mo-section-eyebrow--center">Why this works when other things didn&apos;t</div>
           <h2 className="mo-section-title" style={{ marginTop: 16 }}>
-            Gym industry builds muscle. <em>We build attractiveness Protocol for you.</em>
+            Your training built strength. <em>We build what people notice.</em>
           </h2>
         </div>
 
@@ -799,7 +799,7 @@ function MTestimonials() {
       <div className="mo-container">
         <div className="mo-section-head--center">
           <div className="mo-section-eyebrow mo-section-eyebrow--center">What club members say</div>
-          <h2 className="mo-section-title" style={{ marginTop: 16 }}><em>A change of shape.</em></h2>
+          <h2 className="mo-section-title" style={{ marginTop: 16 }}><em>Members who started getting noticed.</em></h2>
         </div>
         <div className="mo-testimonials-grid">
           {TESTIMONIALS.map((t, i) => (
@@ -940,7 +940,7 @@ function MWhatYouGet() {
   return (
     <section className="mo-section mo-wyg">
       <div className="mo-container">
-        <p className="mo-section-eyebrow mo-section-eyebrow--center">What you get</p>
+        <p className="mo-section-eyebrow mo-section-eyebrow--center">What you get in 72 hours</p>
         <h2 className="mo-section-title" style={{ marginTop: 12, textAlign: "center" }}>
           Eight deliverables, <em>built for your body.</em>
         </h2>
@@ -965,7 +965,7 @@ function MPricing({ href }: { href: string }) {
       <div className="mo-container">
         <div className="mo-section-head--center">
           <h2 className="mo-section-title" style={{ marginTop: 16, color: "#fff" }}>
-            The full Protocol. <em style={{ color: "rgba(255,255,255,0.5)" }}>$89.</em>
+            The full Protocol. <em style={{ color: "rgba(255,255,255,0.5)" }}>$89, once.</em>
           </h2>
         </div>
         <div className="mo-pricing-card">
