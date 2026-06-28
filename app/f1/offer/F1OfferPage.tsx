@@ -828,7 +828,7 @@ function MTestimonials() {
 }
 
 const OUTCOMES = [
-  { rank: "01", category: "Mindset", label: "Self-confidence",        delta: 37, scaleMax: 50, delay: 0.05 },
+  { rank: "01", category: "Mindset", label: "Self-confidence",        delta: 87, scaleMax: 100, delay: 0.05 },
   { rank: "02", category: "Career",  label: "Salary increase",        delta: 12, scaleMax: 50, delay: 0.20 },
   { rank: "03", category: "Dating",  label: "Matches on dating apps", delta: 34, scaleMax: 50, delay: 0.35 },
 ];
