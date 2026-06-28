@@ -670,12 +670,14 @@ export default function HomePage() {
 
             <ul className="f1-offer-price__includes">
               {[
-                "100+ structural variables analysed by AI + coach review",
-                "Personalised 12-week protocol",
-                "Direct line to our experts — reply within 6 hours",
-                "Weekly check-ins, weekly adjustments",
-                "Full refund if your attractiveness hasn't moved",
-                "90-day measurable-outcome guarantee",
+                "Summary Report",
+                "Body Analysis",
+                "Nutrition Plan",
+                "Workout Plan",
+                "Sleeping Advice",
+                "Supplement Protocol",
+                "Dating App Profile Audit",
+                "Action Plan + WhatsApp coaching",
               ].map((item) => (
                 <li key={item}>
                   <span className="f1-offer-price__check"><CheckIcon /></span>
