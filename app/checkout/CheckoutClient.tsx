@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { tiktokTrackInitiateCheckout } from "../../lib/tiktokPixel";
+import { trackEvent } from "../../lib/analytics";
 
 type Props = {
   funnel: string;
@@ -59,6 +60,16 @@ export default function CheckoutClient({ funnel, params }: Props) {
         tiktokTrackInitiateCheckout(sessionId);
 
         trackGa4Event("checkout_started", { funnel, destination: "stripe" });
+
+        // Log to our own Supabase event_sessions so we can stitch the
+        // hosted-form view back to the funnel session. Fires before the
+        // redirect with keepalive so the request survives the navigation.
+        trackEvent("checkout_form_viewed", {
+          funnel,
+          stripe_session_id: sessionId,
+          funnel_sid: params.funnel_sid,
+        });
+
         setState({ status: "redirecting", url, sessionId });
 
         setTimeout(() => {

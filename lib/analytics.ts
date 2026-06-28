@@ -9,7 +9,8 @@ type EventName =
   | "cta_clicked"
   | "program_landing_viewed"
   | "program_cta_clicked"
-  | "view_offer";
+  | "view_offer"
+  | "checkout_form_viewed";
 
 const SESSION_KEY = "sf_quiz_session_id";
 
