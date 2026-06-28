@@ -288,16 +288,25 @@ function resolveCompareCols(pastAttempts: string[]): { col1: ColDef; col2: ColDe
 
 const TESTIMONIALS = [
   {
-    quote: ["Crop top, no overthinking. ", { em: "Side seam sits clean." }] as TitlePart[],
-    name: "Ryan, 27", meta: "13 weeks",
+    quote: [
+      "I'd been going to the gym for almost four years before this. Plenty of strength. But every time I tried to put myself out there the photos didn't match the work. After twelve weeks the difference wasn't size, it was shape — and that's what people actually react to. ",
+      { em: "The first photoshoot since felt completely different." },
+    ] as TitlePart[],
+    name: "Sam, 32", meta: "Designer · Sept 2025",
   },
   {
-    quote: ["Booked the shirtless shoot. ", { em: "Showed up this time." }] as TitlePart[],
-    name: "Jake, 34", meta: "12 weeks",
+    quote: [
+      "I started after seeing photos from a wedding I'd been training for. I'd put in the work and the photos still made me cringe. The Protocol was the first plan that actually explained why my work wasn't translating to how I looked. ",
+      { em: "By week 8 the next round of photos was the first I actually wanted to keep." },
+    ] as TitlePart[],
+    name: "Alex, 36", meta: "Actor · March 2025",
   },
   {
-    quote: ["Speedo by week 10. ", { em: "Towel stays on the chair." }] as TitlePart[],
-    name: "Marcus, 31", meta: "16 weeks",
+    quote: [
+      "At 47 I was tired of plans built for 25-year-olds. This was the first time I trained with a 10-year horizon — mobility, posture, the right kind of loading. ",
+      { em: "Twelve weeks in I'm stronger and I sleep better. That's the trade I was trying to make." },
+    ] as TitlePart[],
+    name: "James, 47", meta: "Corporate · Jan 2026",
   },
 ];
 
@@ -454,12 +463,10 @@ function MHeroV1({ href, eyebrow, attractsMen, personalization }: { href: string
         ? "A 12-week protocol built around the published research on what attracts the men you want."
         : "A 12-week protocol built around the published research on what the eye reads as attractive.";
 
+  // H1 personalization is intentionally disabled — the headline now always
+  // renders the same hardcoded copy regardless of persona. The personalization
+  // payload still drives lp_hero_desc below for the supporting sentence.
   const renderTitleContent = () => {
-    if (hasPerso) {
-      const pre = (personalization!.lp_hero_h1_pre ?? "").trimEnd();
-      const em = personalization!.lp_hero_h1_em ?? "";
-      return <>{pre}{" "}<em>{em}</em></>;
-    }
     return ACTIVE_VARIANT === "projection"
       ? <>See yourself at your full <em>peak potential</em> and reach it.</>
       : <>Reach your full <em>attractiveness potential</em></>;
