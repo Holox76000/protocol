@@ -445,6 +445,114 @@ const ADHD_PROTOCOL: AdVariant = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Body-type targeted carousels (2026-06-29) — 11 new ads bucketed by angle:
+//   • "attractive-{body}-dating-apps" → outcome framing (matches & swipes)
+//   • "from-{body}-to-attractive"     → transformation arc framing
+//   • "standard-{body}"               → research / measurable formula framing
+// Each variant's headline mirrors the campaign name so the intro slide reads
+// as a direct continuation of the ad, not a reset.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// "attractive-bear-dating-apps"
+const ATTRACTIVE_BEAR_APPS: AdVariant = {
+  badge: "Bear attractiveness research",
+  headline: "How to make a bear body attractive on gay dating apps.",
+  subtext:
+    "Most bear bodies are 2 or 3 calibrations away from getting messaged first. 2 minutes to assess yours and see exactly what to change.",
+  cta: "Assess my body →",
+};
+
+// "attractive-chub-dating-apps"
+const ATTRACTIVE_CHUB_APPS: AdVariant = {
+  badge: "Chub attractiveness research",
+  headline: "How to make a chub body attractive on gay dating apps.",
+  subtext:
+    "Being big isn't the problem. Being read as soft is. 2 minutes to assess your body and see the build that actually pulls matches.",
+  cta: "Assess my body →",
+};
+
+// "attractive-cub-dating-apps"
+const ATTRACTIVE_CUB_APPS: AdVariant = {
+  badge: "Cub attractiveness research",
+  headline: "How to make a cub body attractive on gay dating apps.",
+  subtext:
+    "Cub doesn't have to mean 'just a younger bear'. There's a specific build that gets cubs the most matches. 2 minutes to see where yours stands.",
+  cta: "Assess my body →",
+};
+
+// "attractive-overweight-dating-apps"
+const ATTRACTIVE_OVERWEIGHT_APPS: AdVariant = {
+  badge: "Male attractiveness research",
+  headline: "How to make an overweight body attractive on gay dating apps.",
+  subtext:
+    "Losing weight is one path. Changing what your body reads as is another. 2 minutes to assess yours and see which one wins faster.",
+  cta: "Assess my body →",
+};
+
+// "from-bear-to-attractive"
+const FROM_BEAR_TO_ATTRACTIVE: AdVariant = {
+  badge: "Bear transformation roadmap",
+  headline: "From bear body to the one that gets noticed.",
+  subtext:
+    "Most of what needs to change is below the surface — fat distribution, proportions, posture. 2 minutes to see your starting point.",
+  cta: "See my roadmap →",
+};
+
+// "from-chub-to-attractive"
+const FROM_CHUB_TO_ATTRACTIVE: AdVariant = {
+  badge: "Chub transformation roadmap",
+  headline: "From chub body to the one that gets matches.",
+  subtext:
+    "The fastest path isn't cardio plus crash diet. It's a recomposition built around your frame. 2 minutes to assess yours.",
+  cta: "See my roadmap →",
+};
+
+// "from-cub-to-attractive"
+const FROM_CUB_TO_ATTRACTIVE: AdVariant = {
+  badge: "Cub transformation roadmap",
+  headline: "From cub body to the one that turns heads.",
+  subtext:
+    "The cub-to-wolf path is a small set of calibrated changes — fat, posture, how you carry your shoulders. 2 minutes to assess yours.",
+  cta: "See my roadmap →",
+};
+
+// "standard-bear"
+const STANDARD_BEAR: AdVariant = {
+  badge: "Bear beauty standard research",
+  headline: "The bear beauty standard is more specific than most realize.",
+  subtext:
+    "Body fat distribution, beard shape, shoulder-to-belly ratio, posture — the bear standard has measurable rules. 2 minutes to assess yours.",
+  cta: "Assess my body →",
+};
+
+// "standard-chub"
+const STANDARD_CHUB: AdVariant = {
+  badge: "Chub beauty standard research",
+  headline: "The chub beauty standard is more specific than most realize.",
+  subtext:
+    "What chub-attracted men actually look for isn't generic. 2 minutes to assess yours against the standard.",
+  cta: "Assess my body →",
+};
+
+// "standard-cub"
+const STANDARD_CUB: AdVariant = {
+  badge: "Cub beauty standard research",
+  headline: "The cub beauty standard is more specific than most realize.",
+  subtext:
+    "Body fat, hair pattern, proportions, posture — the cub standard has measurable rules. 2 minutes to assess yours.",
+  cta: "Assess my body →",
+};
+
+// "standard-overweight"
+const STANDARD_OVERWEIGHT: AdVariant = {
+  badge: "Male attractiveness research",
+  headline: "The overweight beauty standard is more specific than most realize.",
+  subtext:
+    "There's a build overweight men can hit that reads as attractive — not 'fit', specifically attractive. 2 minutes to assess yours.",
+  cta: "Assess my body →",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -598,6 +706,22 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
   "120248765221560660": GAY_SKINNY_FAT,
   // "ADHD" video
   "120248765404440660": ADHD_PROTOCOL,
+
+  // ── Body-type targeted carousels (2026-06-29)
+  // "attractive-{body}-dating-apps" — outcome framing (matches & swipes)
+  "120249300793940660": ATTRACTIVE_BEAR_APPS,
+  "120249300820760660": ATTRACTIVE_CHUB_APPS,
+  "120249300859860660": ATTRACTIVE_CUB_APPS,
+  "120249300897150660": ATTRACTIVE_OVERWEIGHT_APPS,
+  // "from-{body}-to-attractive" — transformation arc framing
+  "120249300938110660": FROM_BEAR_TO_ATTRACTIVE,
+  "120249300964100660": FROM_CHUB_TO_ATTRACTIVE,
+  "120249300983330660": FROM_CUB_TO_ATTRACTIVE,
+  // "standard-{body}" — research / measurable formula framing
+  "120249300998030660": STANDARD_BEAR,
+  "120249301008690660": STANDARD_CHUB,
+  "120249301031060660": STANDARD_CUB,
+  "120249301046550660": STANDARD_OVERWEIGHT,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {
