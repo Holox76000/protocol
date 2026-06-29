@@ -155,7 +155,7 @@ export async function GET(request: Request) {
   };
 
   await postToSlack("report", {
-    text: `${headerLine} — Spend ${fmtUsdAbs(metaSpend)} · Sales ${fmtUsdAbs(stripeSales)} · ROAS ${roas.toFixed(2)}× · Net ${fmtUsd(netProfit)}`,
+    text: `<!channel> ${headerLine} — Spend ${fmtUsdAbs(metaSpend)} · Sales ${fmtUsdAbs(stripeSales)} · ROAS ${roas.toFixed(2)}× · Net ${fmtUsd(netProfit)}`,
     attachments: [attachment],
   });
 

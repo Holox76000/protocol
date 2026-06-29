@@ -136,7 +136,7 @@ export async function GET(request: Request) {
     await supabaseAdmin.from("meta_ads_seen").upsert(rows, { onConflict: "ad_id" });
 
     void postToSlack("ads", {
-      text: `:seedling: *Meta ads cron seeded* — ${allAds.length} existing ads stored as baseline. Future runs will notify only new creatives.`,
+      text: `<!channel> :seedling: *Meta ads cron seeded* — ${allAds.length} existing ads stored as baseline. Future runs will notify only new creatives.`,
     });
 
     return NextResponse.json({ checked: allAds.length, new: 0, seeded: allAds.length });
