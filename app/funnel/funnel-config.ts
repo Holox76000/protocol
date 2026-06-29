@@ -85,7 +85,7 @@ export type BeliefSlide = {
 export type InfoSlide = {
   id: string;
   type: "info";
-  variant: "social-proof" | "objection";
+  variant: "social-proof" | "objection" | "results-bars";
   headline: string;
   body: string;
   // Optional copy overrides resolved from later answers (sexual_orientation).
@@ -472,9 +472,9 @@ const BASE_SLIDES: SlideConfig[] = [
   {
     id: "info_time",
     type: "info",
-    variant: "objection",
-    headline: "A busy schedule won't make your transformation harder.",
-    body: "Looking and feeling your best doesn't require hours a day. Based on your answers, we'll build a Protocol that fits into your life: precise, efficient, and designed around your actual schedule.",
+    variant: "results-bars",
+    headline: "Men with your profile who stuck to their Protocol report:",
+    body: "Tracked across 2,500+ men, segmented by body type & orientation.",
   },
 
   {

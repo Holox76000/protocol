@@ -8,6 +8,7 @@ import { createRegistrationToken } from "../../../../lib/auth";
 import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from "../../../../lib/email";
 import { promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { postToSlack } from "../../../../lib/slack";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,24 @@ export async function POST(request: Request) {
       amount: pi.amount,
       funnel: meta.funnel,
       capiSource,
+    });
+
+    // Fan-out to Slack #sales for every PaymentIntent succeeded — fired before
+    // the capiSource branching so we never miss a sale. The PI event fires for
+    // every flow (direct PI, Checkout Session, external), so this is the one
+    // canonical place to ping Slack about a new sale.
+    const slackEmail = meta.customer_email || "(no email — check Stripe)";
+    const slackAmount = (pi.amount ?? 0) / 100;
+    const slackCurrency = (pi.currency ?? "usd").toUpperCase();
+    const slackUtm = [meta.utm_source, meta.utm_campaign, meta.utm_content].filter(Boolean).join(" · ") || "—";
+    void postToSlack("sales", {
+      text: [
+        `<!channel> :moneybag: *New sale — $${slackAmount.toFixed(2)} ${slackCurrency}*`,
+        `Email: \`${slackEmail}\``,
+        `Funnel SID: \`${meta.funnel_sid ?? "—"}\``,
+        `Attribution: ${slackUtm}`,
+        `PI: \`${pi.id}\``,
+      ].join("\n"),
     });
 
     if (capiSource === "checkout_session") {

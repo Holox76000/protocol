@@ -1510,6 +1510,75 @@
   color: var(--q-soft);
 }
 
+/* ─── Results bars (info_time slide) ─────────────────────── */
+.resultsSubtext {
+  margin: 0;
+  font-size: 11px;
+  color: var(--q-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  max-width: 480px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.resultsBars {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 4px;
+}
+
+.resultsBar {
+  display: grid;
+  gap: 0;
+}
+
+.resultsBarHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--q-strong);
+  text-align: left;
+}
+
+.resultsBarLabel {
+  flex: 1;
+  line-height: 1.35;
+}
+
+.resultsBarPct {
+  font-variant-numeric: tabular-nums;
+  color: var(--q-strong);
+  letter-spacing: -0.01em;
+}
+
+.resultsBarTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--q-accent-bg);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.resultsBarFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #445b4f, #75866f);
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resultsBarFill {
+    transition: none;
+  }
+}
+
 /* ─── Final loading slide ────────────────────────────────── */
 .finalLoadingInner {
   display: grid;
