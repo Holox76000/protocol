@@ -5,16 +5,19 @@
 //   sales  → SLACK_WEBHOOK_SALES   (#sales — Stripe paid events)
 //   ads    → SLACK_WEBHOOK_ADS     (#ads-meta — new Meta creatives)
 //   funnel → SLACK_WEBHOOK_FUNNEL  (#funnel-changes — funnel KPI alerts)
+//   report → SLACK_WEBHOOK_REPORT  (#daily-report — nightly P&L summary)
 
-export type SlackChannel = "sales" | "ads" | "funnel";
+export type SlackChannel = "sales" | "ads" | "funnel" | "report";
 
 type SlackBlock = Record<string, unknown>;
-type SlackPayload = { text: string; blocks?: SlackBlock[]; mrkdwn?: boolean };
+type SlackAttachment = { color?: string; blocks?: SlackBlock[]; text?: string };
+type SlackPayload = { text: string; blocks?: SlackBlock[]; attachments?: SlackAttachment[]; mrkdwn?: boolean };
 
 const WEBHOOKS: Record<SlackChannel, string | undefined> = {
   sales:  process.env.SLACK_WEBHOOK_SALES,
   ads:    process.env.SLACK_WEBHOOK_ADS,
   funnel: process.env.SLACK_WEBHOOK_FUNNEL,
+  report: process.env.SLACK_WEBHOOK_REPORT,
 };
 
 export async function postToSlack(channel: SlackChannel, payload: SlackPayload): Promise<void> {
