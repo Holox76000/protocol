@@ -400,11 +400,11 @@ const FOUR_STEPS_FOUNDER: AdVariant = {
 // "Gay standard beauty" carousel — the gay attractiveness standard is specific
 // and measurable; here's the formula
 const GAY_STANDARD_BEAUTY: AdVariant = {
-  badge: "Gay Attractiveness Research",
-  headline: "The gay beauty standard is more specific than most men realize. We measured it.",
+  badge: "Male attractiveness research",
+  headline: "How to build a body that fits the gay beauty standard.",
   subtext:
-    "It's not generic muscle. It's a precise structural formula — shoulder-to-waist, body fat, posture, proportions — that the men at the top of the rating all share. 2 minutes to see exactly where yours stands.",
-  cta: "Measure my proportions →",
+    "It's not generic muscle. It's the specific build that gets the matches, the second looks, and gets messaged first. 2 minutes to assess yours.",
+  cta: "Assess my body →",
 };
 
 // "Gay dating app" carousel — Grindr/Hinge reward a specific structure, not
