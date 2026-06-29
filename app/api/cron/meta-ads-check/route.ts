@@ -32,11 +32,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Meta config missing" }, { status: 500 });
   }
 
-  // We only fetch ads created in the last 48 hours. The cron runs every 15
-  // minutes so 48h gives us plenty of redundancy if a run was skipped or the
-  // Meta API was slow. The seen-table dedupes, so refetching old ones is
-  // harmless beyond a slightly larger API response.
-  const since = Math.floor(Date.now() / 1000) - 48 * 3600;
+  // Fetch the most recent ads (newest first) — no server-side date filter
+  // because Meta's `filtering` param on /ads doesn't reliably support
+  // ad.created_time. We sort + slice client-side instead.
+  const sinceMs = Date.now() - 48 * 3600 * 1000;
 
   const fields = [
     "id",
@@ -49,36 +48,52 @@ export async function GET(request: Request) {
     "creative{name,thumbnail_url}",
   ].join(",");
 
-  // The since/until pair on /ads filters by created_time when paired correctly.
-  // Documented behavior: Marketing API supports filtering on date_preset or a
-  // time_range JSON. For /ads, the safest filter is `time_range` with
-  // since/until, but on the /ads edge it filters by created_time when set.
   const params = new URLSearchParams({
     fields,
-    limit: "200",
+    limit: "100",
     access_token: META_TOKEN,
-    filtering: JSON.stringify([
-      { field: "ad.created_time", operator: "GREATER_THAN", value: since },
-    ]),
   });
 
-  let url = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/ads?${params.toString()}`;
+  const initialUrl = `https://graph.facebook.com/v22.0/${META_ACCOUNT}/ads?${params.toString()}`;
+  let url: string = initialUrl;
   const allAds: MetaAd[] = [];
 
-  // Page through results (max 3 pages to bound runtime — 600 ads is way more
-  // than we'd ever see in a 48h window).
-  for (let page = 0; page < 3 && url; page++) {
-    const res = await fetch(url);
-    const body: { data?: MetaAd[]; paging?: { next?: string }; error?: { message?: string } } = await res.json();
+  // Page through results, bounded by both page count and result count.
+  for (let page = 0; page < 5 && url; page++) {
+    let res: Response;
+    let body: { data?: MetaAd[]; paging?: { next?: string }; error?: unknown };
+    try {
+      res = await fetch(url);
+      body = await res.json();
+    } catch (err) {
+      console.error("[cron/meta-ads-check] fetch/parse failed", { error: String(err), urlPrefix: url.split("?")[0] });
+      return NextResponse.json({ error: "Meta fetch failed", detail: String(err) }, { status: 502 });
+    }
 
     if (body.error) {
-      console.error("[cron/meta-ads-check] Meta API error", body.error);
-      return NextResponse.json({ error: "Meta API error", detail: body.error }, { status: 502 });
+      // Stringify in case body.error is an Error instance with non-enumerable props.
+      const errStr = JSON.stringify(body.error, Object.getOwnPropertyNames(body.error as object));
+      console.error("[cron/meta-ads-check] Meta API error", { error: body.error, errStr, urlPrefix: url.split("?")[0] });
+      return NextResponse.json({ error: "Meta API error", detail: body.error, errStr }, { status: 502 });
     }
 
     if (body.data) allAds.push(...body.data);
     url = body.paging?.next ?? "";
+
+    // Stop early if we're already past the 48h window — older ads aren't useful.
+    if (body.data && body.data.length > 0) {
+      const oldestThisPage = body.data[body.data.length - 1].created_time;
+      if (oldestThisPage && new Date(oldestThisPage).getTime() < sinceMs - 24 * 3600 * 1000) break;
+    }
   }
+
+  // Filter client-side to ads created in the last 48h.
+  const recentAds = allAds.filter(a => a.created_time && new Date(a.created_time).getTime() >= sinceMs);
+  console.log("[cron/meta-ads-check] fetched", { totalFetched: allAds.length, recentAds: recentAds.length });
+
+  // Use only the recent ads for the rest of the diff logic.
+  allAds.length = 0;
+  allAds.push(...recentAds);
 
   if (allAds.length === 0) {
     return NextResponse.json({ checked: 0, new: 0, notified: 0 });
