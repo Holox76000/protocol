@@ -28,7 +28,7 @@ export default async function FunnelPage() {
       .from("event_sessions")
       .select("session_id, event, payload, created_at")
       .gte("created_at", SINCE)
-      .in("event", ["report_viewed", "view_offer"])
+      .in("event", ["report_viewed", "protocol_preview_viewed", "view_offer"])
       .order("created_at", { ascending: true }),
 
     supabaseAdmin

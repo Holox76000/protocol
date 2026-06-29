@@ -26,12 +26,20 @@ function addDays(iso: string, n: number): string {
 const today = new Date().toISOString().slice(0, 10);
 
 const QUIZ_STEPS = [
-  { key: "quiz_started",     label: "Quiz démarré",            threshold: 0  },
-  { key: "quiz_dream",       label: "Dream — multi choice",    threshold: 2  },
-  { key: "quiz_pain",        label: "Pain — multi choice",     threshold: 6  },
-  { key: "quiz_biometrics",  label: "Biométriques",            threshold: 11 },
-  { key: "quiz_past",        label: "Solutions passées",       threshold: 14 },
-  { key: "quiz_yes_ladders", label: "Yes-ladders",             threshold: 18 },
+  { key: "quiz_started",     label: "Quiz démarré",                threshold: 0  }, // intro
+  { key: "quiz_age",         label: "Q1 — Age",                    threshold: 1  }, // q1
+  { key: "quiz_dream",       label: "Q2 — Dream (choix)",          threshold: 2  }, // dream-outcome
+  { key: "quiz_ethnicity",   label: "Q3 — Ethnicité",              threshold: 4  }, // q6b
+  { key: "quiz_morphology",  label: "Q4 — Morphologie",            threshold: 5  }, // q2
+  { key: "quiz_pain",        label: "Q5 — Pain (multi)",           threshold: 6  }, // pain-friction
+  { key: "quiz_timeline",    label: "Q6 — Pain timeline",          threshold: 7  }, // q4
+  { key: "quiz_orientation", label: "Q7 — Orientation",            threshold: 8  }, // q5b
+  { key: "quiz_height",      label: "Q8 — Taille",                 threshold: 10 }, // q_height
+  { key: "quiz_weight",      label: "Q9 — Poids",                  threshold: 11 }, // q_weight
+  { key: "quiz_time",        label: "Q10 — Temps / sem",           threshold: 12 }, // q_time
+  { key: "quiz_past",        label: "Q11 — Solutions passées",     threshold: 14 }, // q_past_solutions
+  { key: "quiz_photo",       label: "Q12 — Upload photo",          threshold: 15 }, // photo-upload
+  { key: "quiz_yes_ladders", label: "Yes-ladders (q16-18)",        threshold: 19 }, // q16b (1st yes-ladder)
 ];
 
 export default function FunnelClient({ sessions, leads, events, users, since }: Props) {
@@ -64,8 +72,9 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
 
     // Downstream events
     const filteredEvents = events.filter(e => inRange(e.date));
-    const reportViewedSids  = new Set(filteredEvents.filter(e => e.event === "report_viewed").map(e => e.sid));
-    const offerViewedSids   = new Set(filteredEvents.filter(e => e.event === "view_offer" && e.funnelSid).map(e => e.funnelSid));
+    const reportViewedSids   = new Set(filteredEvents.filter(e => e.event === "report_viewed").map(e => e.sid));
+    const previewViewedSids  = new Set(filteredEvents.filter(e => e.event === "protocol_preview_viewed" && e.funnelSid).map(e => e.funnelSid));
+    const offerViewedSids    = new Set(filteredEvents.filter(e => e.event === "view_offer" && e.funnelSid).map(e => e.funnelSid));
 
     // All paid users in range — count every purchase, whether or not the user
     // went through the F1 lead optin (some come from retargeting, direct links,
@@ -73,15 +82,12 @@ export default function FunnelClient({ sessions, leads, events, users, since }: 
     const purchases = users.filter(u => inRange(u.date));
 
     const rows = [
-      { key: "quiz_started",       label: "Quiz démarré",            n: quizCounts.quiz_started    ?? 0 },
-      { key: "quiz_goals",         label: "Q6 — Objectifs",          n: quizCounts.quiz_goals      ?? 0 },
-      { key: "quiz_biometrics",    label: "Q8 — Biométriques",       n: quizCounts.quiz_biometrics ?? 0 },
-      { key: "quiz_past",          label: "Q11 — Solutions passées",  n: quizCounts.quiz_past       ?? 0 },
-      { key: "quiz_yes_ladders",   label: "Yes-ladders",             n: quizCounts.quiz_yes_ladders ?? 0 },
-      { key: "optin",              label: "Optin email",             n: optinSids.size                  },
-      { key: "report_viewed",      label: "Rapport vu",              n: reportViewedSids.size           },
-      { key: "offer_viewed",       label: "Offer page vue",          n: offerViewedSids.size            },
-      { key: "purchased",          label: "Achat",                   n: purchases.length                },
+      ...QUIZ_STEPS.map(s => ({ key: s.key, label: s.label, n: quizCounts[s.key] ?? 0 })),
+      { key: "optin",              label: "Optin email",             n: optinSids.size           },
+      { key: "report_viewed",      label: "Rapport vu",              n: reportViewedSids.size    },
+      { key: "preview_viewed",     label: "Preview Protocol vue",    n: previewViewedSids.size   },
+      { key: "offer_viewed",       label: "Offer page vue",          n: offerViewedSids.size     },
+      { key: "purchased",          label: "Achat",                   n: purchases.length         },
     ];
 
     return { rows, purchases };
