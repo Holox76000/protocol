@@ -5,7 +5,11 @@ import { postToSlack } from "../../../../lib/slack";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const META_TOKEN = process.env.META_ACCESS_TOKEN!;
+// Use META_ADS_READ_TOKEN if set (a separate system-user token with ads_read
+// scope), else fall back to META_ACCESS_TOKEN. We split tokens because the
+// pixel/CAPI token usually doesn't carry ads_read and granting it broader
+// scope mixes blast radius across two concerns.
+const META_TOKEN = process.env.META_ADS_READ_TOKEN || process.env.META_ACCESS_TOKEN!;
 const META_ACCOUNT = process.env.META_AD_ACCOUNT_ID!;
 const ADS_MANAGER_BASE = "https://business.facebook.com/adsmanager/manage/ads";
 
