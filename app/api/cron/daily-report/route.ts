@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { postToSlack } from "../../../../lib/slack";
+import { supabaseAdmin } from "../../../../lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -31,26 +32,51 @@ export async function GET(request: Request) {
   const untilSec = Math.floor(untilMs / 1000);
   const sinceSec = Math.floor(sinceMs / 1000);
 
-  // ── Meta spend ────────────────────────────────────────────
+  // ── Meta spend + landing page views ─────────────────────
   let metaSpend = 0;
+  let metaLpv = 0;
   let metaError: string | null = null;
   try {
     const sinceDay = new Date(sinceMs).toISOString().slice(0, 10);
     const untilDay = new Date(untilMs).toISOString().slice(0, 10);
     const params = new URLSearchParams({
-      fields: "spend",
+      fields: "spend,actions",
       level: "account",
       time_range: JSON.stringify({ since: sinceDay, until: untilDay }),
       access_token: META_TOKEN,
     });
     const res = await fetch(`https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?${params.toString()}`);
-    const body: { data?: { spend?: string }[]; error?: { message?: string } } = await res.json();
+    const body: {
+      data?: { spend?: string; actions?: Array<{ action_type: string; value: string }> }[];
+      error?: { message?: string };
+    } = await res.json();
     if (body.error) metaError = body.error.message ?? "unknown Meta API error";
     else if (body.data && body.data.length > 0) {
       metaSpend = parseFloat(body.data[0].spend ?? "0") || 0;
+      const lpvAction = (body.data[0].actions ?? []).find(a => a.action_type === "landing_page_view");
+      metaLpv = lpvAction ? parseInt(lpvAction.value, 10) || 0 : 0;
     }
   } catch (err) {
     metaError = String(err);
+  }
+
+  // ── Opt-ins (funnel_sessions with email captured, external only) ──
+  let optinCount = 0;
+  let optinError: string | null = null;
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("funnel_sessions")
+      .select("answers")
+      .gte("created_at", new Date(sinceMs).toISOString())
+      .lte("created_at", new Date(untilMs).toISOString());
+    if (error) throw error;
+    const externalOptins = (data ?? []).filter(s => {
+      const email = ((s.answers as Record<string, unknown>)?.email ?? "") as string;
+      return email && !isInternal(email);
+    });
+    optinCount = externalOptins.length;
+  } catch (err) {
+    optinError = String(err);
   }
 
   // ── Stripe sales (sum of succeeded $89+ PIs, external customers only) ──
@@ -82,10 +108,13 @@ export async function GET(request: Request) {
     stripeError = String(err);
   }
 
-  // ── Compute P&L ──────────────────────────────────────────
+  // ── Compute P&L + cold traffic funnel ───────────────────
   const roas = metaSpend > 0 ? stripeSales / metaSpend : 0;
   const netProfit = stripeSales - BREAKEVEN_ROAS * metaSpend;
   const isProfit = netProfit >= 0;
+  const lpvToOptinPct = metaLpv > 0 ? (100 * optinCount) / metaLpv : 0;
+  const costPerOptin = optinCount > 0 ? metaSpend / optinCount : 0;
+  const optinToPaidPct = optinCount > 0 ? (100 * stripeSalesCount) / optinCount : 0;
 
   // ── Build Slack message ──────────────────────────────────
   // Date label uses the Dubai-day-just-ended (sinceMs in UTC+4).
@@ -117,6 +146,7 @@ export async function GET(request: Request) {
   const errLines: string[] = [];
   if (metaError) errLines.push(`:warning: Meta API error: \`${metaError.slice(0, 200)}\``);
   if (stripeError) errLines.push(`:warning: Stripe error: \`${stripeError.slice(0, 200)}\``);
+  if (optinError) errLines.push(`:warning: Opt-in query error: \`${optinError.slice(0, 200)}\``);
 
   // Use attachment color for the green/red bar on the left.
   const color = isProfit ? "#2eb886" : "#e01e5a";
@@ -141,6 +171,21 @@ export async function GET(request: Request) {
           { type: "mrkdwn", text: `*Net P&L*\n${fmtUsd(netProfit)}` },
         ],
       },
+      { type: "divider" },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: ":snowflake: *Cold traffic funnel*" },
+      },
+      {
+        type: "section",
+        fields: [
+          { type: "mrkdwn", text: `*LP Views (Meta)*\n${metaLpv}` },
+          { type: "mrkdwn", text: `*Opt-ins*\n${optinCount}` },
+          { type: "mrkdwn", text: `*LPV → Opt-in*\n${lpvToOptinPct.toFixed(1)}%` },
+          { type: "mrkdwn", text: `*Cost per Opt-in*\n${costPerOptin > 0 ? fmtUsdAbs(costPerOptin) : "—"}` },
+          { type: "mrkdwn", text: `*Opt-in → Paid*\n${optinToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${optinCount})_` },
+        ],
+      },
       ...(errLines.length > 0 ? [{
         type: "section",
         text: { type: "mrkdwn", text: errLines.join("\n") },
@@ -162,12 +207,18 @@ export async function GET(request: Request) {
   return NextResponse.json({
     ok: true,
     metaSpend,
+    metaLpv,
     stripeSales,
     stripeSalesCount,
+    optinCount,
     roas,
     netProfit,
     isProfit,
+    lpvToOptinPct,
+    costPerOptin,
+    optinToPaidPct,
     metaError,
     stripeError,
+    optinError,
   });
 }
