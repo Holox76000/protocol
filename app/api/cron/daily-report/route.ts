@@ -25,9 +25,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // The cron runs at 20:00 UTC (= 00:00 Dubai, UTC+4). We report on the last
-  // 24h ending now — that's the full Dubai day that just closed.
-  const untilMs = Date.now();
+  // Report window = last complete Dubai calendar day (00:00 Dubai → 00:00 Dubai),
+  // regardless of when this cron is invoked. Dubai = UTC+4, so 00:00 Dubai =
+  // 20:00 UTC. We anchor untilMs to the most recent 20:00 UTC already passed.
+  // This way the natural 20:00-UTC cron AND any manual trigger always report
+  // on the same well-defined window: yesterday Dubai.
+  const now = new Date();
+  const todayCutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 20, 0, 0, 0)).getTime();
+  const untilMs = now.getTime() >= todayCutoff ? todayCutoff : todayCutoff - 24 * 3600 * 1000;
   const sinceMs = untilMs - 24 * 3600 * 1000;
   const untilSec = Math.floor(untilMs / 1000);
   const sinceSec = Math.floor(sinceMs / 1000);
