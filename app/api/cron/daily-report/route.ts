@@ -124,6 +124,8 @@ export async function GET(request: Request) {
   const isProfit = netProfit >= 0;
   const lpvToOptinPct = metaLpv > 0 ? (100 * optinCount) / metaLpv : 0;
   const costPerOptin = optinCount > 0 ? metaSpend / optinCount : 0;
+  const costPerCart = stripeCartInitiated > 0 ? metaSpend / stripeCartInitiated : 0;
+  const costPerPurchase = stripeSalesCount > 0 ? metaSpend / stripeSalesCount : 0;
   const optinToCartPct = optinCount > 0 ? (100 * stripeCartInitiated) / optinCount : 0;
   const cartToPaidPct = stripeCartInitiated > 0 ? (100 * stripeSalesCount) / stripeCartInitiated : 0;
   const optinToPaidPct = optinCount > 0 ? (100 * stripeSalesCount) / optinCount : 0;
@@ -195,9 +197,11 @@ export async function GET(request: Request) {
           { type: "mrkdwn", text: `*Opt-ins*\n${optinCount}` },
           { type: "mrkdwn", text: `*LPV → Opt-in*\n${lpvToOptinPct.toFixed(1)}%` },
           { type: "mrkdwn", text: `*Cost per Opt-in*\n${costPerOptin > 0 ? fmtUsdAbs(costPerOptin) : "—"}` },
-          { type: "mrkdwn", text: `*Cart initiated*\n${stripeCartInitiated} _(${cartToPaidPct.toFixed(0)}% paid)_` },
+          { type: "mrkdwn", text: `*Cart initiated*\n${stripeCartInitiated}` },
+          { type: "mrkdwn", text: `*Cost per Cart*\n${costPerCart > 0 ? fmtUsdAbs(costPerCart) : "—"}` },
           { type: "mrkdwn", text: `*Opt-in → Cart*\n${optinToCartPct.toFixed(1)}% _(${stripeCartInitiated}/${optinCount})_` },
           { type: "mrkdwn", text: `*Cart → Paid*\n${cartToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${stripeCartInitiated})_` },
+          { type: "mrkdwn", text: `*Cost per Purchase*\n${costPerPurchase > 0 ? fmtUsdAbs(costPerPurchase) : "—"}` },
           { type: "mrkdwn", text: `*Opt-in → Paid*\n${optinToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${optinCount})_` },
         ],
       },
@@ -232,6 +236,8 @@ export async function GET(request: Request) {
     isProfit,
     lpvToOptinPct,
     costPerOptin,
+    costPerCart,
+    costPerPurchase,
     optinToCartPct,
     cartToPaidPct,
     optinToPaidPct,
