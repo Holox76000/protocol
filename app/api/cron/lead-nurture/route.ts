@@ -250,14 +250,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Killed by default — the fetch→markSent→send loop races when the scheduler
-  // fires this endpoint in parallel, causing 2-3× sends per lead. Set
-  // LEAD_NURTURE_ENABLED=1 in Netlify env once an atomic per-lead claim ships.
-  if (process.env.LEAD_NURTURE_ENABLED !== "1") {
-    console.log("[cron/lead-nurture] kill switch active — no-op");
-    return NextResponse.json({ ok: true, killed: true });
-  }
-
   const now = new Date();
   const results: Record<string, { sent: number; skipped: number; failed: number }> = {};
 
