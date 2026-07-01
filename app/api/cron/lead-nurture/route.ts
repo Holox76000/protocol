@@ -96,41 +96,59 @@ const STEP_COL: Record<StepKey, string> = {
   E7: "nurture_e7_sent_at",
 };
 
-async function fetchDueLeads(step: StepKey, now: Date): Promise<LeadRow[]> {
+// Atomically claim leads due for `step`. Fetches candidates, then updates
+// only rows where the target column is still NULL — Postgres row-level locks
+// under READ COMMITTED guarantee each lead is claimed by exactly one run,
+// even when this endpoint is fired in parallel. The returned rows are the
+// ones we own and must process.
+async function claimDueLeads(step: StepKey, now: Date): Promise<LeadRow[]> {
   const col = STEP_COL[step];
   const cutoff = new Date(now.getTime() - DELAYS[step]).toISOString();
 
   // Use nurture_starts_at (not created_at) so legacy leads onboarded after
   // the sequence shipped progress at the same 24h cadence as fresh leads.
-  const query = supabaseAdmin
+  const candidateQuery = supabaseAdmin
     .from("leads")
-    .select("email, payload, created_at")
+    .select("email")
     .is("nurture_paused_at", null)
     .is(col, null)
     .lte("nurture_starts_at", cutoff)
     .limit(BATCH_LIMIT);
 
-  // For steps after E2, only consider leads that already received the previous step.
   const stepIndex = Number(step.slice(1));
   if (stepIndex > 2) {
     const prevCol = STEP_COL[`E${stepIndex - 1}` as StepKey];
-    query.not(prevCol, "is", null);
+    candidateQuery.not(prevCol, "is", null);
   }
 
-  const { data, error } = await query;
-  if (error) {
-    console.error(`[cron/lead-nurture] fetch ${step} failed`, { error: error.message });
+  const { data: candidates, error: cErr } = await candidateQuery;
+  if (cErr) {
+    console.error(`[cron/lead-nurture] candidate fetch ${step} failed`, { error: cErr.message });
     return [];
   }
-  return (data ?? []) as LeadRow[];
-}
+  if (!candidates || candidates.length === 0) return [];
 
-async function markSent(step: StepKey, email: string, now: Date) {
-  const col = STEP_COL[step];
-  await supabaseAdmin
+  const emails = candidates.map((c) => (c as { email: string }).email);
+
+  const claimQuery = supabaseAdmin
     .from("leads")
     .update({ [col]: now.toISOString() })
-    .eq("email", email);
+    .in("email", emails)
+    .is(col, null)
+    .is("nurture_paused_at", null)
+    .lte("nurture_starts_at", cutoff);
+
+  if (stepIndex > 2) {
+    const prevCol = STEP_COL[`E${stepIndex - 1}` as StepKey];
+    claimQuery.not(prevCol, "is", null);
+  }
+
+  const { data: claimed, error: uErr } = await claimQuery.select("email, payload, created_at");
+  if (uErr) {
+    console.error(`[cron/lead-nurture] claim ${step} failed`, { error: uErr.message });
+    return [];
+  }
+  return (claimed ?? []) as LeadRow[];
 }
 
 function offerUrl(funnelSid: string | undefined, answers: FunnelAnswers | null): string {
@@ -152,14 +170,17 @@ function reportUrl(funnelSid: string): string {
 }
 
 async function processStep(step: StepKey, now: Date, results: Record<string, { sent: number; skipped: number; failed: number }>) {
-  const leads = await fetchDueLeads(step, now);
+  // claimDueLeads already marked the target column, so a concurrent run of
+  // this endpoint cannot re-select these leads. If the send below fails we
+  // do not retry — matches the prior "mark before send" contract.
+  const leads = await claimDueLeads(step, now);
   results[step] = { sent: 0, skipped: 0, failed: 0 };
 
   for (const lead of leads) {
-    // Idempotence: mark sent before the send. If the send fails we still skip retry.
     if (await isPaidOrSuppressed(lead.email)) {
       results[step].skipped++;
-      // Pause this lead to skip future steps too.
+      // Pause this lead to skip future steps too. The step column is already
+      // marked from the claim; the pause overrides it going forward.
       await supabaseAdmin
         .from("leads")
         .update({ nurture_paused_at: now.toISOString() })
@@ -169,13 +190,10 @@ async function processStep(step: StepKey, now: Date, results: Record<string, { s
 
     const funnelSid = (lead.payload?.funnel_sid as string | undefined) ?? undefined;
     if (!funnelSid) {
-      // Mark sent (skip) — we can't personalize without funnel_sid.
-      await markSent(step, lead.email, now);
+      // Skip — we can't personalize without funnel_sid. Column already marked.
       results[step].skipped++;
       continue;
     }
-
-    await markSent(step, lead.email, now);
 
     try {
       const answers = await fetchAnswers(funnelSid);
