@@ -84,9 +84,10 @@ export async function GET(request: Request) {
     optinError = String(err);
   }
 
-  // ── Stripe sales (sum of succeeded $89+ PIs, external customers only) ──
+  // ── Stripe sales + cart initiations (PIs created in window, external) ──
   let stripeSales = 0;
   let stripeSalesCount = 0;
+  let stripeCartInitiated = 0;
   let stripeError: string | null = null;
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-04-10" as Stripe.LatestApiVersion });
@@ -102,11 +103,15 @@ export async function GET(request: Request) {
       if (!page.has_more) break;
       starting_after = page.data[page.data.length - 1].id;
     }
-    const paid = pis.filter(pi =>
-      pi.status === "succeeded" &&
+    // Cart initiated = any PI created in window at $89, external. Includes
+    // both succeeded and failed/abandoned (requires_payment_method, etc.).
+    const cartExternal = pis.filter(pi =>
       (pi.amount ?? 0) >= 100 &&
       !isInternal((pi as Stripe.PaymentIntent & { receipt_email?: string | null }).receipt_email)
     );
+    stripeCartInitiated = cartExternal.length;
+    // Sales = the subset that actually paid.
+    const paid = cartExternal.filter(pi => pi.status === "succeeded");
     stripeSales = paid.reduce((sum, pi) => sum + (pi.amount ?? 0) / 100, 0);
     stripeSalesCount = paid.length;
   } catch (err) {
@@ -119,6 +124,8 @@ export async function GET(request: Request) {
   const isProfit = netProfit >= 0;
   const lpvToOptinPct = metaLpv > 0 ? (100 * optinCount) / metaLpv : 0;
   const costPerOptin = optinCount > 0 ? metaSpend / optinCount : 0;
+  const optinToCartPct = optinCount > 0 ? (100 * stripeCartInitiated) / optinCount : 0;
+  const cartToPaidPct = stripeCartInitiated > 0 ? (100 * stripeSalesCount) / stripeCartInitiated : 0;
   const optinToPaidPct = optinCount > 0 ? (100 * stripeSalesCount) / optinCount : 0;
 
   // ── Build Slack message ──────────────────────────────────
@@ -188,6 +195,9 @@ export async function GET(request: Request) {
           { type: "mrkdwn", text: `*Opt-ins*\n${optinCount}` },
           { type: "mrkdwn", text: `*LPV → Opt-in*\n${lpvToOptinPct.toFixed(1)}%` },
           { type: "mrkdwn", text: `*Cost per Opt-in*\n${costPerOptin > 0 ? fmtUsdAbs(costPerOptin) : "—"}` },
+          { type: "mrkdwn", text: `*Cart initiated*\n${stripeCartInitiated} _(${cartToPaidPct.toFixed(0)}% paid)_` },
+          { type: "mrkdwn", text: `*Opt-in → Cart*\n${optinToCartPct.toFixed(1)}% _(${stripeCartInitiated}/${optinCount})_` },
+          { type: "mrkdwn", text: `*Cart → Paid*\n${cartToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${stripeCartInitiated})_` },
           { type: "mrkdwn", text: `*Opt-in → Paid*\n${optinToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${optinCount})_` },
         ],
       },
@@ -215,12 +225,15 @@ export async function GET(request: Request) {
     metaLpv,
     stripeSales,
     stripeSalesCount,
+    stripeCartInitiated,
     optinCount,
     roas,
     netProfit,
     isProfit,
     lpvToOptinPct,
     costPerOptin,
+    optinToCartPct,
+    cartToPaidPct,
     optinToPaidPct,
     metaError,
     stripeError,
