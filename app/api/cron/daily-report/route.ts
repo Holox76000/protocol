@@ -25,15 +25,34 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Report window = last complete Dubai calendar day (00:00 Dubai → 00:00 Dubai),
-  // regardless of when this cron is invoked. Dubai = UTC+4, so 00:00 Dubai =
-  // 20:00 UTC. We anchor untilMs to the most recent 20:00 UTC already passed.
-  // This way the natural 20:00-UTC cron AND any manual trigger always report
-  // on the same well-defined window: yesterday Dubai.
+  // Report window = last complete Europe/Paris calendar day.
+  // Rationale: the Meta ad account "Bouchou Paris" is in Europe/Paris timezone,
+  // so every number in Meta Ads Manager is bucketed by Paris day. Aligning our
+  // report window to the same day means the spend / LPV numbers in Slack match
+  // exactly what the user sees in the Meta dashboard.
+  //
+  // DST-safe: parisMidnightUtc reads the Paris hour at a known UTC moment to
+  // derive the offset for that date (+2 CEST summer, +1 CET winter).
+  function parisDateStr(d: Date): string {
+    const fmt = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" });
+    const parts = fmt.formatToParts(d);
+    const y = parts.find(p => p.type === "year")!.value;
+    const m = parts.find(p => p.type === "month")!.value;
+    const dd = parts.find(p => p.type === "day")!.value;
+    return `${y}-${m}-${dd}`;
+  }
+  function parisMidnightUtc(dateStr: string): number {
+    const noonUtc = new Date(`${dateStr}T12:00:00Z`);
+    const parisHour = parseInt(new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(noonUtc), 10);
+    const offsetHours = parisHour - 12;
+    return new Date(`${dateStr}T00:00:00Z`).getTime() - offsetHours * 3600 * 1000;
+  }
+
   const now = new Date();
-  const todayCutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 20, 0, 0, 0)).getTime();
-  const untilMs = now.getTime() >= todayCutoff ? todayCutoff : todayCutoff - 24 * 3600 * 1000;
-  const sinceMs = untilMs - 24 * 3600 * 1000;
+  const todayParisDate = parisDateStr(now);
+  const untilMs = parisMidnightUtc(todayParisDate); // midnight Paris start of today = end of yesterday
+  const yesterdayParisDate = parisDateStr(new Date(untilMs - 12 * 3600 * 1000));
+  const sinceMs = parisMidnightUtc(yesterdayParisDate);
   const untilSec = Math.floor(untilMs / 1000);
   const sinceSec = Math.floor(sinceMs / 1000);
 
@@ -42,12 +61,13 @@ export async function GET(request: Request) {
   let metaLpv = 0;
   let metaError: string | null = null;
   try {
-    const sinceDay = new Date(sinceMs).toISOString().slice(0, 10);
-    const untilDay = new Date(untilMs).toISOString().slice(0, 10);
+    // Meta interprets date strings in the ad account's own timezone (Europe/Paris
+    // here), so passing yesterdayParisDate for both since and until gives us
+    // exactly the same day-bucket that Meta Ads Manager shows.
     const params = new URLSearchParams({
       fields: "spend,actions",
       level: "account",
-      time_range: JSON.stringify({ since: sinceDay, until: untilDay }),
+      time_range: JSON.stringify({ since: yesterdayParisDate, until: yesterdayParisDate }),
       access_token: META_TOKEN,
     });
     const res = await fetch(`https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?${params.toString()}`);
@@ -131,14 +151,13 @@ export async function GET(request: Request) {
   const optinToPaidPct = optinCount > 0 ? (100 * stripeSalesCount) / optinCount : 0;
 
   // ── Build Slack message ──────────────────────────────────
-  // Date label uses the Dubai-day-just-ended (sinceMs in UTC+4).
-  const dubaiDayEndedDate = new Date(sinceMs + 4 * 3600 * 1000); // shift to Dubai for label
-  const dateLabel = dubaiDayEndedDate.toLocaleDateString("en-US", {
+  // Date label = the Paris day that this report covers (yesterday Paris).
+  const dateLabel = new Date(sinceMs).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "Asia/Dubai",
+    timeZone: "Europe/Paris",
   });
 
   const fmtUsd = (n: number) =>
@@ -212,7 +231,7 @@ export async function GET(request: Request) {
       {
         type: "context",
         elements: [
-          { type: "mrkdwn", text: `_Period: last 24h ending ${new Date(untilMs).toISOString().slice(0, 16)}Z · ${headerWord} = sales − 1.2 × spend_` },
+          { type: "mrkdwn", text: `_Period: Europe/Paris day ${yesterdayParisDate} (Meta ad account timezone) · ${headerWord} = sales − 1.2 × spend_` },
         ],
       },
     ],
