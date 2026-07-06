@@ -36,7 +36,9 @@ function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
 }
 
-const META_TOKEN    = process.env.META_ACCESS_TOKEN!;
+// META_ACCESS_TOKEN is the CAPI system-user token (no ads_read) — reading
+// insights requires the separate META_ADS_READ_TOKEN, same split as the crons.
+const META_TOKEN    = process.env.META_ADS_READ_TOKEN || process.env.META_ACCESS_TOKEN!;
 const META_ACCOUNT  = process.env.META_AD_ACCOUNT_ID!;
 
 // ── Helpers ───────────────────────────────────────────────
