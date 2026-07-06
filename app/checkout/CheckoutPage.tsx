@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getPersistedUtmParams } from "../../lib/utm";
+import { trackEvent } from "../../lib/analytics";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
@@ -165,6 +166,9 @@ function CheckoutForm({ displayAmount }: { displayAmount: number }) {
     setLoading(true);
     setError(null);
 
+    const sid = new URLSearchParams(window.location.search).get("funnel_sid") ?? undefined;
+    trackEvent("checkout_submitted", { funnel: "f1", ...(sid && { funnel_sid: sid }) });
+
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -248,6 +252,11 @@ export function CheckoutPage({ email }: { email: string }) {
   }, [email]);
 
   useEffect(() => { fetchSecret(); }, [fetchSecret]);
+
+  useEffect(() => {
+    const sid = new URLSearchParams(window.location.search).get("funnel_sid") ?? undefined;
+    trackEvent("checkout_viewed", { funnel: "f1", ...(sid && { funnel_sid: sid }) });
+  }, []);
 
   return (
     <main className="min-h-screen bg-white">

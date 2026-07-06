@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { trackEvent } from "../../lib/analytics";
 
 declare global {
   interface Window {
@@ -29,12 +30,16 @@ export default function RegisterPage({
 
   // Fire AddToCart on page visit
   useEffect(() => {
+    trackEvent("register_viewed", {
+      funnel: "f1",
+      ...(funnelSid && { funnel_sid: funnelSid }),
+    });
     function fire() {
       if (!window.TriplePixel) { setTimeout(fire, 400); return; }
       window.TriplePixel("AddToCart", { item: "attractiveness-protocol", q: 1, v: "89" });
     }
     fire();
-  }, []);
+  }, [funnelSid]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {

@@ -124,6 +124,12 @@ function CtaButton({
       cta_location: location ?? "unknown",
       cta_label: label,
     });
+    const funnelSid = new URLSearchParams(window.location.search).get("funnel_sid") ?? undefined;
+    trackEvent("offer_cta_clicked", {
+      funnel: "f1",
+      cta_location: location ?? "unknown",
+      ...(funnelSid && { funnel_sid: funnelSid }),
+    });
   }, [label, location]);
 
   return (

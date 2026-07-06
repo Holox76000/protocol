@@ -9,6 +9,7 @@ import {
   type Answers,
   type SlideConfig,
 } from "./funnel-config";
+import { trackEvent } from "../../lib/analytics";
 import dynamic from "next/dynamic";
 import { IntroSlide } from "./slides/IntroSlide";
 
@@ -90,6 +91,7 @@ export default function FunnelShell() {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       let parsed: Answers = raw ? (JSON.parse(raw) as Answers) : {};
+      const hadExistingSession = Boolean(parsed._session_id);
       if (!parsed._session_id) {
         parsed = {
           ...parsed,
@@ -106,6 +108,14 @@ export default function FunnelShell() {
       }
       latestAnswersRef.current = parsed;
       setAnswers(parsed);
+
+      // Measure intro bounce incl. returning visitors (invisible in
+      // funnel_sessions because rows only sync after the first step).
+      trackEvent("intro_viewed", {
+        funnel_sid: parsed._session_id,
+        has_existing_session: hadExistingSession,
+        ...(adId && { ad_id: adId }),
+      });
 
       // Resume flow: if URL targets a different session than localStorage,
       // refetch its answers from Supabase. Then jump to the requested slide.
