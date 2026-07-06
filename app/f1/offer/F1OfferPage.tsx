@@ -42,12 +42,16 @@ const AGE_PHRASES: Record<string, string> = {
   "50+":   "over 50",
 };
 
-function buildEyebrow(morphology: string | null, ethnicity: string | null, age: string | null): string | null {
+function buildEyebrow(morphology: string | null, ethnicity: string | null, age: string | null, gayBear = false): string | null {
   const body = morphology ? BODY_LABELS[morphology] : null;
   const eth  = ethnicity  ? ETH_LABELS[ethnicity]   : null;
   const phrase = age      ? AGE_PHRASES[age]         : null;
   if (!body || !eth || !phrase) return null;
   const ethPart = eth === "Caucasian" ? "" : ` ${eth}`;
+  // Gay + Overweight segment: "bigger" over the clinical "overweight",
+  // and name who the attraction is for. No identity labels (bear/chub) —
+  // the visitor self-reported a body type, not an identity.
+  if (gayBear) return `For bigger${ethPart} men ${phrase} who date men.`;
   return `For ${body}${ethPart} men ${phrase}.`;
 }
 
@@ -452,12 +456,14 @@ function MNav({ href }: { href: string }) {
   );
 }
 
-function MHeroV1({ href, eyebrow, attractsMen }: { href: string; eyebrow: string | null; attractsMen: boolean }) {
+function MHeroV1({ href, eyebrow, attractsMen, gayBear }: { href: string; eyebrow: string | null; attractsMen: boolean; gayBear: boolean }) {
   const desc = ACTIVE_VARIANT === "projection"
     ? "See your full potential, then get the exact protocol to reach it."
-    : attractsMen
-      ? "A 12-week protocol built around the published research on what attracts the men you want."
-      : "A 12-week protocol built around the published research on what the eye reads as attractive.";
+    : gayBear
+      ? "A 12-week protocol built for a bigger frame — around the research on what makes big men attractive to the men they want."
+      : attractsMen
+        ? "A 12-week protocol built around the published research on what attracts the men you want."
+        : "A 12-week protocol built around the published research on what the eye reads as attractive.";
 
   const renderTitleContent = () => {
     return ACTIVE_VARIANT === "projection"
@@ -1198,6 +1204,7 @@ export default function F1OfferPage() {
   const [heroEyebrow, setHeroEyebrow] = useState<string | null>(null);
   const [pastAttempts, setPastAttempts] = useState<string[]>([]);
   const [attractsMen, setAttractsMen] = useState(false);
+  const [gayBear, setGayBear] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1226,18 +1233,23 @@ export default function F1OfferPage() {
       );
     }
 
+    const orientation = params.get("sexual_orientation");
+    const likesMen = orientation === "gay" || orientation === "bisexual";
+    if (likesMen) setAttractsMen(true);
+
+    const isGayBear = likesMen && params.get("morphology") === "Overweight";
+    if (isGayBear) setGayBear(true);
+
     const eyebrow = buildEyebrow(
       params.get("morphology"),
       params.get("ethnicity"),
       params.get("age_bracket"),
+      isGayBear,
     );
     if (eyebrow) setHeroEyebrow(eyebrow);
 
     const rawAttempts = params.get("past_solutions");
     if (rawAttempts) setPastAttempts(rawAttempts.split("|"));
-
-    const orientation = params.get("sexual_orientation");
-    if (orientation === "gay" || orientation === "bisexual") setAttractsMen(true);
 
     const sid = params.get("funnel_sid");
     if (sid) {
@@ -1273,7 +1285,7 @@ export default function F1OfferPage() {
   return (
     <div className="mo-page">
       <MNav href={signupHref} />
-      <MHeroV1 href={signupHref} eyebrow={heroEyebrow} attractsMen={attractsMen} />
+      <MHeroV1 href={signupHref} eyebrow={heroEyebrow} attractsMen={attractsMen} gayBear={gayBear} />
       <MPress />
       <MAdvisors />
       {ACTIVE_VARIANT === "projection" && <ProjectionSection signupHref={signupHref} />}
