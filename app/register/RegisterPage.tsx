@@ -83,7 +83,8 @@ export default function RegisterPage({
           });
         }
 
-        window.location.assign(registrationToken ? "/questionnaire" : "/checkout");
+        const checkoutPath = funnelSid ? `/checkout?funnel_sid=${encodeURIComponent(funnelSid)}` : "/checkout";
+        window.location.assign(registrationToken ? "/questionnaire" : checkoutPath);
       } catch {
         setError("Network error. Please check your connection.");
       } finally {

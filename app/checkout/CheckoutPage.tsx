@@ -234,10 +234,12 @@ export function CheckoutPage({ email }: { email: string }) {
     let funnelFrom: string | undefined;
     try { funnelFrom = sessionStorage.getItem("protocol.funnel.from") ?? undefined; } catch {}
 
+    const funnelSid = sp.get("funnel_sid") ?? undefined;
+
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }), ...(funnelFrom && { from: funnelFrom }) }),
+      body: JSON.stringify({ funnel: "f1", customer_email: email, ...utms, ...(gaClientId && { ga_client_id: gaClientId }), ...(funnelFrom && { from: funnelFrom }), ...(funnelSid && { funnel_sid: funnelSid }) }),
     })
       .then((r) => r.json())
       .then((d: { clientSecret?: string; paymentIntentId?: string; error?: string }) => {

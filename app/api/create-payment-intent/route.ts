@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { getStripeServerClient, getPublicSiteUrl } from "../../../lib/stripe";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
+import { supabaseAdmin } from "../../../lib/supabase";
 
 export const runtime = "nodejs";
 
 type Body = {
   customer_email?: string;
   funnel?: string;
+  funnel_sid?: string;
   from?: string;
   utm_source?: string;
   utm_medium?: string;
@@ -32,6 +34,36 @@ export async function POST(request: Request) {
     if (body[key]) utmMetadata[key] = body[key]!;
   }
   if (body.from) utmMetadata.from = body.from;
+
+  // Attribution safety net: 12/19 historical sales had no UTMs because the
+  // client-side localStorage copy was lost between funnel and checkout. The
+  // funnel session row is the source of truth — backfill from it server-side.
+  const funnelSid = (body.funnel_sid ?? "").trim() || null;
+  if (funnelSid) {
+    utmMetadata.funnel_sid = funnelSid;
+    if (!utmMetadata.utm_content || !utmMetadata.utm_source) {
+      try {
+        const { data: sess } = await supabaseAdmin
+          .from("funnel_sessions")
+          .select("answers")
+          .eq("session_id", funnelSid)
+          .maybeSingle();
+        const a = (sess?.answers ?? {}) as Record<string, string>;
+        const fromSession: Record<string, string | undefined> = {
+          utm_source: a._utm_source,
+          utm_campaign: a._utm_campaign,
+          utm_content: a._utm_content,
+          fbclid: a._fbclid,
+          ttclid: a._ttclid,
+        };
+        for (const [k, v] of Object.entries(fromSession)) {
+          if (v && !utmMetadata[k]) utmMetadata[k] = v;
+        }
+      } catch (err) {
+        console.error("[create-payment-intent] funnel session UTM backfill failed", { error: String(err), funnelSid });
+      }
+    }
+  }
 
   // Capture customer signals here — the Stripe webhook can't see them later
   // (Stripe → us = server-to-server, headers are Stripe's). Stashing in

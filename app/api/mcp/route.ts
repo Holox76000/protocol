@@ -88,7 +88,7 @@ function bucketOf(dateStr: string, breakdown: "day" | "week" | "month"): string 
 }
 
 const INTERNAL_EMAIL_PATTERNS = [
-  "patrypierreandre", "sofiane.lekfif", "thibault.cdn", "reddotgrowth",
+  "patrypierreandre", "sofiane.lekfif", "thibault.cdn", "reddotgrowth", "test@ail.com",
 ];
 function isInternalEmail(email: string | null | undefined): boolean {
   if (!email) return false;

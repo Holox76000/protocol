@@ -14,7 +14,7 @@ const META_ACCOUNT = process.env.META_AD_ACCOUNT_ID!;
 const BREAKEVEN_ROAS = 1.2;
 
 // Internal/test emails to exclude from sales totals.
-const INTERNAL = ["patrypierreandre", "sofiane.lekfif", "sofiane@reddotgrowth", "thibault.cdn", "reddotgrowth"];
+const INTERNAL = ["patrypierreandre", "sofiane.lekfif", "sofiane@reddotgrowth", "thibault.cdn", "reddotgrowth", "test@ail.com"];
 const isInternal = (email: string | null | undefined): boolean =>
   !!email && INTERNAL.some(p => email.toLowerCase().includes(p));
 
