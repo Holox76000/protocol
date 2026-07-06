@@ -39,7 +39,6 @@ const QUIZ_STEPS = [
   { key: "quiz_time",        label: "Q10 — Temps / sem",           threshold: 12 }, // q_time
   { key: "quiz_past",        label: "Q11 — Solutions passées",     threshold: 14 }, // q_past_solutions
   { key: "quiz_photo",       label: "Q12 — Upload photo",          threshold: 15 }, // photo-upload
-  { key: "quiz_yes_ladders", label: "Yes-ladders (q16-18)",        threshold: 19 }, // q16b (1st yes-ladder)
 ];
 
 export default function FunnelClient({ sessions, leads, events, users, since }: Props) {

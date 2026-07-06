@@ -521,41 +521,6 @@ const BASE_SLIDES: SlideConfig[] = [
     type: "promise",
   },
 
-  // ── SECTION 7 — SOLUTION FRAMING ──────────────────────
-
-  {
-    id: "q16b",
-    type: "yes-ladder",
-    stateKey: "yes_uniqueness",
-    qNumber: 16,
-    loaderStep: 1,
-    loaderLabel: "Analyzing your profile...",
-    question: "Did you know attractiveness is unique to each person, shaped by age, face, social context, and genetics?",
-    options: ["Yes", "No"],
-  },
-
-  {
-    id: "q17",
-    type: "yes-ladder",
-    stateKey: "yes_determination",
-    qNumber: 17,
-    loaderStep: 2,
-    loaderLabel: "Generating your personalized protocol...",
-    question: "Are you ready to improve your attractiveness using science?",
-    options: ["Yes", "No"],
-  },
-
-  {
-    id: "q18",
-    type: "yes-ladder",
-    stateKey: "yes_protocol",
-    qNumber: 18,
-    loaderStep: 3,
-    loaderLabel: "Generating your 12-week protocol...",
-    question: "Would a simple, science-backed protocol built specifically for your body interest you?",
-    options: ["Yes", "No"],
-  },
-
   {
     id: "final-loading",
     type: "final-loading",
