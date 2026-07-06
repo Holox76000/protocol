@@ -153,7 +153,7 @@ const stripeAppearance = {
 
 // ── Payment form (inside Elements provider) ────────────────────────────────────
 
-function CheckoutForm({ displayAmount }: { displayAmount: number }) {
+function CheckoutForm({ displayAmount, guest }: { displayAmount: number; guest?: boolean }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -167,12 +167,17 @@ function CheckoutForm({ displayAmount }: { displayAmount: number }) {
     setError(null);
 
     const sid = new URLSearchParams(window.location.search).get("funnel_sid") ?? undefined;
-    trackEvent("checkout_submitted", { funnel: "f1", ...(sid && { funnel_sid: sid }) });
+    trackEvent("checkout_submitted", { funnel: "f1", guest: Boolean(guest), ...(sid && { funnel_sid: sid }) });
+
+    // Guests have no session cookie — /dashboard would bounce them to /login.
+    // /checkout/success without session_id already shows "check your email
+    // for the registration link", which matches the webhook's welcome email.
+    const returnPath = guest ? "/checkout/success?funnel=f1" : "/dashboard?payment=success";
 
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/dashboard?payment=success`,
+        return_url: `${window.location.origin}${returnPath}`,
       },
     });
 
@@ -205,7 +210,7 @@ function CheckoutForm({ displayAmount }: { displayAmount: number }) {
 
 // ── Checkout page ──────────────────────────────────────────────────────────────
 
-export function CheckoutPage({ email }: { email: string }) {
+export function CheckoutPage({ email, guest = false }: { email: string; guest?: boolean }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -272,11 +277,18 @@ export function CheckoutPage({ email }: { email: string }) {
             height={30}
           />
           <ol role="list" aria-label="Registration steps" className="mt-3 flex items-center gap-0">
-            {[
-              { label: "Account", active: false, done: true },
-              { label: "Payment", active: true, done: false },
-              { label: "Protocol", active: false, done: false },
-            ].map(({ label, active, done }, i, arr) => (
+            {(guest
+              ? [
+                  { label: "Payment", active: true, done: false },
+                  { label: "Account", active: false, done: false },
+                  { label: "Protocol", active: false, done: false },
+                ]
+              : [
+                  { label: "Account", active: false, done: true },
+                  { label: "Payment", active: true, done: false },
+                  { label: "Protocol", active: false, done: false },
+                ]
+            ).map(({ label, active, done }, i, arr) => (
               <li key={label} className="flex items-center" aria-current={active ? "step" : undefined}>
                 <div className="flex flex-col items-center gap-1">
                   <div className={`h-2 w-2 rounded-full ${active ? "bg-void" : done ? "bg-void/30" : "bg-wire"}`} />
@@ -324,7 +336,7 @@ export function CheckoutPage({ email }: { email: string }) {
           ) : (
             <div className="lg:mx-[3vw]">
               <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance, locale: "en" }}>
-                <CheckoutForm displayAmount={displayAmount} />
+                <CheckoutForm displayAmount={displayAmount} guest={guest} />
               </Elements>
             </div>
           )}

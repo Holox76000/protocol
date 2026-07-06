@@ -1216,7 +1216,13 @@ export default function F1OfferPage() {
 
     const utm = getUtmParams();
     persistUtmParams(utm);
-    setSignupHref(appendUtmToPath("/register", utm));
+    // Payment-first: with a funnel session we can skip the account wall and
+    // send buyers straight to guest checkout (email comes from the session).
+    setSignupHref(
+      funnelSid
+        ? appendUtmToPath(`/checkout?funnel_sid=${encodeURIComponent(funnelSid)}`, utm)
+        : appendUtmToPath("/register", utm)
+    );
 
     const onScroll = () => setStickyVisible(window.scrollY > 600);
     window.addEventListener("scroll", onScroll, { passive: true });
