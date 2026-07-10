@@ -4,6 +4,50 @@ Items deferred from feature reviews. Pick up from here.
 
 ---
 
+## P1 — Protocol Dating (deferred from v1.1.0.0 ship review)
+
+### Hosted checkout ignores the dating funnel
+**What:** `app/checkout/hosted/page.tsx:5` has its own `KNOWN_FUNNELS` set without `"dating"` — a `/checkout/hosted?funnel=dating` link silently coerces to `"main"` and charges **$19 instead of $39**. Also reject `embedded: true` + `funnel: "dating"` in `create-checkout-session` (return_url goes to the auth-gated /dashboard and the PI gets no metadata → double CAPI).
+**Effort:** S (CC: ~10 min) · **Priority:** P1
+
+### Browser-side Purchase pixel on /dating/success
+**What:** Dating purchases are CAPI-only for Meta/TikTok — no browser `fbq('track','Purchase')` / TikTok pixel on the success page (f1's `/checkout/success` fires both, deduped by session id). Lower EMQ exactly on the campaign whose optimization depends on Purchase signal quality.
+**Where:** `app/dating/success/DatingSuccessPage.tsx` — mirror `app/checkout/success/page.tsx`.
+**Effort:** S (CC: ~15 min) · **Priority:** P1
+
+### Session id is a write-capability bearer token leaked to analytics
+**What:** `cs_live_...` in the /dating/success URL grants order reads + uploads + completion; GA4/Meta pixels auto-capture full URLs. Strip via `history.replaceState` after read, or mint a dedicated upload token column. Also cap user-supplied UTM values at 500 chars and mirror only the fields the Slack ping reads (funnel, utm_source/campaign/content) into PI metadata instead of full sharedMetadata (customer_ip/UA/ttp = PII in an extra Stripe surface).
+**Effort:** M (CC: ~30 min) · **Priority:** P1
+
+---
+
+## P2 — Protocol Dating (deferred from v1.1.0.0 ship review)
+
+### Robustness batch
+- Rate limiting on `/api/dating/*` (anonymous, each miss fans out to Stripe) — pattern exists on `/api/auth/login`.
+- Webhook: upsert the order (fast, idempotent) BEFORE the 3 sequential ad-API awaits; add idempotency to the confirmation email (redelivery re-sends it today).
+- Slack #sales pings for dating PIs show "(no email)" — enrich from session in the webhook.
+- Shared products constant (name/id/value duplicated across 5 files; `content_name` already inconsistent: "Protocol Dating" vs "— AI Dating Photos").
+- Dedup `dating_orders` upsert (webhook vs `lib/datingOrders.ts`); shared MIN/MAX_PHOTOS + 10MB constants (client + serveur) ; type `DatingOrderStatus`.
+- HTML-escape `firstName` in all `lib/email.ts` templates (forwardable-phishing primitive).
+
+### UX/design batch (verify visually at 390/430px)
+- Mobile hero: `.dt-hero-grid` may clip in the 280px `mo-hero-v1__right` panel; "Matches/week" card overlaps a tile label.
+- Hero CTA spinner invisible (white-on-white inside `.mo-hero .mo-cta`).
+- `.dt-upload-add` hover/focus state; FAQ rows are clickable divs (fix f1 + dating together, a11y).
+- Success page: reload mid-upload shows count without thumbnails (render placeholder tiles); counter reads "8/6 minimum" past the min; HEIC previews break in Chrome (placeholder tile for heic/heif).
+- Hero copy duplicated desktop/mobile (extract HeroCopy/HeroMeta).
+
+---
+
+## P3 — Protocol Dating (deferred from v1.1.0.0 ship review)
+
+- Perf: `/dating` imports ~101KB of f1 CSS for a subset of `.mo-*` rules — extract shared styles; split the 695-line client LP into server sections + client islands (CheckoutButton, DFaq, DSticky); parallel uploads with bounded concurrency (safe now that filenames are unique and counts storage-derived).
+- Tests: `lib/analytics.ts` dating branch via jsdom pragma; negative paths (Stripe client null, upsert failure, resend error, empty firstName); `vi.resetAllMocks` + `afterEach(unstubAllEnvs)` hygiene.
+- Scripts: shared `.env.local` loader (73 copies under scripts/); drop `META_ACCESS_TOKEN` fallback in `fetch-ad-creative.ts` (CAPI token lacks ads_read).
+
+---
+
 ## P2 — PDF Export (Phase 2)
 
 ### Client self-serve PDF via email
@@ -37,3 +81,5 @@ Items deferred from feature reviews. Pick up from here.
 **Effort:** S (human ~3h | CC: ~15 min)
 **Priority:** P3
 **Depends on:** PDF Export v1
+
+## Completed
