@@ -1,0 +1,268 @@
+/* Protocol Dating — overrides & additions on top of f1-offer.css */
+
+/* Buttons reuse anchor-styled classes from f1-offer.css */
+.dt-btn {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.dt-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+button.mo-pricing-card__cta {
+  width: 100%;
+}
+
+/* Hero style grid (placeholder visuals until real AI examples land) */
+.dt-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+.dt-hero-tile {
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  overflow: hidden;
+}
+.dt-hero-tile span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+.dt-hero-tile--professional { background: linear-gradient(145deg, #37474f, #1c262b); }
+.dt-hero-tile--casual       { background: linear-gradient(145deg, #8d9c86, #5a6b55); }
+.dt-hero-tile--outdoor      { background: linear-gradient(145deg, #c9a06b, #8a6437); }
+.dt-hero-tile--night        { background: linear-gradient(145deg, #3d3654, #191527); }
+.dt-hero-tile--athletic     { background: linear-gradient(145deg, #6b8ba3, #3c5568); }
+
+/* Research section */
+.dt-research-sub {
+  max-width: 560px;
+  margin: 16px auto 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #515255;
+  text-align: center;
+}
+.dt-research-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+.dt-research-card {
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 14px;
+  padding: 28px 24px;
+}
+.dt-research-card h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #253239;
+}
+.dt-research-card p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #515255;
+}
+
+/* Styles section */
+.dt-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+}
+.dt-style-card__visual {
+  border-radius: 12px;
+  aspect-ratio: 3 / 4;
+}
+.dt-style-card__name {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #253239;
+}
+.dt-style-card__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #515255;
+}
+
+/* Sticky desktop pill is a div here (button inside), keep the pill layout */
+.dt-sticky-desktop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Founder story */
+.dt-founder {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(37, 50, 57, 0.06);
+  padding: 48px;
+}
+.dt-founder__mark {
+  color: #b9c4c8;
+  margin-bottom: 16px;
+}
+.dt-founder__body {
+  margin-top: 24px;
+}
+.dt-founder__body p {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #515255;
+}
+.dt-founder__body p:last-child {
+  margin-bottom: 0;
+}
+.dt-founder__author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #edf0f1;
+}
+.dt-founder__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #253239;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 600;
+}
+.dt-founder__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #253239;
+}
+.dt-founder__title {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #7f949b;
+}
+
+/* Success / upload page */
+.dt-success__main {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 64px 20px;
+  background: #f9fbfb;
+}
+.dt-success__card {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(37, 50, 57, 0.06);
+  padding: 40px;
+}
+.dt-success__title {
+  margin: 8px 0 0;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #253239;
+}
+.dt-success__muted {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #515255;
+}
+.dt-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 28px;
+}
+.dt-upload-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #dfe4e6;
+}
+.dt-upload-add {
+  aspect-ratio: 1;
+  border: 1.5px dashed #b9c4c8;
+  border-radius: 10px;
+  background: #f9fbfb;
+  color: #515255;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dt-upload-add:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.dt-success__count {
+  margin: 16px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7f949b;
+}
+.dt-success__error {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #b3403a;
+}
+.dt-success .mo-cta {
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .dt-success__card {
+    padding: 28px 20px;
+  }
+  .dt-upload-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dt-research-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 32px;
+  }
+  .dt-styles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 32px;
+  }
+  .dt-styles-grid .dt-style-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
