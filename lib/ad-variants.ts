@@ -553,6 +553,21 @@ const STANDARD_OVERWEIGHT: AdVariant = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Mediads carousels (2026-07-06)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// "How to build a body for the gay beauty standard if you're a bear" —
+// audience: bears who want to build the dream body, not stay big. Peak
+// projection framing, mirrors the ad's closing line ("potential").
+const GAY_STANDARD_BEAR: AdVariant = {
+  badge: "Gay beauty standard · Bear",
+  headline: "Most bears are sitting on more potential than they think.",
+  subtext:
+    "We analyze your body and project what you'd look like at your peak — the dream-body version of your build, not somebody else's silhouette. 2 minutes to see how far you can go.",
+  cta: "Get my free analysis →",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Full mapping: ad_id → AdVariant
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -722,6 +737,10 @@ export const AD_VARIANTS: Record<string, AdVariant> = {
   "120249301008690660": STANDARD_CHUB,
   "120249301031060660": STANDARD_CUB,
   "120249301046550660": STANDARD_OVERWEIGHT,
+
+  // ── Mediads carousels (2026-07-06)
+  // "How to build a body for the gay beauty standard if you're a bear"
+  "120249601537790660": GAY_STANDARD_BEAR,
 };
 
 export function getAdVariant(adId: string | undefined): AdVariant {

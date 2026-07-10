@@ -15,6 +15,10 @@ SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
+For the `/dating` checkout, also set `STRIPE_SECRET_KEY`. Optional:
+`STRIPE_DATING_PRICE_ID` (a Stripe Price id for the $39 dating product —
+without it, checkout falls back to inline price data at $39).
+
 3. Run the dev server:
 
 ```bash
@@ -24,6 +28,7 @@ npm run dev
 4. Open:
 - Quiz: http://localhost:3000
 - Landing page: http://localhost:3000/program
+- Dating photos LP: http://localhost:3000/dating
 - Admin: http://localhost:3000/admin
 
 ## Supabase Setup (SQL)

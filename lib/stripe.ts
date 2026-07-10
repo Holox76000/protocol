@@ -51,6 +51,26 @@ export function getCheckoutLineItems(funnel = "main"): Stripe.Checkout.SessionCr
     ];
   }
 
+  if (funnel === "dating") {
+    const datingPriceId = process.env.STRIPE_DATING_PRICE_ID?.trim();
+    if (datingPriceId) {
+      return [{ price: datingPriceId, quantity: 1 }];
+    }
+    return [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: 3900,
+          product_data: {
+            name: "Protocol Dating — AI Dating Photos",
+            description: "30 AI-generated dating profile photos, 5 styles, 24h delivery.",
+          },
+        },
+      },
+    ];
+  }
+
   const priceId = process.env.STRIPE_PRICE_ID?.trim();
   if (priceId) {
     return [{ price: priceId, quantity: 1 }];

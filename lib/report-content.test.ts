@@ -10,32 +10,18 @@ import {
 } from "./report-content";
 
 describe("getPatterns", () => {
-  it("returns the skinny pattern set for 'Skinny'", () => {
-    const p = getPatterns("Skinny");
-    expect(p.p1t).toMatch(/Training harder/i);
-    expect(p.p2t).toMatch(/clothes/i);
+  // Since 2eba130 the pattern copy is universal — the same outcome-first set
+  // for every morphology. The contract is stability across inputs, not
+  // morphology-specific text.
+  it("returns the same universal set for every morphology", () => {
+    const skinny = getPatterns("Skinny");
+    for (const m of ["Skinny-fat", "Overweight", "Average", "anything else", ""]) {
+      expect(getPatterns(m)).toEqual(skinny);
+    }
   });
 
-  it("returns the skinny-fat set for 'Skinny-fat'", () => {
-    const p = getPatterns("Skinny-fat");
-    expect(p.p1t).toMatch(/gaining fat and losing muscle/i);
-    expect(p.p2t).toMatch(/waist/i);
-  });
-
-  it("returns the overweight set for 'Overweight'", () => {
-    const p = getPatterns("Overweight");
-    expect(p.p1t).toMatch(/Where fat sits/i);
-    expect(p.p2t).toMatch(/Visceral fat/i);
-  });
-
-  it("falls back to the 'Average' set for unknown morphology", () => {
-    const p = getPatterns("anything else");
-    expect(p.p1t).toMatch(/Average is invisible/i);
-  });
-
-  it("is case-insensitive on the morphology key", () => {
-    expect(getPatterns("skinny").p1t).toBe(getPatterns("SKINNY").p1t);
-    expect(getPatterns("Skinny-Fat").p1t).toBe(getPatterns("skinny-fat").p1t);
+  it("leads with the outcome-first headline", () => {
+    expect(getPatterns("Skinny").p1t).toMatch(/doesn't get noticed/i);
   });
 
   it("always returns all 8 pattern fields populated", () => {
@@ -121,7 +107,7 @@ describe("getHistoryParagraph", () => {
   });
 
   it("matches the 'personal trainer' case", () => {
-    expect(getHistoryParagraph("Personal trainer")).toMatch(/trainer certifications/i);
+    expect(getHistoryParagraph("Personal trainer")).toMatch(/Trainers build for fitness/i);
   });
 
   it("matches the 'youtube' case", () => {
