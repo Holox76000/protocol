@@ -22,6 +22,8 @@ $B goto http://localhost:3000/funnel && $B screenshot /tmp/render.png
 **Route mapping :**
 - `app/funnel/**` → `http://localhost:3000/funnel`
 - `app/f1/**`, `app/home/**` → `http://localhost:3000`
+- `app/dating/**` → `http://localhost:3000/dating`
+- `app/dating/success/**` → nécessite un `session_id` Stripe, skip ou note-le
 - `app/protocol/**` → nécessite une auth, skip ou note-le
 
 **Règle** : Ne marque jamais une tâche frontend comme terminée sans avoir vérifié le screenshot.
