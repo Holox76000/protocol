@@ -64,6 +64,10 @@ export async function POST(request: Request) {
     const eventId = body.eventId ?? `${body.sessionId}:view_offer:${eventTime}`;
     const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
     const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
+    const isDating = (body.payload as Record<string, unknown> | undefined)?.funnel === "dating";
+    const product = isDating
+      ? { name: "Protocol Dating", id: "dating-ai-photos", value: 39 }
+      : { name: "F1 Offer", id: "f1-attractiveness-protocol", value: 89 };
 
     await Promise.allSettled([
       sendMetaEvent({
@@ -75,10 +79,10 @@ export async function POST(request: Request) {
         userAgent,
         ipAddress,
         customData: {
-          content_name: "F1 Offer",
-          content_ids: ["f1-attractiveness-protocol"],
+          content_name: product.name,
+          content_ids: [product.id],
           content_type: "product",
-          value: 89,
+          value: product.value,
           currency: "USD",
         }
       }),
@@ -93,12 +97,12 @@ export async function POST(request: Request) {
         ttclid,
         ttp,
         properties: {
-          value: 89,
+          value: product.value,
           currency: "USD",
           contents: [{
-            content_id: "f1-attractiveness-protocol",
+            content_id: product.id,
             content_type: "product",
-            content_name: "F1 Offer",
+            content_name: product.name,
           }],
         },
       }),

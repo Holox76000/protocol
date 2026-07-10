@@ -5,7 +5,7 @@ import { sendTiktokEvent } from "../../../../lib/tiktokEventsApi";
 import { sendGA4Purchase, extractGa4ClientId } from "../../../../lib/ga4";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
-import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from "../../../../lib/email";
+import { sendWelcomeEmail, sendPurchaseConfirmationEmail, sendDatingConfirmationEmail } from "../../../../lib/email";
 import { promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { postToSlack } from "../../../../lib/slack";
@@ -297,6 +297,10 @@ export async function POST(request: Request) {
     const sessionPurchaseEventTime = session.created ?? Math.floor(Date.now() / 1000);
     const sessionPurchaseValue = typeof session.amount_total === "number" ? session.amount_total / 100 : 89;
     const sessionPurchaseCurrency = (session.currency ?? "usd").toUpperCase();
+    const isDating = meta.funnel === "dating";
+    const purchaseProduct = isDating
+      ? { name: "Protocol Dating — AI Dating Photos", id: "dating-ai-photos" }
+      : { name: "Attractiveness Protocol", id: "f1-attractiveness-protocol" };
     try {
       await sendMetaEvent({
         eventName: "Purchase",
@@ -309,8 +313,8 @@ export async function POST(request: Request) {
         customData: {
           value: sessionPurchaseValue,
           currency: sessionPurchaseCurrency,
-          content_name: "Attractiveness Protocol",
-          content_ids: ["f1-attractiveness-protocol"],
+          content_name: purchaseProduct.name,
+          content_ids: [purchaseProduct.id],
           content_type: "product",
           funnel: meta.funnel ?? null,
           funnel_type: meta.funnel_type ?? null,
@@ -355,9 +359,9 @@ export async function POST(request: Request) {
           value: sessionPurchaseValue,
           currency: sessionPurchaseCurrency,
           contents: [{
-            content_id: "f1-attractiveness-protocol",
+            content_id: purchaseProduct.id,
             content_type: "product",
-            content_name: "Attractiveness Protocol",
+            content_name: purchaseProduct.name,
           }],
         },
       });
@@ -394,6 +398,62 @@ export async function POST(request: Request) {
         .from("leads")
         .update({ nurture_paused_at: new Date().toISOString() })
         .eq("email", customerEmail.toLowerCase());
+
+      if (isDating) {
+        // Protocol Dating order — no Protocol account, no registration email.
+        // Async payment methods fire checkout.session.completed with
+        // payment_status "unpaid" — don't record or confirm unsettled money
+        // (getOrCreateDatingOrder applies the same gate on the success page).
+        if (session.payment_status !== "paid") {
+          console.log("[webhook/stripe] Dating session completed but not paid — skipping", {
+            sessionId: session.id,
+            paymentStatus: session.payment_status,
+          });
+          return NextResponse.json({ received: true });
+        }
+        try {
+          const { error: orderError } = await supabaseAdmin
+            .from("dating_orders")
+            .upsert(
+              {
+                stripe_session_id: session.id,
+                email: customerEmail.toLowerCase(),
+                first_name: firstName ?? null,
+                amount_cents: typeof session.amount_total === "number" ? session.amount_total : 3900,
+                utm_source: meta.utm_source ?? null,
+                utm_campaign: meta.utm_campaign ?? null,
+                utm_content: meta.utm_content ?? null,
+              },
+              { onConflict: "stripe_session_id" }
+            );
+          if (orderError) throw new Error(orderError.message);
+
+          // Awaited: on serverless the runtime can freeze after the response
+          // is sent, and this email is the customer's only recovery path to
+          // the upload link.
+          await sendDatingConfirmationEmail({
+            email: customerEmail,
+            firstName,
+            uploadUrl: `${SITE_URL}/dating/success?session_id=${session.id}`,
+          }).catch((err) => {
+            console.error("[webhook/stripe] Dating confirmation email failed", {
+              error: String(err),
+              email: customerEmail,
+            });
+          });
+
+          console.log("[webhook/stripe] Dating order recorded, confirmation email queued", {
+            sessionId: session.id,
+            email: customerEmail,
+          });
+        } catch (err) {
+          console.error("[webhook/stripe] Dating order setup failed", {
+            error: String(err),
+            sessionId: session.id,
+          });
+        }
+        return NextResponse.json({ received: true });
+      }
 
       try {
         // If the user already has an account, mark them as paid

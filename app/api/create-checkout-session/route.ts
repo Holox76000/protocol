@@ -5,7 +5,7 @@ import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 
 export const runtime = "nodejs";
 
-const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1"]);
+const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1", "dating"]);
 
 type Body = {
   funnel?: string;
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const funnel = KNOWN_FUNNELS.has(rawFunnel) ? rawFunnel : "main";
   const internalFunnel = funnel === "v2" ? "f2" : funnel;
   const funnelType = body.funnel_type ?? "long";
-  const landingPage = body.landing_page ?? (funnel === "f1" ? "/f1" : "/");
+  const landingPage = body.landing_page ?? (funnel === "dating" ? "/dating" : funnel === "f1" ? "/f1" : "/");
   const customerEmail = body.customer_email ?? null;
   const embedded = body.embedded === true;
 
@@ -99,8 +99,15 @@ export async function POST(request: Request) {
           recovery: { enabled: true, allow_promotion_codes: false },
         },
         expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
-        success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
-        cancel_url: `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
+        success_url: internalFunnel === "dating"
+          ? `${siteUrl}/dating/success?session_id={CHECKOUT_SESSION_ID}`
+          : `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
+        cancel_url: internalFunnel === "dating"
+          ? `${siteUrl}/dating?checkout=cancelled`
+          : `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
+        // The Slack #sales ping reads pi.metadata, which does not inherit
+        // session metadata — mirror it onto the PaymentIntent.
+        ...(internalFunnel === "dating" && { payment_intent_data: { metadata: sharedMetadata } }),
         metadata: sharedMetadata,
       });
     }
@@ -134,6 +141,9 @@ export async function POST(request: Request) {
   const referer = request.headers.get("referer") ?? undefined;
   const ttp = customerTtp;
   const eventTime = Math.floor(Date.now() / 1000);
+  const product = internalFunnel === "dating"
+    ? { name: "Protocol Dating — AI Dating Photos", id: "dating-ai-photos", value: 39 }
+    : { name: "Attractiveness Protocol", id: "f1-attractiveness-protocol", value: 89 };
 
   void sendMetaEvent({
     eventName: "InitiateCheckout",
@@ -146,9 +156,9 @@ export async function POST(request: Request) {
     email: customerEmail,
     fbclid: body.fbclid || null,
     customData: {
-      content_name: "Attractiveness Protocol",
-      content_ids: ["f1-attractiveness-protocol"],
-      value: 89,
+      content_name: product.name,
+      content_ids: [product.id],
+      value: product.value,
       currency: "USD",
       num_items: 1,
       ...(body.utm_source && { utm_source: body.utm_source }),
@@ -171,12 +181,12 @@ export async function POST(request: Request) {
     ttclid: body.ttclid || null,
     ttp,
     properties: {
-      value: 89,
+      value: product.value,
       currency: "USD",
       contents: [{
-        content_id: "f1-attractiveness-protocol",
+        content_id: product.id,
         content_type: "product",
-        content_name: "Attractiveness Protocol",
+        content_name: product.name,
       }],
     },
   }).catch((err) => {

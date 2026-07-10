@@ -44,14 +44,23 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
   const fbq = (window as Window & { fbq?: FbqFunction }).fbq;
 
   if (name === "view_offer") {
+    const isDating = payload.funnel === "dating";
     try {
-      fbq?.("track", "ViewContent", {
-        content_name: "F1 Offer",
-        content_ids: ["f1-attractiveness-protocol"],
-        content_type: "product",
-        value: 89,
-        currency: "USD",
-      }, { eventID: eventId });
+      fbq?.("track", "ViewContent", isDating
+        ? {
+            content_name: "Protocol Dating",
+            content_ids: ["dating-ai-photos"],
+            content_type: "product",
+            value: 39,
+            currency: "USD",
+          }
+        : {
+            content_name: "F1 Offer",
+            content_ids: ["f1-attractiveness-protocol"],
+            content_type: "product",
+            value: 89,
+            currency: "USD",
+          }, { eventID: eventId });
     } catch {
       // Ignore Meta Pixel runtime issues in the UI flow.
     }
