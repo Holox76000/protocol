@@ -160,6 +160,48 @@ export async function sendWelcomeEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
+// Protocol Dating — post-purchase confirmation + upload link
+// ─────────────────────────────────────────────────────────
+export async function sendDatingConfirmationEmail(props: {
+  email: string;
+  firstName?: string;
+  uploadUrl: string;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Payment confirmed.<br>Now send us your photos.
+    </h1>
+
+    <p style="margin:24px 0;font-size:15px;color:${C.muted};line-height:1.65;">
+      Hey ${name} — your Protocol Dating order is in. Upload 6–12 recent photos and our AI studio gets to work.
+    </p>
+
+    <p style="margin:0 0 32px;font-size:15px;color:${C.muted};line-height:1.65;">
+      Different angles, good light, face clearly visible. Phone selfies work.
+    </p>
+
+    ${btn("Upload my photos →", props.uploadUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Your 30 photos land in your inbox within 24 hours of your upload.
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: props.email,
+    subject: "Your order is confirmed — upload your photos",
+    html: emailShell(content),
+  });
+
+  if (error) throw new Error(`[resend] sendDatingConfirmationEmail failed: ${error.message}`);
+  console.log("[resend] dating confirmation email sent", { email: props.email });
+}
+
+// ─────────────────────────────────────────────────────────
 // Magic link — passwordless login
 // ─────────────────────────────────────────────────────────
 export async function sendMagicLinkEmail(props: {
