@@ -3,6 +3,17 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.1.0] - 2026-07-12
+
+### Added
+- "Old way → new way" comparison on the dating landing page: booking a $400
+  half-day photographer vs an AI-trained photographer's eye at $39 — visitors
+  see the price, speed and volume trade-off side by side before pricing.
+
+### Fixed
+- Comparison cards pass contrast checks (tags, list marks) and read cleanly
+  in screen readers; card copy no longer contradicts itself on photo counts.
+
 ## [1.1.0.0] - 2026-07-10
 
 ### Added
