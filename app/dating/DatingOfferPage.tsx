@@ -496,6 +496,65 @@ function DFounderStory() {
   );
 }
 
+const OLD_WAY = [
+  "$400+ for a half-day shoot",
+  "One location, one outfit, one light",
+  "20–25 edited photos, delivered in 1–2 weeks",
+  "Posing in public while strangers watch",
+];
+
+const NEW_WAY = [
+  "$39 — ten times less",
+  "5 styles, 5 settings, one upload",
+  "30 photos in your inbox within 24h",
+  "Shot from selfies you already have",
+];
+
+function DOldNew() {
+  return (
+    <section className="mo-section mo-section--surface">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">Old way → new way</p>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            The $400 shoot, <em>reinvented.</em>
+          </h2>
+          <p className="dt-research-sub">
+            Same photographer&rsquo;s eye — trained on dating profiles, powered by AI. Same
+            result, more photos, a tenth of the price.
+          </p>
+        </div>
+        <div className="dt-oldnew-grid">
+          <div className="dt-oldnew-card dt-oldnew-card--old">
+            <div className="dt-oldnew-card__tag">The old way</div>
+            <h3 className="dt-oldnew-card__name">Book a photographer</h3>
+            <ul>
+              {OLD_WAY.map((item) => (
+                <li key={item}>
+                  <span className="dt-oldnew-card__mark" aria-hidden="true">✕</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="dt-oldnew-card dt-oldnew-card--new">
+            <div className="dt-oldnew-card__tag">The new way</div>
+            <h3 className="dt-oldnew-card__name">Protocol Dating</h3>
+            <ul>
+              {NEW_WAY.map((item) => (
+                <li key={item}>
+                  <span className="dt-oldnew-card__mark dt-oldnew-card__mark--check"><CheckIcon size={12} /></span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function DTestimonials() {
   return (
     <section className="mo-section">
@@ -684,6 +743,7 @@ export default function DatingOfferPage() {
       <DStyles />
       <DLikeYou />
       <DFounderStory />
+      <DOldNew />
       <DTestimonials />
       <DPricing />
       <DGuarantee />
