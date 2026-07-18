@@ -246,7 +246,6 @@ function DHero() {
     <section className="mo-hero mo-hero-v1">
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
-          <p className="mo-hero__eyebrow">AI photo studio</p>
           <h1 className="mo-hero__title">Photos that get you <em>matches.</em></h1>
           <p className="mo-hero__desc">
             We analyzed thousands of top-performing profiles on the main dating apps.
@@ -270,7 +269,6 @@ function DHero() {
 
       {/* Mobile: copy above the visual */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
-        <p className="mo-hero__eyebrow">AI photo studio</p>
         <h1 className="mo-hero__title">Photos that get you <em>matches.</em></h1>
         <p className="mo-hero__desc">
           We analyzed thousands of top-performing profiles on the main dating apps.
@@ -283,7 +281,7 @@ function DHero() {
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
           <div className="dt-hero-grid">
-            {STYLES.slice(0, 4).map((s) => (
+            {STYLES.filter((s) => s.key !== "professional").map((s) => (
               <div key={s.key} className={`dt-hero-tile dt-hero-tile--${s.key}`}>
                 <span>{s.name}</span>
               </div>
@@ -688,7 +686,7 @@ function DFooter() {
           </div>
         </div>
         <div className="mo-footer__bottom">
-          <span>© {new Date().getFullYear()} Protocol Dating · part of Protocol Club</span>
+          <span>© {new Date().getFullYear()} Protocol Dating</span>
           <span>hello@protocol-club.com</span>
         </div>
         <p className="mo-footer__disclaimer">

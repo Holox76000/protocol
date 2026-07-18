@@ -8,5 +8,14 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <DatingOfferPage />;
+  return (
+    <>
+      {/* Hero photos load as CSS backgrounds — preload so LCP doesn't wait on CSSOM */}
+      <link rel="preload" as="image" href="/dating/casual.webp" fetchpriority="high" />
+      <link rel="preload" as="image" href="/dating/outdoor.webp" fetchpriority="high" />
+      <link rel="preload" as="image" href="/dating/night.webp" fetchpriority="high" />
+      <link rel="preload" as="image" href="/dating/athletic.webp" fetchpriority="high" />
+      <DatingOfferPage />
+    </>
+  );
 }
