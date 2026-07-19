@@ -40,7 +40,6 @@ button.mo-pricing-card__cta {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.92);
 }
-.dt-hero-tile--professional { background: linear-gradient(145deg, #37474f, #1c262b); }
 .dt-hero-tile--casual       { background: linear-gradient(145deg, #8d9c86, #5a6b55); }
 .dt-hero-tile--outdoor      { background: linear-gradient(145deg, #c9a06b, #8a6437); }
 .dt-hero-tile--night        { background: linear-gradient(145deg, #3d3654, #191527); }
@@ -83,7 +82,7 @@ button.mo-pricing-card__cta {
 /* Styles section */
 .dt-styles-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-top: 48px;
 }
@@ -337,8 +336,5 @@ button.mo-pricing-card__cta {
   .dt-styles-grid {
     grid-template-columns: repeat(2, 1fr);
     margin-top: 32px;
-  }
-  .dt-styles-grid .dt-style-card:last-child {
-    grid-column: 1 / -1;
   }
 }

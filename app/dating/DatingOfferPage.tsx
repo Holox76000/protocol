@@ -121,8 +121,8 @@ const STEPS = [
   {
     num: "02",
     time: "AI STUDIO",
-    title: "We shoot you in 5 styles",
-    desc: "A private model is trained on your face, then shot in the styles top profiles use: professional, casual, outdoor, night out, athletic.",
+    title: "We shoot you in 4 styles",
+    desc: "A private model is trained on your face, then shot in the styles top profiles use: casual, outdoor, night out, athletic.",
   },
   {
     num: "03",
@@ -133,7 +133,6 @@ const STEPS = [
 ];
 
 const STYLES = [
-  { key: "professional", name: "Professional", desc: "The headshot that reads competent." },
   { key: "casual", name: "Casual", desc: "Weekend daylight, relaxed." },
   { key: "outdoor", name: "Outdoor", desc: "Golden hour, open air." },
   { key: "night", name: "Night out", desc: "Low light, sharp fit." },
@@ -142,7 +141,7 @@ const STYLES = [
 
 const RESEARCH_CARDS = [
   { title: "Natural light, sharp focus", desc: "Top profiles are shot in daylight or golden hour — almost never flash, almost never filters." },
-  { title: "3+ different contexts", desc: "The most-matched profiles mix settings: work, outdoors, social. Variety reads as a life, not a photoshoot." },
+  { title: "3+ different contexts", desc: "The most-matched profiles mix settings: outdoors, social, everyday. Variety reads as a life, not a photoshoot." },
   { title: "Face-forward framing", desc: "Chest-up crops, eyes visible, no sunglasses in the first photo. The frame the swipe decision is made on." },
 ];
 
@@ -166,7 +165,7 @@ const TESTIMONIALS = [
 
 const PRICING_BULLETS = [
   "30 high-resolution photos",
-  "5 styles: professional · casual · outdoor · night out · athletic",
+  "4 styles: casual · outdoor · night out · athletic",
   "Ready for Tinder, Hinge and Bumble crops",
   "Delivered by email within 24 hours",
   "Source photos deleted after delivery",
@@ -261,7 +260,7 @@ function DHero() {
           <div className="mo-hero__meta">
             <span>30 photos</span>
             <span className="mo-hero__meta-dot">·</span>
-            <span>5 styles</span>
+            <span>4 styles</span>
             <span className="mo-hero__meta-dot">·</span>
             <span>delivered in 24h</span>
           </div>
@@ -305,7 +304,7 @@ function DHero() {
         <div className="mo-hero__meta">
           <span>30 photos</span>
           <span className="mo-hero__meta-dot">·</span>
-          <span>5 styles</span>
+          <span>4 styles</span>
           <span className="mo-hero__meta-dot">·</span>
           <span>delivered in 24h</span>
         </div>
@@ -391,9 +390,9 @@ function DStyles() {
     <section className="mo-section mo-section--surface">
       <div className="mo-container">
         <div className="mo-section-head--center">
-          <p className="mo-section-eyebrow mo-section-eyebrow--center">The 5 styles</p>
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">The 4 styles</p>
           <h2 className="mo-section-title" style={{ marginTop: 12 }}>
-            One upload. <em>Five shoots.</em>
+            One upload. <em>Four shoots.</em>
           </h2>
         </div>
         <div className="dt-styles-grid">
@@ -475,7 +474,7 @@ function DFounderStory() {
             <p>
               But at $400 a session, the people who need those photos most never book them. So we
               trained our AI studio on everything those shoots taught us — the framing, the light,
-              the five styles that get profiles noticed.
+              the four styles that get profiles noticed.
             </p>
             <p>
               Same treatment, a tenth of the budget. And the point was never prettier pictures —
@@ -505,7 +504,7 @@ const OLD_WAY = [
 
 const NEW_WAY = [
   "$39 — ten times less",
-  "5 styles, 5 settings, one upload",
+  "4 styles, 4 settings, one upload",
   "30 photos in your inbox within 24h",
   "Shot from selfies you already have",
 ];
