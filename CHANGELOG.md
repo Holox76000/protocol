@@ -3,6 +3,13 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.2.1] - 2026-07-19
+
+### Changed
+- Dating "How it works" step 1 now announces the short questionnaire: a few
+  questions about your style and your life, so the photos genuinely look like
+  you — not just any set of good-looking shots.
+
 ## [1.1.2.0] - 2026-07-18
 
 ### Added

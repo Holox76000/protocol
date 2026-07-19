@@ -115,8 +115,8 @@ const STEPS = [
   {
     num: "01",
     time: "5 MIN",
-    title: "Upload 6–12 photos",
-    desc: "Selfies are fine. Different angles, good light, face clearly visible.",
+    title: "Photos + a short questionnaire",
+    desc: "Upload 6–12 selfies — different angles, good light. Then a few questions about who you are: your style, your settings, your life.",
   },
   {
     num: "02",
