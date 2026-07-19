@@ -18,16 +18,16 @@ button.mo-pricing-card__cta {
   width: 100%;
 }
 
-/* Hero style grid (placeholder visuals until real AI examples land) */
+/* Hero style grid — full-bleed photo wall filling the right panel */
 .dt-hero-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 100%;
 }
 .dt-hero-tile {
-  border-radius: 12px;
   display: flex;
   align-items: flex-end;
   padding: 12px;
@@ -41,10 +41,55 @@ button.mo-pricing-card__cta {
   color: rgba(255, 255, 255, 0.92);
 }
 .dt-hero-tile--professional { background: linear-gradient(145deg, #37474f, #1c262b); }
-.dt-hero-tile--casual       { background: linear-gradient(145deg, #8d9c86, #5a6b55); }
-.dt-hero-tile--outdoor      { background: linear-gradient(145deg, #c9a06b, #8a6437); }
-.dt-hero-tile--night        { background: linear-gradient(145deg, #3d3654, #191527); }
-.dt-hero-tile--athletic     { background: linear-gradient(145deg, #6b8ba3, #3c5568); }
+/* Photo tiles — classes also used by .dt-style-card__visual in the styles section */
+.dt-hero-tile--casual,
+.dt-hero-tile--outdoor,
+.dt-hero-tile--night,
+.dt-hero-tile--athletic {
+  --dt-scrim: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.45));
+  background-size: cover;
+  background-position: center top;
+}
+.dt-hero-tile--casual   { background-image: var(--dt-scrim), url("/dating/casual.webp"); }
+.dt-hero-tile--outdoor  { background-image: var(--dt-scrim), url("/dating/outdoor.webp"); }
+.dt-hero-tile--night    { background-image: var(--dt-scrim), url("/dating/night.webp"); }
+.dt-hero-tile--athletic { background-image: var(--dt-scrim), url("/dating/athletic.webp"); }
+/* Tablet band: the base 280px panel gives landscape tiles that crop faces — add height */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .mo-hero-v1__right {
+    height: 480px;
+  }
+}
+/* Matches card: straddling the bottom edge of the photo wall, half in / half out */
+.mo-hero-v1__right {
+  overflow: visible;
+}
+.mo-hero-v1__fc--ratio {
+  top: auto;
+  bottom: 0;
+  right: 32px;
+  transform: translateY(50%) rotate(1.5deg);
+  z-index: 2;
+}
+/* Clearance below the photo wall so the straddling card doesn't eat the CTA */
+.mo-hero-v1__mobile-cta-strip {
+  padding-top: 56px;
+}
+/* Narrow desktops: the straddling card hangs into the press strip and can cover
+   the last logo. Verified clear at ≥1200px — only pad the colliding band. */
+@media (min-width: 1024px) and (max-width: 1179px) {
+  .mo-press {
+    padding-top: 72px;
+  }
+}
+/* Tighter gap between nav and headline */
+.mo-hero-v1__left {
+  padding-top: 40px;
+  padding-bottom: 120px;
+}
+.mo-hero-v1__mobile-ctas {
+  padding-top: 10px;
+}
 
 /* Research section */
 .dt-research-sub {
@@ -104,11 +149,14 @@ button.mo-pricing-card__cta {
   color: #515255;
 }
 
-/* Sticky desktop pill is a div here (button inside), keep the pill layout */
-.dt-sticky-desktop {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+/* Sticky desktop pill is a div here (button inside), keep the pill layout.
+   Scoped to desktop — the base .mo-sticky__desktop is display:none on mobile. */
+@media (min-width: 1024px) {
+  .dt-sticky-desktop {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
 }
 
 /* Old way → new way */

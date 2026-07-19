@@ -3,6 +3,28 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.2.0] - 2026-07-18
+
+### Added
+- Real photos on the dating landing page: the hero is now a full-bleed 2×2
+  photo wall (casual, outdoor, night out, athletic) and the "5 styles" cards
+  show the same real shots — visitors see actual output instead of colored
+  placeholders.
+
+### Changed
+- The "Matches/week 9 → 47" stat card now straddles the bottom edge of the
+  photo wall; hero headline sits closer to the nav; the "AI photo studio"
+  eyebrow and the footer "part of Protocol Club" mention are gone.
+
+### Fixed
+- Hero photos are preloaded so the first paint doesn't wait on the stylesheet
+  (faster LCP for paid mobile traffic).
+- Tablet widths (600–1023px) no longer crop faces out of the hero tiles;
+  narrow desktops (1024–1179px) no longer hide a press logo under the stat
+  card.
+- The bottom checkout bar shows a single variant per screen size — the desktop
+  pill no longer stacks on top of the mobile bar on phones.
+
 ## [1.1.1.0] - 2026-07-12
 
 ### Added
