@@ -1,0 +1,118 @@
+/* Protocol Dating — /demo fake onboarding, on top of dating.css */
+
+/* The eyebrow is styled for the dark hero — make it visible on white cards */
+.dt-demo .mo-hero__eyebrow {
+  color: #7f949b;
+}
+.dt-demo .mo-hero__eyebrow::before {
+  background: #b9c4c8;
+}
+
+.dt-demo__nav-link {
+  font-size: 13px;
+  color: #515255;
+  text-decoration: none;
+}
+.dt-demo__nav-link:hover {
+  color: #253239;
+}
+
+/* Questions stage */
+.dt-demo__opts {
+  display: grid;
+  gap: 10px;
+  margin-top: 28px;
+}
+.dt-demo__opt {
+  padding: 14px 18px;
+  border: 1px solid #dfe4e6;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  font: inherit;
+  font-size: 15px;
+  color: #253239;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.dt-demo__opt:hover {
+  border-color: #253239;
+  background: #f9fbfb;
+}
+
+/* Generating stage */
+.dt-demo__gen-step {
+  min-height: 25px;
+}
+.dt-demo__bar {
+  margin-top: 24px;
+  height: 6px;
+  border-radius: 999px;
+  background: #edf0f1;
+  overflow: hidden;
+}
+.dt-demo__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #253239;
+  transition: width 0.15s linear;
+}
+
+/* Results stage */
+.dt-demo__results-card {
+  max-width: 720px;
+}
+.dt-demo__results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 28px;
+}
+.dt-demo__result {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #edf0f1;
+  background: #f9fbfb;
+  opacity: 0;
+  animation: dt-demo-reveal 0.6s ease forwards;
+}
+.dt-demo__result img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center top;
+}
+.dt-demo__result figcaption {
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #515255;
+}
+@keyframes dt-demo-reveal {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dt-demo__result {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .dt-demo__results-grid {
+    gap: 8px;
+  }
+}
