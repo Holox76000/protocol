@@ -122,7 +122,7 @@ const STEPS = [
     num: "02",
     time: "AI STUDIO",
     title: "We shoot you in 5 styles",
-    desc: "A private model is trained on your face, then shot in the styles top profiles use: professional, casual, outdoor, night out, athletic.",
+    desc: "A private model is trained on your face, then shot in the styles top profiles use: nature, casual, outdoor, night out, athletic.",
   },
   {
     num: "03",
@@ -133,7 +133,7 @@ const STEPS = [
 ];
 
 const STYLES = [
-  { key: "professional", name: "Professional", desc: "The headshot that reads competent." },
+  { key: "nature", name: "Nature", desc: "Trails, greenery, fresh air." },
   { key: "casual", name: "Casual", desc: "Weekend daylight, relaxed." },
   { key: "outdoor", name: "Outdoor", desc: "Golden hour, open air." },
   { key: "night", name: "Night out", desc: "Low light, sharp fit." },
@@ -166,7 +166,7 @@ const TESTIMONIALS = [
 
 const PRICING_BULLETS = [
   "30 high-resolution photos",
-  "5 styles: professional · casual · outdoor · night out · athletic",
+  "5 styles: nature · casual · outdoor · night out · athletic",
   "Ready for Tinder, Hinge and Bumble crops",
   "Delivered by email within 24 hours",
   "Source photos deleted after delivery",
@@ -246,7 +246,7 @@ function DHero() {
     <section className="mo-hero mo-hero-v1">
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
-          <h1 className="mo-hero__title">Photos that get you <em>matches.</em></h1>
+          <h1 className="mo-hero__title">Photos that get you matches. <em>Without a photographer.</em></h1>
           <p className="mo-hero__desc">
             We analyzed thousands of top-performing profiles on the main dating apps.
             Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
@@ -269,7 +269,7 @@ function DHero() {
 
       {/* Mobile: copy above the visual */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
-        <h1 className="mo-hero__title">Photos that get you <em>matches.</em></h1>
+        <h1 className="mo-hero__title">Photos that get you matches. <em>Without a photographer.</em></h1>
         <p className="mo-hero__desc">
           We analyzed thousands of top-performing profiles on the main dating apps.
           Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
@@ -281,7 +281,7 @@ function DHero() {
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
           <div className="dt-hero-grid">
-            {STYLES.filter((s) => s.key !== "professional").map((s) => (
+            {STYLES.filter((s) => s.key !== "nature").map((s) => (
               <div key={s.key} className={`dt-hero-tile dt-hero-tile--${s.key}`}>
                 <span>{s.name}</span>
               </div>

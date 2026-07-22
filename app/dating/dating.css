@@ -40,7 +40,7 @@ button.mo-pricing-card__cta {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.92);
 }
-.dt-hero-tile--professional { background: linear-gradient(145deg, #37474f, #1c262b); }
+.dt-hero-tile--nature { background: linear-gradient(145deg, #8d9c86, #5a6b55); }
 /* Photo tiles — classes also used by .dt-style-card__visual in the styles section */
 .dt-hero-tile--casual,
 .dt-hero-tile--outdoor,
