@@ -301,11 +301,18 @@ export async function POST(request: Request) {
     const purchaseProduct = isDating
       ? { name: "Protocol Dating — AI Dating Photos", id: "dating-ai-photos" }
       : { name: "Attractiveness Protocol", id: "f1-attractiveness-protocol" };
+    // Use the PI id as the canonical event_id across ALL fire paths (this
+    // handler, the payment_intent.succeeded handler, and any manual replay).
+    // Same event_id + same event_name = Meta/TikTok dedupe to a single
+    // conversion, even if the guard on payment_intent.succeeded slips.
+    const purchasePiId = typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : (session.payment_intent?.id ?? session.id);
     try {
       await sendMetaEvent({
         eventName: "Purchase",
         eventTime: sessionPurchaseEventTime,
-        eventId: session.id,
+        eventId: purchasePiId,
         actionSource: "website",
         eventSourceUrl: "https://protocol-club.com/checkout",
         email: customerEmail,
@@ -346,7 +353,7 @@ export async function POST(request: Request) {
       await sendTiktokEvent({
         eventName: "Purchase",
         eventTime: sessionPurchaseEventTime,
-        eventId: session.id,
+        eventId: purchasePiId,
         eventSourceUrl: "https://protocol-club.com/checkout",
         userAgent: meta.customer_user_agent || undefined,
         ipAddress: meta.customer_ip || undefined,
@@ -381,7 +388,7 @@ export async function POST(request: Request) {
     // ── GA4 Measurement Protocol Purchase ────────────────────
     try {
       await sendGA4Purchase({
-        transactionId: session.id,
+        transactionId: purchasePiId,
         value: typeof session.amount_total === "number" ? session.amount_total / 100 : 89,
         currency: session.currency ?? "usd",
         eventTime: session.created ?? Math.floor(Date.now() / 1000),

@@ -121,8 +121,8 @@ const STEPS = [
   {
     num: "02",
     time: "AI STUDIO",
-    title: "We shoot you in 5 styles",
-    desc: "A private model is trained on your face, then shot in the styles top profiles use: nature, casual, outdoor, night out, athletic.",
+    title: "We shoot you in 6 styles",
+    desc: "A private model is trained on your face, then shot in the styles top profiles use: nature, casual, outdoor, night out, athletic, lifestyle.",
   },
   {
     num: "03",
@@ -138,6 +138,7 @@ const STYLES = [
   { key: "outdoor", name: "Outdoor", desc: "Golden hour, open air." },
   { key: "night", name: "Night out", desc: "Low light, sharp fit." },
   { key: "athletic", name: "Athletic", desc: "In motion, not flexing." },
+  { key: "lifestyle", name: "Lifestyle", desc: "Travel, moments, on the move." },
 ];
 
 const RESEARCH_CARDS = [
@@ -166,7 +167,7 @@ const TESTIMONIALS = [
 
 const PRICING_BULLETS = [
   "30 high-resolution photos",
-  "5 styles: nature · casual · outdoor · night out · athletic",
+  "6 styles: nature · casual · outdoor · night out · athletic · lifestyle",
   "Ready for Tinder, Hinge and Bumble crops",
   "Delivered by email within 24 hours",
   "Source photos deleted after delivery",
@@ -194,6 +195,20 @@ const FAQS = [
     q: "Can I use the photos outside dating apps?",
     a: "They're yours. Profile pictures, social — anywhere.",
   },
+];
+
+const BEFORE_PHOTOS = [
+  { src: "/dating/transformation/before-1.webp", alt: "Phone selfie, indoor low light" },
+  { src: "/dating/transformation/before-2.webp", alt: "Casual outdoor snapshot" },
+];
+
+const AFTER_PHOTOS = [
+  { src: "/dating/transformation/after-1.webp", alt: "Outdoor — on the boat", style: "Outdoor" },
+  { src: "/dating/transformation/after-2.webp", alt: "Night out — sunset outfit", style: "Night out" },
+  { src: "/dating/transformation/after-3.webp", alt: "Nature — snorkeling at sea", style: "Nature" },
+  { src: "/dating/transformation/after-4.webp", alt: "Athletic — shirtless outdoor portrait", style: "Athletic" },
+  { src: "/dating/transformation/after-5.webp", alt: "Lifestyle — helicopter ride", style: "Lifestyle" },
+  { src: "/dating/transformation/after-6.webp", alt: "Casual — at the museum", style: "Casual" },
 ];
 
 const PRESS_LOGOS = [
@@ -260,7 +275,7 @@ function DHero() {
           <div className="mo-hero__meta">
             <span>30 photos</span>
             <span className="mo-hero__meta-dot">·</span>
-            <span>5 styles</span>
+            <span>6 styles</span>
             <span className="mo-hero__meta-dot">·</span>
             <span>delivered in 24h</span>
           </div>
@@ -281,7 +296,7 @@ function DHero() {
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
           <div className="dt-hero-grid">
-            {STYLES.filter((s) => s.key !== "nature").map((s) => (
+            {STYLES.filter((s) => s.key !== "nature" && s.key !== "lifestyle").map((s) => (
               <div key={s.key} className={`dt-hero-tile dt-hero-tile--${s.key}`}>
                 <span>{s.name}</span>
               </div>
@@ -389,9 +404,9 @@ function DStyles() {
     <section className="mo-section mo-section--surface">
       <div className="mo-container">
         <div className="mo-section-head--center">
-          <p className="mo-section-eyebrow mo-section-eyebrow--center">The 5 styles</p>
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">The 6 styles</p>
           <h2 className="mo-section-title" style={{ marginTop: 12 }}>
-            One upload. <em>Five shoots.</em>
+            One upload. <em>Six shoots.</em>
           </h2>
         </div>
         <div className="dt-styles-grid">
@@ -402,6 +417,68 @@ function DStyles() {
               <p className="dt-style-card__desc">{s.desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DBeforeAfter() {
+  return (
+    <section className="mo-section mo-section--surface">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">Before / after</p>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            The selfies you have. <em>The 30 photos you need.</em>
+          </h2>
+          <p className="dt-research-sub">
+            Same face, same features — reframed the way top dating profiles are shot. Below,
+            a real member: two phone selfies in, six of thirty out.
+          </p>
+        </div>
+
+        <div className="dt-ba-grid">
+          <div className="dt-ba-col dt-ba-col--before">
+            <div className="dt-ba-col__head">
+              <span className="dt-ba-col__tag dt-ba-col__tag--before">You upload</span>
+              <span className="dt-ba-col__meta">2 of 6–12 selfies</span>
+            </div>
+            <div className="dt-ba-before-stack">
+              {BEFORE_PHOTOS.map((p, i) => (
+                <div key={i} className="dt-ba-photo dt-ba-photo--before">
+                  <Image src={p.src} alt={p.alt} width={700} height={924} sizes="(max-width: 900px) 42vw, 240px" />
+                </div>
+              ))}
+            </div>
+            <p className="dt-ba-col__caption">Phone selfies, mixed light, mixed angles.</p>
+          </div>
+
+          <div className="dt-ba-arrow" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+
+          <div className="dt-ba-col dt-ba-col--after">
+            <div className="dt-ba-col__head">
+              <span className="dt-ba-col__tag dt-ba-col__tag--after">You get back</span>
+              <span className="dt-ba-col__meta">6 of 30 photos</span>
+            </div>
+            <div className="dt-ba-after-grid">
+              {AFTER_PHOTOS.map((p, i) => (
+                <div key={i} className="dt-ba-photo dt-ba-photo--after">
+                  <Image src={p.src} alt={p.alt} width={700} height={934} sizes="(max-width: 900px) 30vw, 180px" />
+                  <span className="dt-ba-photo__style">{p.style}</span>
+                </div>
+              ))}
+            </div>
+            <p className="dt-ba-col__caption">Nature · Casual · Outdoor · Night out · Athletic · Lifestyle.</p>
+          </div>
+        </div>
+
+        <div className="mo-section-cta">
+          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="before-after" />
         </div>
       </div>
     </section>
@@ -473,7 +550,7 @@ function DFounderStory() {
             <p>
               But at $400 a session, the people who need those photos most never book them. So we
               trained our AI studio on everything those shoots taught us — the framing, the light,
-              the five styles that get profiles noticed.
+              the six styles that get profiles noticed.
             </p>
             <p>
               Same treatment, a tenth of the budget. And the point was never prettier pictures —
@@ -503,7 +580,7 @@ const OLD_WAY = [
 
 const NEW_WAY = [
   "$39 — ten times less",
-  "5 styles, 5 settings, one upload",
+  "6 styles, 6 settings, one upload",
   "30 photos in your inbox within 24h",
   "Shot from selfies you already have",
 ];
@@ -739,6 +816,7 @@ export default function DatingOfferPage() {
       <DResearch />
       <DSteps />
       <DStyles />
+      <DBeforeAfter />
       <DLikeYou />
       <DFounderStory />
       <DOldNew />
