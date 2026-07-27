@@ -124,3 +124,16 @@ export async function getTemplateById(id: string): Promise<DatingTemplate | null
   }
   return data ? rowToTemplate(data as Row) : null;
 }
+
+export async function getTemplateBySlug(slug: string): Promise<DatingTemplate | null> {
+  const { data, error } = await supabaseAdmin
+    .from("dating_templates")
+    .select(SELECT_COLUMNS)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) {
+    console.error("[datingTemplates] getTemplateBySlug failed", { error: error.message, slug });
+    return null;
+  }
+  return data ? rowToTemplate(data as Row) : null;
+}

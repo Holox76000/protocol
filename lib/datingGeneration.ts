@@ -10,7 +10,7 @@
 
 import { supabaseAdmin } from "./supabase";
 import { generateImage, NanoBananaError, type ReferenceImage } from "./nanoBanana";
-import { loadActiveTemplates, buildPrompt, type DatingTemplate } from "./datingTemplates";
+import { loadActiveTemplates, buildPrompt, getTemplateBySlug, type DatingTemplate } from "./datingTemplates";
 import { refinePromptForPair } from "./promptAnalyzer";
 import { listOrderPhotoPaths, orderPhotosPrefix } from "./datingOrders";
 import { sendDatingDeliveryEmail } from "./email";
@@ -307,4 +307,115 @@ export async function releaseOrder(order: ReleaseOrder): Promise<{ ok: boolean; 
   }
 
   return { ok: true };
+}
+
+// ── Single-template regeneration (admin action per photo) ──────────
+
+export type SingleRegenOrder = {
+  id: string;
+  stripe_session_id: string;
+  generation_cost_cents: number | null;
+};
+
+// Regenerate ONE photo for a given (order, template) pair. Used by the
+// admin per-photo "↻" button. Optional feedback string is appended to
+// the prompt as a corrective clause so the next run fixes what the
+// admin flagged (e.g. "The nose is too thin — keep the wide bulbous
+// tip visible in the selfies").
+export async function regenerateSingleTemplate(args: {
+  order: SingleRegenOrder;
+  templateSlug: string;
+  feedback?: string | null;
+}): Promise<{ ok: boolean; path?: string; error?: string }> {
+  const { order, templateSlug, feedback } = args;
+  const sessionId = order.stripe_session_id;
+
+  const tpl = await getTemplateBySlug(templateSlug);
+  if (!tpl) return { ok: false, error: `template "${templateSlug}" not found` };
+
+  // 1. Load source selfies (same as full generation).
+  const sourcePaths = await listOrderPhotoPaths(sessionId);
+  if (sourcePaths.length < 4) {
+    return { ok: false, error: `only ${sourcePaths.length} source photos — need ≥4` };
+  }
+  const refPaths = sourcePaths.slice(0, MAX_REFERENCE_IMAGES);
+
+  const refs: ReferenceImage[] = [];
+  for (const path of refPaths) {
+    const { data, error } = await supabaseAdmin.storage.from("dating-photos").download(path);
+    if (error || !data) {
+      return { ok: false, error: `download ref failed: ${error?.message ?? "no data"}` };
+    }
+    const buf = Buffer.from(await data.arrayBuffer());
+    const ext = path.split(".").pop()?.toLowerCase() ?? "jpeg";
+    const mimeType =
+      ext === "png" ? "image/png" :
+      ext === "webp" ? "image/webp" :
+      ext === "heic" || ext === "heif" ? "image/heic" :
+      "image/jpeg";
+    refs.push({ data: buf, mimeType });
+  }
+
+  // 2. Load template ref.
+  const { data: tplData, error: tplErr } = await supabaseAdmin.storage
+    .from("dating-photos")
+    .download(tpl.refImagePath);
+  if (tplErr || !tplData) {
+    return { ok: false, error: `template ref download: ${tplErr?.message ?? "no data"}` };
+  }
+  const tplBuf = Buffer.from(await tplData.arrayBuffer());
+  const tplExt = tpl.refImagePath.split(".").pop()?.toLowerCase() ?? "jpeg";
+  const tplMime = tplExt === "png" ? "image/png" : tplExt === "webp" ? "image/webp" : "image/jpeg";
+  const templateRef: ReferenceImage = { data: tplBuf, mimeType: tplMime };
+
+  // 3. Build prompt. If feedback is present, append it as a
+  // high-priority corrective clause so the model sees it. The refined
+  // prompt path also gets the feedback woven into the scenePromptHint.
+  const feedbackClause = feedback && feedback.trim()
+    ? `\n\nADMIN CORRECTIVE FEEDBACK (highest priority — the previous generation had this specific issue, fix it in this one): ${feedback.trim()}`
+    : "";
+
+  const scenePromptHint = tpl.prompt + feedbackClause;
+  const refined = await refinePromptForPair({
+    templateReference: templateRef,
+    characterReferences: refs,
+    scenePromptHint,
+  });
+  const promptForGeneration = refined?.refinedPrompt
+    ? refined.refinedPrompt + feedbackClause
+    : buildPrompt(scenePromptHint);
+
+  try {
+    const result = await generateImage({
+      prompt: promptForGeneration,
+      templateReference: templateRef,
+      characterReferences: refs,
+      resolution: "1K",
+      aspectRatio: "4:5",
+    });
+    const uploadPath = `${orderPhotosPrefix(sessionId)}/output/${tpl.slug}.jpg`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("dating-photos")
+      .upload(uploadPath, result.imageBytes, {
+        contentType: result.mimeType,
+        upsert: true, // overwrite the previous version
+      });
+    if (upErr) return { ok: false, error: `upload: ${upErr.message}` };
+
+    // Bump the recorded generation cost by one extra photo so the
+    // Slack digest and admin gallery stay honest about spend.
+    await supabaseAdmin
+      .from("dating_orders")
+      .update({
+        generation_cost_cents: (order.generation_cost_cents ?? 0) + COST_PER_IMAGE_CENTS,
+      })
+      .eq("id", order.id);
+
+    return { ok: true, path: uploadPath };
+  } catch (err) {
+    const msg = err instanceof NanoBananaError
+      ? `NB2 ${err.status ?? "net"}: ${err.message.slice(0, 200)}`
+      : String(err).slice(0, 200);
+    return { ok: false, error: msg };
+  }
 }

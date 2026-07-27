@@ -6,6 +6,7 @@ import { listOrderPhotoPaths, orderPhotosPrefix } from "../../../../lib/datingOr
 import { DATING_QUESTIONS } from "../../../../lib/datingQuestionnaire";
 import DownloadAllButton from "./DownloadAllButton";
 import OrderActions from "./OrderActions";
+import GeneratedPhotoCard from "./GeneratedPhotoCard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,7 +49,7 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
 
   const { data: order } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, stripe_session_id, email, first_name, status, photos_count, output_count, output_paths, generation_cost_cents, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, generated_at, deliver_at, delivered_at, questionnaire_answers")
+    .select("id, stripe_session_id, email, first_name, status, photos_count, output_count, output_paths, generation_cost_cents, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, generated_at, deliver_at, delivered_at, questionnaire_answers, feedback_by_template")
     .eq("stripe_session_id", sessionId)
     .maybeSingle();
 
@@ -169,27 +170,27 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
               <p className="text-[14px] text-mute">Nothing generated yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {outputPhotos.map((p) => (
-                <a
-                  key={p.path}
-                  href={p.signedUrl}
-                  download={p.filename}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block overflow-hidden rounded-xl border border-pebble bg-white transition-shadow hover:shadow-lg"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.signedUrl} alt={p.filename} className="aspect-[4/5] w-full object-cover" loading="lazy" />
-                  <div className="flex items-center justify-between px-3 py-2 text-[11px]">
-                    <span className="truncate font-mono text-mute">{p.filename}</span>
-                    <span className="shrink-0 font-semibold text-void opacity-0 transition-opacity group-hover:opacity-100">
-                      Download →
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
+            (() => {
+              const feedbackMap = (order.feedback_by_template as Record<string, string> | null) ?? {};
+              return (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {outputPhotos.map((p) => {
+                    // Filename is "{slug}.jpg" — strip the extension to get the slug.
+                    const slug = p.filename.replace(/\.[^.]+$/, "");
+                    return (
+                      <GeneratedPhotoCard
+                        key={p.path}
+                        sessionId={sessionId}
+                        templateSlug={slug}
+                        initialSignedUrl={p.signedUrl}
+                        filename={p.filename}
+                        initialFeedback={feedbackMap[slug] ?? null}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })()
           )}
         </div>
 
