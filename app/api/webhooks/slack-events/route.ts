@@ -54,15 +54,26 @@ async function slackApi<T = Record<string, unknown>>(
   method: string,
   body: Record<string, unknown>,
 ): Promise<{ ok: boolean; error?: string } & T> {
+  // Form-encoded: Slack Web API is stricter about JSON — many endpoints
+  // reject with `invalid_arguments` when given JSON with numeric fields.
+  // Form always works.
+  const form = new URLSearchParams();
+  for (const [k, v] of Object.entries(body)) {
+    if (v !== undefined && v !== null) form.set(k, String(v));
+  }
   const res = await fetch(`https://slack.com/api/${method}`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${SLACK_BOT_TOKEN}`,
-      "Content-Type": "application/json; charset=utf-8",
+      "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
     },
-    body: JSON.stringify(body),
+    body: form.toString(),
   });
-  return (await res.json()) as { ok: boolean; error?: string } & T;
+  const json = (await res.json()) as { ok: boolean; error?: string } & T;
+  if (!json.ok) {
+    console.error("[slack-events] slackApi failed", { method, args: Object.keys(body), error: json.error });
+  }
+  return json;
 }
 
 function extractResendId(text: string | undefined): string | null {
@@ -100,6 +111,7 @@ async function handleTrigger(args: {
   replyBody: string;
 }) {
   const { channel, threadTs, triggerTs, replyBody } = args;
+  console.log("[slack-events] handleTrigger", { channel, threadTs, triggerTs, bodyLen: replyBody.length });
 
   // 1. Fetch the thread's root message to find the Resend id.
   const replies = await slackApi<{ messages: Array<{ ts: string; text?: string }> }>("conversations.replies", {
