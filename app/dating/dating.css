@@ -152,6 +152,57 @@ button.mo-pricing-card__cta {
   color: #515255;
 }
 
+/* Questionnaire textarea (real /dating/success + /demo) */
+.dt-questionnaire__textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  margin: 20px 0 4px;
+  border: 1px solid #dfe4e6;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #253239;
+  background: #fff;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.dt-questionnaire__textarea:focus {
+  outline: none;
+  border-color: #253239;
+  box-shadow: 0 0 0 3px rgba(37, 50, 57, 0.08);
+}
+.dt-questionnaire__textarea:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.dt-questionnaire__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.dt-questionnaire__actions .mo-cta {
+  flex: 1;
+}
+.dt-questionnaire__back {
+  padding: 12px 16px;
+  background: #f4f6f7;
+  color: #515255;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+.dt-questionnaire__back:hover:not(:disabled) {
+  background: #e6ebed;
+}
+.dt-questionnaire__back:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Customer gallery — /dating/gallery */
 .dt-gallery-grid {
   display: grid;

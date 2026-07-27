@@ -35,6 +35,7 @@ type Stage = "questions" | "upload" | "generating" | "results";
 export default function DemoPage() {
   const [stage, setStage] = useState<Stage>("questions");
   const [qIndex, setQIndex] = useState(0);
+  const [draft, setDraft] = useState<string>("");
   const [previews, setPreviews] = useState<string[]>([]);
   const [genStep, setGenStep] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -49,13 +50,15 @@ export default function DemoPage() {
     if (inputRef.current) inputRef.current.value = "";
   }, []);
 
-  const handleAnswer = useCallback(() => {
+  const handleNextQuestion = useCallback(() => {
+    if (!draft.trim()) return;
     if (qIndex + 1 >= QUESTIONS.length) {
       setStage("upload");
     } else {
       setQIndex(qIndex + 1);
+      setDraft("");
     }
-  }, [qIndex]);
+  }, [qIndex, draft]);
 
   useEffect(() => {
     if (stage !== "generating") return;
@@ -87,22 +90,35 @@ export default function DemoPage() {
             <p className="mo-hero__eyebrow">About you</p>
             <h1 className="dt-success__title">{QUESTIONS[qIndex].q}</h1>
             <p className="dt-success__muted">
-              Your answers calibrate the shoot — settings, outfits, framing.
+              Your answers calibrate the shoot — settings, outfits, framing. Be specific.
             </p>
-            <div className="dt-demo__opts">
-              {QUESTIONS[qIndex].options.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className="dt-demo__opt"
-                  onClick={handleAnswer}
-                >
-                  {option}
-                </button>
-              ))}
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  handleNextQuestion();
+                }
+              }}
+              placeholder={QUESTIONS[qIndex].placeholder}
+              maxLength={1000}
+              rows={4}
+              className="dt-questionnaire__textarea"
+              autoFocus
+            />
+            <div className="dt-questionnaire__actions">
+              <button
+                type="button"
+                onClick={handleNextQuestion}
+                disabled={!draft.trim()}
+                className="dt-btn mo-cta mo-cta--hero"
+              >
+                {qIndex + 1 === QUESTIONS.length ? "Done — upload photos" : "Next →"}
+              </button>
             </div>
             <p className="dt-success__count">
-              Question {qIndex + 1}/{QUESTIONS.length}
+              Question {qIndex + 1}/{QUESTIONS.length} · {draft.length}/1000
             </p>
           </div>
         )}

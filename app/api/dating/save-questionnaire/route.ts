@@ -25,9 +25,10 @@ import {
 
 export const runtime = "nodejs";
 
-// Cap the payload to prevent bloat / abuse. Each answer is a short string
-// picked from a small option set; a legit call is a few hundred bytes.
-const MAX_ANSWER_LENGTH = 200;
+// Cap per answer. Free text now — customers may write a couple of
+// sentences per question. 1000 chars per answer × 8 questions ≈ 8 KB
+// max payload, comfortably under any body-size limit.
+const MAX_ANSWER_LENGTH = 1000;
 
 function sanitize(rawAnswers: unknown): DatingAnswers | null {
   if (!rawAnswers || typeof rawAnswers !== "object") return null;

@@ -268,9 +268,8 @@ export default function DatingSuccessPage() {
   );
 }
 
-// Same UX as /demo: one question at a time, tap-to-answer, single POST on
-// the final answer. Persists existing answers if the customer refreshes
-// mid-flow (letting them pick up where they left off).
+// Same UX as /demo: one question at a time, free-text answer, single POST
+// on the last one. Resumes from the first unanswered question on refresh.
 function Questionnaire({
   sessionId,
   existingAnswers,
@@ -282,34 +281,36 @@ function Questionnaire({
 }) {
   const [answers, setAnswers] = useState<DatingAnswers>(existingAnswers ?? {});
   const [qIndex, setQIndex] = useState(() => {
-    // Resume: skip past any question the customer already answered.
     if (!existingAnswers) return 0;
     for (let i = 0; i < DATING_QUESTIONS.length; i++) {
-      if (!existingAnswers[DATING_QUESTIONS[i].id]) return i;
+      if (!existingAnswers[DATING_QUESTIONS[i].id]?.trim()) return i;
     }
     return DATING_QUESTIONS.length - 1;
   });
+  const [draft, setDraft] = useState<string>(existingAnswers?.[DATING_QUESTIONS[0].id] ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const current = DATING_QUESTIONS[qIndex];
+  const isLast = qIndex + 1 === DATING_QUESTIONS.length;
+  const canSubmit = draft.trim().length > 0 && !saving;
 
-  async function handlePick(option: string) {
-    if (saving) return;
+  async function handleNext() {
+    if (!canSubmit) return;
     setError(null);
-    const next = { ...answers, [current.id]: option };
+    const trimmed = draft.trim();
+    const next = { ...answers, [current.id]: trimmed };
     setAnswers(next);
 
-    if (qIndex + 1 < DATING_QUESTIONS.length) {
-      // Middle of the flow — just advance, no network call yet. Keeps
-      // the UX snappy; a mid-flow refresh loses the un-saved answers,
-      // which is fine because the customer just picks them again in
-      // under 30 seconds.
-      setQIndex(qIndex + 1);
+    if (!isLast) {
+      // Advance to next question, pre-fill with any existing answer for that id
+      const nextIndex = qIndex + 1;
+      setQIndex(nextIndex);
+      setDraft(next[DATING_QUESTIONS[nextIndex].id] ?? "");
       return;
     }
 
-    // Last answer → single POST with the full set.
+    // Last answer → POST the whole set.
     setSaving(true);
     try {
       const res = await fetch("/api/dating/save-questionnaire", {
@@ -330,28 +331,62 @@ function Questionnaire({
     }
   }
 
+  function handleBack() {
+    if (qIndex === 0 || saving) return;
+    // Save the current draft into the local answers map before moving back
+    const trimmed = draft.trim();
+    const withDraft = trimmed ? { ...answers, [current.id]: trimmed } : answers;
+    const prevIndex = qIndex - 1;
+    setAnswers(withDraft);
+    setQIndex(prevIndex);
+    setDraft(withDraft[DATING_QUESTIONS[prevIndex].id] ?? "");
+    setError(null);
+  }
+
   return (
     <div className="dt-success__card">
       <p className="mo-hero__eyebrow">About you</p>
       <h1 className="dt-success__title">{current.q}</h1>
       <p className="dt-success__muted">
-        Your answers calibrate the shoot — settings, outfits, framing.
+        Your answers calibrate the shoot — settings, outfits, framing. Be specific.
       </p>
-      <div className="dt-demo__opts">
-        {current.options.map((option) => (
-          <button
-            key={option}
-            type="button"
-            className="dt-demo__opt"
-            disabled={saving}
-            onClick={() => handlePick(option)}
-          >
-            {option}
-          </button>
-        ))}
+      <textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          // Submit on Cmd/Ctrl + Enter, mirrors chat UX.
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            e.preventDefault();
+            void handleNext();
+          }
+        }}
+        placeholder={current.placeholder}
+        maxLength={1000}
+        rows={4}
+        className="dt-questionnaire__textarea"
+        disabled={saving}
+        autoFocus
+      />
+      <div className="dt-questionnaire__actions">
+        <button
+          type="button"
+          onClick={handleBack}
+          disabled={qIndex === 0 || saving}
+          className="dt-btn dt-questionnaire__back"
+        >
+          ← Back
+        </button>
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={!canSubmit}
+          className="dt-btn mo-cta mo-cta--hero"
+        >
+          {saving ? "Saving…" : isLast ? "Done — start the shoot" : "Next →"}
+        </button>
       </div>
       <p className="dt-success__count">
-        {saving ? "Saving…" : `Question ${qIndex + 1}/${DATING_QUESTIONS.length}`}
+        Question {qIndex + 1}/{DATING_QUESTIONS.length} · {draft.length}/1000
       </p>
       {error && <p className="dt-success__error">{error}</p>}
     </div>
