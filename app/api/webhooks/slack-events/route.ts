@@ -175,8 +175,31 @@ async function handleTrigger(args: {
   });
 }
 
+// GET is a health-check for humans and Slack's URL verification pre-check.
+// Slack itself only ever POSTs, but exposing GET here lets ops verify the
+// route is deployed and reachable via a simple browser hit.
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    route: "/api/webhooks/slack-events",
+    hint: "POST me with { type: 'url_verification', challenge: '...' } to test.",
+    signingSecretConfigured: !!process.env.SLACK_SIGNING_SECRET,
+    emailsChannelConfigured: !!process.env.SLACK_EMAILS_CHANNEL_ID,
+    botTokenConfigured: !!process.env.SLACK_BOT_TOKEN,
+  });
+}
+
 export async function POST(request: Request) {
   const rawBody = await request.text();
+  // TEMP diagnostic: log every hit so we can confirm Slack is delivering.
+  console.log("[slack-events] REQUEST", {
+    ua: request.headers.get("user-agent"),
+    retry: request.headers.get("x-slack-retry-num"),
+    hasTs: !!request.headers.get("x-slack-request-timestamp"),
+    hasSig: !!request.headers.get("x-slack-signature"),
+    bodyStart: rawBody.slice(0, 200),
+    bodyLen: rawBody.length,
+  });
 
   let payload: SlackEventPayload;
   try { payload = JSON.parse(rawBody); }
