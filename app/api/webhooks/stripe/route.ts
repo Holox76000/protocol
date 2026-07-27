@@ -280,6 +280,56 @@ export async function POST(request: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const meta = (session.metadata ?? {}) as Record<string, string>;
 
+    // Dating upsells ride the same webhook. They must skip the full
+    // Purchase flow (CAPI / GA4 / registration email / lead nurture pause
+    // / lead → customer promotion) because those already fired on the
+    // original $39 payment. Just flip the flag on the order.
+    if (meta.upsell_kind === "priority" || meta.upsell_kind === "luxury") {
+      if (session.payment_status !== "paid") {
+        console.log("[webhook/stripe] Dating upsell not paid — skipping", {
+          sessionId: session.id, paymentStatus: session.payment_status,
+        });
+        return NextResponse.json({ received: true });
+      }
+      const orderId = meta.dating_order_id;
+      const kind = meta.upsell_kind as "priority" | "luxury";
+      if (!orderId) {
+        console.error("[webhook/stripe] Dating upsell missing dating_order_id metadata", { sessionId: session.id });
+        return NextResponse.json({ received: true });
+      }
+      const piId = typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : (session.payment_intent?.id ?? null);
+      const nowIso = new Date().toISOString();
+
+      const update = kind === "priority"
+        ? { upsell_priority: true,  upsell_priority_paid_at: nowIso, upsell_priority_pi_id: piId }
+        : { upsell_luxury:  true,   upsell_luxury_paid_at:   nowIso, upsell_luxury_pi_id:   piId };
+
+      const { error: updErr } = await supabaseAdmin
+        .from("dating_orders")
+        .update(update)
+        .eq("id", orderId);
+
+      if (updErr) {
+        console.error("[webhook/stripe] Dating upsell update failed", { error: updErr.message, orderId, kind });
+      } else {
+        console.log("[webhook/stripe] Dating upsell recorded", { orderId, kind });
+      }
+
+      // Ping #new-sales so the team sees the upsell in the same feed as the
+      // parent order. Best-effort — never block the webhook on Slack.
+      try {
+        await postToSlack("sales", {
+          text: kind === "priority"
+            ? `:zap: *Priority delivery upsell* — $20 · order \`${orderId.slice(0,8)}\``
+            : `:champagne: *Luxury Lifestyle pack upsell* — $20 · order \`${orderId.slice(0,8)}\``,
+        });
+      } catch { /* best-effort */ }
+
+      return NextResponse.json({ received: true, upsell: kind });
+    }
+
     const customerEmail = session.customer_details?.email ?? null;
     const customerName = session.customer_details?.name ?? null;
     const stripeCustomerId =

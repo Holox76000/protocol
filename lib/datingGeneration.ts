@@ -50,6 +50,7 @@ export type GenerationOrder = {
   email: string;
   first_name: string | null;
   photos_uploaded_at: string | null;
+  created_at: string;
   amount_cents: number | null;
   utm_source: string | null;
   utm_campaign: string | null;
@@ -58,7 +59,21 @@ export type GenerationOrder = {
   // Admin-picked subset of source selfies used as Nano Banana character refs.
   // Empty = fall back to the first MAX_REFERENCE_IMAGES alphabetically.
   selected_ref_paths: string[] | null;
+  // Post-purchase upsells (see supabase/migrations/032_dating_upsells.sql).
+  //   priority → guarantees delivery within 8h of the original payment.
+  //   luxury   → unlocks the 8 luxury templates on top of the core set.
+  upsell_priority: boolean;
+  upsell_luxury: boolean;
 };
+
+// Delivery target when the priority upsell is paid: 8h from the original
+// Stripe payment. Uses `created_at` on dating_orders as the payment anchor —
+// the row is upserted in the checkout.session.completed webhook, so its
+// timestamp lines up with the payment within a few seconds.
+const PRIORITY_DELIVERY_HOURS = 8;
+export function computePriorityDeliverAt(paidAtIso: string): string {
+  return new Date(new Date(paidAtIso).getTime() + PRIORITY_DELIVERY_HOURS * 3600 * 1000).toISOString();
+}
 
 // Resolve which storage paths to use as character references, given the
 // admin's picked list (if any) and the full listing of source photos.
@@ -119,7 +134,11 @@ export async function generateForOrder(
   }
 
   // 3. Load active templates from DB. Each one = 1 generated photo.
-  const templates = await loadActiveTemplates();
+  //    The luxury set is only pulled in when the order paid the $20 upsell.
+  const templateKinds: Array<"core" | "luxury"> = order.upsell_luxury
+    ? ["core", "luxury"]
+    : ["core"];
+  const templates = await loadActiveTemplates(templateKinds);
   if (templates.length === 0) {
     return { ok: false, error: "no active templates configured" };
   }
@@ -204,12 +223,21 @@ export async function generateForOrder(
     return { ok: false, error: errSummary };
   }
 
-  // 6. Compute deliver_at based on the caller's intent.
-  //   - Cron: hold 6-8h from photos_uploaded_at ("we're reviewing" narrative)
-  //   - Admin manual: deliver_at = now (skip the wait; the release action
-  //     is a separate explicit click by the admin)
+  // 6. Compute deliver_at based on the caller's intent + upsells.
+  //   - Admin manual: deliver_at = now (skip the wait)
+  //   - Priority upsell paid: deliver_at = paid_at + 8h (guaranteed SLA sold
+  //     to the customer). Overrides the 6-8h hold regardless of whether the
+  //     hold would land earlier or later.
+  //   - Otherwise: hold 6-8h from photos_uploaded_at ("we're reviewing")
   const anchor = order.photos_uploaded_at ?? new Date().toISOString();
-  const deliverAt = holdBeforeDelivery ? computeDeliverAt(anchor) : new Date().toISOString();
+  let deliverAt: string;
+  if (!holdBeforeDelivery) {
+    deliverAt = new Date().toISOString();
+  } else if (order.upsell_priority) {
+    deliverAt = computePriorityDeliverAt(order.created_at);
+  } else {
+    deliverAt = computeDeliverAt(anchor);
+  }
   const generationCostCents = uploaded.length * COST_PER_IMAGE_CENTS;
 
   const { error: upOrderErr } = await supabaseAdmin

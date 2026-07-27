@@ -15,9 +15,12 @@ export type DatingTemplate = {
   refImagePath: string;   // path inside the dating-photos bucket
   active: boolean;
   sortOrder: number;
+  kind: "core" | "luxury"; // luxury = unlocked only by the $20 upsell
   createdAt: string;
   updatedAt: string;
 };
+
+export type TemplateKind = "core" | "luxury";
 
 // Minimal wrapper. Keep it SHORT — long text prompts confuse the image model
 // and get overweighted vs the visual references. The core instruction is
@@ -60,6 +63,7 @@ type Row = {
   ref_image_path: string;
   active: boolean;
   sort_order: number;
+  kind: TemplateKind | null;
   created_at: string;
   updated_at: string;
 };
@@ -73,22 +77,29 @@ function rowToTemplate(row: Row): DatingTemplate {
     refImagePath: row.ref_image_path,
     active: row.active,
     sortOrder: row.sort_order,
+    kind: (row.kind ?? "core") as TemplateKind,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
 const SELECT_COLUMNS =
-  "id, slug, label, prompt, ref_image_path, active, sort_order, created_at, updated_at";
+  "id, slug, label, prompt, ref_image_path, active, sort_order, kind, created_at, updated_at";
 
 // Worker path. Returns templates in the order the customer will receive
 // their photos. Filter is DB-side so an inactive template never even makes
 // it into the fan-out.
-export async function loadActiveTemplates(): Promise<DatingTemplate[]> {
+//
+// `kinds` restricts to a subset — defaults to core only. The luxury set is
+// gated behind the $20 upsell and should never leak into a standard order.
+export async function loadActiveTemplates(
+  kinds: TemplateKind[] = ["core"],
+): Promise<DatingTemplate[]> {
   const { data, error } = await supabaseAdmin
     .from("dating_templates")
     .select(SELECT_COLUMNS)
     .eq("active", true)
+    .in("kind", kinds)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
   if (error) {

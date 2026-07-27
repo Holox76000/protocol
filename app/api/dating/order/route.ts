@@ -24,5 +24,7 @@ export async function GET(request: Request) {
     // partially filled in and refreshed sees their in-progress state.
     questionnaireDone: isQuestionnaireComplete(order.questionnaire_answers),
     questionnaireAnswers: order.questionnaire_answers ?? null,
+    upsellPriority: order.upsell_priority,
+    upsellLuxury: order.upsell_luxury,
   });
 }

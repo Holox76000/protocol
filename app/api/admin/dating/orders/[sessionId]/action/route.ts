@@ -25,7 +25,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const ORDER_COLS = "id, stripe_session_id, email, first_name, status, output_count, photos_uploaded_at, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts, selected_ref_paths";
+const ORDER_COLS = "id, stripe_session_id, email, first_name, status, output_count, photos_uploaded_at, created_at, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts, selected_ref_paths, upsell_priority, upsell_luxury";
 
 type Action = "generate" | "deliver" | "regenerate";
 

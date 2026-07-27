@@ -17,6 +17,11 @@ type OrderState =
   | { status: "ready"; email: string }
   | { status: "done"; email: string };
 
+type UpsellState = {
+  priority: boolean;
+  luxury: boolean;
+};
+
 export default function DatingSuccessPage() {
   const [order, setOrder] = useState<OrderState>({ status: "loading" });
   const [sessionId, setSessionId] = useState<string>("");
@@ -25,16 +30,26 @@ export default function DatingSuccessPage() {
   const [uploading, setUploading] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upsells, setUpsells] = useState<UpsellState>({ priority: false, luxury: false });
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const sid = new URLSearchParams(window.location.search).get("session_id");
+    const url = new URLSearchParams(window.location.search);
+    const sid = url.get("session_id");
     if (!sid) {
       setOrder({ status: "invalid" });
       return;
     }
     setSessionId(sid);
     trackGa4Event("dating_success_viewed", { funnel: "dating", page_path: "/dating/success" });
+
+    // Coming back from a Stripe Checkout upsell — the webhook may need a
+    // few seconds to land, so we'll poll below until the flag flips.
+    const justPaidUpsell = url.get("upsell");
+    if (justPaidUpsell === "priority" || justPaidUpsell === "luxury") {
+      trackGa4Event("dating_upsell_returned", { funnel: "dating", kind: justPaidUpsell });
+      pollUpsellUntilPaid(sid, justPaidUpsell, setUpsells);
+    }
 
     // Retry transient failures (cold start, network blip) — a customer who
     // paid 10 seconds ago must not land on "order not found" because of a 500.
@@ -49,8 +64,11 @@ export default function DatingSuccessPage() {
               photosCount: number;
               questionnaireDone: boolean;
               questionnaireAnswers: DatingAnswers | null;
+              upsellPriority?: boolean;
+              upsellLuxury?: boolean;
             };
             setUploadedCount(data.photosCount);
+            setUpsells({ priority: !!data.upsellPriority, luxury: !!data.upsellLuxury });
             // Stage precedence:
             //   1. Beyond paid → the customer already uploaded (or we generated) → done
             //   2. Paid + questionnaire not done → questions
@@ -257,13 +275,160 @@ export default function DatingSuccessPage() {
         {order.status === "done" && (
           <div className="dt-success__card">
             <p className="mo-hero__eyebrow">Photos received</p>
-            <h1 className="dt-success__title">Done. Your dating photos land in your inbox within 24 hours.</h1>
+            <h1 className="dt-success__title">
+              Done. Your dating photos land in your inbox within {upsells.priority ? "8 hours" : "24 hours"}.
+            </h1>
             <p className="dt-success__muted">
               We&rsquo;ll send them to <strong>{order.email}</strong>. Nothing else to do.
             </p>
           </div>
         )}
+
+        {(order.status === "ready" || order.status === "done") && (
+          <UpsellCards sessionId={sessionId} upsells={upsells} orderStatus={order.status} />
+        )}
       </main>
+    </div>
+  );
+}
+
+// ── Upsell cards ──────────────────────────────────────────────────────
+
+async function pollUpsellUntilPaid(
+  sessionId: string,
+  kind: string,
+  setUpsells: React.Dispatch<React.SetStateAction<UpsellState>>,
+): Promise<void> {
+  // Webhook usually lands within 1-2s. Poll for up to ~20s before giving up.
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 2000));
+    try {
+      const res = await fetch(`/api/dating/order?session_id=${encodeURIComponent(sessionId)}`);
+      if (!res.ok) continue;
+      const data = (await res.json()) as { upsellPriority?: boolean; upsellLuxury?: boolean };
+      const paid = kind === "priority" ? data.upsellPriority : data.upsellLuxury;
+      if (paid) {
+        setUpsells({ priority: !!data.upsellPriority, luxury: !!data.upsellLuxury });
+        return;
+      }
+    } catch { /* retry */ }
+  }
+}
+
+function UpsellCards({
+  sessionId, upsells, orderStatus,
+}: {
+  sessionId: string;
+  upsells: UpsellState;
+  orderStatus: "ready" | "done";
+}) {
+  const [busy, setBusy] = useState<"priority" | "luxury" | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const buy = async (kind: "priority" | "luxury") => {
+    if (busy) return;
+    setBusy(kind);
+    setErr(null);
+    try {
+      const res = await fetch("/api/dating/upsell/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, kind }),
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (res.ok && data.url) {
+        trackGa4Event("dating_upsell_clicked", { funnel: "dating", kind });
+        window.location.href = data.url;
+        return;
+      }
+      setErr(data.error ?? "Something went wrong.");
+    } catch {
+      setErr("Something went wrong.");
+    }
+    setBusy(null);
+  };
+
+  return (
+    <section style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
+      <p className="mo-hero__eyebrow" style={{ textAlign: "center" }}>Add to your order</p>
+
+      <UpsellCard
+        title="Priority delivery — 8 hours"
+        body={upsells.priority
+          ? "You'll get your dating photos within 8 hours of your purchase."
+          : "Skip the wait. Get your photos within 8 hours of your purchase instead of 24."}
+        price="$20"
+        added={upsells.priority}
+        busy={busy === "priority"}
+        disabled={orderStatus === "done" && false /* priority still useful pre-delivery */}
+        onAdd={() => buy("priority")}
+      />
+
+      <UpsellCard
+        title="Luxury Lifestyle pack — 8 extra photos"
+        body={upsells.luxury
+          ? "Your 8 luxury photos (yacht, private jet, ski chalet…) are being generated."
+          : "Add 8 dating photos in luxury scenes — yacht, private jet, rooftop pool, ski chalet, F1 paddock, and more."}
+        price="$20"
+        added={upsells.luxury}
+        busy={busy === "luxury"}
+        onAdd={() => buy("luxury")}
+      />
+
+      {err && <p className="dt-success__error" style={{ textAlign: "center" }}>{err}</p>}
+    </section>
+  );
+}
+
+function UpsellCard({
+  title, body, price, added, busy, disabled, onAdd,
+}: {
+  title: string;
+  body: string;
+  price: string;
+  added: boolean;
+  busy: boolean;
+  disabled?: boolean;
+  onAdd: () => void;
+}) {
+  return (
+    <div style={{
+      background: added ? "#e8f2ec" : "#ffffff",
+      border: `1.5px solid ${added ? "#4a7a5e" : "#dfe4e6"}`,
+      borderRadius: 12,
+      padding: "18px 20px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 16,
+    }}>
+      <div style={{ flex: 1 }}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#253239" }}>{title}</p>
+        <p style={{ margin: "4px 0 0", fontSize: 13, color: "#515255", lineHeight: 1.5 }}>{body}</p>
+      </div>
+      {added ? (
+        <span style={{ color: "#4a7a5e", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap" }}>
+          ✓ Added
+        </span>
+      ) : (
+        <button
+          onClick={onAdd}
+          disabled={busy || disabled}
+          style={{
+            padding: "10px 18px",
+            background: busy || disabled ? "#dfe4e6" : "#253239",
+            color: busy || disabled ? "#7f949b" : "#ffffff",
+            border: "none",
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: busy || disabled ? "not-allowed" : "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {busy ? "…" : `Add ${price}`}
+        </button>
+      )}
     </div>
   );
 }

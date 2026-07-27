@@ -16,9 +16,11 @@ export type DatingOrder = {
   utm_content: string | null;
   slack_sales_thread_ts: string | null;
   questionnaire_answers: Record<string, string> | null;
+  upsell_priority: boolean;
+  upsell_luxury: boolean;
 };
 
-const ORDER_COLUMNS = "id, stripe_session_id, email, first_name, status, photo_paths, photos_count, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts, questionnaire_answers";
+const ORDER_COLUMNS = "id, stripe_session_id, email, first_name, status, photo_paths, photos_count, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts, questionnaire_answers, upsell_priority, upsell_luxury";
 
 export function isValidCheckoutSessionId(id: string | null | undefined): id is string {
   return typeof id === "string" && /^cs_[A-Za-z0-9_]+$/.test(id);
