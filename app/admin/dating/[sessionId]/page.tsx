@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "../../../../lib/adminAuth";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { listOrderPhotoPaths } from "../../../../lib/datingOrders";
+import { DATING_QUESTIONS } from "../../../../lib/datingQuestionnaire";
 import DownloadAllButton from "./DownloadAllButton";
 
 export const runtime = "nodejs";
@@ -26,7 +27,7 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
 
   const { data: order } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, stripe_session_id, email, first_name, status, photos_count, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, delivered_at")
+    .select("id, stripe_session_id, email, first_name, status, photos_count, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, delivered_at, questionnaire_answers")
     .eq("stripe_session_id", sessionId)
     .maybeSingle();
 
@@ -82,6 +83,33 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
             )}
           </div>
         </div>
+
+        {(() => {
+          const answers = (order.questionnaire_answers as Record<string, string> | null) ?? null;
+          const answered = answers ? Object.keys(answers).length : 0;
+          return (
+            <div className="mb-6 rounded-2xl border border-pebble bg-white p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">Questionnaire</p>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${answered === DATING_QUESTIONS.length ? "bg-emerald-50 text-emerald-700" : answered > 0 ? "bg-amber-50 text-amber-700" : "bg-pebble text-dim"}`}>
+                  {answered}/{DATING_QUESTIONS.length}
+                </span>
+              </div>
+              {answered === 0 ? (
+                <p className="text-[13px] text-mute">Not answered yet.</p>
+              ) : (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {DATING_QUESTIONS.map((q) => (
+                    <div key={q.id}>
+                      <dt className="text-[11px] font-semibold uppercase tracking-wider text-mute">{q.q}</dt>
+                      <dd className="mt-1 text-[13px] text-void">{answers?.[q.id] ?? <span className="text-dim">—</span>}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="mb-4 flex items-center justify-between">
           <div className="text-[13px] text-mute">

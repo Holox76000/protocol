@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackGa4Event } from "../../../lib/ga4Event";
+import { DATING_QUESTIONS, type DatingAnswers } from "../../../lib/datingQuestionnaire";
 import "../../f1/f1.css";
 import "../../f1/offer/f1-offer.css";
 import "../dating.css";
@@ -12,6 +13,7 @@ const MAX_PHOTOS = 12;
 type OrderState =
   | { status: "loading" }
   | { status: "invalid" }
+  | { status: "questions"; email: string; existingAnswers: DatingAnswers | null }
   | { status: "ready"; email: string }
   | { status: "done"; email: string };
 
@@ -41,13 +43,25 @@ export default function DatingSuccessPage() {
         try {
           const res = await fetch(`/api/dating/order?session_id=${encodeURIComponent(sid)}`);
           if (res.ok) {
-            const data = (await res.json()) as { status: string; email: string; photosCount: number };
+            const data = (await res.json()) as {
+              status: string;
+              email: string;
+              photosCount: number;
+              questionnaireDone: boolean;
+              questionnaireAnswers: DatingAnswers | null;
+            };
             setUploadedCount(data.photosCount);
-            setOrder(
-              data.status === "photos_uploaded" || data.status === "delivered"
-                ? { status: "done", email: data.email }
-                : { status: "ready", email: data.email }
-            );
+            // Stage precedence:
+            //   1. Beyond paid → the customer already uploaded (or we generated) → done
+            //   2. Paid + questionnaire not done → questions
+            //   3. Paid + questionnaire done → ready (upload)
+            if (data.status === "photos_uploaded" || data.status === "delivered" || data.status === "generating" || data.status === "generated") {
+              setOrder({ status: "done", email: data.email });
+            } else if (!data.questionnaireDone) {
+              setOrder({ status: "questions", email: data.email, existingAnswers: data.questionnaireAnswers });
+            } else {
+              setOrder({ status: "ready", email: data.email });
+            }
             return;
           }
           if (res.status < 500) break;
@@ -60,6 +74,15 @@ export default function DatingSuccessPage() {
     };
     void loadOrder();
   }, []);
+
+  const handleQuestionnaireDone = useCallback((answers: DatingAnswers) => {
+    if (order.status !== "questions") return;
+    trackGa4Event("dating_questionnaire_completed", { funnel: "dating" });
+    setOrder({ status: "ready", email: order.email });
+    // Nothing to await here — the API save happened inside the questionnaire
+    // component right before it fired this callback.
+    void answers;
+  }, [order]);
 
   const handleFiles = useCallback(
     async (files: FileList | null) => {
@@ -171,6 +194,14 @@ export default function DatingSuccessPage() {
           </div>
         )}
 
+        {order.status === "questions" && (
+          <Questionnaire
+            sessionId={sessionId}
+            existingAnswers={order.existingAnswers}
+            onDone={handleQuestionnaireDone}
+          />
+        )}
+
         {order.status === "ready" && (
           <div className="dt-success__card">
             <p className="mo-hero__eyebrow">Order confirmed</p>
@@ -233,6 +264,96 @@ export default function DatingSuccessPage() {
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+// Same UX as /demo: one question at a time, tap-to-answer, single POST on
+// the final answer. Persists existing answers if the customer refreshes
+// mid-flow (letting them pick up where they left off).
+function Questionnaire({
+  sessionId,
+  existingAnswers,
+  onDone,
+}: {
+  sessionId: string;
+  existingAnswers: DatingAnswers | null;
+  onDone: (answers: DatingAnswers) => void;
+}) {
+  const [answers, setAnswers] = useState<DatingAnswers>(existingAnswers ?? {});
+  const [qIndex, setQIndex] = useState(() => {
+    // Resume: skip past any question the customer already answered.
+    if (!existingAnswers) return 0;
+    for (let i = 0; i < DATING_QUESTIONS.length; i++) {
+      if (!existingAnswers[DATING_QUESTIONS[i].id]) return i;
+    }
+    return DATING_QUESTIONS.length - 1;
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const current = DATING_QUESTIONS[qIndex];
+
+  async function handlePick(option: string) {
+    if (saving) return;
+    setError(null);
+    const next = { ...answers, [current.id]: option };
+    setAnswers(next);
+
+    if (qIndex + 1 < DATING_QUESTIONS.length) {
+      // Middle of the flow — just advance, no network call yet. Keeps
+      // the UX snappy; a mid-flow refresh loses the un-saved answers,
+      // which is fine because the customer just picks them again in
+      // under 30 seconds.
+      setQIndex(qIndex + 1);
+      return;
+    }
+
+    // Last answer → single POST with the full set.
+    setSaving(true);
+    try {
+      const res = await fetch("/api/dating/save-questionnaire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, answers: next }),
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        setError(data.error ?? "Could not save your answers — try again.");
+        setSaving(false);
+        return;
+      }
+      onDone(next);
+    } catch {
+      setError("Could not save your answers — check your connection and try again.");
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="dt-success__card">
+      <p className="mo-hero__eyebrow">About you</p>
+      <h1 className="dt-success__title">{current.q}</h1>
+      <p className="dt-success__muted">
+        Your answers calibrate the shoot — settings, outfits, framing.
+      </p>
+      <div className="dt-demo__opts">
+        {current.options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            className="dt-demo__opt"
+            disabled={saving}
+            onClick={() => handlePick(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <p className="dt-success__count">
+        {saving ? "Saving…" : `Question ${qIndex + 1}/${DATING_QUESTIONS.length}`}
+      </p>
+      {error && <p className="dt-success__error">{error}</p>}
     </div>
   );
 }

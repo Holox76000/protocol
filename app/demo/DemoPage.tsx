@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DATING_QUESTIONS } from "../../lib/datingQuestionnaire";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -26,32 +27,8 @@ const GENERATION_STEPS = [
   "Retouching light and framing…",
 ];
 
-const QUESTIONS = [
-  {
-    q: "How would you describe your style?",
-    options: ["Clean & classic", "Casual", "Streetwear", "Rugged"],
-  },
-  {
-    q: "Where do you feel most yourself?",
-    options: ["At home", "Outdoors", "At the gym", "Out at night"],
-  },
-  {
-    q: "What does a good weekend look like?",
-    options: ["Training", "Cooking with friends", "A hike out of town", "Going out"],
-  },
-  {
-    q: "Beard or clean-shaven?",
-    options: ["Beard", "Stubble", "Clean-shaven"],
-  },
-  {
-    q: "What are you hoping for?",
-    options: ["A relationship", "Dates", "Not sure yet"],
-  },
-  {
-    q: "Pick your vibe.",
-    options: ["Warm & approachable", "Confident & sharp", "Laid-back"],
-  },
-];
+// Shared with the real /dating/success flow — see lib/datingQuestionnaire.
+const QUESTIONS = DATING_QUESTIONS;
 
 type Stage = "questions" | "upload" | "generating" | "results";
 

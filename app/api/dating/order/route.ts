@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOrCreateDatingOrder, isValidCheckoutSessionId } from "../../../../lib/datingOrders";
+import { isQuestionnaireComplete } from "../../../../lib/datingQuestionnaire";
 
 export const runtime = "nodejs";
 
@@ -18,5 +19,10 @@ export async function GET(request: Request) {
     status: order.status,
     email: order.email,
     photosCount: order.photos_count,
+    // Client decides between "show questionnaire" and "show upload" based
+    // on this flag. Also returns the current answers so a customer who
+    // partially filled in and refreshed sees their in-progress state.
+    questionnaireDone: isQuestionnaireComplete(order.questionnaire_answers),
+    questionnaireAnswers: order.questionnaire_answers ?? null,
   });
 }
