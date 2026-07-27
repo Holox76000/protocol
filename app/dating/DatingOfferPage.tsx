@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
+import { getDatingHeroVariant, DEFAULT_DATING_HERO_VARIANT, type DatingHeroVariant } from "../../lib/datingAdVariants";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "./dating.css";
@@ -257,11 +258,31 @@ function DNav() {
 }
 
 function DHero() {
+  // Swap the H1 after hydration based on the ad the visitor clicked
+  // (utm_content = Meta ad_id). Default variant renders in SSR so
+  // Google indexes the canonical headline and the LCP isn't blocked
+  // by any client work. The switch happens in one paint after
+  // hydration — invisible flash in practice.
+  const [variant, setVariant] = useState<DatingHeroVariant>(DEFAULT_DATING_HERO_VARIANT);
+  useEffect(() => {
+    const utms = { ...getPersistedUtmParams(), ...getUtmParams() };
+    const next = getDatingHeroVariant(utms.utm_content);
+    if (next.key !== DEFAULT_DATING_HERO_VARIANT.key) {
+      setVariant(next);
+    }
+    // Fire once per view so we can compare CTR/CVR by variant in GA4.
+    trackGa4Event("dating_hero_variant_shown", {
+      funnel: "dating",
+      variant_key: next.key,
+      utm_content: utms.utm_content ?? null,
+    });
+  }, []);
+
   return (
     <section className="mo-hero mo-hero-v1">
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
-          <h1 className="mo-hero__title">Photos that get you matches. <em>Without a photographer.</em></h1>
+          <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
           <p className="mo-hero__desc">
             We analyzed thousands of top-performing profiles on the main dating apps.
             Our AI studio shoots you the way they&rsquo;re shot — a full pack of profile-ready
@@ -284,7 +305,7 @@ function DHero() {
 
       {/* Mobile: copy above the visual */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
-        <h1 className="mo-hero__title">Photos that get you matches. <em>Without a photographer.</em></h1>
+        <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
         <p className="mo-hero__desc">
           We analyzed thousands of top-performing profiles on the main dating apps.
           Our AI studio shoots you the way they&rsquo;re shot — a full pack of profile-ready
