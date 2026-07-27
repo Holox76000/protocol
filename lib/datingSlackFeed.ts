@@ -122,8 +122,11 @@ export async function postDatingOrderRoot(args: {
 }
 
 // Refresh the root header. Called at every status transition. If ts is
-// missing (e.g. root was never posted), we fall back to posting a fresh
-// message so the feed still gets a signal.
+// missing (root was never posted), we fall back to posting a fresh
+// message and persist the new ts back on the order. Returns the ts
+// that's now live on the message — callers should use this for any
+// subsequent thread reply so old-order rows with initially-NULL ts
+// still get their thread messages properly attached.
 export async function refreshDatingOrderRoot(args: {
   orderId: string;
   ts: string | null;
@@ -136,9 +139,9 @@ export async function refreshDatingOrderRoot(args: {
   utmCampaign: string | null;
   utmContent: string | null;
   holdHoursRemaining?: number | null;
-}): Promise<void> {
+}): Promise<{ ts: string | null }> {
   const channelId = salesChannelId();
-  if (!channelId) return;
+  if (!channelId) return { ts: args.ts };
 
   const utm = [args.utmSource, args.utmCampaign, args.utmContent].filter(Boolean).join(" · ") || null;
   const revenueCents = args.amountCents ?? REVENUE_CENTS_DEFAULT;
@@ -155,20 +158,24 @@ export async function refreshDatingOrderRoot(args: {
 
   if (args.ts) {
     const res = await slackUpdateMessage({ channelId, ts: args.ts, text });
-    if (res.ok) return;
+    if (res.ok) return { ts: args.ts };
     console.error("[dating/slack] root update failed — falling back to a new post", {
       error: res.error, orderId: args.orderId,
     });
   }
 
-  // Fallback: post fresh and re-persist.
+  // Fallback: post fresh and re-persist so the next transition can edit it.
   const post = await slackPostMessage({ channelId, text });
-  if (post.ok && post.ts) {
-    await supabaseAdmin
-      .from("dating_orders")
-      .update({ slack_sales_thread_ts: post.ts })
-      .eq("id", args.orderId);
+  if (!post.ok || !post.ts) {
+    console.error("[dating/slack] root fallback post also failed", { error: post.error, orderId: args.orderId });
+    return { ts: null };
   }
+  const { error: dbErr } = await supabaseAdmin
+    .from("dating_orders")
+    .update({ slack_sales_thread_ts: post.ts })
+    .eq("id", args.orderId);
+  if (dbErr) console.error("[dating/slack] persist new ts failed", { error: dbErr.message, orderId: args.orderId });
+  return { ts: post.ts };
 }
 
 // Post a threaded reply below the root. Silent no-op if ts missing (nothing

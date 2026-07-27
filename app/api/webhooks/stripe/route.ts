@@ -443,13 +443,15 @@ export async function POST(request: Request) {
             .single();
           if (orderError) throw new Error(orderError.message);
 
-          // Post the root of the sales feed once per order. Idempotent: if the
-          // webhook is redelivered, we skip if a ts already exists.
+          // Post the root of the sales feed once per order. Idempotent:
+          // if the webhook is redelivered, we skip when a ts already
+          // exists. Awaited so Netlify's Lambda freeze doesn't drop the
+          // Slack call after the response is sent.
           if (upsertedOrder && !upsertedOrder.slack_sales_thread_ts) {
             const piIdFromSession = typeof session.payment_intent === "string"
               ? session.payment_intent
               : (session.payment_intent?.id ?? null);
-            void postDatingOrderRoot({
+            await postDatingOrderRoot({
               orderId: upsertedOrder.id as string,
               stripeSessionId: session.id,
               email: customerEmail,

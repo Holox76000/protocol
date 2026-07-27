@@ -229,7 +229,7 @@ export async function generateForOrder(
   }
 
   const deliverInHours = Math.max(0, (new Date(deliverAt).getTime() - Date.now()) / 3600000);
-  void refreshDatingOrderRoot({
+  const refreshed = await refreshDatingOrderRoot({
     orderId,
     ts: order.slack_sales_thread_ts,
     status: "generated",
@@ -250,8 +250,8 @@ export async function generateForOrder(
   const releaseNote = holdBeforeDelivery
     ? `Releases in ${deliverInHours.toFixed(1)}h.`
     : "Ready for admin review — manual delivery pending.";
-  void replyDatingOrderThread({
-    ts: order.slack_sales_thread_ts,
+  await replyDatingOrderThread({
+    ts: refreshed.ts,
     text: [
       `:test_tube: *Generated* — ${uploaded.length} photos in ${refs.length}-ref mode.`,
       `${costLine}`,
@@ -294,7 +294,12 @@ export async function releaseOrder(order: ReleaseOrder): Promise<{ ok: boolean; 
     return { ok: false, error: `release update: ${upErr.message}` };
   }
 
-  void refreshDatingOrderRoot({
+  // Await both Slack calls — void-callbacks get frozen when the Netlify
+  // Lambda returns, silently dropping the update. The refresh returns
+  // the resolved ts so the reply can attach to the newly-created root
+  // when the order didn't have one before (rows paid before we shipped
+  // the Slack thread integration).
+  const refreshed = await refreshDatingOrderRoot({
     orderId: order.id,
     ts: order.slack_sales_thread_ts,
     status: "delivered",
@@ -306,8 +311,8 @@ export async function releaseOrder(order: ReleaseOrder): Promise<{ ok: boolean; 
     utmCampaign: order.utm_campaign,
     utmContent: order.utm_content,
   });
-  void replyDatingOrderThread({
-    ts: order.slack_sales_thread_ts,
+  await replyDatingOrderThread({
+    ts: refreshed.ts,
     text: `:package: *Delivered* — email sent, ${order.output_count} photos live on the gallery.`,
   });
 

@@ -54,8 +54,10 @@ export async function POST(request: Request) {
 
   if (transitioned && transitioned.length > 0) {
     // Update the sales feed root header + drop a thread reply with details.
-    // Both no-op if the bot isn't configured, so this is safe pre-setup.
-    void refreshDatingOrderRoot({
+    // Awaited (not void-called) so the serverless runtime doesn't freeze
+    // mid-flight and silently drop the Slack update. Both helpers catch
+    // internal errors so they never throw.
+    const refreshed = await refreshDatingOrderRoot({
       orderId: order.id,
       ts: order.slack_sales_thread_ts,
       status: "photos_uploaded",
@@ -67,8 +69,8 @@ export async function POST(request: Request) {
       utmCampaign: order.utm_campaign,
       utmContent: order.utm_content,
     });
-    void replyDatingOrderThread({
-      ts: order.slack_sales_thread_ts,
+    await replyDatingOrderThread({
+      ts: refreshed.ts,
       text: `:camera_with_flash: *Photos uploaded* — ${paths.length} selfies handed off. Generation queues within a couple of minutes.`,
     });
   }
