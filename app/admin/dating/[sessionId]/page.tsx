@@ -7,6 +7,7 @@ import { DATING_QUESTIONS } from "../../../../lib/datingQuestionnaire";
 import DownloadAllButton from "./DownloadAllButton";
 import OrderActions from "./OrderActions";
 import GeneratedPhotoCard from "./GeneratedPhotoCard";
+import RefSelector from "./RefSelector";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,7 +50,7 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
 
   const { data: order } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, stripe_session_id, email, first_name, status, photos_count, output_count, output_paths, generation_cost_cents, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, generated_at, deliver_at, delivered_at, questionnaire_answers, feedback_by_template")
+    .select("id, stripe_session_id, email, first_name, status, photos_count, output_count, output_paths, generation_cost_cents, amount_cents, utm_source, utm_campaign, utm_content, created_at, photos_uploaded_at, generated_at, deliver_at, delivered_at, questionnaire_answers, feedback_by_template, selected_ref_paths")
     .eq("stripe_session_id", sessionId)
     .maybeSingle();
 
@@ -194,48 +195,21 @@ export default async function AdminDatingOrderPage({ params }: { params: Promise
           )}
         </div>
 
-        {/* Source photos (customer uploads) */}
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">Source selfies (customer upload)</p>
-              <p className="mt-1 text-[13px] text-mute">
-                {sourcePhotos.length} selfie{sourcePhotos.length !== 1 ? "s" : ""} · Attribution: {utm}
-              </p>
-            </div>
-            {sourcePhotos.length > 0 && (
-              <DownloadAllButton photos={sourcePhotos} orderLabel={`${order.first_name ?? "order"}-${sessionId.slice(-8)}-source`} />
-            )}
-          </div>
+        {/* Source photos (customer uploads) — interactive selector */}
+        <RefSelector
+          sessionId={sessionId}
+          photos={sourcePhotos}
+          initialSelectedPaths={((order.selected_ref_paths as string[] | null) ?? []).slice(0, 4)}
+          orderLabel={`${order.first_name ?? "order"}-${sessionId.slice(-8)}`}
+        />
 
-          {sourcePhotos.length === 0 ? (
-            <div className="rounded-2xl border border-pebble bg-white px-6 py-16 text-center">
-              <p className="text-[14px] text-mute">No source photos uploaded yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {sourcePhotos.map((p) => (
-                <a
-                  key={p.path}
-                  href={p.signedUrl}
-                  download={p.filename}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block overflow-hidden rounded-xl border border-pebble bg-white transition-shadow hover:shadow-lg"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.signedUrl} alt={p.filename} className="aspect-[3/4] w-full object-cover" loading="lazy" />
-                  <div className="flex items-center justify-between px-3 py-2 text-[11px]">
-                    <span className="truncate font-mono text-mute">{p.filename}</span>
-                    <span className="shrink-0 font-semibold text-void opacity-0 transition-opacity group-hover:opacity-100">
-                      Download →
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Bulk download for source photos */}
+        {sourcePhotos.length > 0 && (
+          <div className="mb-8 flex items-center justify-between text-[12px] text-mute">
+            <span>Attribution: {utm}</span>
+            <DownloadAllButton photos={sourcePhotos} orderLabel={`${order.first_name ?? "order"}-${sessionId.slice(-8)}-source`} />
+          </div>
+        )}
       </div>
     </main>
   );

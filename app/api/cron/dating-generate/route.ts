@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 
   const { data: candidates, error: fetchErr } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, stripe_session_id, email, first_name, status, generation_started_at, photos_uploaded_at, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts")
+    .select("id, stripe_session_id, email, first_name, status, generation_started_at, photos_uploaded_at, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts, selected_ref_paths")
     .or(
       `status.eq.photos_uploaded,and(status.eq.generating,generation_started_at.lt.${stuckCutoff})`
     )

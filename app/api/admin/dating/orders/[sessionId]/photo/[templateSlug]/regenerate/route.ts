@@ -46,7 +46,7 @@ export async function POST(
 
   const { data: order, error: fetchErr } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, stripe_session_id, generation_cost_cents, feedback_by_template")
+    .select("id, stripe_session_id, generation_cost_cents, feedback_by_template, selected_ref_paths")
     .eq("stripe_session_id", sessionId)
     .maybeSingle();
   if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 });
@@ -72,6 +72,7 @@ export async function POST(
       id: order.id as string,
       stripe_session_id: order.stripe_session_id as string,
       generation_cost_cents: (order.generation_cost_cents as number | null) ?? null,
+      selected_ref_paths: (order.selected_ref_paths as string[] | null) ?? null,
     },
     templateSlug,
     feedback: effectiveFeedback,

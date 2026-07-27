@@ -55,7 +55,25 @@ export type GenerationOrder = {
   utm_campaign: string | null;
   utm_content: string | null;
   slack_sales_thread_ts: string | null;
+  // Admin-picked subset of source selfies used as Nano Banana character refs.
+  // Empty = fall back to the first MAX_REFERENCE_IMAGES alphabetically.
+  selected_ref_paths: string[] | null;
 };
+
+// Resolve which storage paths to use as character references, given the
+// admin's picked list (if any) and the full listing of source photos.
+// - Admin picks provided → use them (cap at MAX_REFERENCE_IMAGES). Filter
+//   to paths that actually exist in the listing so a stale admin pick
+//   (photo deleted after selection) doesn't break the pipeline.
+// - Otherwise → deterministic fallback: first N alphabetical.
+function resolveRefPaths(sourcePaths: string[], adminPicks: string[] | null): string[] {
+  if (adminPicks && adminPicks.length > 0) {
+    const existing = new Set(sourcePaths);
+    const filtered = adminPicks.filter((p) => existing.has(p));
+    if (filtered.length > 0) return filtered.slice(0, MAX_REFERENCE_IMAGES);
+  }
+  return sourcePaths.slice(0, MAX_REFERENCE_IMAGES);
+}
 
 export type GenerateResult = {
   ok: boolean;
@@ -81,7 +99,7 @@ export async function generateForOrder(
   if (sourcePaths.length < 4) {
     return { ok: false, error: `only ${sourcePaths.length} source photos — need ≥4` };
   }
-  const refPaths = sourcePaths.slice(0, MAX_REFERENCE_IMAGES);
+  const refPaths = resolveRefPaths(sourcePaths, order.selected_ref_paths);
 
   // 2. Download references once, hold in memory for all shots.
   const refs: ReferenceImage[] = [];
@@ -315,6 +333,7 @@ export type SingleRegenOrder = {
   id: string;
   stripe_session_id: string;
   generation_cost_cents: number | null;
+  selected_ref_paths: string[] | null;
 };
 
 // Regenerate ONE photo for a given (order, template) pair. Used by the
@@ -338,7 +357,7 @@ export async function regenerateSingleTemplate(args: {
   if (sourcePaths.length < 4) {
     return { ok: false, error: `only ${sourcePaths.length} source photos — need ≥4` };
   }
-  const refPaths = sourcePaths.slice(0, MAX_REFERENCE_IMAGES);
+  const refPaths = resolveRefPaths(sourcePaths, order.selected_ref_paths);
 
   const refs: ReferenceImage[] = [];
   for (const path of refPaths) {
