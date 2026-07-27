@@ -1,9 +1,10 @@
-// One-off backfill: post every inbound email received today to the
-// #emails Slack channel. Uses client_messages (direction=inbound, today).
-// Caveat: only emails whose reply-id matched a known Protocol user are
-// stored — orphan inbound emails without a user match aren't in the DB
-// so they're not covered here. Going forward the webhook posts every
-// inbound (matched or not) to Slack in real time.
+// Backfill inbound emails to the #emails Slack channel by fetching
+// directly from Resend's /emails/receiving endpoint.
+//
+// This is the exhaustive source (unlike client_messages which only has
+// rows that matched a reply+uuid@ recipient). Fetches all inbounds
+// within HOURS_BACK, retrieves the plain-text body of each, formats
+// and posts to Slack.
 
 import { readFileSync } from "fs";
 import { resolve } from "path";
@@ -13,40 +14,35 @@ for (const line of env.split("\n")) {
   if (m && !process.env[m[1].trim()]) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
 }
 
-import { createClient } from "@supabase/supabase-js";
-
+const RESEND_API_KEY = process.env.RESEND_API_KEY!;
 const SLACK_WEBHOOK_EMAILS = process.env.SLACK_WEBHOOK_EMAILS!;
-const SITE_URL = process.env.SITE_URL ?? "https://protocol-club.com";
-const PREVIEW_MAX = 500;
+const HOURS_BACK = parseInt(process.argv.find((a) => /^\d+$/.test(a)) ?? "24", 10);
+const PREVIEW_MAX = 800;
 
-if (!SLACK_WEBHOOK_EMAILS) {
-  console.error("SLACK_WEBHOOK_EMAILS not set — pass it inline or add to env");
-  process.exit(1);
+if (!RESEND_API_KEY) { console.error("RESEND_API_KEY not set"); process.exit(1); }
+if (!SLACK_WEBHOOK_EMAILS) { console.error("SLACK_WEBHOOK_EMAILS not set"); process.exit(1); }
+
+type InboundListItem = {
+  id: string;
+  to: string[];
+  from: string;
+  created_at: string;
+  subject: string;
+  attachments: unknown[];
+};
+
+async function resendGet<T>(path: string): Promise<T> {
+  const res = await fetch(`https://api.resend.com${path}`, {
+    headers: { "Authorization": `Bearer ${RESEND_API_KEY}` },
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend ${path} → ${res.status}: ${body.slice(0, 200)}`);
+  }
+  return (await res.json()) as T;
 }
 
-const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-  auth: { persistSession: false },
-});
-
-// Paris day range — matches the daily-report convention across the codebase.
-function todayParisRange(): { since: string; until: string; label: string } {
-  const now = new Date();
-  const paris = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Paris" }));
-  const y = paris.getFullYear(), m = paris.getMonth(), d = paris.getDate();
-  const dayStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-  const probe = new Date(Date.UTC(y, m, d, 12));
-  const parisStr = probe.toLocaleString("sv-SE", { timeZone: "Europe/Paris" });
-  const utcStr = probe.toISOString().replace("T", " ").slice(0, 19);
-  const diffMs = new Date(parisStr).getTime() - new Date(utcStr).getTime();
-  const sinceMs = Date.UTC(y, m, d, 0, 0, 0) - diffMs;
-  return {
-    since: new Date(sinceMs).toISOString(),
-    until: new Date(sinceMs + 24 * 3600 * 1000).toISOString(),
-    label: dayStr,
-  };
-}
-
-async function postToSlack(text: string) {
+async function postToSlack(text: string): Promise<boolean> {
   const res = await fetch(SLACK_WEBHOOK_EMAILS, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -55,56 +51,84 @@ async function postToSlack(text: string) {
   return res.ok;
 }
 
+function stripQuotedReply(body: string): string {
+  // Common patterns for the "reply above this line" separator + quoted
+  // history. Cut everything at the first hit so the preview shows only
+  // the new content.
+  const cutMarkers = [
+    /^On .* wrote:\s*$/im,
+    /^Le .* écrit\s*:\s*$/im,
+    /^-----Original Message-----/im,
+    /^Sent from my/im,
+    /^From:.*Sent:.*To:/im,
+  ];
+  let earliest = body.length;
+  for (const re of cutMarkers) {
+    const m = body.match(re);
+    if (m?.index !== undefined && m.index < earliest) earliest = m.index;
+  }
+  return body.slice(0, earliest).trim();
+}
+
 async function main() {
-  const { since, until, label } = todayParisRange();
-  console.log(`Backfilling inbound emails for ${label} (${since} → ${until})…`);
+  const since = Date.now() - HOURS_BACK * 3600 * 1000;
+  console.log(`Fetching inbound emails from Resend (last ${HOURS_BACK}h)…`);
 
-  const { data, error } = await sb
-    .from("client_messages")
-    .select("id, user_id, body, resend_email_id, created_at, users:user_id(email, first_name)")
-    .eq("direction", "inbound")
-    .gte("created_at", since)
-    .lt("created_at", until)
-    .order("created_at", { ascending: true });
-  if (error) { console.error(error); process.exit(1); }
+  const list = await resendGet<{ data: InboundListItem[]; has_more?: boolean }>("/emails/receiving?limit=100");
+  const recent = (list.data ?? []).filter((e) => new Date(e.created_at).getTime() >= since);
+  console.log(`Found ${recent.length} inbound(s) in window.\n`);
 
-  const rows = data ?? [];
-  console.log(`Found ${rows.length} inbound message(s).\n`);
+  if (recent.length === 0) {
+    console.log("Nothing to backfill.");
+    return;
+  }
 
-  // Backfill header so ops sees the pass in context.
   await postToSlack(
-    `:mailbox_with_mail: *Backfill — inbound emails for ${label}* (${rows.length} message${rows.length === 1 ? "" : "s"})`,
+    `:mailbox_with_mail: *Backfill — ${recent.length} inbound email${recent.length === 1 ? "" : "s"} from the last ${HOURS_BACK}h*`,
   );
 
-  for (const row of rows) {
-    const u = (row.users as { email?: string; first_name?: string } | null) ?? null;
-    const clientEmail = u?.email ?? "unknown";
-    const clientName = u?.first_name ?? "";
-    const body = (row.body ?? "").trim();
-    const preview = body.slice(0, PREVIEW_MAX);
-    const truncated = body.length > PREVIEW_MAX;
+  // Post oldest-first so the channel reads chronologically.
+  for (const e of recent.slice().reverse()) {
+    // Fetch body — the list endpoint doesn't include text/html.
+    let body = "(message body unavailable)";
+    try {
+      const detail = await resendGet<{ text?: string; html?: string }>(`/emails/receiving/${encodeURIComponent(e.id)}`);
+      if (detail.text) body = detail.text.trim();
+      else if (detail.html) body = detail.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    } catch (err) {
+      console.log(`  ⚠ body fetch failed for ${e.id}: ${String(err).slice(0, 120)}`);
+    }
+
+    const clean = stripQuotedReply(body);
+    const preview = clean.slice(0, PREVIEW_MAX);
+    const truncated = clean.length > PREVIEW_MAX;
     const quoted = preview
       .split("\n")
-      .filter((line) => !line.startsWith("> "))
-      .slice(0, 20)
+      .slice(0, 25)
       .map((line) => `> ${line}`)
       .join("\n");
 
-    const adminUrl = `${SITE_URL}/admin/users/${encodeURIComponent(row.user_id)}`;
+    const receivedAt = new Date(e.created_at).toLocaleString("en-US", {
+      timeZone: "Europe/Paris",
+      month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+
     const text = [
-      `:email: *Reply from client* — \`${clientEmail}\`${clientName ? ` (${clientName})` : ""}`,
-      `Received ${new Date(row.created_at).toLocaleString("en-US", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hour12: false })} Paris · <${adminUrl}|open in admin> · resend id \`${row.resend_email_id ?? "—"}\``,
+      `:mailbox: *Inbound email* — from \`${e.from}\``,
+      `*Subject:* ${e.subject || "(no subject)"}`,
+      `_Received ${receivedAt} Paris · To: ${e.to.join(", ")} · resend id \`${e.id}\`_`,
+      e.attachments && e.attachments.length > 0 ? `_📎 ${e.attachments.length} attachment(s)_` : "",
       "",
       quoted || "> _(empty body)_",
-      truncated ? `_…truncated (${body.length} chars total)_` : "",
+      truncated ? `_…truncated (${clean.length} chars total)_` : "",
     ].filter(Boolean).join("\n");
 
     const ok = await postToSlack(text);
-    console.log(`  ${ok ? "✓" : "✗"}  ${clientEmail}  ${body.slice(0, 60).replace(/\n/g, " ")}…`);
-    // Small pacing so Slack doesn't rate-limit and out-of-order the messages
+    console.log(`  ${ok ? "✓" : "✗"}  ${e.from}  ${(e.subject || "(no subject)").slice(0, 60)}`);
     await new Promise((r) => setTimeout(r, 400));
   }
 
   console.log(`\nDone.`);
 }
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((err) => { console.error(err); process.exit(1); });
