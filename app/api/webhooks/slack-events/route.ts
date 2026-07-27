@@ -261,15 +261,22 @@ export async function POST(request: Request) {
   const notThreadReply = !e.thread_ts || e.thread_ts === e.ts;
 
   if (notMessage || isSubtype || wrongChannel || fromOurBot || notThreadReply) {
+    console.log("[slack-events] filtered", {
+      notMessage, isSubtype, wrongChannel, fromOurBot, notThreadReply,
+      type: e.type, subtype: e.subtype, channel: e.channel, bot_id: e.bot_id,
+      thread_ts: e.thread_ts, ts: e.ts, textStart: (e.text ?? "").slice(0, 50),
+    });
     return NextResponse.json({ received: true });
   }
 
   const match = (e.text ?? "").match(TRIGGER_RE);
   if (!match) {
+    console.log("[slack-events] no !send match", { textStart: (e.text ?? "").slice(0, 50) });
     return NextResponse.json({ received: true });
   }
   const replyBody = match[1].trim();
   if (!replyBody) {
+    console.log("[slack-events] empty replyBody");
     return NextResponse.json({ received: true });
   }
 
