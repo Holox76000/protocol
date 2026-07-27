@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     `> ${reason.trim().slice(0, 400).replace(/\n/g, "\n> ")}`,
   ].filter(Boolean).join("\n");
 
-  await postToSlack("ops", { text: lines });
+  await postToSlack("survey", { text: lines });
 
   return NextResponse.json({ ok: true });
 }

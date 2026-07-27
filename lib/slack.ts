@@ -16,13 +16,14 @@
 //   report → SLACK_WEBHOOK_REPORT  (#daily-report — nightly P&L)
 //   ops    → SLACK_WEBHOOK_OPS     (#ops — daily digest + fallback for bot path)
 //   emails → SLACK_WEBHOOK_EMAILS  (#emails — every inbound reply from Resend)
+//   survey → SLACK_WEBHOOK_SURVEY  (#survey — NPS responses from clients)
 //
 // Web API env vars:
 //   SLACK_BOT_TOKEN         xoxb-... bot user OAuth token
 //   SLACK_SALES_CHANNEL_ID  C... channel id for the sales feed
 //   SLACK_OPS_CHANNEL_ID    C... channel id for the ops digest
 
-export type SlackChannel = "sales" | "ads" | "funnel" | "report" | "ops" | "emails";
+export type SlackChannel = "sales" | "ads" | "funnel" | "report" | "ops" | "emails" | "survey";
 
 type SlackBlock = Record<string, unknown>;
 type SlackAttachment = { color?: string; blocks?: SlackBlock[]; text?: string };
@@ -35,6 +36,7 @@ const WEBHOOKS: Record<SlackChannel, string | undefined> = {
   report: process.env.SLACK_WEBHOOK_REPORT,
   ops:    process.env.SLACK_WEBHOOK_OPS,
   emails: process.env.SLACK_WEBHOOK_EMAILS,
+  survey: process.env.SLACK_WEBHOOK_SURVEY,
 };
 
 export async function postToSlack(channel: SlackChannel, payload: SlackPayload): Promise<void> {
