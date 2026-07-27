@@ -226,7 +226,7 @@ export default function DatingSuccessPage() {
         {order.status === "done" && (
           <div className="dt-success__card">
             <p className="mo-hero__eyebrow">Photos received</p>
-            <h1 className="dt-success__title">Done. Your 30 photos land in your inbox within 24 hours.</h1>
+            <h1 className="dt-success__title">Done. Your dating photos land in your inbox within 24 hours.</h1>
             <p className="dt-success__muted">
               We&rsquo;ll send them to <strong>{order.email}</strong>. Nothing else to do.
             </p>
