@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { Resend } from "resend";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { notifyInboundEmailToSlack } from "../../../../lib/inboundEmailSlack";
 
 export const runtime = "nodejs";
 
@@ -86,6 +87,15 @@ export async function POST(request: Request) {
     } catch (err) {
       console.error("[webhook/resend-inbound] Forward failed (no userId)", { error: String(err) });
     }
+    await notifyInboundEmailToSlack({
+      from: event.data.from,
+      toAddresses: to,
+      subject: event.data.subject ?? null,
+      body,
+      emailId,
+      userId: null,
+      userFound: false,
+    });
     return NextResponse.json({ received: true });
   }
 
@@ -109,6 +119,15 @@ export async function POST(request: Request) {
     } catch (err) {
       console.error("[webhook/resend-inbound] Forward failed (unknown userId)", { error: String(err) });
     }
+    await notifyInboundEmailToSlack({
+      from: event.data.from,
+      toAddresses: to,
+      subject: event.data.subject ?? null,
+      body,
+      emailId,
+      userId,
+      userFound: false,
+    });
     return NextResponse.json({ received: true });
   }
 
@@ -135,6 +154,16 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[webhook/resend-inbound] Forward failed", { error: String(err) });
   }
+
+  await notifyInboundEmailToSlack({
+    from: event.data.from,
+    toAddresses: to,
+    subject: event.data.subject ?? null,
+    body,
+    emailId,
+    userId,
+    userFound: true,
+  });
 
   return NextResponse.json({ received: true });
 }
