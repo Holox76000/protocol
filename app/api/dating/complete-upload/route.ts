@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
-import { postToSlack } from "../../../../lib/slack";
 import {
   getOrCreateDatingOrder,
   isValidCheckoutSessionId,
   syncOrderPhotos,
 } from "../../../../lib/datingOrders";
+import { refreshDatingOrderRoot, replyDatingOrderThread } from "../../../../lib/datingSlackFeed";
 
 export const runtime = "nodejs";
 
@@ -53,8 +53,23 @@ export async function POST(request: Request) {
   }
 
   if (transitioned && transitioned.length > 0) {
-    await postToSlack("sales", {
-      text: `📸 Dating photos uploaded — ${order.email}, ${paths.length} photos (order …${order.stripe_session_id.slice(-8)})`,
+    // Update the sales feed root header + drop a thread reply with details.
+    // Both no-op if the bot isn't configured, so this is safe pre-setup.
+    void refreshDatingOrderRoot({
+      orderId: order.id,
+      ts: order.slack_sales_thread_ts,
+      status: "photos_uploaded",
+      email: order.email,
+      firstName: order.first_name,
+      stripeSessionId: order.stripe_session_id,
+      amountCents: order.amount_cents,
+      utmSource: order.utm_source,
+      utmCampaign: order.utm_campaign,
+      utmContent: order.utm_content,
+    });
+    void replyDatingOrderThread({
+      ts: order.slack_sales_thread_ts,
+      text: `:camera_with_flash: *Photos uploaded* — ${paths.length} selfies handed off. Generation queues within a couple of minutes.`,
     });
   }
 

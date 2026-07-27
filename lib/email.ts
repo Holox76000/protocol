@@ -202,6 +202,45 @@ export async function sendDatingConfirmationEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
+// Protocol Dating — delivery notification (photos are ready)
+// ─────────────────────────────────────────────────────────
+export async function sendDatingDeliveryEmail(props: {
+  email: string;
+  firstName?: string;
+  galleryUrl: string;
+  photoCount: number;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      Your ${props.photoCount} photos are ready.
+    </h1>
+
+    <p style="margin:24px 0;font-size:15px;color:${C.muted};line-height:1.65;">
+      Hey ${name} — the AI studio finished your shoot. ${props.photoCount} profile-ready photos across all styles, ready to download and post.
+    </p>
+
+    ${btn("View & download my photos →", props.galleryUrl)}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      The link stays live — bookmark it. If any photo doesn't look like you or feel right, reply to this email and we'll regenerate free.
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: props.email,
+    subject: `Your ${props.photoCount} dating photos are ready`,
+    html: emailShell(content),
+  });
+
+  if (error) throw new Error(`[resend] sendDatingDeliveryEmail failed: ${error.message}`);
+  console.log("[resend] dating delivery email sent", { email: props.email, count: props.photoCount });
+}
+
+// ─────────────────────────────────────────────────────────
 // Magic link — passwordless login
 // ─────────────────────────────────────────────────────────
 export async function sendMagicLinkEmail(props: {

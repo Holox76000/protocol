@@ -10,9 +10,14 @@ export type DatingOrder = {
   status: string;
   photo_paths: string[];
   photos_count: number;
+  amount_cents: number | null;
+  utm_source: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  slack_sales_thread_ts: string | null;
 };
 
-const ORDER_COLUMNS = "id, stripe_session_id, email, first_name, status, photo_paths, photos_count";
+const ORDER_COLUMNS = "id, stripe_session_id, email, first_name, status, photo_paths, photos_count, amount_cents, utm_source, utm_campaign, utm_content, slack_sales_thread_ts";
 
 export function isValidCheckoutSessionId(id: string | null | undefined): id is string {
   return typeof id === "string" && /^cs_[A-Za-z0-9_]+$/.test(id);

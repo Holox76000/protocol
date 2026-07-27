@@ -152,6 +152,63 @@ button.mo-pricing-card__cta {
   color: #515255;
 }
 
+/* Customer gallery — /dating/gallery */
+.dt-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 40px;
+}
+.dt-gallery-item {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid #edf0f1;
+  background: #f4f6f7;
+  aspect-ratio: 4 / 5;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.dt-gallery-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37, 50, 57, 0.14);
+}
+.dt-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.dt-gallery-item__meta {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dt-gallery-item__style { opacity: 0.9; }
+.dt-gallery-item__dl {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.dt-gallery-item:hover .dt-gallery-item__dl {
+  opacity: 1;
+}
+@media (max-width: 900px) {
+  .dt-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 24px;
+  }
+}
+
 /* Before / after — real transformation */
 .dt-ba-grid {
   display: grid;

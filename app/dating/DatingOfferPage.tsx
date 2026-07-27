@@ -122,7 +122,7 @@ const STEPS = [
     num: "02",
     time: "AI STUDIO",
     title: "We shoot you in 6 styles",
-    desc: "A private model is trained on your face, then shot in the styles top profiles use: nature, casual, outdoor, night out, athletic, lifestyle.",
+    desc: "Your photos calibrate our AI studio to your exact features. Then we shoot you in the styles top profiles use: nature, casual, outdoor, night out, athletic, lifestyle.",
   },
   {
     num: "03",
@@ -177,7 +177,7 @@ const PRICING_BULLETS = [
 const FAQS = [
   {
     q: "Will the photos actually look like me?",
-    a: "Yes. The model is trained on your real photos. These aren't stock faces — they're you, in better light, better framing, better moments.",
+    a: "Yes. Your photos are used as reference by our AI studio so every shot preserves your exact features. These aren't stock faces — they're you, in better light, better framing, better moments.",
   },
   {
     q: "What photos should I upload?",

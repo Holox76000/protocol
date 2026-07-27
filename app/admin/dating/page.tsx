@@ -68,6 +68,9 @@ export default async function AdminDatingPage() {
             </p>
           </div>
           <div className="mt-1 flex items-center gap-5">
+            <Link href="/admin/dating/templates" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
+              Templates →
+            </Link>
             <Link href="/admin" className="text-[12px] font-semibold text-mute hover:text-void transition-colors">
               ← Orders
             </Link>

@@ -6,6 +6,7 @@ import { sendGA4Purchase, extractGa4ClientId } from "../../../../lib/ga4";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
 import { sendWelcomeEmail, sendPurchaseConfirmationEmail, sendDatingConfirmationEmail } from "../../../../lib/email";
+import { postDatingOrderRoot } from "../../../../lib/datingSlackFeed";
 import { promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { postToSlack } from "../../../../lib/slack";
@@ -60,23 +61,28 @@ export async function POST(request: Request) {
       capiSource,
     });
 
-    // Fan-out to Slack #sales for every PaymentIntent succeeded — fired before
-    // the capiSource branching so we never miss a sale. The PI event fires for
-    // every flow (direct PI, Checkout Session, external), so this is the one
-    // canonical place to ping Slack about a new sale.
-    const slackEmail = meta.customer_email || "(no email — check Stripe)";
-    const slackAmount = (pi.amount ?? 0) / 100;
-    const slackCurrency = (pi.currency ?? "usd").toUpperCase();
-    const slackUtm = [meta.utm_source, meta.utm_campaign, meta.utm_content].filter(Boolean).join(" · ") || "—";
-    void postToSlack("sales", {
-      text: [
-        `<!channel> :moneybag: *New sale — $${slackAmount.toFixed(2)} ${slackCurrency}*`,
-        `Email: \`${slackEmail}\``,
-        `Funnel SID: \`${meta.funnel_sid ?? "—"}\``,
-        `Attribution: ${slackUtm}`,
-        `PI: \`${pi.id}\``,
-      ].join("\n"),
-    });
+    // Fan-out to Slack #sales for every PaymentIntent succeeded — the PI
+    // event fires for every flow (direct PI, Checkout Session, external),
+    // so this is the one canonical place to ping Slack about a new sale.
+    //
+    // Exception: for dating we defer to checkout.session.completed which
+    // posts the *root* of a per-order threaded feed. Doing it here would
+    // create a duplicate root without a dating_orders row to attach it to.
+    if (meta.funnel !== "dating") {
+      const slackEmail = meta.customer_email || "(no email — check Stripe)";
+      const slackAmount = (pi.amount ?? 0) / 100;
+      const slackCurrency = (pi.currency ?? "usd").toUpperCase();
+      const slackUtm = [meta.utm_source, meta.utm_campaign, meta.utm_content].filter(Boolean).join(" · ") || "—";
+      void postToSlack("sales", {
+        text: [
+          `<!channel> :moneybag: *New sale — $${slackAmount.toFixed(2)} ${slackCurrency}*`,
+          `Email: \`${slackEmail}\``,
+          `Funnel SID: \`${meta.funnel_sid ?? "—"}\``,
+          `Attribution: ${slackUtm}`,
+          `PI: \`${pi.id}\``,
+        ].join("\n"),
+      });
+    }
 
     if (capiSource === "checkout_session") {
       // Fully handled by checkout.session.completed — nothing to do here.
@@ -419,7 +425,7 @@ export async function POST(request: Request) {
           return NextResponse.json({ received: true });
         }
         try {
-          const { error: orderError } = await supabaseAdmin
+          const { data: upsertedOrder, error: orderError } = await supabaseAdmin
             .from("dating_orders")
             .upsert(
               {
@@ -432,8 +438,29 @@ export async function POST(request: Request) {
                 utm_content: meta.utm_content ?? null,
               },
               { onConflict: "stripe_session_id" }
-            );
+            )
+            .select("id, slack_sales_thread_ts")
+            .single();
           if (orderError) throw new Error(orderError.message);
+
+          // Post the root of the sales feed once per order. Idempotent: if the
+          // webhook is redelivered, we skip if a ts already exists.
+          if (upsertedOrder && !upsertedOrder.slack_sales_thread_ts) {
+            const piIdFromSession = typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : (session.payment_intent?.id ?? null);
+            void postDatingOrderRoot({
+              orderId: upsertedOrder.id as string,
+              stripeSessionId: session.id,
+              email: customerEmail,
+              firstName: firstName ?? null,
+              amountCents: typeof session.amount_total === "number" ? session.amount_total : 3900,
+              utmSource: meta.utm_source ?? null,
+              utmCampaign: meta.utm_campaign ?? null,
+              utmContent: meta.utm_content ?? null,
+              piId: piIdFromSession,
+            });
+          }
 
           // Awaited: on serverless the runtime can freeze after the response
           // is sent, and this email is the customer's only recovery path to
