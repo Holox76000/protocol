@@ -61,9 +61,9 @@ export default async function DatingGalleryPage({
 
   const { data: order } = await supabaseAdmin
     .from("dating_orders")
-    .select("id, email, first_name, status, output_paths, output_count, delivered_at, amount_cents")
+    .select("id, email, first_name, status, output_paths, output_count, delivered_at, amount_cents, gallery_first_viewed_at")
     .eq("stripe_session_id", sessionId)
-    .maybeSingle<OrderRow>();
+    .maybeSingle<OrderRow & { gallery_first_viewed_at: string | null }>();
 
   if (!order) {
     return (
@@ -72,6 +72,18 @@ export default async function DatingGalleryPage({
         body="Double-check the link, or reply to your confirmation email — we'll fix it."
       />
     );
+  }
+
+  // First-view stamp: powers the NPS cron (email fires 1h after this).
+  // Fire-and-forget to avoid slowing the page render — writing this exact
+  // field is idempotent (only overwrites null → now), so a lost update is
+  // acceptable and a duplicate is a no-op.
+  if (order.status === "delivered" && !order.gallery_first_viewed_at) {
+    await supabaseAdmin
+      .from("dating_orders")
+      .update({ gallery_first_viewed_at: new Date().toISOString() })
+      .eq("id", order.id)
+      .is("gallery_first_viewed_at", null);
   }
 
   if (order.status !== "delivered") {

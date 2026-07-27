@@ -7,6 +7,7 @@ const SITE_URL = "https://protocol-club.com";
 const NPS_DELAY_MIN = 120; // 2h after first protocol view — lets the user actually read it
 const NPS_30D_DELAY_DAYS = 30;
 const NPS_REMINDER_DELAY_H = 24;
+const NPS_DATING_DELAY_MIN = 60; // 1h after the client first opens their dating gallery
 const FROM = "Protocol Club <hello@protocol-club.com>";
 
 // Internal/team accounts — never send NPS to them (matches the email dashboard
@@ -73,12 +74,12 @@ function emailShell(content: string): string {
 </html>`;
 }
 
-function scoreButtonsHtml(token: string): string {
+function scoreButtonsHtml(token: string, basePath = "/nps"): string {
   const buttons = Array.from({ length: 10 }, (_, i) => {
     const score = i + 1;
     const bg = score <= 6 ? "#2d3a3e" : score <= 8 ? "#3d4a30" : C.green;
     return `<td style="padding:2px;">
-      <a href="${SITE_URL}/nps/${token}?score=${score}"
+      <a href="${SITE_URL}${basePath}/${token}?score=${score}"
          style="display:block;width:36px;height:36px;line-height:36px;text-align:center;background:${bg};color:#ffffff;font-size:13px;font-weight:600;border-radius:6px;text-decoration:none;">${score}</a>
     </td>`;
   }).join("");
@@ -274,6 +275,103 @@ const handler = schedule("*/5 * * * *", async () => {
         console.error(`[nps-survey] reminder-${reminder.day} failed`, { email: user.email, error: String(err) });
         await sb.from("users").update({ [reminder.sentAtField]: null }).eq("id", user.id);
       }
+    }
+  }
+
+  // ── Pass 4: Dating NPS — 1h after the client first opens their gallery ──
+  // Different questions than the protocol NPS (favorite template, dating-app
+  // intent) so the survey lives on its own route: /nps/dating/[token].
+  const datingCutoff = new Date(now.getTime() - NPS_DATING_DELAY_MIN * 60 * 1000).toISOString();
+
+  const { data: datingOrders, error: datingErr } = await sb
+    .from("dating_orders")
+    .select("id, email, first_name")
+    .eq("status", "delivered")
+    .is("nps_sent_at", null)
+    .not("gallery_first_viewed_at", "is", null)
+    .lte("gallery_first_viewed_at", datingCutoff)
+    .limit(50);
+
+  if (datingErr) console.error("[nps-survey] dating query failed", datingErr.message);
+
+  for (const order of (datingOrders ?? []).filter((o) => !isInternalEmail(o.email))) {
+    const token = crypto.randomUUID();
+    await sb.from("dating_orders").update({ nps_token: token, nps_sent_at: now.toISOString() }).eq("id", order.id);
+
+    const name = order.first_name ?? "there";
+    const content = `
+      <h1 style="margin:0 0 8px;font-size:24px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+        How were your photos, ${name}?
+      </h1>
+      <p style="margin:0 0 28px;font-size:15px;color:${C.muted};line-height:1.65;">
+        You've just seen your dating set. One question — takes 30 seconds:
+      </p>
+      <p style="margin:0 0 20px;font-size:15px;font-weight:600;color:${C.brand};line-height:1.5;">
+        How likely are you to recommend Protocol Dating to a friend?
+      </p>
+      ${scoreButtonsHtml(token, "/nps/dating")}
+      <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+        Your feedback shapes which templates we keep and which we cut.
+      </p>
+    `;
+
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: order.email,
+        subject: `${name}, how were your Protocol Dating photos?`,
+        html: emailShell(content),
+      });
+      console.log("[nps-survey] dating sent", { email: order.email, orderId: order.id });
+    } catch (err) {
+      console.error("[nps-survey] dating failed", { email: order.email, error: String(err) });
+      await sb.from("dating_orders").update({ nps_sent_at: null, nps_token: null }).eq("id", order.id);
+    }
+  }
+
+  // ── Pass 5: Dating NPS reminder — J+1 for non-responders ──
+  const datingReminderCutoff = new Date(now.getTime() - NPS_REMINDER_DELAY_H * 60 * 60 * 1000).toISOString();
+
+  const { data: datingReminders, error: datingReminderErr } = await sb
+    .from("dating_orders")
+    .select("id, email, first_name, nps_token")
+    .eq("status", "delivered")
+    .not("nps_token", "is", null)
+    .is("nps_submitted_at", null)
+    .is("nps_reminder_1_sent_at", null)
+    .lte("nps_sent_at", datingReminderCutoff)
+    .limit(50);
+
+  if (datingReminderErr) console.error("[nps-survey] dating reminder query failed", datingReminderErr.message);
+
+  for (const order of (datingReminders ?? []).filter((o) => !isInternalEmail(o.email))) {
+    await sb.from("dating_orders").update({ nps_reminder_1_sent_at: now.toISOString() }).eq("id", order.id);
+
+    const name = order.first_name ?? "there";
+    const content = `
+      <h1 style="margin:0 0 8px;font-size:24px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+        Quick one on your photos, ${name}?
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;font-weight:600;color:${C.brand};line-height:1.5;">
+        How likely are you to recommend Protocol Dating to a friend?
+      </p>
+      ${scoreButtonsHtml(order.nps_token as string, "/nps/dating")}
+      <p style="margin:24px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+        30 seconds. Last reminder.
+      </p>
+    `;
+
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: order.email,
+        subject: `${name}, quick feedback on your dating photos?`,
+        html: emailShell(content),
+      });
+      console.log("[nps-survey] dating reminder sent", { email: order.email, orderId: order.id });
+    } catch (err) {
+      console.error("[nps-survey] dating reminder failed", { email: order.email, error: String(err) });
+      await sb.from("dating_orders").update({ nps_reminder_1_sent_at: null }).eq("id", order.id);
     }
   }
 
