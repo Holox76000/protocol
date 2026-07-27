@@ -178,7 +178,21 @@ async function handleTrigger(args: {
 export async function POST(request: Request) {
   const rawBody = await request.text();
 
-  // Signature check must run BEFORE any parsing / API calls.
+  let payload: SlackEventPayload;
+  try { payload = JSON.parse(rawBody); }
+  catch { return NextResponse.json({ error: "invalid json" }, { status: 400 }); }
+
+  // URL verification challenge: must respond with the challenge value
+  // BEFORE the signature check — otherwise the very first setup attempt
+  // (when SLACK_SIGNING_SECRET might not be wired yet, or the URL hasn't
+  // been verified so Slack won't sign properly) fails and the admin
+  // can't save the Request URL. Safe to allow unverified: the response
+  // just echoes the challenge back, no side effects.
+  if (payload.type === "url_verification") {
+    return NextResponse.json({ challenge: payload.challenge });
+  }
+
+  // Signature check for every real event.
   const sig = verifySlackSignature({
     signingSecret: SLACK_SIGNING_SECRET ?? "",
     timestampHeader: request.headers.get("x-slack-request-timestamp"),
@@ -188,15 +202,6 @@ export async function POST(request: Request) {
   if (!sig.ok) {
     console.error("[slack-events] signature rejected", { reason: sig.reason });
     return NextResponse.json({ error: "invalid signature" }, { status: 401 });
-  }
-
-  let payload: SlackEventPayload;
-  try { payload = JSON.parse(rawBody); }
-  catch { return NextResponse.json({ error: "invalid json" }, { status: 400 }); }
-
-  // URL verification challenge on subscription setup.
-  if (payload.type === "url_verification") {
-    return NextResponse.json({ challenge: payload.challenge });
   }
 
   // Slack retries aggressively. If it's a retry, ACK 200 without processing
