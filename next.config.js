@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // The /docs handbook reads markdown from the top-level docs/ folder at request
+  // time (the route is dynamic because it gates on the admin session cookie).
+  // Force-include those files in the serverless function bundle so the reads
+  // resolve in production on Netlify.
+  experimental: {
+    outputFileTracingIncludes: {
+      "/docs": ["./docs/**/*"],
+      "/docs/[slug]": ["./docs/**/*"],
+    },
+  },
   images: {
     remotePatterns: [
       {
