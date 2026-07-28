@@ -3,6 +3,7 @@ import { Webhook } from "svix";
 import { Resend } from "resend";
 import { supabaseAdmin } from "../../../../lib/supabase";
 import { notifyInboundEmailToSlack } from "../../../../lib/inboundEmailSlack";
+import { fetchInboundBody } from "../../../../lib/inboundEmailBody";
 
 export const runtime = "nodejs";
 
@@ -57,20 +58,9 @@ export async function POST(request: Request) {
     if (match) { userId = match[1]; break; }
   }
 
-  // Fetch email body — webhook payload only contains metadata, not text/html
-  let body = "(message body unavailable)";
-  try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    // @ts-expect-error — resend.inbound.get() may not be typed in all SDK versions
-    const email = await resend.inbound.get(emailId) as { text?: string; html?: string } | null;
-    if (email?.text) {
-      body = email.text.trim();
-    } else if (email?.html) {
-      body = email.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    }
-  } catch (err) {
-    console.error("[webhook/resend-inbound] Failed to fetch email body", { error: String(err), emailId });
-  }
+  // Fetch email body — the webhook payload only carries metadata (from/to/subject),
+  // not text/html. Pull the full received email from Resend.
+  const body = await fetchInboundBody(new Resend(process.env.RESEND_API_KEY), emailId);
 
   // If no userId match, still forward to admin — just skip DB insert
   if (!userId) {
