@@ -3,6 +3,29 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.3.0] - 2026-07-29
+
+### Fixed
+- Inbound customer emails mirrored to Slack now show the actual message body
+  instead of "(message body unavailable)". The webhook fetched the body via a
+  method that does not exist in the Resend SDK (`resend.inbound.get`); it now
+  uses the correct `resend.emails.receiving.get(id)` path. Regression test added.
+
+### Added
+- Wiki: new "Précédentes itérations" section (`docs/11-tests-realises.md`) that
+  archives the retired Protocol (attractiveness/body) product — funnel, quiz,
+  scoring, report, PDF, pricing, tracking. The live wiki pages now describe only
+  Protocol Dating.
+- Deploy protocol: after every deploy, update the wiki and post a plain-language
+  Slack notification to the deploy channel with a link to the relevant doc page.
+  New internal endpoint `app/api/notify-deploy` (bot-token post, auth via
+  CRON_SECRET/BG_FN_SECRET), `scripts/notify-deploy.ts`, and a mandatory
+  "Après chaque deploy" convention in `CLAUDE.md`.
+
+### Changed
+- Wiki pages 01–10 refocused on the single live product (Dating); all
+  Protocol/attractiveness detail moved to Précédentes itérations.
+
 ## [1.1.2.1] - 2026-07-19
 
 ### Changed
