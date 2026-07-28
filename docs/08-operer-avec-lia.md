@@ -34,8 +34,8 @@ Trois artefacts :
 
 | Outil | Ce qu'il fait |
 |---|---|
-| `leads` | Leads opt-in du quiz avec nom/email/UTM/morphologie/wants |
-| `lead_detail` | Profil quiz complet d'un lead (toutes les réponses) |
+| `leads` | Leads opt-in avec nom/email/UTM (+ réponses de funnel) |
+| `lead_detail` | Profil complet d'un lead (toutes les réponses de funnel) |
 | `funnel_stats` | Drop-off du funnel, complétion par step, taux d'opt-in, cohortes hebdo |
 | `customers` | Clients payants (nom, email, date, montant, statut protocole) |
 | `revenue` | Résumé revenus Stripe (total, ticket moyen, breakdown jour/semaine/mois) |

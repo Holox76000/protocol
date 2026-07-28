@@ -53,18 +53,14 @@ serveur :
 | Event funnel | Meta | TikTok | GA4 | Valeur |
 |---|---|---|---|---|
 | PageView / route | `PageView` | `ViewContent` | `page_view` | — |
-| `quiz_started` | `StartQuiz` (CAPI) | — | — | — |
-| `view_offer` (F1) | `ViewContent` (px+CAPI) | `ViewContent` | — | **$89** |
 | `view_offer` (dating) | `ViewContent` | `ViewContent` | — | **$39** |
-| Lead (`/api/lead`) | `Lead` (CAPI) | `CompleteRegistration` | — | $89 |
-| `cta_clicked` | custom « Vue de page de paiement » | — | — | — |
-| InitiateCheckout | pixel + CAPI | pixel + Events API | `checkout_started` | $89 / $39 |
+| InitiateCheckout | pixel + CAPI | pixel + Events API | `checkout_started` | $39 |
 | **Purchase** | `Purchase` CAPI | `Purchase` Events API | `purchase` MP | **`amount_total` Stripe réel** |
 
-> ⚠️ **À savoir** : les valeurs pixel navigateur sont **codées en dur** à $89
-> (F1) ou $39 (dating), quel que soit le prix réel. Seul le Purchase serveur
-> utilise le vrai `amount_total` Stripe. Sur le funnel `main` à $19, les valeurs
-> du pixel navigateur sont donc nominales, pas réelles.
+> ⚠️ **À savoir** : la valeur pixel navigateur est **codée en dur** à $39, quel
+> que soit le prix réel. Seul le Purchase serveur utilise le vrai `amount_total`
+> Stripe. *(Les events du funnel Protocol — `quiz_started`, `Lead`, etc. — sont
+> archivés dans* Précédentes itérations*.)*
 
 ## EMQ (Event Match Quality)
 
@@ -79,34 +75,15 @@ l'optimisation. Le code **travaille activement** pour le maximiser :
   EMQ ».
 - Plus email + téléphone (collecté par Stripe) → un max de clés de matching.
 - ⚠️ Gap connu (`TODOS.md`) : les Purchase Dating sont **CAPI-only** (pas de
-  pixel Purchase navigateur sur la success page Dating, contrairement à F1) →
-  EMQ plus bas exactement sur la campagne dont l'optimisation dépend de la
-  qualité du signal Purchase.
+  pixel Purchase navigateur sur la success page Dating) → EMQ plus bas exactement
+  sur la campagne dont l'optimisation dépend de la qualité du signal Purchase.
 
 ## Personnalisation par IA
 
-Deux mécanismes de personnalisation de la copy (voir aussi *Parcours & funnels*) :
-
-1. **Maps statiques ad_id → copy** (`lib/ad-variants.ts`, `lib/datingAdVariants.ts`)
-   — congruence pub ↔ landing.
-2. **Génération LLM** (`lib/personalization.ts`) — **Claude Sonnet** avec
-   `tool_use` forcé (JSON strict) génère la copy hero LP + choix de testimonial
-   à partir des réponses en texte libre du quiz. `validatePayload` **rejette** le
-   « AI slop » (mots bannis, em-dashes, mauvaise longueur, phrases d'ouverture
-   imposées). Caché dans `funnel_sessions.answers._personalization` ; le cache
-   est *warmé* à la soumission du lead. Un détecteur de persona rule-based
-   (`lib/personalizationPrompt.ts`) route vers 6 personas.
-
-> Note : `lib/promptAnalyzer.ts` utilise **Gemini** (pas Anthropic) pour raffiner
-> les prompts d'images du produit Dating — usage IA distinct.
-
-## Preuve sociale
-
-- **`lib/testimonials.ts`** — 7 témoignages keyés par persona ; la personnalisation
-  Claude en choisit un.
-- **`lib/studies.ts`** — bibliothèque de citations d'études peer-reviewed injectées
-  dans les prompts de génération de rapport (crédibilité), avec instruction de
-  citer `[Auteur, Année]` et de ne jamais fabriquer.
+`lib/datingAdVariants.ts` — map statique `ad_id → copy` qui aligne l'intro de la
+LP `/dating` sur la pub cliquée (9 pubs). Côté génération d'images,
+`lib/promptAnalyzer.ts` utilise **Gemini** pour raffiner les prompts (usage IA
+distinct — voir *Parcours & funnels*).
 
 ## Email marketing
 
@@ -116,6 +93,8 @@ Deux mécanismes de personnalisation de la copy (voir aussi *Parcours & funnels*
   link, livraison Dating) **et** la séquence de **nurture E2→E7**
   (Wedge/Insight/Mirror/Stakes/Projection/Breakup), avec footer marketing +
   désinscription un-clic (RFC 8058). L'E7 « breakup » part de l'adresse fondateur.
+  *(La copy de nurture a été écrite pour le funnel Protocol ; à revoir pour
+  Dating.)*
 - **`lib/sendWindow.ts`** — ancre la séquence à **14:00 UTC** (pic d'inbox
   10am ET). Tous les steps partagent l'ancre.
 - Orchestration : crons `lead-nurture` (E2→E7) et `abandoned-cart` (E1/E2). Un

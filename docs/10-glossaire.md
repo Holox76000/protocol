@@ -7,11 +7,8 @@
 
 | Terme | Définition |
 |---|---|
-| **Protocol** (produit) | Le produit cœur : analyse d'attractivité + protocole de transformation 3 mois. Prix live $89. |
-| **Protocol Dating** | Photos de dating générées par IA. $39 + 2 upsells $20. |
-| **Funnel** | Un parcours de conversion. Clés internes : `main`, `f1`, `f2`, `v3`, `woman`, `dating`. Le funnel live cœur = `f1`. |
-| **F1** | Le funnel/produit d'attractivité principal (`/f1/*`). Le quiz y envoie. |
-| **VSL** | Video Sales Letter — la vidéo de vente gated entre le quiz et l'offre (`/f1/vsl`). |
+| **Protocol Dating** | Le produit live : photos de dating générées par IA. $39 + 2 upsells $20. |
+| **Funnel** | Un parcours de conversion. Le funnel live = `dating` (`getCheckoutLineItems`). |
 | **CAPI** | Conversions API — l'envoi **serveur** des events de conversion à Meta (vs le pixel navigateur). |
 | **Events API** | L'équivalent TikTok de CAPI. |
 | **MP** | Measurement Protocol — l'équivalent GA4 (envoi serveur). |
@@ -22,7 +19,7 @@
 | **ROAS** | Return On Ad Spend. Le rapport quotidien compare au breakeven ~1.2×. |
 | **CPL** | Cost Per Lead. |
 | **LPV** | Landing Page View (event pub). |
-| **Nurture** | La séquence email E2→E7 qui relance les leads non-acheteurs. |
+| **Nurture** | La séquence email E2→E7 qui relance les leads non-acheteurs (copy écrite pour Protocol, à revoir pour Dating). |
 | **Nano Banana** | Le modèle d'image Gemini utilisé pour générer les photos Dating (`lib/nanoBanana.ts`). |
 | **Template** (Dating) | Une scène cible pour la génération (`dating_templates`). 1 template actif = 1 photo. `kind` = `core` ou `luxury`. |
 | **Sales feed** | Le fil Slack threadé d'une commande Dating, édité à chaque transition d'état. |
@@ -35,18 +32,18 @@
 ## Problèmes connus (à avoir en tête)
 
 Extraits de `TODOS.md` et des incohérences relevées dans le code. **Lire
-`TODOS.md` pour la liste à jour et priorisée.**
+`TODOS.md` pour la liste à jour et priorisée.** Ne concernent que le produit
+**live (Dating)** — les incohérences de l'ancien Protocol sont archivées dans
+*Précédentes itérations*.
 
-- **Prix incohérent $19 / $89** pour « Protocol » selon le point d'entrée. Le
-  parcours live facture **$89** ; le funnel `main` legacy affiche encore $19.
 - **Bug hosted-checkout Dating (P1)** — `app/checkout/hosted/page.tsx` omet
   `"dating"` de son `KNOWN_FUNNELS`, donc un lien
   `/checkout/hosted?funnel=dating` **facture $19 au lieu de $39**.
 - **EMQ Dating plus bas** — les Purchase Dating sont CAPI-only (pas de pixel
   Purchase navigateur sur la success page), ce qui abaisse la qualité de signal
   sur la campagne Dating.
-- **Valeurs pixel navigateur en dur** ($89/$39) quel que soit le prix réel ;
-  seul le Purchase serveur utilise le montant Stripe réel.
+- **Valeurs pixel navigateur en dur** ($39) quel que soit le prix réel ; seul le
+  Purchase serveur utilise le montant Stripe réel.
 - **« 30 photos » est de la copy**, pas une constante — le nombre réel = les
   `dating_templates` actifs.
 - **Incohérence de nom de modèle** — les commentaires disent « Nano Banana Pro /
@@ -54,9 +51,8 @@ Extraits de `TODOS.md` et des incohérences relevées dans le code. **Lire
 - **Session id = bearer token fuité vers l'analytics (P1)** — le `cs_live_…`
   dans l'URL `/dating/success` donne des droits de lecture/upload et est
   auto-capturé par les pixels GA4/Meta. Mitigation proposée dans `TODOS.md`.
-- **Code legacy à ne pas toucher** : `/f1-old`, `/program` (redirect),
-  `lib/quizConfig.ts`+`lib/scoring.ts` (ancien quiz 9-questions), `/f2`, `/v3`,
-  `/home`. Voir *Technique → Parcours & funnels*.
+- **Code legacy à ne pas toucher** : tout le stack Protocol (funnels, quiz,
+  scoring, rapport, PDF). Inventaire complet dans *Précédentes itérations*.
 
 ## Où trouver quoi (aide-mémoire)
 
@@ -64,7 +60,6 @@ Extraits de `TODOS.md` et des incohérences relevées dans le code. **Lire
 |---|---|
 | La logique de prix / checkout | `lib/stripe.ts`, `app/api/create-*` |
 | Le tracking pub | `lib/metaCapi.ts`, `lib/tiktokEventsApi.ts`, `lib/ga4.ts`, `lib/analytics.ts` |
-| Le scoring | `lib/attractivenessScore.ts`, `lib/preliminaryScore.ts`, `lib/maleBodyFat.ts` |
 | La génération Dating | `lib/datingGeneration.ts`, `lib/nanoBanana.ts`, `lib/datingTemplates.ts` |
 | Les notifs Slack | `lib/slack.ts`, `lib/datingSlackFeed.ts` |
 | Les emails | `lib/email.ts`, `lib/klaviyo.ts` |

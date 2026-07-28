@@ -13,13 +13,18 @@ manuel*).
 
 Protocol est une boîte **AI-native** de produits digitaux direct-to-consumer.
 On acquiert du trafic froid via Meta et TikTok Ads, on le fait passer dans des
-funnels de quiz, et on vend des produits digitaux générés/assistés par IA. Deux
-lignes de produit vivent dans **le même code** :
+funnels, et on vend un produit digital généré par IA.
+
+Aujourd'hui, **un seul produit est live** :
 
 | Produit | Ce que c'est | Prix | Route |
 |---|---|---|---|
-| **Protocol** | Analyse d'attractivité + protocole de transformation physique 3 mois (assisté IA) | **$89** (parcours live) | `/` → `/funnel` → `/f1/*` |
 | **Protocol Dating** | Photos de profil de dating générées par IA à partir de selfies | **$39** + 2 upsells à $20 | `/dating` |
+
+> Le nom « Protocol » vient d'une **itération précédente** — une analyse
+> d'attractivité + protocole de transformation physique ($89). Ce produit a été
+> **arrêté** ; son code vit encore dans le repo mais ne se vend plus. Toute son
+> histoire est dans *Précédentes itérations*.
 
 ## Le business model, vu du code
 
@@ -27,15 +32,14 @@ C'est une machine d'acquisition payante mesurée de bout en bout :
 
 1. **Acquisition** — pubs Meta/TikTok. Chaque créa a un `ad_id` qui suit le
    visiteur jusqu'à la vente (`utm_content` = ad_id Meta).
-2. **Funnel** — un quiz diagnostic (27 slides pour Protocol) capture des
-   réponses, qualifie, et personnalise la copy selon la pub d'origine et les
-   réponses (dont une génération de copy par **Claude**).
+2. **Landing & offre** — la LP `/dating` présente l'offre, personnalisée selon la
+   pub d'origine (`lib/datingAdVariants.ts`).
 3. **Conversion** — checkout Stripe. La vente est attribuée à la créa exacte.
 4. **Tracking** — chaque événement est renvoyé aux plateformes pub **deux fois**
    (pixel navigateur + API serveur), dédupliqué, pour maximiser la qualité du
    signal d'optimisation.
-5. **Delivery** — Protocol : compte + questionnaire + protocole livré. Dating :
-   upload de selfies → génération d'images IA → galerie livrée.
+5. **Delivery** — upload de selfies → génération d'images IA → galerie livrée,
+   avec un état de commande suivi de bout en bout (voir *Produit*).
 6. **Rétention / feedback** — séquences email de nurture, NPS post-livraison,
    support client bidirectionnel via Slack.
 
@@ -50,6 +54,7 @@ QA, ship et fait les rétros. C'est le sujet de **Operations → Opérer avec l'
 - **Nouveau dev** → *Fondations → Produit*, puis toute la section *Technique*,
   puis *Getting started*.
 - **Growth / marketing** → *Fondations* puis *Marketing*.
+- **Comprendre d'où on vient** → *Précédentes itérations*.
 
 ## Repères rapides
 
@@ -60,4 +65,5 @@ QA, ship et fait les rétros. C'est le sujet de **Operations → Opérer avec l'
   Resend · Meta/TikTok/GA4 · génération d'images Gemini « Nano Banana » ·
   Anthropic SDK.
 - **Nom interne du package** : `skinny-fat-quiz` (héritage du tout premier
-  produit — la boîte a pivoté vers « attractivité » depuis).
+  produit — la boîte a pivoté vers « attractivité » (Protocol), puis vers Dating.
+  Voir *Précédentes itérations*).
