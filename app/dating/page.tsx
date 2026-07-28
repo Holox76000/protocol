@@ -4,7 +4,7 @@ import DatingOfferPage from "./DatingOfferPage";
 export const metadata: Metadata = {
   title: "Protocol Dating — AI dating photos that get you matches",
   description:
-    "We analyzed thousands of top-performing dating profiles. Upload a few phone photos, get a full pack of profile-ready shots in 6 styles, delivered in 24 hours. $39.",
+    "We analyzed thousands of top-performing dating profiles. Upload a few phone photos, get 30 profile-ready shots in 6 styles, delivered in 24 hours. $39.",
 };
 
 // React 18 only renders the lowercase attribute, but the TS types only accept

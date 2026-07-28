@@ -110,7 +110,7 @@ function CheckoutButton({
 
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
-const CTA_LABEL = "Get my dating photos — $39";
+const CTA_LABEL = "Get my 30 photos — $39";
 
 const STEPS = [
   {
@@ -128,7 +128,7 @@ const STEPS = [
   {
     num: "03",
     time: "24 H",
-    title: "Your dating photos in your inbox",
+    title: "30 photos in your inbox",
     desc: "Download, pick your favorites, update your profile.",
   },
 ];
@@ -155,7 +155,7 @@ const TESTIMONIALS = [
     meta: "Hinge · May 2026",
   },
   {
-    quote: "I uploaded twelve selfies and got back a pack of photos I actually wanted to post.",
+    quote: "I uploaded twelve selfies and got back thirty photos I actually wanted to post.",
     name: "Sam, 29",
     meta: "Tinder · April 2026",
   },
@@ -167,7 +167,7 @@ const TESTIMONIALS = [
 ];
 
 const PRICING_BULLETS = [
-  "A full pack of high-resolution profile photos",
+  "30 high-resolution photos",
   "6 styles: nature · casual · outdoor · night out · athletic · lifestyle",
   "Ready for Tinder, Hinge and Bumble crops",
   "Delivered by email within 24 hours",
@@ -285,8 +285,8 @@ function DHero() {
           <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
           <p className="mo-hero__desc">
             We analyzed thousands of top-performing profiles on the main dating apps.
-            Our AI studio shoots you the way they&rsquo;re shot — a full pack of profile-ready
-            photos, delivered in 24 hours.
+            Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
+            delivered in 24 hours.
           </p>
           <div className="mo-hero__ctas">
             <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
@@ -294,7 +294,7 @@ function DHero() {
           </div>
           <TrustpilotBadge />
           <div className="mo-hero__meta">
-            <span>full photo pack</span>
+            <span>30 photos</span>
             <span className="mo-hero__meta-dot">·</span>
             <span>6 styles</span>
             <span className="mo-hero__meta-dot">·</span>
@@ -308,8 +308,8 @@ function DHero() {
         <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
         <p className="mo-hero__desc">
           We analyzed thousands of top-performing profiles on the main dating apps.
-          Our AI studio shoots you the way they&rsquo;re shot — a full pack of profile-ready
-          photos, delivered in 24 hours.
+          Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
+          delivered in 24 hours.
         </p>
       </div>
 
@@ -337,9 +337,9 @@ function DHero() {
         <a href="#dt-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
         <div className="mo-hero__meta">
-          <span>full photo pack</span>
+          <span>30 photos</span>
           <span className="mo-hero__meta-dot">·</span>
-          <span>6 styles</span>
+          <span>5 styles</span>
           <span className="mo-hero__meta-dot">·</span>
           <span>delivered in 24h</span>
         </div>
@@ -451,11 +451,11 @@ function DBeforeAfter() {
         <div className="mo-section-head--center">
           <p className="mo-section-eyebrow mo-section-eyebrow--center">Before / after</p>
           <h2 className="mo-section-title" style={{ marginTop: 12 }}>
-            The selfies you have. <em>The dating photos you need.</em>
+            The selfies you have. <em>The 30 photos you need.</em>
           </h2>
           <p className="dt-research-sub">
             Same face, same features — reframed the way top dating profiles are shot. Below,
-            a real member: two phone selfies in, a full pack out.
+            a real member: two phone selfies in, six of thirty out.
           </p>
         </div>
 
@@ -484,7 +484,7 @@ function DBeforeAfter() {
           <div className="dt-ba-col dt-ba-col--after">
             <div className="dt-ba-col__head">
               <span className="dt-ba-col__tag dt-ba-col__tag--after">You get back</span>
-              <span className="dt-ba-col__meta">a few of the pack</span>
+              <span className="dt-ba-col__meta">6 of 30 photos</span>
             </div>
             <div className="dt-ba-after-grid">
               {AFTER_PHOTOS.map((p, i) => (
@@ -602,7 +602,7 @@ const OLD_WAY = [
 const NEW_WAY = [
   "$39 — ten times less",
   "6 styles, 6 settings, one upload",
-  "Your photo pack in your inbox within 24h",
+  "30 photos in your inbox within 24h",
   "Shot from selfies you already have",
 ];
 
@@ -687,7 +687,7 @@ function DPricing() {
       <div className="mo-container">
         <div className="mo-section-head--center">
           <h2 className="mo-section-title" style={{ marginTop: 16, color: "#fff" }}>
-            Your dating photos. <em style={{ color: "rgba(255,255,255,0.5)" }}>$39, once.</em>
+            Your 30 photos. <em style={{ color: "rgba(255,255,255,0.5)" }}>$39, once.</em>
           </h2>
         </div>
         <div className="mo-pricing-card">
@@ -726,7 +726,7 @@ function DGuarantee() {
           </div>
           <div>
             <h2 className="mo-guarantee__title">
-              Look through the whole pack.{" "}
+              Look through all 30.{" "}
               <em>If you don&rsquo;t love them, full refund.</em>
             </h2>
           </div>
@@ -799,7 +799,7 @@ function DSticky({ visible }: { visible: boolean }) {
   return (
     <div className={`mo-sticky ${visible ? "mo-sticky--visible" : ""}`}>
       <div className="mo-sticky__mobile">
-        <div className="mo-sticky__text">Your dating photos, in 24h</div>
+        <div className="mo-sticky__text">Your 30 photos, in 24h</div>
         <CheckoutButton label={CTA_LABEL} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
       </div>
       <div className="mo-sticky__desktop dt-sticky-desktop">
