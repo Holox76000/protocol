@@ -3,6 +3,12 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.3.1] - 2026-07-29
+
+### Changed
+- Deploy notifications now mention the whole channel (`@channel`) so the plain-
+  language note reaches everyone in #news, instead of posting silently.
+
 ## [1.1.3.0] - 2026-07-29
 
 ### Fixed
