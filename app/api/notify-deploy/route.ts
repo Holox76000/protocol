@@ -49,8 +49,10 @@ export async function POST(request: Request) {
   }
 
   const url = docUrl(body.doc);
+  // `<!channel>` notifie tous les membres du canal — chaque note de deploy doit
+  // être vue par toute l'entreprise, pas rester silencieuse.
   const lines = [
-    body.title ? `:rocket: *Deploy — ${body.title}*` : ":rocket: *Nouveau deploy*",
+    body.title ? `:rocket: *Deploy — ${body.title}* <!channel>` : ":rocket: *Nouveau deploy* <!channel>",
     "",
     message,
   ];
