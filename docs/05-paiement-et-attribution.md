@@ -8,25 +8,27 @@
 Client serveur : `getStripeServerClient()` (`lib/stripe.ts`), version d'API
 épinglée `2024-06-20`.
 
-| Mode | Où | Comportement |
-|---|---|---|
-| **Hosted Checkout Session** | `create-checkout-session` (branche non-embedded) | `mode: payment`, collecte téléphone, codes promo, expiration 30 min avec recovery. `success_url` branche vers `/dating/success` ou `/checkout/success`. |
-| **Embedded Checkout** | même route, `ui_mode: embedded` | Renvoie un `client_secret`, `return_url` → `/dashboard`. |
-| **Payment Intent** | `create-payment-intent` | `paymentIntents.create` direct, **montant $89 en dur**, trouve/crée le customer par email. C'est le flow embarqué de `/f1`. |
+Le flow live est le **Hosted Checkout Session** (`create-checkout-session`,
+`mode: payment`) : collecte téléphone, codes promo, expiration 30 min avec
+recovery, `success_url` → `/dating/success`. (La route sait aussi rendre un
+**Embedded Checkout** — `ui_mode: embedded`, renvoie un `client_secret`.)
 
-### Logique de prix par funnel
+### Le prix
 
-`getCheckoutLineItems(funnel)` (`lib/stripe.ts`) :
-
-| Funnel | Price ID (env) | Fallback inline |
-|---|---|---|
-| `f1` | `STRIPE_F1_PRICE_ID` | **$89** — « Attractiveness Protocol — 3-Month Program » |
-| `dating` | `STRIPE_DATING_PRICE_ID` | **$39** — « Protocol Dating — AI Dating Photos » |
-| `main` (défaut) | `STRIPE_PRICE_ID` | **$19** — « Body Analysis + Body Transformation Protocol » |
-
-Funnels connus : `main, f2, v3, woman, f1, dating`. Un funnel inconnu tombe sur
-`main`. Les upsells Dating utilisent toujours du `price_data` inline ($20),
+`getCheckoutLineItems("dating")` (`lib/stripe.ts`) résout le funnel `dating` vers
+`STRIPE_DATING_PRICE_ID`, fallback inline **$39** (« Protocol Dating — AI Dating
+Photos »). Les **upsells** utilisent toujours du `price_data` inline ($20),
 jamais un Price ID.
+
+> Le repo porte d'autres funnels de prix hérités du Protocol arrêté (`f1` $89,
+> `main` $19…) — voir *Précédentes itérations*.
+
+> ⚠️ **Bug de prix connu** (`TODOS.md`, P1, non corrigé) :
+> `app/checkout/hosted/page.tsx` a son propre `KNOWN_FUNNELS` qui **omet
+> `"dating"`**, donc un lien `/checkout/hosted?funnel=dating` retombe
+> silencieusement sur `main` et **facture $19 au lieu de $39**. La LP Dating
+> utilise normalement une session Stripe directe, donc ça ne mord que si un lien
+> Dating passe par `/checkout/hosted`.
 
 > ⚠️ **Bug de prix connu** (`TODOS.md`, P1, non corrigé) :
 > `app/checkout/hosted/page.tsx` a son propre `KNOWN_FUNNELS` qui **omet
@@ -38,16 +40,10 @@ jamais un Price ID.
 ## Le webhook Stripe
 
 `app/api/webhooks/stripe/route.ts`, signature vérifiée avec
-`STRIPE_WEBHOOK_SECRET`. C'est le point central de la conversion. Deux
-événements :
-
-**`payment_intent.succeeded`**
-- Ping Slack `#sales` canonique pour **chaque** vente non-Dating.
-- Le champ metadata `capi_purchase_source` désambiguïse le flow pour éviter le
-  double-comptage (skip les PI détenus par une Checkout Session).
-- Fire Meta CAPI + TikTok + GA4 `Purchase` (event_id = id du PI).
-- Marque `users.has_paid`, met en pause le nurture, et pour un nouveau client
-  crée un token d'inscription + email de bienvenue.
+`STRIPE_WEBHOOK_SECRET`. C'est le point central de la conversion. L'événement
+live est **`checkout.session.completed`** (le handler `payment_intent.succeeded`
+existe encore mais servait l'ancien flow Protocol — voir *Précédentes
+itérations*).
 
 **`checkout.session.completed`**
 - Branche **upsells Dating** (`upsell_kind` priority/luxury) : flip des flags sur
@@ -68,8 +64,9 @@ Comment une vente est reliée à la créa exacte qui l'a générée. **`utm_cont
    content/term/adset/ad`, `fbclid`, `ttclid`) depuis l'URL et les persiste en
    **sessionStorage** (`prtcl_utm`, stratégie de merge). `appendUtmToPath` les
    réattache aux liens internes.
-2. **Session funnel** — `funnel-shell.tsx` écrit les UTM dans les réponses
-   (`_utm_*`) et synchronise vers `funnel_sessions` en Supabase.
+2. **Session funnel** — la session écrit les UTM dans les réponses (`_utm_*`) et
+   synchronise vers `funnel_sessions` en Supabase (mécanisme partagé, toujours
+   utilisé côté Dating).
 3. **Checkout** — le client passe les UTM + `ga_client_id` (du cookie `_ga`) +
    `funnel_sid` aux routes de création, qui les écrivent toutes dans la
    **metadata Stripe**. `create-payment-intent` a un **filet de sécurité** : si

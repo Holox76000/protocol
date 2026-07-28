@@ -1,0 +1,160 @@
+<!-- category: Précédentes itérations -->
+<!-- summary: Tout le produit Protocol (attractivité/body) et les funnels d'avant : morts, mais archivés ici pour la mémoire de la boîte. -->
+
+# Précédentes itérations
+
+Cette page est la **mémoire des paris qu'on a arrêtés**. Le wiki « actuel »
+(toutes les autres pages) ne parle que du **produit live, Protocol Dating**. Tout
+ce qui concerne l'ancien produit **Protocol** (analyse d'attractivité + body
+transformation) et les funnels d'avant est rassemblé **ici** — pour ne pas
+polluer la doc courante, tout en gardant la trace de ce qu'on a construit et
+appris.
+
+> Règle : ce qui est décrit **sur cette page** est de l'**historique**. Le code
+> existe encore dans le repo mais ne se vend plus, n'est plus maintenu, et ne
+> doit servir à aucune décision courante.
+
+---
+
+## Protocol — « analyse d'attractivité + transformation » (MORT)
+
+Le produit d'origine après le pivot depuis le tout premier « skinny-fat quiz ».
+Cœur de la boîte pendant des mois ; **il ne se vend plus**.
+
+### Ce que c'était
+
+Une **analyse d'attractivité / composition corporelle** assistée par IA, plus un
+« protocole » de transformation personnalisé (entraînement + nutrition + sommeil
++ posture) sur **3 mois**. Positionnement : *attractivité, pas volume musculaire*
+— « the science of male attractiveness ». Prix live facturé : **$89**.
+
+**Ce que le client recevait** : accès à vie à l'analyse, au protocole
+personnalisé et aux ressources membres. Après paiement : lien d'inscription
+(`/register?token=…`), création de compte, puis un **questionnaire d'onboarding**
+gated (`/questionnaire`, 7 sections) qui alimentait le **rapport Protocol**,
+livré dans l'espace membre (`/protocol`) et exportable en **PDF**. L'état de
+livraison vivait sur `users.protocol_status` (`in_review` → `delivered`).
+
+### Le funnel (mort)
+
+```
+Pub → /  (F1OfferPage $89) ou /funnel (quiz 27 slides)
+    → /f1  (advertorial) → /f1/vsl  (VSL vidéo Wistia) → /f1/offer  (page de vente longue)
+    → /checkout (Payment Intent embarqué, $89 en dur)
+    → /register → /questionnaire (7 sections) → /protocol (rapport + PDF)
+```
+
+| Route | Rôle |
+|---|---|
+| `/` | Page de vente Protocol ($89), rend `F1OfferPage` |
+| `/funnel`, `/qz` | Le quiz diagnostic 27 slides (+ son clone trafic pub) |
+| `/f1`, `/f1/vsl`, `/f1/offer` | Advertorial → VSL → page de vente |
+| `/f1/report`, `/f1/report-loading` | Rapport diagnostic HTML (`data/report-template.html`) |
+| `/questionnaire` | Onboarding post-achat (7 sections) |
+| `/protocol`, `/protocol/[email]` | Espace membre : protocole livré |
+| `/nps/[token]` | NPS Protocol |
+| `/f1-old` | Copie stale byte-identique de `/f1` |
+| `/program` | `redirect("/")` — route morte, composants réutilisés |
+| `/f2`, `/v3`, `/home` | Variantes A/B enregistrées (`/f2` cotait $19) |
+| `/scan`, `/interface`, `/preview`, `/visualization`, `/upper-body-reel` | Outils internes / démos |
+
+### La machinerie technique construite (et qui dort)
+
+**Le moteur de quiz.** Deux systèmes :
+
+1. **Legacy skinny-fat** — `lib/quizConfig.ts` + `lib/scoring.ts` : le quiz
+   original 9 questions, segments + « primary blocker ». L'ADN du premier produit.
+2. **Quiz 27 slides** — `app/funnel/funnel-config.ts` : moteur de slides typé
+   (âge, ethnicité, morphologie, douleurs, orientation, taille/poids, temps hebdo,
+   solutions passées, dream outcome, + uploads photo). Résolveurs d'images par
+   âge×ethnicité. Variantes (`lib/variant.ts`, `default` | `projection`).
+
+**Le scoring.**
+
+- **`lib/preliminaryScore.ts`** — score préliminaire (0–100, current + potential)
+  depuis les réponses du quiz (base morphologie, nudge BMI, pénalité d'âge).
+- **`lib/attractivenessScore.ts`** — le « vrai » score, 6 métriques photo
+  pondérées : SWR 0.35, BF% 0.25, CWR 0.15, TI 0.10, PAS 0.10, PC 0.05, ajusté
+  par l'âge. Labels Elite→Needs Work + « ceiling » réaliste par âge.
+- **`lib/maleBodyFat.ts`** — estimateur de % de masse grasse (18–90 ans),
+  multi-formules (RFM, WHtR, Deurenberg, CUN-BAE). Fortement testé.
+
+**Le rapport & le PDF.**
+
+- **`lib/report-content.ts`** — copy personnalisée (patterns émotionnels par âge /
+  ethnicité / environnement / historique), partagée rapport HTML + emails.
+- **`lib/parseProtocolSections.ts`** — découpe un protocole markdown en 6 sections.
+- **`app/pdf/`** — le PDF via `@react-pdf/renderer` (couverture avec score, TOC,
+  analyse corporelle, nutrition, workout, sommeil, posture, suppléments, plan).
+  Resté en download admin ; livraison email jamais finie (TODO P2).
+
+**Personnalisation & preuve sociale.**
+
+- **`lib/ad-variants.ts`** — ~90 `ad_id` Meta → `{badge, headline, subtext, cta}`.
+- **`lib/personalization.ts`** — **Claude Sonnet** (tool_use forcé, JSON strict)
+  générait la copy hero + choix de testimonial depuis les réponses libres du quiz,
+  validation anti-« AI slop », 6 personas (`lib/personalizationPrompt.ts`).
+- **`lib/testimonials.ts`** — 7 témoignages keyés par persona (choisis par Claude).
+- **`lib/studies.ts`** — citations d'études peer-reviewed injectées dans les
+  prompts de génération de rapport.
+
+### Paiement (mort)
+
+- **Payment Intent embarqué** (`create-payment-intent`) : `amount: 8900` **en
+  dur** ($89), c'était le flow de `/f1`.
+- Price IDs par funnel : `f1` = $89 (« Attractiveness Protocol — 3-Month
+  Program ») ; `main` (défaut) = **$19** (« Body Analysis + Body Transformation
+  Protocol »). D'où l'incohérence **$19 / $89** selon le point d'entrée.
+- Webhook `payment_intent.succeeded` : ping Slack `#sales` pour chaque vente
+  non-Dating, fire Meta/TikTok/GA4 `Purchase`, marque `users.has_paid`, crée le
+  token d'inscription + email de bienvenue.
+
+### Tracking (events morts)
+
+Events funnel spécifiques au Protocol, plus émis : `quiz_started` (`StartQuiz`
+CAPI), `view_offer (F1)` (`ViewContent`, valeur $89), `Lead` (`/api/lead`,
+`Lead` CAPI + TikTok `CompleteRegistration`, $89), `cta_clicked`. Le pixel
+navigateur codait la valeur $89 en dur pour F1.
+
+### NPS Protocol (mort)
+
+Passes du cron `nps-survey` visant l'ancien produit : NPS initial 2h après
+`protocol_viewed_at` (`/nps/{token}`), re-sondage J+30, relances J+1/2/3. Ces
+passes écrivaient en base mais **ne postaient pas** sur Slack (seul le NPS Dating
+atteint #survey).
+
+### Tables Supabase héritées
+
+Restent en base, non alimentées : **`protocols`**, **`questionnaire_responses`**,
+**`visualization_previews`**, colonnes `users.protocol_status` / `protocol_*`.
+État du quiz côté client : `localStorage` `sf_quiz_state`.
+
+### Pourquoi c'est mort
+
+La boîte a **consolidé sur Protocol Dating** comme produit unique. Le stack
+Protocol est conservé dans le repo mais **n'est plus vendu ni maintenu** : plus
+de spend dirigé vers ces funnels, plus de fulfillment.
+
+---
+
+## Le tout premier produit — « skinny-fat quiz »
+
+Avant Protocol, la boîte est née comme un **quiz skinny-fat** (d'où le nom de
+package `skinny-fat-quiz`, encore dans `package.json`). Le quiz 9 questions
+(`lib/quizConfig.ts` + `lib/scoring.ts`) en est le vestige. Pivot vers
+« attractivité » (Protocol), puis vers Dating.
+
+---
+
+## Ce qui survit et reste live
+
+Plusieurs briques nées pour Protocol sont **partagées et toujours utilisées par
+Dating** — elles ne sont *pas* mortes, et restent documentées dans les pages
+courantes :
+
+- Le **checkout Stripe** (hosted / embedded) et le webhook.
+- La **chaîne d'attribution** UTM → metadata Stripe → `ad_id` (`lib/utm.ts`,
+  `funnel_sessions`).
+- Le **tracking multi-canal** Meta/TikTok/GA4 + dedup + EMQ.
+- Le socle **Slack** (`lib/slack.ts`), les **emails** (`lib/email.ts`), le
+  **serveur MCP**, et toute la couche **Opérer avec l'IA**.

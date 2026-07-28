@@ -39,7 +39,6 @@ Définis dans `lib/slack.ts` :
 
 | Event | Canal | Déclencheur |
 |---|---|---|
-| **Nouvelle vente** (PI non-Dating réussi) | `sales` | webhook Stripe `payment_intent.succeeded` |
 | **Commande Dating créée** (racine du fil) | `sales` (bot) | `checkout.session.completed` Dating payé |
 | Dating : photos uploadées (édite racine 📸 + thread) | `sales` (bot) | route `complete-upload` |
 | Dating : généré (édite racine ⏳ + coût/marge) | `sales` (bot) | `generateForOrder` |
@@ -50,9 +49,6 @@ Définis dans `lib/slack.ts` :
 | **Digest ops Dating** (compte par statut, marge, warnings stuck/overdue) | `ops` | cron `dating-daily-ops` |
 | **Email entrant** (chaque inbound Resend) | `emails` | webhook `resend-inbound` |
 | **Réponse NPS Dating** | `survey` | route `nps/dating/submit` |
-
-> Note : le NPS **Protocol** (non-Dating) écrit en base mais **ne poste pas**
-> sur Slack. Seul le NPS **Dating** atteint #survey.
 
 ## Slack → app : répondre aux clients depuis Slack
 
@@ -73,16 +69,16 @@ Pas de slash commands ni de boutons interactifs — juste `!send`.
 
 ## NPS
 
-Envoi planifié par `netlify/functions/nps-survey.mts` (`*/5 * * * *`), 5 passes.
-Les emails internes/équipe sont filtrés partout.
+Envoi planifié par `netlify/functions/nps-survey.mts` (`*/5 * * * *`). Les emails
+internes/équipe sont filtrés partout.
 
-| Passe | Sondage | Timing | Route |
-|---|---|---|---|
-| 1 | NPS Protocol initial | 2h après `protocol_viewed_at` | `/nps/{token}` |
-| 2 | Re-sondage J+30 | répondants initiaux, 30j après livraison | `/nps/{token}` |
-| 3 | Relances J+1/J+2/J+3 | non-répondants | `/nps/{token}` |
-| 4 | **NPS Dating** | 1h après `gallery_first_viewed_at` | `/nps/dating/{token}` |
-| 5 | Relance Dating J+1 | non-répondants | `/nps/dating/{token}` |
+| Sondage | Timing | Route |
+|---|---|---|
+| **NPS Dating** | 1h après `gallery_first_viewed_at` | `/nps/dating/{token}` |
+| Relance Dating J+1 | non-répondants | `/nps/dating/{token}` |
+
+> Le cron porte aussi des passes NPS de l'ancien Protocol (elles n'atteignent pas
+> Slack) — voir *Précédentes itérations*.
 
 ## Emails (Resend)
 

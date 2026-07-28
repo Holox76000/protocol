@@ -18,11 +18,10 @@ npx vitest           # tests unitaires (lib/*.test.ts)
 Crée un `.env` (ou `.env.local`) avec au minimum les clés Supabase et Stripe.
 Routes utiles en local :
 
-- Quiz : `http://localhost:3000/funnel`
-- Offre Protocol : `http://localhost:3000/`
-- Dating : `http://localhost:3000/dating`
+- Dating (produit live) : `http://localhost:3000/dating`
 - Admin : `http://localhost:3000/admin` (nécessite un user `is_admin`)
 - **Ce manuel** : `http://localhost:3000/docs` (nécessite un user `is_admin`)
+- Anciennes routes Protocol (mortes) : `/`, `/funnel`, `/f1/*` — voir *Précédentes itérations*
 
 ## Variables d'environnement par service
 
@@ -46,8 +45,8 @@ Set complet, groupé. (Ne jamais committer de clé — Netlify les gère en prod
   `app/`. Match le style du code environnant.
 - **Après chaque edit frontend** (`.tsx`/`.css`), vérifie le rendu via le
   screenshot auto (`/tmp/latest-render.png`) — c'est une règle de `CLAUDE.md`.
-- Écris des tests Vitest pour la logique pure (voir `lib/*.test.ts` :
-  scoring, body fat, stripe, email, dating orders).
+- Écris des tests Vitest pour la logique pure (voir `lib/*.test.ts` : stripe,
+  email, dating orders…).
 - Tiens `CHANGELOG.md` + `VERSION` à jour à chaque release (playbook
   `document-release`).
 - **Lis `TODOS.md` avant de démarrer** — il liste les problèmes connus et les

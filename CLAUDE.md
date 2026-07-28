@@ -5,6 +5,26 @@
 **Ne jamais demander de confirmation** pour exécuter des outils (bash, edit, read, screenshot, etc.). Procéder directement. Demander seulement avant d'entrer en mode Plan (`/plan`) pour aligner sur l'approche.
 
 
+## Après chaque deploy (OBLIGATOIRE)
+
+Cette règle s'applique à **toute** session, pas seulement celle en cours. **Dès qu'un deploy en prod est fait** (via `ship` / `land-and-deploy`, ou tout push sur `main` qui déclenche Netlify), effectuer **systématiquement** ces 2 étapes avant de considérer le deploy terminé :
+
+1. **Mettre à jour le wiki** (`docs/`, docs-as-code). Identifier la/les page(s) impactée(s) par le changement et les éditer dans la foulée :
+   - Changement sur le produit live (Dating) → la page primaire concernée (`docs/02-produit.md`, `docs/04-parcours-et-funnels.md`, etc.).
+   - Quelque chose lié à une itération morte (Protocol / attractivité) → **`docs/11-tests-realises.md`** (catégorie *Précédentes itérations*). Le wiki « actuel » ne parle **que** de Dating.
+   - Nouveau comportement → documenter sur la page pertinente.
+
+2. **Notifier Slack** en langage **simple et non technique** (l'audience inclut des associés non-devs) : *ce que ce deploy change* et *ce que ça implique*. Utiliser le script, avec un lien vers la page wiki concernée :
+
+   ```bash
+   npx tsx scripts/notify-deploy.ts \
+     --title "<titre court>" \
+     --message "<explication en mots simples : ce qui change + ce que ça implique, zéro jargon>" \
+     --doc <slug-de-la-page-wiki>     # ex: produit, parcours-et-funnels
+   ```
+
+   Le post part sur le canal deploy `C0BKXQRPULX` (via l'endpoint prod `app/api/notify-deploy`, qui poste avec le bot token — présent en prod uniquement). `--doc <slug>` génère le lien `https://protocol-club.com/docs/<slug>`.
+
 ## Frontend Workflow
 
 After every edit to a `.tsx`, `.css`, or `.module.css` file, **always check the visual render** :

@@ -78,17 +78,14 @@ fichiers `.sql` ne font que les *étendre*.
 
 | Table | Rôle | Colonnes clés |
 |---|---|---|
-| **leads** | Opt-ins du quiz (haut de funnel), 1 ligne/email | `email`, `payload` JSONB (answers, utm, funnel_sid), colonnes nurture `nurture_e2…e7_sent_at`, `nurture_paused_at`, `nurture_starts_at` |
-| **funnel_sessions** | État complet d'une session de quiz — **source de vérité pour l'attribution** | `session_id`, `answers` JSONB (réponses + `_utm_*`, `_fbclid`, `_ttclid`) |
+| **leads** | Opt-ins de funnel (haut de funnel), 1 ligne/email | `email`, `payload` JSONB (answers, utm, funnel_sid), colonnes nurture `nurture_e2…e7_sent_at`, `nurture_paused_at`, `nurture_starts_at` |
+| **funnel_sessions** | État complet d'une session de funnel — **source de vérité pour l'attribution** | `session_id`, `answers` JSONB (réponses + `_utm_*`, `_fbclid`, `_ttclid`) |
 | **event_sessions** | Log d'événements de funnel au niveau step | `session_id`, `event`, `step`, `payload` |
-| **users** | Clients payants / comptes | `email`, `password_hash`, `is_admin`, `has_paid`, `paid_amount_cents`, `paid_at`, `protocol_status`, `stripe_customer_id`… |
-| **protocols** | Contenu du protocole généré par user | sections, `before_url`/`after_url`, `before_after_analysis` |
-| **questionnaire_responses** | Questionnaire d'onboarding post-achat | (spec dans `protocol-questionnaire-spec.md`) |
+| **users** | Clients payants / comptes | `email`, `password_hash`, `is_admin`, `has_paid`, `paid_amount_cents`, `paid_at`, `stripe_customer_id`… |
 | **sessions** | Sessions d'auth serveur | `user_id`, `token_hash`, `expires_at` |
 | **registration_tokens** / **magic_link_tokens** / **cart_recovery_tokens** / **unsubscribe_tokens** | Tokens à usage unique / TTL variés | `token_hash`, `expires_at`, `used` |
 | **email_suppressions** / **email_events** | Do-not-send + log append-only Resend | — |
 | **client_messages** | Messages bidirectionnels client↔admin | `user_id`, `direction` (inbound/outbound), `resend_email_id` |
-| **visualization_previews** | Previews before/after IA | `before_path`, `after_path`, `analysis_text` |
 | **meta_ads_seen** | Dedup pour le cron de détection de nouvelles créas Meta | `ad_id` PK, `effective_status`… |
 | **dating_orders** | Cycle de vie des commandes Dating (le state machine le plus riche) | voir *Produit* ; `status`, `photo_paths`, `output_paths`, `generation_cost_cents`, `deliver_at`, `slack_sales_thread_ts`, `upsell_priority/luxury`, bloc NPS |
 | **dating_templates** | Templates de scènes pour la génération | `slug`, `label`, `prompt`, `ref_image_path`, `active`, `kind` (core/luxury) |
@@ -101,9 +98,12 @@ RLS), donc activer la RLS sans policy bloque tout accès anon/PostgREST.
 `dating_orders` : RLS activée, 0 policy. `dating_templates` : RLS + une policy
 service-role uniquement. `client_messages` : RLS explicitement désactivée.
 
+> D'autres tables non alimentées restent en base (`protocols`,
+> `questionnaire_responses`, `visualization_previews`, colonnes `protocol_*`) —
+> héritage de l'ancien produit, voir *Précédentes itérations*.
+
 ## Storage
 
-- **État du quiz côté client** : localStorage (`sf_quiz_state`), pas Supabase.
 - **Selfies Dating** : bucket privé `dating-photos`, uploadés **directement**
   par le navigateur via URLs signées (les fonctions Netlify plafonnent les
   bodies ~6 Mo, donc les fichiers ne transitent pas par l'API). Normalisation
