@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.4.1] - 2026-07-31
+
+### Fixed
+- Netlify Functions bundling failed for the new `dating-generate-bg-background`
+  function ("Could not resolve server-only"): it pulls in `lib/email.ts`, which
+  imported `createUnsubscribeToken` from `lib/auth.ts`, and `lib/auth.ts` starts
+  with `import "server-only"` — unresolvable by the esbuild function bundler.
+  Moved `createUnsubscribeToken` / `verifyUnsubscribeToken` into a new
+  `server-only`-free `lib/unsubscribeToken.ts` (re-exported from `lib/auth` for
+  existing importers) so the email path bundles cleanly into standalone functions.
+  This unblocks the v1.1.4.0 background-generation fix.
+
 ## [1.1.4.0] - 2026-07-31
 
 ### Fixed
