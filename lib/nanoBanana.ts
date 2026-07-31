@@ -57,6 +57,7 @@ class NanoBananaError extends Error {
     public readonly status: number | null,
     public readonly retryable: boolean,
     public readonly rawBody: string | null,
+    public readonly retryAfterMs: number | null = null,
   ) {
     super(message);
     this.name = "NanoBananaError";
@@ -66,6 +67,17 @@ class NanoBananaError extends Error {
 // 5xx + 429 = retryable; 4xx (auth, bad request) = permanent.
 function isRetryableStatus(status: number): boolean {
   return status === 429 || status >= 500;
+}
+
+// Parse a Retry-After header (delta-seconds or HTTP-date) into ms, clamped to
+// a sane ceiling so a hostile/huge value can't stall the worker for minutes.
+function parseRetryAfterMs(header: string | null): number | null {
+  if (!header) return null;
+  const secs = Number(header);
+  if (Number.isFinite(secs)) return Math.min(Math.max(secs, 0) * 1000, 60_000);
+  const when = Date.parse(header);
+  if (!Number.isNaN(when)) return Math.min(Math.max(when - Date.now(), 0), 60_000);
+  return null;
 }
 
 async function callOnce(opts: GenerateOptions, apiKey: string): Promise<GenerateResult> {
@@ -126,6 +138,7 @@ async function callOnce(opts: GenerateOptions, apiKey: string): Promise<Generate
       res.status,
       isRetryableStatus(res.status),
       rawText,
+      parseRetryAfterMs(res.headers.get("retry-after")),
     );
   }
 
@@ -169,14 +182,16 @@ async function callOnce(opts: GenerateOptions, apiKey: string): Promise<Generate
   };
 }
 
-const DEFAULT_MAX_ATTEMPTS = 3;
+const DEFAULT_MAX_ATTEMPTS = 4;
 
-// Exponential backoff with jitter. Honours Retry-After? Not surfaced on
-// Nano Banana yet, so we go blind: 1s → 3s → 9s + up to 500ms jitter.
-async function sleepBackoff(attempt: number): Promise<void> {
+// Exponential backoff with jitter (1s → 3s → 9s + up to 500ms). When the API
+// returns a Retry-After (e.g. on 429 throttling), honour it — waiting at least
+// that long — so we back off exactly as the provider asks under rate limits.
+async function sleepBackoff(attempt: number, retryAfterMs: number | null): Promise<void> {
   const base = 1000 * Math.pow(3, attempt - 1);
   const jitter = Math.floor(Math.random() * 500);
-  await new Promise((r) => setTimeout(r, base + jitter));
+  const wait = retryAfterMs != null ? Math.max(retryAfterMs, base) : base + jitter;
+  await new Promise((r) => setTimeout(r, wait));
 }
 
 export async function generateImage(opts: GenerateOptions): Promise<GenerateResult> {
@@ -197,7 +212,7 @@ export async function generateImage(opts: GenerateOptions): Promise<GenerateResu
       if (!(err instanceof NanoBananaError)) throw err;
       lastError = err;
       if (!err.retryable || attempt === DEFAULT_MAX_ATTEMPTS) throw err;
-      await sleepBackoff(attempt);
+      await sleepBackoff(attempt, err.retryAfterMs);
     }
   }
   throw lastError ?? new NanoBananaError("exhausted retries", null, false, null);

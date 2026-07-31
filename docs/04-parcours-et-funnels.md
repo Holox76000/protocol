@@ -57,6 +57,13 @@ exponentiel, coût ~14 cents/image. Une régénération par-photo existe côté 
 > `netlify/functions/dating-generate-bg-background.mts` (limite 15 min) ; l'UI
 > admin se rafraîchit pour voir les photos apparaître. En local (pas de Netlify),
 > la génération tourne inline.
+>
+> **Reprise (rate-limit Nano Banana).** À 30–47 images/commande, l'API d'images
+> peut throttler (429). La génération est donc **reprenable** : elle liste les
+> images déjà présentes dans `orders/{sid}/output/` et **skippe** celles-là — un
+> run throttlé ou coupé au timeout reprend là où il s'est arrêté (le cron le
+> relance via sa fenêtre de résurrection 30 min, sans tout régénérer). Le retry
+> Nano Banana **honore `Retry-After`** (`lib/nanoBanana.ts`, 4 tentatives).
 
 ## Personnalisation par pub (ad-congruence)
 
