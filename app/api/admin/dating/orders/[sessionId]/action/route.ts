@@ -55,24 +55,58 @@ async function runGenerate(sessionId: string) {
   if (claimErr) return { ok: false, error: `claim: ${claimErr.message}` };
   if (!claimed || claimed.length === 0) return { ok: false, error: "already claimed by another process" };
 
-  try {
-    // Admin manual → holdBeforeDelivery=false so deliver_at=now (ready to
-    // release with the deliver action; not auto-released).
-    const res = await generateForOrder(order as GenerationOrder, { holdBeforeDelivery: false });
-    if (!res.ok) {
-      // Roll back to photos_uploaded so cron / admin can retry.
-      await supabaseAdmin
-        .from("dating_orders")
-        .update({ status: "photos_uploaded", generation_error: res.error ?? "unknown" })
-        .eq("id", order.id);
+  // Admin manual → holdBeforeDelivery=false so deliver_at=now (ready to
+  // release with the deliver action; not auto-released).
+  return dispatchGeneration(sessionId, order.id, order as GenerationOrder, { holdBeforeDelivery: false });
+}
+
+async function rollbackToUploaded(orderId: string, error: string) {
+  await supabaseAdmin
+    .from("dating_orders")
+    .update({ status: "photos_uploaded", generation_error: error })
+    .eq("id", orderId);
+}
+
+// Generation makes one image per active template (30 core, 47 with luxury),
+// which exceeds the 60s function timeout. In production hand off to the
+// 15-min background function and return immediately (the order is already
+// claimed to `generating`; the UI polls via refresh). Locally (no Netlify)
+// fall back to running inline.
+async function dispatchGeneration(
+  sessionId: string,
+  orderId: string,
+  order: GenerationOrder,
+  opts: { holdBeforeDelivery: boolean },
+): Promise<{ ok: boolean; queued?: boolean; generated?: number; error?: string }> {
+  const siteUrl = process.env.URL ?? process.env.NETLIFY_SITE_URL;
+  if (siteUrl) {
+    let bgRes: Response;
+    try {
+      bgRes = await fetch(`${siteUrl}/.netlify/functions/dating-generate-bg-background`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, holdBeforeDelivery: opts.holdBeforeDelivery, secret: process.env.BG_FN_SECRET }),
+      });
+    } catch (err) {
+      await rollbackToUploaded(orderId, `bg dispatch error: ${String(err).slice(0, 200)}`);
+      return { ok: false, error: "failed to start background generation" };
     }
+    if (bgRes.status !== 202) {
+      const t = await bgRes.text().catch(() => "");
+      await rollbackToUploaded(orderId, `bg dispatch ${bgRes.status}: ${t.slice(0, 150)}`);
+      return { ok: false, error: `failed to start background generation (${bgRes.status})` };
+    }
+    return { ok: true, queued: true };
+  }
+
+  // Local dev: run inline (old blocking behavior).
+  try {
+    const res = await generateForOrder(order, { holdBeforeDelivery: opts.holdBeforeDelivery });
+    if (!res.ok) await rollbackToUploaded(orderId, res.error ?? "unknown");
     return res;
   } catch (err) {
     const msg = String(err).slice(0, 500);
-    await supabaseAdmin
-      .from("dating_orders")
-      .update({ status: "photos_uploaded", generation_error: msg })
-      .eq("id", order.id);
+    await rollbackToUploaded(orderId, msg);
     return { ok: false, error: msg };
   }
 }
