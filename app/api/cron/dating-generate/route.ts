@@ -87,27 +87,54 @@ export async function GET(request: Request) {
       continue;
     }
 
-    try {
-      const res = await generateForOrder(order);
-      summary.generated.push({ orderId: order.id, ...res });
-
-      if (!res.ok) {
+    // Generation makes one image per active template (30 core, 47 with luxury),
+    // which exceeds this cron's 60s budget. Hand off to the 15-min background
+    // function (order is already claimed to `generating`). Locally, run inline.
+    const siteUrl = process.env.URL ?? process.env.NETLIFY_SITE_URL;
+    if (siteUrl) {
+      try {
+        const bgRes = await fetch(`${siteUrl}/.netlify/functions/dating-generate-bg-background`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: order.stripe_session_id, holdBeforeDelivery: true, secret: process.env.BG_FN_SECRET }),
+        });
+        if (bgRes.status !== 202) {
+          const t = await bgRes.text().catch(() => "");
+          await supabaseAdmin
+            .from("dating_orders")
+            .update({ status: "photos_uploaded", generation_error: `bg dispatch ${bgRes.status}: ${t.slice(0, 150)}` })
+            .eq("id", order.id);
+          summary.generated.push({ orderId: order.id, ok: false, error: `bg dispatch ${bgRes.status}` });
+        } else {
+          summary.generated.push({ orderId: order.id, ok: true });
+        }
+      } catch (err) {
+        const msg = String(err).slice(0, 500);
         await supabaseAdmin
           .from("dating_orders")
-          .update({
-            status: "photos_uploaded",
-            generation_error: res.error ?? "unknown",
-          })
+          .update({ status: "photos_uploaded", generation_error: msg })
           .eq("id", order.id);
+        summary.generated.push({ orderId: order.id, ok: false, error: msg });
       }
-    } catch (err) {
-      const msg = String(err).slice(0, 500);
-      console.error("[cron/dating-generate] generateForOrder crashed", { orderId: order.id, msg });
-      await supabaseAdmin
-        .from("dating_orders")
-        .update({ status: "photos_uploaded", generation_error: msg })
-        .eq("id", order.id);
-      summary.generated.push({ orderId: order.id, ok: false, error: msg });
+    } else {
+      try {
+        const res = await generateForOrder(order);
+        summary.generated.push({ orderId: order.id, ...res });
+        if (!res.ok) {
+          await supabaseAdmin
+            .from("dating_orders")
+            .update({ status: "photos_uploaded", generation_error: res.error ?? "unknown" })
+            .eq("id", order.id);
+        }
+      } catch (err) {
+        const msg = String(err).slice(0, 500);
+        console.error("[cron/dating-generate] generateForOrder crashed", { orderId: order.id, msg });
+        await supabaseAdmin
+          .from("dating_orders")
+          .update({ status: "photos_uploaded", generation_error: msg })
+          .eq("id", order.id);
+        summary.generated.push({ orderId: order.id, ok: false, error: msg });
+      }
     }
   }
 

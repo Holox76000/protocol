@@ -35,6 +35,8 @@ déclenché par le cron `/api/cron/dating-generate` ou une action admin :
 1. Lister les selfies source (besoin de ≥4) → choisir jusqu'à 4 refs de
    « personnage ».
 2. Charger les templates actifs (`core`, + `luxury` si l'upsell est acheté).
+   Aujourd'hui : **30 templates `core` actifs** (= 30 photos pour une commande
+   standard) + **17 `luxury`** (débloqués par l'upsell → 47 photos).
 3. **Fan-out : un appel Nano Banana par template**, concurrence 5.
 4. Chaque appel : `refinePromptForPair` (Gemini réécrit le prompt depuis les
    pixels réels du template + selfie, toggle `NANOBANANA_AI_PROMPT_REFINE`) →
@@ -48,6 +50,13 @@ Le client Nano Banana (`lib/nanoBanana.ts`) : modèle Gemini image via
 l'Interactions API, jusqu'à 4 refs + 1 template, retry 3× avec backoff
 exponentiel, coût ~14 cents/image. Une régénération par-photo existe côté admin
 (bouton « ↻ » avec feedback correctif optionnel).
+
+> **Génération en background.** 30–47 images dépassent le timeout de 60s d'une
+> fonction serverless. La route admin et le cron **claim** la commande
+> (`generating`) puis délèguent à la **background function Netlify**
+> `netlify/functions/dating-generate-bg-background.mts` (limite 15 min) ; l'UI
+> admin se rafraîchit pour voir les photos apparaître. En local (pas de Netlify),
+> la génération tourne inline.
 
 ## Personnalisation par pub (ad-congruence)
 

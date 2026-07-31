@@ -43,13 +43,14 @@ export default function OrderActions({ sessionId, status, outputCount, deliverAt
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string; generated?: number };
+      const data = (await res.json()) as { ok?: boolean; error?: string; generated?: number; queued?: boolean };
       if (!res.ok || !data.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         setBusy(null);
         return;
       }
       const summary =
+        data.queued             ? "Generation started in the background (~1-2 min for 30 photos). Refresh in a moment to see them appear." :
         action === "generate"   ? `Generated ${data.generated ?? "?"} photos. Refreshing…` :
         action === "regenerate" ? `Regenerated ${data.generated ?? "?"} photos. Refreshing…` :
                                   "Delivered — email sent, Slack pinged. Refreshing…";
@@ -82,10 +83,10 @@ export default function OrderActions({ sessionId, status, outputCount, deliverAt
           type="button"
           onClick={() => run("generate")}
           disabled={!canGenerate || busy !== null}
-          title={!canGenerate ? `Not available in status "${status}" — use Regenerate instead` : "Run generation now (~20-30s, ~$1.30)"}
+          title={!canGenerate ? `Not available in status "${status}" — use Regenerate instead` : "Start generation (runs in background, ~1-2 min for ~30 photos, ~$4)"}
           className="rounded-lg bg-void px-4 py-2 text-[12px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {busy === "generate" ? "Generating… (~20-30s)" : "▶ Generate now"}
+          {busy === "generate" ? "Starting…" : "▶ Generate now"}
         </button>
 
         <button
@@ -100,12 +101,12 @@ export default function OrderActions({ sessionId, status, outputCount, deliverAt
 
         <button
           type="button"
-          onClick={() => run("regenerate", `Discard the current output and generate again? Existing generated photos will be overwritten. Cost: ~$1.30.`)}
+          onClick={() => run("regenerate", `Discard the current output and generate again? Existing generated photos will be overwritten. Cost: ~$4 (~30 photos).`)}
           disabled={!canRegenerate || busy !== null}
-          title={!canRegenerate ? `Not available in status "${status}"` : "Overwrite generated photos with a fresh run (~$1.30)"}
+          title={!canRegenerate ? `Not available in status "${status}"` : "Overwrite generated photos with a fresh run (background, ~$4)"}
           className="ml-auto rounded-lg border border-pebble bg-white px-4 py-2 text-[12px] font-semibold text-void hover:bg-ash transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {busy === "regenerate" ? "Regenerating… (~20-30s)" : "↻ Regenerate"}
+          {busy === "regenerate" ? "Starting…" : "↻ Regenerate"}
         </button>
       </div>
 

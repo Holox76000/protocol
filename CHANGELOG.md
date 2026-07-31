@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.4.0] - 2026-07-31
+
+### Fixed
+- Dating photo generation failed with "Unexpected token '<' … is not valid JSON"
+  after the active-template count grew to 30 (47 with the luxury upsell). One
+  Nano Banana call per template exceeded the 60s serverless timeout, so the
+  platform returned an HTML 504 that the admin UI / cron tried to parse as JSON.
+  Generation now runs in a Netlify background function (15-min limit,
+  `netlify/functions/dating-generate-bg-background.mts`): the admin action route
+  and the cron claim the order to `generating` then hand off; the admin UI
+  refreshes to show photos as they land. Local dev still runs inline.
+
 ## [1.1.3.1] - 2026-07-29
 
 ### Changed
