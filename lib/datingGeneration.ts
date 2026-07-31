@@ -166,10 +166,30 @@ export async function generateForOrder(
   const uploaded: string[] = [];
   const errors: string[] = [];
 
+  // Resumable generation: a run throttled by the image API (or killed by the
+  // function timeout) leaves partial output in storage. List what's already
+  // there so a retry skips finished images and only regenerates the missing
+  // ones — under rate limits an order then converges across retries instead of
+  // restarting all 30-47 images every time.
+  const existingOutput = new Set<string>();
+  {
+    const { data: existingFiles } = await supabaseAdmin.storage
+      .from("dating-photos")
+      .list(outputPrefix, { limit: 1000 });
+    for (const f of existingFiles ?? []) existingOutput.add(f.name);
+  }
+
   async function runTemplate(tpl: DatingTemplate) {
     const templateRef = templateRefs.get(tpl.id);
     if (!templateRef) {
       errors.push(`${tpl.id}: template ref missing in-memory (should not happen)`);
+      return;
+    }
+    const uploadPath = `${outputPrefix}/${tpl.slug}.jpg`;
+    // Resume: this template's image already exists from a previous partial run
+    // — count it and skip the (rate-limited, costly) regeneration.
+    if (existingOutput.has(`${tpl.slug}.jpg`)) {
+      uploaded.push(uploadPath);
       return;
     }
     // Two-phase: (1) Gemini refines the prompt using the actual visual
@@ -190,7 +210,6 @@ export async function generateForOrder(
         resolution: "1K",
         aspectRatio: "4:5",
       });
-      const uploadPath = `${outputPrefix}/${tpl.slug}.jpg`;
       const { error: upErr } = await supabaseAdmin.storage
         .from("dating-photos")
         .upload(uploadPath, result.imageBytes, {
