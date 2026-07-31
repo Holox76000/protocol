@@ -14,7 +14,7 @@ vi.mock("resend", () => ({
     emails = { send: sendMock };
   },
 }));
-vi.mock("./auth", () => ({
+vi.mock("./unsubscribeToken", () => ({
   createUnsubscribeToken: vi.fn(() => "tok"),
 }));
 
