@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { createUnsubscribeToken } from "./auth";
+import { createUnsubscribeToken } from "./unsubscribeToken";
 import {
   getPatterns,
   getAgeContent,
