@@ -3,6 +3,19 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.4.2] - 2026-07-31
+
+### Fixed
+- Dating generation now survives Nano Banana rate limits. At 30-47 images per
+  order the image API throttles (429): one order finished 30/30 in 150s while
+  another managed only 5/30 in 15 min before the background function timed out.
+  Two changes: (1) **resumable generation** — `generateForOrder` lists the images
+  already in `orders/{sid}/output/` and skips them, so a throttled/killed run
+  resumes where it left off (converging across the cron's 30-min resurrection
+  instead of regenerating all images every time); (2) the Nano Banana retry now
+  **honours the `Retry-After` header** and does 4 attempts (was 3), backing off
+  exactly as the provider asks under throttling.
+
 ## [1.1.4.1] - 2026-07-31
 
 ### Fixed
