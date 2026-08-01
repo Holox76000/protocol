@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const SIGNED_URL_TTL_SEC = 3600; // 1h — plenty for a browse + download session
+// 7 days. The gallery page regenerates fresh links on every load, so a customer
+// returning to /dating/gallery?session_id=… days later always works. This long
+// TTL also covers the edge cases: a tab left open, or a photo link saved/shared
+// — it stays valid for a week rather than an hour.
+const SIGNED_URL_TTL_SEC = 604800;
 
 type OrderRow = {
   id: string;
