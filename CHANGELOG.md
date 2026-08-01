@@ -3,6 +3,15 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.4.3] - 2026-08-02
+
+### Changed
+- Dating gallery photo links now stay valid for 7 days (was 1 hour). The gallery
+  page already regenerates fresh links on every load, so returning to
+  `/dating/gallery?session_id=…` days later already worked; this also covers a
+  tab left open or a saved/shared photo link — a customer can come back well
+  beyond 3 days without a broken link.
+
 ## [1.1.4.2] - 2026-07-31
 
 ### Fixed
