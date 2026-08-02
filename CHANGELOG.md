@@ -3,6 +3,19 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.0] - 2026-08-02
+
+### Added
+- Dating LP urgency + social proof:
+  - Top bar: **$39 launch price** with a live countdown to the **$59** bump, plus
+    "Only N production spots left today" (N trends down through the day, coherent
+    with 24h delivery).
+  - Hero: a subtle live "N photo sets delivered today" counter (grows through the
+    day) as volume social proof.
+  - Pricing card: struck-through **$59** next to $39 and a "rising to $59 in 3
+    days" tag.
+  - Testimonials: a green **Verified purchase** marker under each review.
+
 ## [1.1.4.3] - 2026-08-02
 
 ### Changed

@@ -623,3 +623,92 @@ button.mo-pricing-card__cta {
     margin-top: 32px;
   }
 }
+
+/* ─── Urgency bar: launch price + daily production spots ─────────────────── */
+.dt-urgency {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 18px;
+  background: #14181c;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  padding: 9px 16px;
+  text-align: center;
+}
+.dt-urgency strong { font-weight: 700; }
+.dt-urgency__price { color: rgba(255, 255, 255, 0.9); }
+.dt-urgency__spots {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #ffcf9e;
+}
+.dt-urgency__pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff8a3d;
+  animation: dt-pulse 1.8s ease-out infinite;
+}
+@keyframes dt-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 138, 61, 0.55); }
+  70%  { box-shadow: 0 0 0 7px rgba(255, 138, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 138, 61, 0); }
+}
+@media (max-width: 560px) {
+  .dt-urgency { font-size: 12px; gap: 3px 12px; padding: 8px 12px; }
+}
+
+/* ─── Delivered-today counter (hero social proof) ───────────────────────── */
+.dt-delivered {
+  display: inline-flex;
+  align-self: flex-start;   /* never stretch to full width in the flex column */
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.dt-delivered strong { color: rgba(255, 255, 255, 0.92); font-weight: 700; }
+.dt-delivered__live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: dt-live 1.6s ease-out infinite;
+}
+@keyframes dt-live {
+  0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* ─── Pricing: struck regular price ─────────────────────────────────────── */
+.dt-pricing-was {
+  margin-left: 10px;
+  color: #aab2b7;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  font-size: 22px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* ─── Testimonials: verified-purchase chip ──────────────────────────────── */
+.dt-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dt-verified svg { color: #16a34a; }

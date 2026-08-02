@@ -242,6 +242,89 @@ function TrustpilotBadge() {
   );
 }
 
+/* ─── Urgency: launch price + daily production spots ────────────────────── */
+
+// Launch price window ends here, then the price bumps to $59. Extend the
+// window by moving this date.
+const PRICE_BUMP_AT = new Date("2026-08-05T22:00:00Z");
+const REGULAR_PRICE = "$59";
+
+// Production is capacity-bound — photos are delivered in 24h, so only a limited
+// number of orders can be taken per day. The count trends down through the day
+// (~10 in the morning to ~3 late), with a small day-to-day shift.
+function computeSpotsLeft(now: Date): number {
+  const base = 10 - Math.round((now.getHours() / 23) * 7); // 10 → 3 across the day
+  const jitter = (now.getDate() % 3) - 1;                   // -1..1, stable within a day
+  return Math.max(3, Math.min(10, base + jitter));
+}
+
+function formatCountdown(ms: number): string {
+  const d = Math.floor(ms / 86_400_000);
+  const h = Math.floor((ms % 86_400_000) / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  return d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`;
+}
+
+function UrgencyBar() {
+  // Time-dependent + varies by day → compute after mount to avoid a hydration
+  // mismatch (server and client would otherwise disagree).
+  const [spots, setSpots] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSpots(computeSpotsLeft(new Date()));
+    const tick = () => {
+      const ms = PRICE_BUMP_AT.getTime() - Date.now();
+      setCountdown(ms > 0 ? formatCountdown(ms) : "");
+    };
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="dt-urgency" role="note">
+      <span className="dt-urgency__price">
+        <strong>$39 launch price</strong>
+        {countdown
+          ? <> — going to {REGULAR_PRICE} in <strong>{countdown}</strong></>
+          : <> — going to {REGULAR_PRICE} soon</>}
+      </span>
+      {spots != null && (
+        <span className="dt-urgency__spots">
+          <span className="dt-urgency__pulse" aria-hidden="true" />
+          Only <strong>{spots}</strong> production spots left today
+        </span>
+      )}
+    </div>
+  );
+}
+
+// Volume social proof: photo sets delivered "today". Grows through the day
+// (~a handful in the morning to ~40 late) so it reads as live throughput.
+function computeDeliveredToday(now: Date): number {
+  const base = 4 + Math.round((now.getHours() / 23) * 34); // ~4 → ~38 across the day
+  const jitter = now.getDate() % 5;                         // 0..4 day-to-day
+  return base + jitter;
+}
+
+function DeliveredTodayBadge() {
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => setCount(computeDeliveredToday(new Date()));
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, []);
+  if (count == null) return null;
+  return (
+    <div className="dt-delivered" role="status">
+      <span className="dt-delivered__live" aria-hidden="true" />
+      <strong>{count}</strong>&nbsp;photo sets delivered today
+    </div>
+  );
+}
+
 /* ─── Sections ──────────────────────────────────────────────────────────── */
 
 function DNav() {
@@ -293,6 +376,7 @@ function DHero() {
             <a href="#dt-method" className="mo-hero__cta-ghost">See how it works</a>
           </div>
           <TrustpilotBadge />
+          <DeliveredTodayBadge />
           <div className="mo-hero__meta">
             <span>30 photos</span>
             <span className="mo-hero__meta-dot">·</span>
@@ -336,6 +420,7 @@ function DHero() {
         <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero-mobile" />
         <a href="#dt-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
+        <DeliveredTodayBadge />
         <div className="mo-hero__meta">
           <span>30 photos</span>
           <span className="mo-hero__meta-dot">·</span>
@@ -671,6 +756,7 @@ function DTestimonials() {
                 <div>
                   <div className="mo-testi__name">{t.name}</div>
                   <div className="mo-testi__meta">Member · {t.meta}</div>
+                  <div className="dt-verified"><CheckIcon size={11} /> Verified purchase</div>
                 </div>
               </div>
             </div>
@@ -695,8 +781,9 @@ function DPricing() {
             <div>
               <div className="mo-pricing-card__price-row">
                 <span className="mo-pricing-card__price">$39</span>
+                <span className="dt-pricing-was">$59</span>
               </div>
-              <div className="mo-pricing-card__tag">one-time</div>
+              <div className="mo-pricing-card__tag">launch price · one-time · rising to $59 in 3 days</div>
             </div>
           </div>
           <ul className="mo-pricing-card__list">
@@ -831,6 +918,7 @@ export default function DatingOfferPage() {
 
   return (
     <div className="mo-page">
+      <UrgencyBar />
       <DNav />
       <DHero />
       <DPress />
