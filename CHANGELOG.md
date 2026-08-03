@@ -3,6 +3,13 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.4] - 2026-08-03
+
+### Changed
+- Mobile dating hero: the photo grid now flexes to fill the first screen (big,
+  legible photos) and the Trustpilot badge sits right at the fold as the last
+  visible element. Slightly smaller CTA. Verified at 390×844 and 360×740.
+
 ## [1.1.5.3] - 2026-08-03
 
 ### Changed
