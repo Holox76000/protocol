@@ -3,6 +3,14 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.5] - 2026-08-03
+
+### Added
+- Dating upsells ($20 priority / $20 luxury) now fire a Meta CAPI Purchase
+  event with their own value and event_id (distinct from the $39 order), so Meta
+  value optimization sees the upsell revenue. Attribution (utm/email) is pulled
+  from the parent order.
+
 ## [1.1.5.4] - 2026-08-03
 
 ### Changed
