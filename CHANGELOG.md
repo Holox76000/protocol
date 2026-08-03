@@ -3,6 +3,15 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.1] - 2026-08-03
+
+### Changed
+- Mobile: the entire /dating hero (headline, description, style grid, CTA,
+  Trustpilot + "delivered today" proof) now fits within the first screen on
+  mobile — tighter type/spacing, a shorter visual panel, and the redundant
+  ghost link + meta line hidden on mobile. Verified above the fold at 390×844
+  and 360×740.
+
 ## [1.1.5.0] - 2026-08-02
 
 ### Added
