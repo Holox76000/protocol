@@ -325,9 +325,8 @@ function DHero() {
         <div className="mo-hero-v1__copy">
           <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
           <p className="mo-hero__desc">
-            We analyzed thousands of top-performing profiles on the main dating apps.
-            Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
-            delivered in 24 hours.
+            Trained on thousands of top dating profiles. 30 photos shot like theirs,
+            delivered in 24h.
           </p>
           <div className="mo-hero__ctas">
             <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
@@ -348,9 +347,8 @@ function DHero() {
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
         <h1 className="mo-hero__title">{variant.headlineMain} <em>{variant.headlineEm}</em></h1>
         <p className="mo-hero__desc">
-          We analyzed thousands of top-performing profiles on the main dating apps.
-          Our AI studio shoots you the way they&rsquo;re shot — 30 profile-ready photos,
-          delivered in 24 hours.
+          Trained on thousands of top dating profiles. 30 photos shot like theirs,
+          delivered in 24h.
         </p>
       </div>
 
