@@ -712,3 +712,25 @@ button.mo-pricing-card__cta {
   font-weight: 600;
 }
 .dt-verified svg { color: #16a34a; }
+
+/* ─── Mobile: fit the entire hero within the first screen (above the fold) ── */
+@media (max-width: 767px) {
+  .mo-hero-v1 { padding: 4px 0 8px; }
+
+  /* Title + description block — tighter type and spacing */
+  .mo-hero-v1__mobile-ctas { padding: 10px 20px 8px; gap: 7px; }
+  .mo-hero-v1__mobile-ctas .mo-hero__title { font-size: 29px; line-height: 1.05; max-width: 100%; }
+  .mo-hero-v1__mobile-ctas .mo-hero__desc { font-size: 12.5px; line-height: 1.38; }
+
+  /* Visual panel — shorter so the CTA + proof stay above the fold */
+  .mo-hero-v1__right { height: 172px; }
+  .dt-hero-tile { padding: 8px; }
+  /* Keep the floating stat card clear of the CTA below */
+  .mo-hero-v1__fc--ratio { bottom: 26px; right: 12px; }
+
+  /* CTA strip — trim redundant bits, tighten spacing */
+  .mo-hero-v1__mobile-cta-strip { padding: 10px 20px 12px; gap: 9px; }
+  .mo-hero-v1__mobile-cta-strip .mo-hero__cta-ghost { display: none; }
+  .mo-hero-v1__mobile-cta-strip .mo-hero__meta { display: none; }
+  .dt-delivered { margin-top: 2px; }
+}
