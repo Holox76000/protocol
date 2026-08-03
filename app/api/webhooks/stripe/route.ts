@@ -306,15 +306,58 @@ export async function POST(request: Request) {
         ? { upsell_priority: true,  upsell_priority_paid_at: nowIso, upsell_priority_pi_id: piId }
         : { upsell_luxury:  true,   upsell_luxury_paid_at:   nowIso, upsell_luxury_pi_id:   piId };
 
-      const { error: updErr } = await supabaseAdmin
+      const { data: upsellOrder, error: updErr } = await supabaseAdmin
         .from("dating_orders")
         .update(update)
-        .eq("id", orderId);
+        .eq("id", orderId)
+        .select("id, email, utm_source, utm_campaign, utm_content")
+        .maybeSingle();
 
       if (updErr) {
         console.error("[webhook/stripe] Dating upsell update failed", { error: updErr.message, orderId, kind });
       } else {
         console.log("[webhook/stripe] Dating upsell recorded", { orderId, kind });
+      }
+
+      // ── Meta CAPI Purchase for the upsell ─────────────────
+      // The upsell is a separate charge, so it gets its own Purchase event with
+      // a distinct event_id (the upsell PI) — it won't dedupe against the $39
+      // Purchase. This feeds Meta value optimization the extra upsell revenue.
+      // Attribution (utm/email) comes from the parent order.
+      const upsellValue = typeof session.amount_total === "number" ? session.amount_total / 100 : 20;
+      const upsellCurrency = (session.currency ?? "usd").toUpperCase();
+      const upsellEmail = session.customer_details?.email ?? upsellOrder?.email ?? null;
+      const upsellProduct = kind === "priority"
+        ? { name: "Protocol Dating — Priority Delivery", id: "dating-upsell-priority" }
+        : { name: "Protocol Dating — Luxury Lifestyle Pack", id: "dating-upsell-luxury" };
+      try {
+        await sendMetaEvent({
+          eventName: "Purchase",
+          eventTime: session.created ?? Math.floor(Date.now() / 1000),
+          eventId: piId ?? session.id,
+          actionSource: "website",
+          eventSourceUrl: `${SITE_URL}/dating/success`,
+          email: upsellEmail,
+          fbclid: meta.fbclid || null,
+          customData: {
+            value: upsellValue,
+            currency: upsellCurrency,
+            content_name: upsellProduct.name,
+            content_ids: [upsellProduct.id],
+            content_type: "product",
+            funnel: "dating",
+            upsell_kind: kind,
+            ...(upsellOrder?.utm_source && { utm_source: upsellOrder.utm_source }),
+            ...(upsellOrder?.utm_campaign && { utm_campaign: upsellOrder.utm_campaign }),
+            ...(upsellOrder?.utm_content && { utm_content: upsellOrder.utm_content }),
+          },
+        });
+        console.log("[webhook/stripe] Upsell Purchase CAPI sent", { orderId, kind, value: upsellValue });
+      } catch (err) {
+        console.error("[CAPI-FAIL-ALERT] Upsell Purchase CAPI failed", {
+          error: String(err), orderId, kind, email: upsellEmail, value: upsellValue,
+          utm_content: upsellOrder?.utm_content ?? null,
+        });
       }
 
       // Ping #new-sales so the team sees the upsell in the same feed as the
