@@ -668,23 +668,33 @@ button.mo-pricing-card__cta {
 }
 .dt-verified svg { color: #16a34a; }
 
-/* ─── Mobile: fit the entire hero within the first screen (above the fold) ── */
+/* ─── Mobile: fill the first screen — big photos, Trustpilot at the fold ──── */
 @media (max-width: 767px) {
-  .mo-hero-v1 { padding: 4px 0 8px; }
+  /* The hero is a flex column that fills the viewport; the photo panel takes
+     the leftover space (flex:1) so the photos read big and the Trustpilot badge
+     lands right at the fold on any phone height (press falls just below). */
+  .mo-hero-v1 {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - 104px); /* viewport minus the urgency bar + nav */
+    padding: 4px 0 6px;
+  }
 
-  /* Title + description block — tighter type and spacing */
-  .mo-hero-v1__mobile-ctas { padding: 10px 20px 8px; gap: 7px; }
+  /* Title + description — tighter type/spacing, natural height */
+  .mo-hero-v1__mobile-ctas { flex: 0 0 auto; padding: 10px 20px 8px; gap: 7px; }
   .mo-hero-v1__mobile-ctas .mo-hero__title { font-size: 29px; line-height: 1.05; max-width: 100%; }
   .mo-hero-v1__mobile-ctas .mo-hero__desc { font-size: 12.5px; line-height: 1.38; }
 
-  /* Visual panel — big enough that the photos read well */
-  .mo-hero-v1__right { height: 250px; }
+  /* Photo panel flexes to fill the remaining height → photos read big.
+     Flex the inner stack (not % heights) so the grid actually fills the panel. */
+  .mo-hero-v1__right { flex: 1 1 auto; min-height: 240px; display: flex; flex-direction: column; }
+  .mo-hero-v1__product-stack { flex: 1 1 auto; min-height: 0; }
   .dt-hero-tile { padding: 10px; }
-  /* Keep the floating stat card clear of the CTA below */
   .mo-hero-v1__fc--ratio { bottom: 26px; right: 12px; }
 
-  /* CTA strip — trim redundant bits, tighten spacing */
-  .mo-hero-v1__mobile-cta-strip { padding: 10px 20px 12px; gap: 9px; }
+  /* CTA strip — smaller CTA, tighter spacing, natural height */
+  .mo-hero-v1__mobile-cta-strip { flex: 0 0 auto; padding: 10px 20px 12px; gap: 9px; }
   .mo-hero-v1__mobile-cta-strip .mo-hero__cta-ghost { display: none; }
   .mo-hero-v1__mobile-cta-strip .mo-hero__meta { display: none; }
+  .mo-hero-v1__mobile-cta-strip .mo-cta--hero { padding: 12px 20px; font-size: 14px; }
 }
