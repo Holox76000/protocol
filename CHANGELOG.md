@@ -3,6 +3,14 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.2] - 2026-08-03
+
+### Changed
+- Dating LP: removed the "N photo sets delivered today" counter and the "Only N
+  production spots left today" line (both were simulated). The launch-price
+  countdown, struck $59, and Verified-purchase badges stay. On mobile the hero
+  photo grid is now larger (250px) so the sample photos read clearly.
+
 ## [1.1.5.1] - 2026-08-03
 
 ### Changed
