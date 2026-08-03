@@ -3,6 +3,12 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.3] - 2026-08-03
+
+### Changed
+- Dating LP hero subline reworded to "Trained on thousands of top dating
+  profiles. 30 photos shot like theirs, delivered in 24h." (desktop + mobile).
+
 ## [1.1.5.2] - 2026-08-03
 
 ### Changed
