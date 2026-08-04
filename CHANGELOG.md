@@ -3,6 +3,26 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.7.0] - 2026-08-04
+
+### Changed
+- Activated the (previously dormant) server-side TikTok Events API and pointed
+  the whole TikTok integration at the new pixel `D9OSILJC77U7RKPO8F3G` (was
+  `D8RKQNRC77UFFED96BL0`) — client pixel in `app/layout.tsx`, the
+  `DEFAULT_PIXEL_ID` fallback, and env (`TIKTOK_PIXEL_ID` / `TIKTOK_ACCESS_TOKEN`
+  in `.env.local` + Netlify prod). The Events API was fully wired but skipped
+  every call because no access token was set.
+- Fixed the TikTok purchase event name: `Purchase` → `CompletePayment` (TikTok's
+  standard payment event; "Purchase" is Meta's name and registered as a custom
+  event on TikTok, so it didn't feed purchase optimization). Applied to the
+  browser pixel (`tiktokTrackPurchase`) and both server Purchase paths in the
+  Stripe webhook. Meta keeps "Purchase" (its correct standard name).
+
+### Added
+- TikTok `CompletePayment` server event for the dating upsells ($20 priority /
+  $20 luxury), mirroring the existing Meta CAPI upsell event — own event_id (the
+  upsell PI) so it doesn't dedupe against the $39 purchase.
+
 ## [1.1.6.1] - 2026-08-04
 
 ### Changed
