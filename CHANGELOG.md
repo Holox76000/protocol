@@ -3,6 +3,15 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.6.1] - 2026-08-04
+
+### Changed
+- Dating urgency bar is now day-aware: Mon–Thu it shows "Order now — get your
+  matches for the weekend" instead of the price countdown (24h delivery + a
+  couple days of matches still land before the weekend). Fri–Sun keep the
+  "$39 launch price → $59" countdown (Fri is too tight to promise the weekend).
+  Day is read client-side after mount → no SSR hydration mismatch.
+
 ## [1.1.6.0] - 2026-08-04
 
 ### Added
