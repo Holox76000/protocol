@@ -703,6 +703,11 @@ button.mo-pricing-card__cta {
      Flex the inner stack (not % heights) so the grid actually fills the panel. */
   .mo-hero-v1__right { flex: 0 0 auto; height: auto; min-height: 0; display: flex; flex-direction: column; }
   .mo-hero-v1__product-stack { flex: 0 0 auto; min-height: 0; }
+  /* The taller multi-line headline pushed the CTA + Trustpilot below the fold.
+     Trim the photo wall a touch (slightly shorter than square) so the badge
+     lands back at the fold — big photos, but the CTA/Trustpilot stay visible
+     without scrolling. */
+  .mo-hero-v1__right .dt-hero-grid { aspect-ratio: 1 / 0.82; }
   .dt-hero-tile { padding: 10px; }
   .mo-hero-v1__fc--ratio { bottom: 26px; right: 12px; }
 
