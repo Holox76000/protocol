@@ -85,8 +85,12 @@ qu'on y est). Même URL `/dating`, une simple condition côté client.
   Les variantes par pub (`utm_content`) gardent la priorité sur cet angle.
 - **Section timeline semaine** sous le hero : *« New photos today. Matches by
   the weekend. »* (Aujourd'hui → +24h → le week-end). Cachée le week-end.
-- Le jour est lu **côté client après montage** (`isWeekend(new Date())`, fuseau
-  du visiteur) → pas de mismatch d'hydratation SSR.
+- **Barre d'urgence Lun–Jeu** : affiche *« Order now — get your matches for the
+  weekend »* à la place du compte à rebours prix. Ven–Dim : garde le countdown
+  prix (« $39 launch price → $59 ») — le vendredi, 24h de livraison = samedi,
+  trop juste pour promettre le week-end.
+- Le jour est lu **côté client après montage** (`isWeekend(new Date())` /
+  `getDay()`, fuseau du visiteur) → pas de mismatch d'hydratation SSR.
 
 > Le hero a aussi été repassé en **photos carrées** (au lieu du format
 > « story » vertical), avec un encart « matches / semaine » réduit.
