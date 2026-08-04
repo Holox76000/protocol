@@ -72,6 +72,25 @@ Pour que la landing continue la promesse de la pub cliquée :
 - **`lib/datingAdVariants.ts`** — mappe les `ad_id` Meta des campagnes Dating
   (9 pubs) → contenu d'intro adapté sur `/dating`.
 
+## Variation selon le jour de la semaine (semaine vs week-end)
+
+Hypothèse : les prospects convertissent mieux à l'approche du week-end. En
+**semaine (Lun–Ven)**, la landing pousse un angle « prépare ton week-end
+maintenant » ; le **week-end (Sam–Dim)** elle reste sur la version évergreen
+(celle qui convertit déjà — et « before the weekend » n'a plus de sens une fois
+qu'on y est). Même URL `/dating`, une simple condition côté client.
+
+- **H1 semaine** : *« Photos that get matches before the weekend. Without a
+  photographer. »* — week-end : retombe sur *« Photos that get you matches. »*.
+  Les variantes par pub (`utm_content`) gardent la priorité sur cet angle.
+- **Section timeline semaine** sous le hero : *« New photos today. Matches by
+  the weekend. »* (Aujourd'hui → +24h → le week-end). Cachée le week-end.
+- Le jour est lu **côté client après montage** (`isWeekend(new Date())`, fuseau
+  du visiteur) → pas de mismatch d'hydratation SSR.
+
+> Le hero a aussi été repassé en **photos carrées** (au lieu du format
+> « story » vertical), avec un encart « matches / semaine » réduit.
+
 > L'ancien funnel Protocol avait sa propre couche de personnalisation bien plus
 > lourde (~90 pubs mappées + génération de copy par Claude Sonnet depuis les
 > réponses du quiz). Elle n'est plus active — détail dans *Précédentes
