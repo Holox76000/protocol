@@ -26,6 +26,23 @@ export const DEFAULT_DATING_HERO_VARIANT: DatingHeroVariant = {
   headlineEm: "Without a photographer.",
 };
 
+// Weekday-only default. On Mon–Fri, broad/direct visitors (no ad-specific
+// match) get a weekend-framed headline; on Sat–Sun it falls back to the
+// evergreen DEFAULT above — the headline that already converts on weekends,
+// and "before the weekend" makes no sense once you're in it.
+export const WEEKDAY_DATING_HERO_VARIANT: DatingHeroVariant = {
+  key: "weekday-weekend",
+  headlineMain: "Photos that get matches before the weekend.",
+  headlineEm: "Without a photographer.",
+};
+
+// Sat/Sun in the visitor's local timezone. Gates the weekday headline —
+// call it client-side only (day-dependent → would break SSR hydration).
+export function isWeekend(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+
 // ad_id (from Meta) → variant. Ad_ids match Meta's numeric ad IDs and are
 // what our checkout flow already persists in utm_content.
 const AD_ID_TO_VARIANT: Record<string, DatingHeroVariant> = {

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
-import { getDatingHeroVariant, DEFAULT_DATING_HERO_VARIANT, type DatingHeroVariant } from "../../lib/datingAdVariants";
+import { getDatingHeroVariant, DEFAULT_DATING_HERO_VARIANT, WEEKDAY_DATING_HERO_VARIANT, isWeekend, type DatingHeroVariant } from "../../lib/datingAdVariants";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "./dating.css";
@@ -130,6 +130,30 @@ const STEPS = [
     time: "24 H",
     title: "30 photos in your inbox",
     desc: "Download, pick your favorites, update your profile.",
+  },
+];
+
+// Weekday-only timeline: frames the week as the run-up to the weekend.
+// Labels read as a calendar (TODAY → +24H → THE WEEKEND), not product
+// mechanics, so it complements DSteps instead of repeating it.
+const WEEKEND_TIMELINE = [
+  {
+    num: "01",
+    time: "TODAY · 5 MIN",
+    title: "Upload your selfies",
+    desc: "6–12 phone selfies and a few quick questions. Five minutes, done tonight.",
+  },
+  {
+    num: "02",
+    time: "+24 H",
+    title: "30 photos land",
+    desc: "Your full set hits your inbox tomorrow — six styles, ready to post.",
+  },
+  {
+    num: "03",
+    time: "THE WEEKEND",
+    title: "You get more matches by the weekend",
+    desc: "Your new photos have been up all week — so by Friday the likes and matches are already coming in.",
   },
 ];
 
@@ -307,7 +331,15 @@ function DHero() {
   const [variant, setVariant] = useState<DatingHeroVariant>(DEFAULT_DATING_HERO_VARIANT);
   useEffect(() => {
     const utms = { ...getPersistedUtmParams(), ...getUtmParams() };
-    const next = getDatingHeroVariant(utms.utm_content);
+    const adVariant = getDatingHeroVariant(utms.utm_content);
+    // Day-aware default: broad/direct traffic (no ad-specific match) gets the
+    // weekend-framed headline on weekdays, and the evergreen default on the
+    // weekend. Computed here (post-hydration) so the day never causes an SSR
+    // mismatch. Ad-specific variants always win — they match their ad's angle.
+    const next =
+      adVariant.key === DEFAULT_DATING_HERO_VARIANT.key && !isWeekend(new Date())
+        ? WEEKDAY_DATING_HERO_VARIANT
+        : adVariant;
     if (next.key !== DEFAULT_DATING_HERO_VARIANT.key) {
       setVariant(next);
     }
@@ -453,6 +485,47 @@ function DSteps() {
         </div>
         <div className="mo-section-cta">
           <CheckoutButton label={CTA_LABEL} className="mo-cta" location="steps" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DWeekendTimeline() {
+  // Weekday-only, same rule as the hero: the "week → weekend" frame only
+  // makes sense Mon–Fri, and the weekend page stays exactly as it converts
+  // today. Day is read client-side, so it starts hidden in SSR and reveals
+  // after mount on weekdays — no hydration mismatch, and it sits below the
+  // hero so the reveal isn't disruptive.
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (!isWeekend(new Date())) setShow(true);
+  }, []);
+  if (!show) return null;
+
+  return (
+    <section className="mo-section">
+      <div className="mo-container">
+        <div className="mo-section-head">
+          <div>
+            <div className="mo-section-eyebrow">Why start now</div>
+            <h2 className="mo-section-title">New photos today. <em>Matches by the weekend.</em></h2>
+          </div>
+        </div>
+        <div className="mo-steps-grid">
+          {WEEKEND_TIMELINE.map((s) => (
+            <div key={s.num} className="mo-step">
+              <div className="mo-step__head">
+                <div className="mo-step__num">{s.num} /</div>
+                <div className="mo-step__time">{s.time}</div>
+              </div>
+              <h3 className="mo-step__title">{s.title}</h3>
+              <p className="mo-step__desc">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mo-section-cta">
+          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="weekend-timeline" />
         </div>
       </div>
     </section>
@@ -876,6 +949,7 @@ export default function DatingOfferPage() {
       <DNav />
       <DHero />
       <DPress />
+      <DWeekendTimeline />
       <DResearch />
       <DSteps />
       <DStyles />
