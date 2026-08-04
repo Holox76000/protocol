@@ -53,7 +53,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ valid: false, error: "Invalid promo code" });
   }
 
-  const newAmount = Math.max(100, BASE_AMOUNT - discountCents);
+  // Guard: only apply a promo to a PaymentIntent this app created for checkout
+  // and that is not yet paid — prevents applying a discount to an arbitrary or
+  // already-settled PaymentIntent (which the client should never control).
+  let pi;
+  try {
+    pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+  } catch (err) {
+    console.error("[apply-promo] retrieve failed", { error: String(err), paymentIntentId });
+    return NextResponse.json({ valid: false, error: "Unable to apply code" }, { status: 404 });
+  }
+  const MODIFIABLE = new Set(["requires_payment_method", "requires_confirmation", "requires_action"]);
+  if (pi.metadata?.source !== "app_checkout" || !MODIFIABLE.has(pi.status)) {
+    return NextResponse.json({ valid: false, error: "Unable to apply code" }, { status: 403 });
+  }
+
+  // Preserve any rush-delivery surcharge already on the intent, so applying a
+  // promo doesn't silently drop it.
+  const rushCents = pi.metadata?.rush_delivery === "true" ? 2900 : 0;
+  const newAmount = Math.max(100, BASE_AMOUNT - discountCents) + rushCents;
 
   try {
     await stripe.paymentIntents.update(paymentIntentId, {

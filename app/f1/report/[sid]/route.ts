@@ -7,7 +7,7 @@ import { computePreliminaryScore } from "../../../../lib/preliminaryScore";
 import { getOrGeneratePersonalization, patternsEyebrowFor } from "../../../../lib/personalization";
 import { getTestimonialById } from "../../../../lib/testimonials";
 
-const TEN_YEARS = 315_360_000;
+const PHOTO_URL_TTL = 90 * 24 * 60 * 60; // 90 days — bounds exposure of signed photo URLs (was 10 years)
 
 function formatHeight(answers: Record<string, unknown>): string {
   const unit = answers.height_unit as string | undefined;
@@ -78,8 +78,8 @@ export async function GET(
   let projectionBlock = "";
   if (hasPhotos) {
     const [b, a] = await Promise.all([
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath!, TEN_YEARS),
-      supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath!, TEN_YEARS),
+      supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath!, PHOTO_URL_TTL),
+      supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath!, PHOTO_URL_TTL),
     ]);
     const beforeUrl = b.data?.signedUrl ?? "/assets/projection-now.png";
     const afterUrl = a.data?.signedUrl ?? "/assets/projection-potential.png";

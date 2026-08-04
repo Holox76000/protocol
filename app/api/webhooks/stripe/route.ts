@@ -18,6 +18,24 @@ const stripe = getStripeServerClient();
 
 const SITE_URL = process.env.SITE_URL ?? "https://protocol-club.com";
 
+// Defense-in-depth against price manipulation: the real fix lives at the source
+// (server-side price recompute in /api/update-payment-intent & /api/apply-promo),
+// but if a settled charge ever comes in below this floor it is almost certainly
+// fraud on an $89/$39 product. We alert (don't block, to avoid false-positives on
+// legitimate deep discounts) so the team can review before fulfilling.
+const SANITY_FLOOR_CENTS = 500;
+
+function alertIfSuspiciousAmount(ctx: { amount: number | null | undefined; ref: string; email: string | null }) {
+  const amount = ctx.amount ?? 0;
+  if (amount >= SANITY_FLOOR_CENTS) return;
+  console.error("[FRAUD-ALERT] Suspiciously low settled amount — review before fulfilling", {
+    ref: ctx.ref, amount, email: ctx.email,
+  });
+  void postToSlack("sales", {
+    text: `<!channel> :rotating_light: *[FRAUD-ALERT]* \`${ctx.ref}\` settled at $${(amount / 100).toFixed(2)} — review before fulfilling.`,
+  });
+}
+
 export async function POST(request: Request) {
   if (!stripe || !stripeWebhookSecret) {
     console.error("[webhook/stripe] Stripe not configured — missing secret key or webhook secret");
@@ -193,6 +211,8 @@ export async function POST(request: Request) {
       }
 
       if (customerEmail) {
+        alertIfSuspiciousAmount({ amount: pi.amount, ref: pi.id, email: customerEmail });
+
         // Pause the lead nurture sequence regardless of whether a user row exists yet.
         await supabaseAdmin
           .from("leads")
@@ -567,7 +587,18 @@ export async function POST(request: Request) {
             )
             .select("id, slack_sales_thread_ts")
             .single();
-          if (orderError) throw new Error(orderError.message);
+          if (orderError) {
+            // Persisting the order is the one non-negotiable step: the money is
+            // captured but we'd have no order row and the customer no upload
+            // link. Return non-2xx so Stripe redelivers the event. Safe to
+            // retry: the upsert is idempotent on stripe_session_id and the
+            // CAPI/GA4/TikTok events above dedupe on the PI id.
+            console.error("[webhook/stripe] Dating order upsert failed — asking Stripe to retry", {
+              error: orderError.message,
+              sessionId: session.id,
+            });
+            return NextResponse.json({ error: "order persistence failed" }, { status: 500 });
+          }
 
           // Post the root of the sales feed once per order. Idempotent:
           // if the webhook is redelivered, we skip when a ts already
@@ -616,6 +647,8 @@ export async function POST(request: Request) {
         }
         return NextResponse.json({ received: true });
       }
+
+      alertIfSuspiciousAmount({ amount: session.amount_total, ref: session.id, email: customerEmail });
 
       try {
         // If the user already has an account, mark them as paid

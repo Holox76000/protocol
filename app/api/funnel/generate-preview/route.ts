@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
+import { rateLimit, clientIp } from "../../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -255,6 +256,17 @@ export async function POST(request: Request) {
 
     if (!/^[a-f0-9-]{36}$/.test(session_id)) {
       return NextResponse.json({ error: "Invalid session_id" }, { status: 400 });
+    }
+
+    // Unauthenticated + triggers paid AI image generation → rate limit hard by
+    // IP and by session so it can't be scripted into unbounded Gemini spend.
+    const ip = clientIp(request);
+    const [ipRl, sidRl] = await Promise.all([
+      rateLimit(`preview:ip:${ip}`, { max: 10, windowMs: 60 * 60_000 }),
+      rateLimit(`preview:sid:${session_id}`, { max: 3, windowMs: 60 * 60_000 }),
+    ]);
+    if (!ipRl.ok || !sidRl.ok) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const socialEnv = body.social_environment ?? "";

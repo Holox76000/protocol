@@ -3,6 +3,33 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.8.0] - 2026-08-04
+
+### Security
+- **Payment amount can no longer be set by the client.** `/api/update-payment-intent`
+  now recomputes the price entirely server-side (base − re-validated promo + rush)
+  and refuses intents it didn't create or that are already paid; it previously
+  trusted a client `discountedBase`, letting anyone pay $0.50 for an $89 product.
+  `/api/apply-promo` gets the same ownership/status guard, and the Stripe webhook
+  alerts on any settled amount below a sanity floor.
+- **Removed the account-takeover path in `/api/auth/register`.** Paid access is now
+  granted only via the emailed single-use registration token; matching a typed
+  email to a Stripe customer no longer grants `has_paid` (that let anyone claim a
+  paying customer's account and PII).
+- **Rate limiting** added to unauthenticated, cost-bearing endpoints (`/api/lead`,
+  `/api/funnel/generate-preview`, `/api/visualize`) and login moved to a shared,
+  persistent limiter (`lib/rateLimit.ts` + migration `033_rate_limits.sql`) instead
+  of a per-instance in-memory counter.
+- Shortened the funnel photo-preview signed URL from 10 years to 1 hour; removed
+  PII from `/api/lead` logs; stopped committing `tsconfig.tsbuildinfo` and
+  `supabase/.temp`.
+
+### Changed
+- Bumped Next.js 14.2.5 → 14.2.35 (includes the fix for CVE-2025-29927, the
+  middleware authorization-bypass vulnerability).
+- The dating Stripe webhook now returns 5xx (so Stripe retries) when persisting the
+  order fails, instead of silently returning 200 and losing a paid order.
+
 ## [1.1.7.0] - 2026-08-04
 
 ### Changed

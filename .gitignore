@@ -20,3 +20,9 @@ bulldozer.json
 
 # Local Netlify folder
 .netlify
+
+# Build cache — leaks internal file tree, should never be committed
+tsconfig.tsbuildinfo
+
+# Supabase local temp (contains project ref)
+supabase/.temp

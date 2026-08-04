@@ -3,7 +3,7 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 
 export const runtime = "nodejs";
 
-const TEN_YEARS = 315_360_000;
+const PHOTO_URL_TTL = 90 * 24 * 60 * 60; // 90 days — bounds exposure of signed photo URLs (was 10 years)
 
 export async function POST(request: Request) {
   const body = await request.json() as { session_id?: string; answers?: Record<string, unknown> };
@@ -64,8 +64,8 @@ export async function GET(request: Request) {
   }
 
   const [beforeSigned, afterSigned] = await Promise.all([
-    supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath, TEN_YEARS),
-    supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath, TEN_YEARS),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(beforePath, PHOTO_URL_TTL),
+    supabaseAdmin.storage.from("user-photos").createSignedUrl(afterPath, PHOTO_URL_TTL),
   ]);
 
   if (!beforeSigned.data?.signedUrl || !afterSigned.data?.signedUrl) {

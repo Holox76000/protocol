@@ -8,7 +8,6 @@ import {
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
 import { addToLeadsList, promoteLeadToCustomer } from "../../../../lib/klaviyo";
-import { getStripeServerClient } from "../../../../lib/stripe";
 import { sendMetaEvent } from "../../../../lib/metaCapi";
 
 export const runtime = "nodejs";
@@ -59,38 +58,20 @@ export async function POST(request: Request) {
   let hasPaid = false;
   let stripeCustomerId: string | null = null;
 
-  // Path A: user arrived via post-purchase registration token
+  // Paid access is granted ONLY via a single-use registration token that was
+  // emailed to the proven owner of this address after purchase (Path A).
+  //
+  // SECURITY: we deliberately do NOT grant paid access by matching the typed
+  // email against a Stripe customer with a successful charge. That "Path B"
+  // let anyone who knew a paying customer's email create an account over it —
+  // taking over their PII (questionnaire, photos, messages) and locking the
+  // real customer out. A historical customer without a token must recover
+  // access via the emailed link / magic link, which proves email ownership.
   if (registrationToken) {
     const tokenData = await consumeRegistrationToken(registrationToken);
     if (tokenData && tokenData.email === email) {
       hasPaid = true;
       stripeCustomerId = tokenData.stripeCustomerId;
-    }
-  }
-
-  // Path B: historical customer — check Stripe by email
-  if (!hasPaid) {
-    const stripe = getStripeServerClient();
-    if (stripe) {
-      try {
-        const customers = await stripe.customers.list({
-          email,
-          limit: 1,
-        });
-        if (customers.data.length > 0) {
-          const customer = customers.data[0];
-          stripeCustomerId = customer.id;
-          // Check if they have a successful payment
-          const charges = await stripe.charges.list({
-            customer: customer.id,
-            limit: 1,
-          });
-          hasPaid = charges.data.some((c) => c.status === "succeeded");
-        }
-      } catch (err) {
-        // Non-fatal — user can still register, has_paid just defaults false
-        console.error("[register] Stripe lookup failed", { error: String(err), email });
-      }
     }
   }
 

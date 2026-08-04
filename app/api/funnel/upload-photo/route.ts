@@ -50,10 +50,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const TEN_YEARS = 315_360_000;
+  // Short-lived: this URL is only used to preview the photo the user just
+  // uploaded. Anything that needs it later re-signs on demand. (Was 10 years,
+  // which turned any leaked URL into permanent access to a body photo.)
+  const ONE_HOUR = 60 * 60;
   const { data: signed } = await supabaseAdmin.storage
     .from("user-photos")
-    .createSignedUrl(path, TEN_YEARS);
+    .createSignedUrl(path, ONE_HOUR);
 
   return NextResponse.json({ path, before_url: signed?.signedUrl ?? null });
 }

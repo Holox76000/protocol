@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { rateLimit, clientIp } from "../../../lib/rateLimit";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DEFAULT_PROMPT =
@@ -170,6 +171,13 @@ export async function POST(request: Request) {
 
     if (!apiKey) {
       return jsonError("NANOBANANA_API_KEY is not configured on the server.", 503);
+    }
+
+    // Unauthenticated + runs paid AI image generation → rate limit by IP so it
+    // can't be scripted into unbounded Gemini/nanoBanana spend.
+    const rl = await rateLimit(`visualize:ip:${clientIp(request)}`, { max: 10, windowMs: 60 * 60_000 });
+    if (!rl.ok) {
+      return jsonError("Too many requests. Please try again later.", 429);
     }
 
     const parsedRequest = await parseVisualizationRequest(request);

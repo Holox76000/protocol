@@ -3,10 +3,10 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 import {
   verifyPassword,
   createSession,
-  checkRateLimit,
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
 } from "../../../../lib/auth";
+import { rateLimit, clientIp } from "../../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -16,11 +16,11 @@ type Body = {
 };
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = clientIp(request);
 
-  // ── Rate limit ───────────────────────────────
-  if (!checkRateLimit(ip)) {
+  // ── Rate limit (shared/persistent across serverless instances) ──
+  const rl = await rateLimit(`login:${ip}`, { max: 5, windowMs: 60_000 });
+  if (!rl.ok) {
     return NextResponse.json(
       { error: "Too many attempts. Please wait a minute and try again." },
       { status: 429 }

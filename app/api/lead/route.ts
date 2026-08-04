@@ -5,6 +5,7 @@ import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
 import { sendReportEmail } from "../../../lib/email";
 import { computeNurtureStartsAt } from "../../../lib/sendWindow";
 import { getOrGeneratePersonalization } from "../../../lib/personalization";
+import { rateLimit, clientIp } from "../../../lib/rateLimit";
 
 type LeadPayload = {
   email: string;
@@ -21,13 +22,21 @@ type LeadPayload = {
 };
 
 export async function POST(request: Request) {
+  // Unauthenticated + sends email + calls the LLM per request → rate limit by
+  // IP so it can't be used for email-bombing or to run up LLM/CAPI costs.
+  const ip = clientIp(request);
+  const rl = await rateLimit(`lead:${ip}`, { max: 10, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json({ ok: false, error: "Too many requests" }, { status: 429 });
+  }
+
   const body = (await request.json()) as LeadPayload;
   const email = body.email?.trim();
-  console.log("[lead] incoming", { email });
 
   if (!email || !/\S+@\S+\.\S+/.test(email)) {
     return NextResponse.json({ ok: false, error: "Invalid email" }, { status: 400 });
   }
+  console.log("[lead] incoming");
 
   const payload: LeadPayload = {
     ...body,
@@ -103,7 +112,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
   }
-  console.log("[lead]", payload);
 
   const eventTime = Math.floor(new Date(createdAt).getTime() / 1000) || Math.floor(Date.now() / 1000);
   const userAgent = request.headers.get("user-agent") ?? undefined;
