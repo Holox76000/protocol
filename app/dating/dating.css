@@ -25,7 +25,11 @@ button.mo-pricing-card__cta {
   grid-template-rows: repeat(2, 1fr);
   gap: 2px;
   width: 100%;
-  height: 100%;
+  /* Square block (2×2 equal tracks) → each tile is square, not "story".
+     Height derives from width instead of stretching to fill a tall panel. */
+  aspect-ratio: 1 / 1;
+  height: auto;
+  margin: auto;
 }
 .dt-hero-tile {
   display: flex;
@@ -62,10 +66,11 @@ button.mo-pricing-card__cta {
 .mo-hero-v1__right .dt-hero-tile--outdoor {
   background-image: var(--dt-scrim), url("/dating/transformation/after-1.webp");
 }
-/* Tablet band: the base 280px panel gives landscape tiles that crop faces — add height */
+/* Tablet band: square tiles derive their height from width, so let the panel
+   hug the grid instead of forcing a fixed height (which would leave dead space). */
 @media (min-width: 600px) and (max-width: 1023px) {
   .mo-hero-v1__right {
-    height: 480px;
+    height: auto;
   }
 }
 /* Matches card: straddling the bottom edge of the photo wall, half in / half out */
@@ -78,7 +83,12 @@ button.mo-pricing-card__cta {
   right: 32px;
   transform: translateY(50%) rotate(1.5deg);
   z-index: 2;
+  /* Compact: the card was eating too much of the photo wall. */
+  padding: 6px 9px;
 }
+.mo-hero-v1__fc--ratio .mo-fc-label { font-size: 8px; }
+.mo-hero-v1__fc--ratio .mo-fc-val { font-size: 12px; }
+.mo-hero-v1__fc--ratio .mo-fc-delta { font-size: 8px; margin-top: 1px; }
 /* Clearance below the photo wall so the straddling card doesn't eat the CTA */
 .mo-hero-v1__mobile-cta-strip {
   padding-top: 56px;
@@ -681,19 +691,18 @@ button.mo-pricing-card__cta {
   .mo-hero-v1 {
     display: flex;
     flex-direction: column;
-    min-height: calc(100svh - 104px); /* viewport minus the urgency bar + nav */
     padding: 4px 0 6px;
   }
 
-  /* Title + description — tighter type/spacing, natural height */
-  .mo-hero-v1__mobile-ctas { flex: 0 0 auto; padding: 10px 20px 8px; gap: 7px; }
-  .mo-hero-v1__mobile-ctas .mo-hero__title { font-size: 29px; line-height: 1.05; max-width: 100%; }
-  .mo-hero-v1__mobile-ctas .mo-hero__desc { font-size: 12.5px; line-height: 1.38; }
+  /* Title + description — give the headline block room to breathe */
+  .mo-hero-v1__mobile-ctas { flex: 0 0 auto; padding: 16px 20px 14px; gap: 15px; }
+  .mo-hero-v1__mobile-ctas .mo-hero__title { font-size: 29px; line-height: 1.12; max-width: 100%; }
+  .mo-hero-v1__mobile-ctas .mo-hero__desc { font-size: 12.5px; line-height: 1.5; }
 
   /* Photo panel flexes to fill the remaining height → photos read big.
      Flex the inner stack (not % heights) so the grid actually fills the panel. */
-  .mo-hero-v1__right { flex: 1 1 auto; min-height: 240px; display: flex; flex-direction: column; }
-  .mo-hero-v1__product-stack { flex: 1 1 auto; min-height: 0; }
+  .mo-hero-v1__right { flex: 0 0 auto; height: auto; min-height: 0; display: flex; flex-direction: column; }
+  .mo-hero-v1__product-stack { flex: 0 0 auto; min-height: 0; }
   .dt-hero-tile { padding: 10px; }
   .mo-hero-v1__fc--ratio { bottom: 26px; right: 12px; }
 
@@ -702,4 +711,14 @@ button.mo-pricing-card__cta {
   .mo-hero-v1__mobile-cta-strip .mo-hero__cta-ghost { display: none; }
   .mo-hero-v1__mobile-cta-strip .mo-hero__meta { display: none; }
   .mo-hero-v1__mobile-cta-strip .mo-cta--hero { padding: 12px 20px; font-size: 14px; }
+}
+
+/* Desktop: the photo panel now hugs the square grid instead of stretching to
+   90vh — otherwise the grid centers in a tall panel and the matches card
+   (pinned to the panel's bottom) detaches from the photos and overlaps the
+   press strip. Panel = grid height, centered in the row; card straddles the
+   real photo edge again. */
+@media (min-width: 1024px) {
+  .mo-hero-v1 { min-height: 0; }
+  .mo-hero-v1__right { min-height: 0; height: auto; align-self: center; }
 }
