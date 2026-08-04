@@ -3,6 +3,14 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.6] - 2026-08-04
+
+### Changed
+- Dating generation now weaves the customer's questionnaire answers to "How
+  would you describe your style?" and "Where do you feel most yourself?" into
+  every scene prompt (full batch + single-photo regenerate), biasing wardrobe/
+  grooming/mood toward the customer while keeping the template scene unchanged.
+
 ## [1.1.5.5] - 2026-08-03
 
 ### Added

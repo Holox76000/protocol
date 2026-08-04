@@ -97,6 +97,24 @@ export type GenerateResult = {
   error?: string;
 };
 
+// Weave the customer's two most style-relevant questionnaire answers — "How
+// would you describe your style?" (id: style) and "Where do you feel most
+// yourself?" (id: setting) — into the scene prompt so wardrobe, grooming and
+// mood reflect them, without changing the template's scene, location, or
+// composition. Empty answers → no clause.
+function buildPersonalizationClause(answers: Record<string, string> | null | undefined): string {
+  if (!answers) return "";
+  const style = (answers.style ?? "").trim();
+  const setting = (answers.setting ?? "").trim();
+  if (!style && !setting) return "";
+  const lines = [
+    "\n\nCUSTOMER PERSONALIZATION (bias his wardrobe, grooming and overall mood toward these — keep the scene, location and composition of the reference image unchanged):",
+  ];
+  if (style) lines.push(`- His personal style: ${style}`);
+  if (setting) lines.push(`- Where he feels most himself: ${setting}`);
+  return lines.join("\n");
+}
+
 // Options control:
 //   - holdBeforeDelivery: true (cron default) sets deliver_at to now + 6-8h.
 //     false (admin manual) sets deliver_at to now — the order becomes
@@ -132,6 +150,17 @@ export async function generateForOrder(
       "image/jpeg";
     refs.push({ data: buf, mimeType });
   }
+
+  // Personalization: the customer's style + "where he feels most himself"
+  // answers, woven into every scene prompt to bias wardrobe and mood.
+  const { data: qRow } = await supabaseAdmin
+    .from("dating_orders")
+    .select("questionnaire_answers")
+    .eq("id", orderId)
+    .maybeSingle();
+  const personalizationClause = buildPersonalizationClause(
+    (qRow?.questionnaire_answers as Record<string, string> | null) ?? null,
+  );
 
   // 3. Load active templates from DB. Each one = 1 generated photo.
   //    The luxury set is only pulled in when the order paid the $20 upsell.
@@ -199,9 +228,9 @@ export async function generateForOrder(
     const refined = await refinePromptForPair({
       templateReference: templateRef,
       characterReferences: refs,
-      scenePromptHint: tpl.prompt,
+      scenePromptHint: tpl.prompt + personalizationClause,
     });
-    const promptForGeneration = refined?.refinedPrompt ?? buildPrompt(tpl.prompt);
+    const promptForGeneration = refined?.refinedPrompt ?? buildPrompt(tpl.prompt + personalizationClause);
     try {
       const result = await generateImage({
         prompt: promptForGeneration,
@@ -442,11 +471,19 @@ export async function regenerateSingleTemplate(args: {
   // 3. Build prompt. If feedback is present, append it as a
   // high-priority corrective clause so the model sees it. The refined
   // prompt path also gets the feedback woven into the scenePromptHint.
+  const { data: qRow } = await supabaseAdmin
+    .from("dating_orders")
+    .select("questionnaire_answers")
+    .eq("id", order.id)
+    .maybeSingle();
+  const personalizationClause = buildPersonalizationClause(
+    (qRow?.questionnaire_answers as Record<string, string> | null) ?? null,
+  );
   const feedbackClause = feedback && feedback.trim()
     ? `\n\nADMIN CORRECTIVE FEEDBACK (highest priority — the previous generation had this specific issue, fix it in this one): ${feedback.trim()}`
     : "";
 
-  const scenePromptHint = tpl.prompt + feedbackClause;
+  const scenePromptHint = tpl.prompt + personalizationClause + feedbackClause;
   const refined = await refinePromptForPair({
     templateReference: templateRef,
     characterReferences: refs,
