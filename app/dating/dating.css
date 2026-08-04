@@ -57,6 +57,11 @@ button.mo-pricing-card__cta {
 .dt-hero-tile--night     { background-image: var(--dt-scrim), url("/dating/night.webp"); }
 .dt-hero-tile--athletic  { background-image: var(--dt-scrim), url("/dating/athletic.webp"); }
 .dt-hero-tile--lifestyle { background-image: var(--dt-scrim), url("/dating/transformation/after-5.webp"); }
+
+/* Hero grid uses a stronger outdoor shot than the styles-section card below. */
+.mo-hero-v1__right .dt-hero-tile--outdoor {
+  background-image: var(--dt-scrim), url("/dating/transformation/after-1.webp");
+}
 /* Tablet band: the base 280px panel gives landscape tiles that crop faces — add height */
 @media (min-width: 600px) and (max-width: 1023px) {
   .mo-hero-v1__right {
