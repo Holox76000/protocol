@@ -93,7 +93,11 @@ qu'on y est). Même URL `/dating`, une simple condition côté client.
   `getDay()`, fuseau du visiteur) → pas de mismatch d'hydratation SSR.
 
 > Le hero a aussi été repassé en **photos carrées** (au lieu du format
-> « story » vertical), avec un encart « matches / semaine » réduit.
+> « story » vertical), avec un encart « matches / semaine » réduit. Sur
+> **mobile**, comme la nouvelle headline (plus longue) tient sur 3 lignes, le
+> mur de photos est **légèrement raccourci** (un peu moins que carré) pour que
+> le bouton d'achat **et** le badge Trustpilot restent visibles dès le premier
+> écran, sans scroller.
 
 > L'ancien funnel Protocol avait sa propre couche de personnalisation bien plus
 > lourde (~90 pubs mappées + génération de copy par Claude Sonnet depuis les
