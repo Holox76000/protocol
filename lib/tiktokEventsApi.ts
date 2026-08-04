@@ -8,7 +8,7 @@ import { createHash } from "crypto";
 // (Stripe session.id for InitiateCheckout / Purchase, etc).
 
 const ENDPOINT = "https://business-api.tiktok.com/open_api/v1.3/event/track/";
-const DEFAULT_PIXEL_ID = "D8RKQNRC77UFFED96BL0";
+const DEFAULT_PIXEL_ID = "D9OSILJC77U7RKPO8F3G";
 
 type TiktokContent = {
   content_id: string;
@@ -30,7 +30,7 @@ type TiktokEvent = {
     | "InitiateCheckout"
     | "PlaceAnOrder"
     | "CompleteRegistration"
-    | "Purchase";
+    | "CompletePayment";
   eventTime: number; // unix seconds
   eventId: string;
   eventSourceUrl?: string;

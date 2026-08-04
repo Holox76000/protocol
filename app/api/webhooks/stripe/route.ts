@@ -147,7 +147,7 @@ export async function POST(request: Request) {
       // the webhook is server-to-server so we can't read them from headers.
       try {
         await sendTiktokEvent({
-          eventName: "Purchase",
+          eventName: "CompletePayment",
           eventTime: purchaseEventTime,
           eventId: pi.id,
           eventSourceUrl: "https://protocol-club.com/dashboard",
@@ -360,6 +360,39 @@ export async function POST(request: Request) {
         });
       }
 
+      // ── TikTok Events API CompletePayment for the upsell ──
+      // Mirror of the Meta upsell event above: own event_id (the upsell PI) so
+      // it won't dedupe against the $39 CompletePayment, feeding TikTok the
+      // extra upsell revenue. Attribution (ttclid/ttp/email) from the session.
+      try {
+        await sendTiktokEvent({
+          eventName: "CompletePayment",
+          eventTime: session.created ?? Math.floor(Date.now() / 1000),
+          eventId: piId ?? session.id,
+          eventSourceUrl: `${SITE_URL}/dating/success`,
+          userAgent: meta.customer_user_agent || undefined,
+          ipAddress: meta.customer_ip || undefined,
+          email: upsellEmail,
+          externalId: upsellEmail || undefined,
+          ttclid: meta.ttclid || null,
+          ttp: meta.customer_ttp || null,
+          properties: {
+            value: upsellValue,
+            currency: upsellCurrency,
+            contents: [{
+              content_id: upsellProduct.id,
+              content_type: "product",
+              content_name: upsellProduct.name,
+            }],
+          },
+        });
+        console.log("[webhook/stripe] Upsell CompletePayment TikTok sent", { orderId, kind, value: upsellValue });
+      } catch (err) {
+        console.error("[TIKTOK-FAIL-ALERT] Upsell CompletePayment failed", {
+          error: String(err), orderId, kind, email: upsellEmail, value: upsellValue,
+        });
+      }
+
       // Ping #new-sales so the team sees the upsell in the same feed as the
       // parent order. Best-effort — never block the webhook on Slack.
       try {
@@ -450,7 +483,7 @@ export async function POST(request: Request) {
     // Phone comes from Stripe Checkout phone_number_collection (E.164 format).
     try {
       await sendTiktokEvent({
-        eventName: "Purchase",
+        eventName: "CompletePayment",
         eventTime: sessionPurchaseEventTime,
         eventId: purchasePiId,
         eventSourceUrl: "https://protocol-club.com/checkout",
