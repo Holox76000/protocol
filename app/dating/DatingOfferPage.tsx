@@ -284,8 +284,16 @@ function UrgencyBar() {
   // Time-dependent + varies by day → compute after mount to avoid a hydration
   // mismatch (server and client would otherwise disagree).
   const [countdown, setCountdown] = useState<string | null>(null);
+  const [weekendPush, setWeekendPush] = useState(false);
 
   useEffect(() => {
+    // Mon–Thu: push the weekend-delivery angle instead of the price countdown.
+    // 24h delivery + a couple days of matches still land before the weekend.
+    // Fri–Sun keep the price countdown (Fri is too tight to promise "for the
+    // weekend"). Day is read after mount → no hydration mismatch.
+    const day = new Date().getDay();
+    setWeekendPush(day >= 1 && day <= 4);
+
     const tick = () => {
       const ms = PRICE_BUMP_AT.getTime() - Date.now();
       setCountdown(ms > 0 ? formatCountdown(ms) : "");
@@ -297,12 +305,18 @@ function UrgencyBar() {
 
   return (
     <div className="dt-urgency" role="note">
-      <span className="dt-urgency__price">
-        <strong>$39 launch price</strong>
-        {countdown
-          ? <> — going to {REGULAR_PRICE} in <strong>{countdown}</strong></>
-          : <> — going to {REGULAR_PRICE} soon</>}
-      </span>
+      {weekendPush ? (
+        <span className="dt-urgency__price">
+          <strong>Order now</strong> — get your matches for the weekend
+        </span>
+      ) : (
+        <span className="dt-urgency__price">
+          <strong>$39 launch price</strong>
+          {countdown
+            ? <> — going to {REGULAR_PRICE} in <strong>{countdown}</strong></>
+            : <> — going to {REGULAR_PRICE} soon</>}
+        </span>
+      )}
     </div>
   );
 }
