@@ -109,7 +109,7 @@ export function tiktokTrackPurchase(sessionId?: string, value?: number) {
   if (!t) return;
   try {
     t.track(
-      "Purchase",
+      "CompletePayment",
       {
         contents: [PRODUCT],
         value: value ?? PRODUCT_PRICE_USD,
