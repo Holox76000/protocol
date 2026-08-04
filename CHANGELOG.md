@@ -3,6 +3,26 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.6.0] - 2026-08-04
+
+### Added
+- Dating hero headline is now weekday-aware: Mon–Fri, broad/direct visitors see
+  "Photos that get matches before the weekend." (Sat–Sun falls back to the
+  evergreen "Photos that get you matches." — the line that already converts, and
+  "before the weekend" makes no sense once you're in it). Ad-specific variants
+  still win. Day is read client-side after mount, so there's no SSR hydration
+  mismatch.
+- Weekday-only "New photos today. Matches by the weekend." timeline section under
+  the hero (Today → +24h → the weekend), planting the run-up-to-the-weekend frame.
+  Hidden Sat–Sun.
+
+### Changed
+- Dating hero photo grid tiles are now square instead of tall "story" crops; the
+  panel hugs the square block on mobile, tablet, and desktop.
+- Shrunk the "matches / week 9 → 47" stat card so it stops eating the photo wall.
+- More breathing room in the mobile hero headline/subhead block (looser spacing
+  and line-height).
+
 ## [1.1.5.7] - 2026-08-04
 
 ### Changed
