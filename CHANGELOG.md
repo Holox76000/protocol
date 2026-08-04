@@ -3,6 +3,14 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.5.7] - 2026-08-04
+
+### Changed
+- Dating hero photo grid: replaced the weaker "night out" and "outdoor" model
+  shots — the grid now shows Casual, Outdoor (the on-the-boat shot from the
+  transformation section), Athletic, and Lifestyle (helicopter). Scoped to the
+  hero; the styles section below is unchanged.
+
 ## [1.1.5.6] - 2026-08-04
 
 ### Changed

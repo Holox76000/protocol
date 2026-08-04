@@ -356,7 +356,7 @@ function DHero() {
       <div className="mo-hero-v1__right">
         <div className="mo-hero-v1__product-stack">
           <div className="dt-hero-grid">
-            {STYLES.filter((s) => s.key !== "nature" && s.key !== "lifestyle").map((s) => (
+            {STYLES.filter((s) => s.key !== "nature" && s.key !== "night").map((s) => (
               <div key={s.key} className={`dt-hero-tile dt-hero-tile--${s.key}`}>
                 <span>{s.name}</span>
               </div>
