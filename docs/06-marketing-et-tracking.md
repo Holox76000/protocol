@@ -22,6 +22,11 @@ un `event_id` partagé.
   `fbclid`. Envoie `event_id` pour la dedup.
 - **TikTok Events API** : hash email + téléphone E.164 + `external_id`, passe
   `ttclid`, `ttp`. Gère le quirk TikTok (HTTP 200 avec un `code` non-zéro = échec).
+  Pixel actif = **`D9OSILJC77U7RKPO8F3G`** (env `TIKTOK_PIXEL_ID`, token
+  `TIKTOK_ACCESS_TOKEN`). L'achat utilise l'event standard TikTok
+  **`CompletePayment`** (et non `Purchase`, qui est le nom Meta et serait traité
+  comme event custom → pas d'optimisation achat). Les upsells dating envoient
+  aussi un `CompletePayment` serveur dédié.
 - **GA4 MP** : parse le cookie `_ga` pour le `client_id`, envoie `purchase` avec
   `transaction_id`, `value`, `items`. Ne tourne qu'en production.
 
@@ -55,7 +60,7 @@ serveur :
 | PageView / route | `PageView` | `ViewContent` | `page_view` | — |
 | `view_offer` (dating) | `ViewContent` | `ViewContent` | — | **$39** |
 | InitiateCheckout | pixel + CAPI | pixel + Events API | `checkout_started` | $39 |
-| **Purchase** | `Purchase` CAPI | `Purchase` Events API | `purchase` MP | **`amount_total` Stripe réel** |
+| **Purchase** | `Purchase` CAPI | `CompletePayment` Events API | `purchase` MP | **`amount_total` Stripe réel** |
 
 > ⚠️ **À savoir** : la valeur pixel navigateur est **codée en dur** à $39, quel
 > que soit le prix réel. Seul le Purchase serveur utilise le vrai `amount_total`
