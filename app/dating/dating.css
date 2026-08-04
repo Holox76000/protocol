@@ -707,7 +707,7 @@ button.mo-pricing-card__cta {
      Trim the photo wall a touch (slightly shorter than square) so the badge
      lands back at the fold — big photos, but the CTA/Trustpilot stay visible
      without scrolling. */
-  .mo-hero-v1__right .dt-hero-grid { aspect-ratio: 1 / 0.82; }
+  .mo-hero-v1__right .dt-hero-grid { aspect-ratio: 1 / 0.79; }
   .dt-hero-tile { padding: 10px; }
   .mo-hero-v1__fc--ratio { bottom: 26px; right: 12px; }
 
