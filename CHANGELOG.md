@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.1.8.1] - 2026-08-07
+
+### Added
+- **TikTok `AddToCart` event on every `/dating` CTA click.** Clicking any dating
+  CTA (`Get my 30 photos — $39`: nav, hero, steps, before/after, pricing, sticky)
+  now fires a TikTok `AddToCart` — a higher-funnel, more frequent optimization
+  signal than `InitiateCheckout` (which only fires once the Stripe session is
+  created). Sent both via the browser pixel (`lib/tiktokPixel.ts`) and server-side
+  CAPI (`/api/track`), sharing one `event_id` for TikTok dedup, matching the
+  existing `ViewContent`/`CompletePayment` pattern. Product `dating-ai-photos`,
+  $39 USD. Gated on `funnel === "dating"`, so the F1 funnel is unaffected.
+
 ## [1.1.8.0] - 2026-08-04
 
 ### Security

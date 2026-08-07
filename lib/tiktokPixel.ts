@@ -26,6 +26,14 @@ const PRODUCT: TtqContent = {
 
 const PRODUCT_PRICE_USD = 89;
 
+const DATING_PRODUCT: TtqContent = {
+  content_id: "dating-ai-photos",
+  content_type: "product",
+  content_name: "Protocol Dating",
+};
+
+const DATING_PRICE_USD = 39;
+
 function ttq(): Ttq | null {
   if (typeof window === "undefined") return null;
   const g = (window as Window & { ttq?: Ttq }).ttq;
@@ -67,6 +75,27 @@ export function tiktokTrackViewContent(pathname: string, title?: string) {
         },
       ],
     });
+  } catch {
+    /* noop */
+  }
+}
+
+// Fired on every /dating CTA click (higher-funnel intent signal than
+// InitiateCheckout, which only fires once the Stripe session is created).
+// event_id is shared with the server CAPI AddToCart for TikTok dedup.
+export function tiktokTrackAddToCart(eventId?: string) {
+  const t = ttq();
+  if (!t) return;
+  try {
+    t.track(
+      "AddToCart",
+      {
+        contents: [DATING_PRODUCT],
+        value: DATING_PRICE_USD,
+        currency: "USD",
+      },
+      eventId ? { event_id: eventId } : undefined,
+    );
   } catch {
     /* noop */
   }

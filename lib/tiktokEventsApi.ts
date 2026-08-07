@@ -26,6 +26,7 @@ type TiktokProperties = {
 type TiktokEvent = {
   eventName:
     | "ViewContent"
+    | "AddToCart"
     | "AddPaymentInfo"
     | "InitiateCheckout"
     | "PlaceAnOrder"
