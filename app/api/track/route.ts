@@ -126,6 +126,36 @@ export async function POST(request: Request) {
     });
   }
 
+  if (
+    body.event === "offer_cta_clicked" &&
+    (body.payload as Record<string, unknown> | undefined)?.funnel === "dating"
+  ) {
+    const eventId = body.eventId ?? `${body.sessionId}:offer_cta_clicked:${eventTime}`;
+    const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
+    const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
+    await sendTiktokEvent({
+      eventName: "AddToCart",
+      eventTime,
+      eventId,
+      eventSourceUrl,
+      userAgent,
+      ipAddress,
+      externalId: funnelSid ?? body.sessionId,
+      ttclid,
+      ttp,
+      properties: {
+        value: 39,
+        currency: "USD",
+        contents: [{
+          content_id: "dating-ai-photos",
+          content_type: "product",
+          content_name: "Protocol Dating",
+        }],
+      },
+    });
+    console.log("[track] tiktok sent", { event: "AddToCart", sessionId: body.sessionId });
+  }
+
   if (body.event === "cta_clicked") {
     await sendMetaEvent({
       eventName: "Vue de page de paiement",

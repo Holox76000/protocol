@@ -1,3 +1,5 @@
+import { tiktokTrackAddToCart } from "./tiktokPixel";
+
 type EventPayload = Record<string, unknown>;
 
 type EventName =
@@ -72,6 +74,12 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
     } catch {
       // Ignore Meta Pixel runtime issues in the UI flow.
     }
+  }
+
+  // TikTok AddToCart on any /dating CTA click. Client pixel here + server CAPI
+  // in /api/track share this eventId for dedup (same pattern as view_offer).
+  if (name === "offer_cta_clicked" && payload.funnel === "dating") {
+    tiktokTrackAddToCart(eventId);
   }
 
   console.log(`[event] ${name}`, payload);
