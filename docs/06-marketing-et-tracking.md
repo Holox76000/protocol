@@ -49,6 +49,7 @@ serveur :
 
 | Event | `event_id` utilisé |
 |---|---|
+| AddToCart (dating) | `{sessionId}:offer_cta_clicked:{ts}` (partagé pixel ↔ CAPI) |
 | InitiateCheckout | id de la Session Stripe (hosted) ou du PaymentIntent (embedded) |
 | **Purchase** | id du PaymentIntent (canonique sur tous les chemins de fire) |
 | ViewContent | `{sessionId}:view_offer:{ts}` |
@@ -59,6 +60,7 @@ serveur :
 |---|---|---|---|---|
 | PageView / route | `PageView` | `ViewContent` | `page_view` | — |
 | `view_offer` (dating) | `ViewContent` | `ViewContent` | — | **$39** |
+| **CTA `/dating` cliqué** | — | **`AddToCart`** pixel + Events API | — | **$39** |
 | InitiateCheckout | pixel + CAPI | pixel + Events API | `checkout_started` | $39 |
 | **Purchase** | `Purchase` CAPI | `CompletePayment` Events API | `purchase` MP | **`amount_total` Stripe réel** |
 
@@ -66,6 +68,13 @@ serveur :
 > que soit le prix réel. Seul le Purchase serveur utilise le vrai `amount_total`
 > Stripe. *(Les events du funnel Protocol — `quiz_started`, `Lead`, etc. — sont
 > archivés dans* Précédentes itérations*.)*
+
+> 💡 **`AddToCart` (dating)** est fire sur **chaque clic CTA** de `/dating` (tous
+> passent par `startCheckout()`), donc plus haut et plus fréquent dans le funnel
+> que `InitiateCheckout` (qui n'arrive qu'une fois la session Stripe créée). TikTok
+> uniquement, pixel + Events API, dédup par `event_id` partagé. Gardé sur
+> `funnel === "dating"` → le funnel F1 n'est pas impacté. Funnel TikTok dating :
+> `ViewContent` → `AddToCart` → `InitiateCheckout` → `CompletePayment`.
 
 ## EMQ (Event Match Quality)
 
