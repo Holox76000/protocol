@@ -26,3 +26,4 @@ tsconfig.tsbuildinfo
 
 # Supabase local temp (contains project ref)
 supabase/.temp
+public/_localmocks/

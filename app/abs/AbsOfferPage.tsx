@@ -5,7 +5,6 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
-import { PlaceholderRibbon } from "../../components/ImagePlaceholder";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -331,11 +330,18 @@ const REPORT_ZONES = [
 
 function AbsReportCard() {
   return (
-    <div className="ab-report img-ph-slot">
-      <PlaceholderRibbon note="real Abs Scan result screenshot" />
+    <div className="ab-report">
       <div className="ab-report__head">
         <span className="ab-report__title">Abs Scan Report</span>
         <span className="ab-report__tag">Sample</span>
+      </div>
+      <div className="ab-report__subject">
+        <img src="/abs/scan-torso.jpg" alt="AI abs scan subject" />
+        <span className="ab-report__scan ab-report__scan--tl" />
+        <span className="ab-report__scan ab-report__scan--tr" />
+        <span className="ab-report__scan ab-report__scan--bl" />
+        <span className="ab-report__scan ab-report__scan--br" />
+        <span className="ab-report__scanline" />
       </div>
       <div className="ab-report__score">
         <div className="ab-report__score-num">54<span>/100</span></div>
@@ -352,7 +358,7 @@ function AbsReportCard() {
       </div>
       <div className="ab-report__blocker">
         <span>Primary blocker</span>
-        <strong>Body fat — est. 21–23%</strong>
+        <strong>Body fat — est. 13–15%</strong>
       </div>
     </div>
   );
@@ -363,62 +369,43 @@ function AbsReportCard() {
 
 function AbsZoneMap() {
   return (
-    <div className="ab-mock ab-zonemap img-ph-slot">
-      <PlaceholderRibbon note="real body scan / zone visual" />
+    <div className="ab-mock ab-zonemap">
       <div className="ab-report__head">
-        <span className="ab-report__title">Zone Map</span>
-        <span className="ab-report__tag">From your scan</span>
+        <span className="ab-report__title">Zone Scan</span>
+        <span className="ab-report__tag">From your photo</span>
       </div>
-      <svg viewBox="0 0 340 250" role="img" aria-label="Torso diagram with scores per ab zone">
-        {/* Torso silhouette, wide shoulders → V-taper */}
-        <path
-          d="M105 22 Q170 6 235 22 L229 88 Q224 126 208 148 L200 218 Q170 240 140 218 L132 148 Q116 126 111 88 Z"
-          fill="#f1f4f5" stroke="#dfe4e6" strokeWidth="1.5"
-        />
-        {/* Pec line */}
-        <path d="M130 76 Q170 90 210 76" fill="none" stroke="#dfe4e6" strokeWidth="1.5" />
-        {/* Abs grid — lower row highlighted as the weak zone */}
-        <rect x="146" y="98" width="22" height="26" rx="7" fill="#dfe4e6" />
-        <rect x="172" y="98" width="22" height="26" rx="7" fill="#dfe4e6" />
-        <rect x="146" y="130" width="22" height="26" rx="7" fill="#dfe4e6" />
-        <rect x="172" y="130" width="22" height="26" rx="7" fill="#dfe4e6" />
-        <rect x="146" y="162" width="22" height="26" rx="7" fill="#253239" />
-        <rect x="172" y="162" width="22" height="26" rx="7" fill="#253239" />
-        {/* Obliques */}
-        <path d="M130 112 Q136 150 144 170" fill="none" stroke="#c9d2d6" strokeWidth="4" strokeLinecap="round" />
-        <path d="M210 112 Q204 150 196 170" fill="none" stroke="#c9d2d6" strokeWidth="4" strokeLinecap="round" />
-        {/* Callouts */}
-        <line x1="194" y1="106" x2="244" y2="92" stroke="#b9c4c8" strokeWidth="1" />
-        <text x="248" y="90" className="ab-zonemap__lbl">Upper abs</text>
-        <text x="248" y="104" className="ab-zonemap__val">71</text>
-        <line x1="132" y1="140" x2="86" y2="134" stroke="#b9c4c8" strokeWidth="1" />
-        <text x="82" y="130" textAnchor="end" className="ab-zonemap__lbl">Obliques</text>
-        <text x="82" y="144" textAnchor="end" className="ab-zonemap__val">58</text>
-        <line x1="194" y1="176" x2="244" y2="186" stroke="#b9c4c8" strokeWidth="1" />
-        <text x="248" y="184" className="ab-zonemap__lbl">Lower abs</text>
-        <text x="248" y="198" className="ab-zonemap__val ab-zonemap__val--weak">43 · weak</text>
-        <line x1="138" y1="196" x2="92" y2="212" stroke="#b9c4c8" strokeWidth="1" />
-        <text x="88" y="210" textAnchor="end" className="ab-zonemap__lbl">V-taper</text>
-        <text x="88" y="224" textAnchor="end" className="ab-zonemap__val">62</text>
-      </svg>
+      <div className="ab-report__subject">
+        <img src="/abs/scan-torso.jpg" alt="AI abs zone scan subject" />
+        <span className="ab-zonemap__weakbox" />
+        <span className="ab-report__scan ab-report__scan--tl" />
+        <span className="ab-report__scan ab-report__scan--tr" />
+        <span className="ab-report__scan ab-report__scan--bl" />
+        <span className="ab-report__scan ab-report__scan--br" />
+      </div>
+      <div className="ab-zonemap__weak">
+        <span className="ab-zonemap__weak-dot" />
+        <div>
+          <div className="ab-zonemap__weak-name">Weak zone — lower abs</div>
+          <div className="ab-zonemap__weak-sub">Scored 43 / 100, your least developed</div>
+        </div>
+      </div>
       <div className="ab-report__blocker">
         <span>Est. body fat</span>
-        <strong>21–23% — diet leads, training follows</strong>
+        <strong>13–15% — diet leads, training follows</strong>
       </div>
     </div>
   );
 }
 
 const PLAN_ROWS = [
-  { name: "Hanging leg raises", sets: "3 × 12" },
-  { name: "Reverse crunches", sets: "4 × 15" },
-  { name: "Flutter kicks", sets: "4 × 40s" },
+  { name: "Hanging leg raises", sets: "3 × 12", img: "/abs/ex-hanging-leg-raises.jpg" },
+  { name: "Reverse crunches", sets: "4 × 15", img: "/abs/ex-reverse-crunches.jpg" },
+  { name: "Flutter kicks", sets: "4 × 40s", img: "/abs/ex-flutter-kicks.jpg" },
 ];
 
 function AbsPlanCard() {
   return (
-    <div className="ab-mock ab-plan img-ph-slot">
-      <PlaceholderRibbon note="real plan screenshot" />
+    <div className="ab-mock ab-plan">
       <div className="ab-report__head">
         <span className="ab-report__title">Your Plan</span>
         <span className="ab-report__tag">Week 1 · Day 1</span>
@@ -431,6 +418,7 @@ function AbsPlanCard() {
       <div className="ab-plan__rows">
         {PLAN_ROWS.map((r) => (
           <div key={r.name} className="ab-plan__row">
+            <img className="ab-plan__thumb" src={r.img} alt="" />
             <span className="ab-plan__row-name">{r.name}</span>
             <span className="ab-plan__row-sets">{r.sets}</span>
           </div>

@@ -60,6 +60,83 @@
   border-radius: 999px;
   padding: 3px 9px;
 }
+/* Scan subject — the generated torso, framed as the thing being analyzed */
+.ab-report__subject {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 4px 0 16px;
+  background: #eef1f2;
+}
+.ab-report__subject img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 48%;
+  display: block;
+  filter: saturate(0.92) contrast(1.04);
+}
+.ab-report__scan {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+.ab-report__scan--tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; border-radius: 3px 0 0 0; }
+.ab-report__scan--tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; border-radius: 0 3px 0 0; }
+.ab-report__scan--bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; border-radius: 0 0 0 3px; }
+.ab-report__scan--br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; border-radius: 0 0 3px 0; }
+.ab-report__scanline {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 34%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(122, 212, 168, 0.9), transparent);
+  box-shadow: 0 0 10px rgba(122, 212, 168, 0.6);
+}
+
+/* Zone scan — weak-zone highlight box over the lower abs + callout row */
+.ab-zonemap__weakbox {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 16%;
+  height: 26%;
+  border: 2px solid rgba(179, 64, 58, 0.85);
+  border-radius: 8px;
+  background: rgba(179, 64, 58, 0.16);
+  box-shadow: 0 0 0 100vmax rgba(37, 50, 57, 0.06) inset;
+}
+.ab-zonemap__weak {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fbf1f0;
+  border: 1px solid #f2dad8;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.ab-zonemap__weak-dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: #b3403a;
+}
+.ab-zonemap__weak-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #253239;
+}
+.ab-zonemap__weak-sub {
+  margin-top: 1px;
+  font-size: 12px;
+  color: #7f949b;
+}
+
 .ab-report__score {
   display: flex;
   align-items: baseline;
@@ -329,14 +406,24 @@
 .ab-plan__row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 11px;
   background: #f9fbfb;
   border: 1px solid #edf0f1;
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 8px 12px;
+}
+.ab-plan__thumb {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: 50% 45%;
+  background: #eef1f2;
+  filter: saturate(0.92);
 }
 .ab-plan__row-name {
+  flex: 1;
   font-size: 14px;
   font-weight: 600;
   color: #253239;
