@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import { getCheckoutLineItems, getPublicSiteUrl, getStripeServerClient } from "../../../lib/stripe";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
+import { getExperiment, getExperimentPlan, EXPERIMENT_SLUGS } from "../../../lib/experiments";
 
 export const runtime = "nodejs";
 
-const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1", "dating"]);
+const KNOWN_FUNNELS = new Set(["main", "f2", "v3", "woman", "f1", "dating", ...EXPERIMENT_SLUGS]);
 
 type Body = {
   funnel?: string;
   funnel_type?: string;
+  plan?: string;
   from?: string;
   customer_email?: string;
   landing_page?: string;
@@ -37,7 +39,11 @@ export async function POST(request: Request) {
   const funnel = KNOWN_FUNNELS.has(rawFunnel) ? rawFunnel : "main";
   const internalFunnel = funnel === "v2" ? "f2" : funnel;
   const funnelType = body.funnel_type ?? "long";
-  const landingPage = body.landing_page ?? (funnel === "dating" ? "/dating" : funnel === "f1" ? "/f1" : "/");
+  const experiment = getExperiment(internalFunnel);
+  const experimentPlan = experiment ? getExperimentPlan(experiment, body.plan) : null;
+  const landingPage =
+    body.landing_page ??
+    (funnel === "dating" ? "/dating" : funnel === "f1" ? "/f1" : experiment ? `/${experiment.slug}` : "/");
   const customerEmail = body.customer_email ?? null;
   const embedded = body.embedded === true;
 
@@ -53,6 +59,7 @@ export async function POST(request: Request) {
   const sharedMetadata = {
     funnel: internalFunnel,
     funnel_type: funnelType,
+    ...(experimentPlan && { plan: experimentPlan.key }),
     source: "app_checkout",
     capi_purchase_source: "checkout_session",
     landing_page: landingPage,
@@ -80,34 +87,51 @@ export async function POST(request: Request) {
         billing_address_collection: "auto",
         phone_number_collection: { enabled: true },
         allow_promotion_codes: true,
-        line_items: getCheckoutLineItems(internalFunnel),
+        line_items: getCheckoutLineItems(internalFunnel, experimentPlan?.key),
         ...(customerEmail && { customer_email: customerEmail }),
         customer_creation: "always",
         return_url: `${siteUrl}/dashboard?payment=success&session_id={CHECKOUT_SESSION_ID}`,
         metadata: sharedMetadata,
       });
     } else {
+      const checkoutMode = experiment?.billing === "subscription" ? "subscription" : "payment";
       session = await stripe.checkout.sessions.create({
-        mode: "payment",
+        mode: checkoutMode,
         billing_address_collection: "auto",
         phone_number_collection: { enabled: true },
         allow_promotion_codes: true,
-        line_items: getCheckoutLineItems(internalFunnel),
+        line_items: getCheckoutLineItems(internalFunnel, experimentPlan?.key),
         ...(customerEmail && { customer_email: customerEmail }),
-        customer_creation: "always",
+        // customer_creation is only valid in payment mode (subscriptions
+        // always create a customer).
+        ...(checkoutMode === "payment" && { customer_creation: "always" as const }),
         after_expiration: {
           recovery: { enabled: true, allow_promotion_codes: false },
         },
         expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
         success_url: internalFunnel === "dating"
           ? `${siteUrl}/dating/success?session_id={CHECKOUT_SESSION_ID}`
+          : experiment
+          ? `${siteUrl}/${experiment.slug}/success?session_id={CHECKOUT_SESSION_ID}`
           : `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&funnel=${encodeURIComponent(funnel)}`,
         cancel_url: internalFunnel === "dating"
           ? `${siteUrl}/dating?checkout=cancelled`
+          : experiment
+          ? `${siteUrl}/${experiment.slug}?checkout=cancelled`
           : `${siteUrl}/checkout/cancel?funnel=${encodeURIComponent(funnel)}`,
         // The Slack #sales ping reads pi.metadata, which does not inherit
-        // session metadata — mirror it onto the PaymentIntent.
-        ...(internalFunnel === "dating" && { payment_intent_data: { metadata: sharedMetadata } }),
+        // session metadata — mirror it onto the PaymentIntent (payment mode)
+        // or the Subscription (subscription mode, where payment_intent_data
+        // is not allowed).
+        ...((internalFunnel === "dating" || (experiment && experiment.billing !== "subscription")) && {
+          payment_intent_data: { metadata: sharedMetadata },
+        }),
+        ...(experiment?.billing === "subscription" && {
+          subscription_data: {
+            metadata: sharedMetadata,
+            ...(experimentPlan?.trialDays && { trial_period_days: experimentPlan.trialDays }),
+          },
+        }),
         metadata: sharedMetadata,
       });
     }
@@ -143,6 +167,8 @@ export async function POST(request: Request) {
   const eventTime = Math.floor(Date.now() / 1000);
   const product = internalFunnel === "dating"
     ? { name: "Protocol Dating — AI Dating Photos", id: "dating-ai-photos", value: 39 }
+    : experiment && experimentPlan
+    ? { name: experiment.productName, id: experiment.contentId, value: experimentPlan.priceCents / 100 }
     : { name: "Attractiveness Protocol", id: "f1-attractiveness-protocol", value: 89 };
 
   void sendMetaEvent({

@@ -1,5 +1,47 @@
 /* Protocol Dating — overrides & additions on top of f1-offer.css */
 
+/* ─── Image placeholders (shared by experiment landings) ─────────────────────
+   Flags a visual that is still a CSS/SVG mock-up and must be replaced by a real
+   image before a paid launch. DEV-ONLY: every marker is scoped to
+   html[data-env="development"] (set in app/layout.tsx) so production ships
+   clean — real visitors never see the badges or dashed outlines. `img-ph-slot`
+   keeps position:relative in every env so layout is identical dev↔prod. */
+.img-ph-slot {
+  position: relative;
+}
+.img-ph-ribbon {
+  display: none;
+}
+:root[data-env="development"] .img-ph-slot {
+  outline: 2px dashed #e0a032;
+  outline-offset: 3px;
+}
+:root[data-env="development"] .img-ph-avatar {
+  outline: 2px dashed #e0a032;
+  outline-offset: 2px;
+}
+:root[data-env="development"] .img-ph-ribbon {
+  position: absolute;
+  z-index: 6;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f4b63f;
+  color: #3a2a06;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  white-space: nowrap;
+}
+:root[data-env="development"] .img-ph-ribbon svg { display: block; }
+
 /* Buttons reuse anchor-styled classes from f1-offer.css */
 .dt-btn {
   border: 0;

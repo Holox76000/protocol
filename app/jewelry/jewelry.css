@@ -1,0 +1,296 @@
+/* GemCheck — overrides & additions on top of f1-offer.css + dating.css.
+   Reuses the generic dt- and mo- classes (buttons, research cards, old/new,
+   urgency, pricing, testimonials); adds only the j- appraisal-report mockup
+   and a copy of the 3-tier plan picker (ab-plan-) so this vertical doesn't
+   import abs.css. */
+
+/* Hero right panel hugs the report card (no photo wall here) */
+.j-hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+/* Wrapper sized to the card so the straddling value chip anchors to the
+   card's bottom edge, not the panel's. */
+.j-report-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.j-report-wrap .mo-hero-v1__fc--ratio {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  right: -14px;
+  transform: translateY(50%) rotate(1.5deg);
+}
+
+/* ─── Sample appraisal report card ──────────────────────────────────────── */
+.j-report {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(37, 50, 57, 0.12);
+  padding: 24px;
+}
+.j-report__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.j-report__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #253239;
+}
+.j-report__tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7f949b;
+  background: #f1f4f5;
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.j-report__piece {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf0f1;
+}
+.j-report__ring {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  display: block;
+}
+.j-report__from {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #c9a961;
+  margin-bottom: 2px;
+}
+.j-report__piece-name {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #253239;
+  line-height: 1.15;
+}
+.j-report__piece-sub {
+  margin-top: 3px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #7f949b;
+}
+.j-report__rows {
+  display: grid;
+  gap: 8px;
+  padding: 16px 0 4px;
+}
+.j-report__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.j-report__row-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7f949b;
+  white-space: nowrap;
+}
+.j-report__row-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #253239;
+  text-align: right;
+}
+/* Value = the payoff. It's the biggest, most emphatic block on the card:
+   this is the "what's it worth?" answer the visitor came for. */
+.j-report__value {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  background: #253239;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.j-report__value-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.j-report__value-num {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #fff;
+}
+.j-report__value-note {
+  font-size: 11px;
+  font-weight: 500;
+  color: #c9a961;
+}
+.j-report__verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #edf0f1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #253239;
+}
+.j-report__verdict-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  background: #eef4ec;
+  color: #4a7a3f;
+}
+
+/* ─── Pricing: 2-tier plan picker (weekly / yearly) ─────────────────────── */
+/* Copied from abs.css so this vertical is self-contained. Mirrors the iOS
+   jewelry-scan competitors: weekly default + yearly best-value, no monthly. */
+.ab-plan-picker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.ab-plan-opt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 18px 16px 14px;
+  border: 1.5px solid #dfe4e6;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.ab-plan-opt:hover {
+  border-color: #b9c4c8;
+}
+.ab-plan-opt--active {
+  border-color: #253239;
+  box-shadow: 0 0 0 3px rgba(37, 50, 57, 0.08);
+}
+.ab-plan-opt__radio {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #c9d2d6;
+  transition: border-color 0.15s ease;
+}
+.ab-plan-opt--active .ab-plan-opt__radio {
+  border-color: #253239;
+  background:
+    radial-gradient(circle, #253239 0 5px, transparent 6px);
+}
+.ab-plan-opt__badge {
+  align-self: flex-start;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #253239;
+  border-radius: 999px;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+}
+.ab-plan-opt__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7f949b;
+}
+.ab-plan-opt__price {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #253239;
+}
+.ab-plan-opt__per {
+  font-size: 13px;
+  font-weight: 500;
+  color: #aab2b7;
+  margin-left: 1px;
+}
+.ab-plan-opt__sub {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #7f949b;
+  min-height: 16px;
+}
+
+@media (max-width: 560px) {
+  .ab-plan-picker {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .ab-plan-opt {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 14px 16px;
+  }
+  .ab-plan-opt__badge {
+    order: 3;
+    margin-bottom: 0;
+  }
+  .ab-plan-opt__label {
+    min-width: 74px;
+  }
+  .ab-plan-opt__price {
+    font-size: 19px;
+  }
+  .ab-plan-opt__sub {
+    flex-basis: 100%;
+    min-height: 0;
+  }
+}
+
+/* Mobile: dating.css flexes the hero — give the report breathing room and
+   keep the straddling value chip inside the viewport. */
+@media (max-width: 767px) {
+  .j-hero-right {
+    padding: 20px 20px 34px;
+  }
+  .j-report-wrap .mo-hero-v1__fc--ratio {
+    right: 4px;
+  }
+}

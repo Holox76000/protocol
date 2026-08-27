@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-env={process.env.NODE_ENV}>
       <body className="font-body text-ink bg-ash" suppressHydrationWarning>
         <Ga4RouteTracker />
         {process.env.NODE_ENV === "production" && (

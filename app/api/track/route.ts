@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
 import { sendMetaEvent } from "../../../lib/metaCapi";
 import { sendTiktokEvent } from "../../../lib/tiktokEventsApi";
+import { getExperiment, getExperimentPlan } from "../../../lib/experiments";
 
 type TrackPayload = {
   sessionId: string;
@@ -64,9 +65,14 @@ export async function POST(request: Request) {
     const eventId = body.eventId ?? `${body.sessionId}:view_offer:${eventTime}`;
     const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
     const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
-    const isDating = (body.payload as Record<string, unknown> | undefined)?.funnel === "dating";
+    const viewFunnel = (body.payload as Record<string, unknown> | undefined)?.funnel as string | undefined;
+    const isDating = viewFunnel === "dating";
+    const viewExperiment = getExperiment(viewFunnel);
+    const viewPlanKey = (body.payload as Record<string, unknown> | undefined)?.plan as string | undefined;
     const product = isDating
       ? { name: "Protocol Dating", id: "dating-ai-photos", value: 39 }
+      : viewExperiment
+      ? { name: viewExperiment.productName, id: viewExperiment.contentId, value: getExperimentPlan(viewExperiment, viewPlanKey).priceCents / 100 }
       : { name: "F1 Offer", id: "f1-attractiveness-protocol", value: 89 };
 
     await Promise.allSettled([
@@ -126,10 +132,13 @@ export async function POST(request: Request) {
     });
   }
 
-  if (
-    body.event === "offer_cta_clicked" &&
-    (body.payload as Record<string, unknown> | undefined)?.funnel === "dating"
-  ) {
+  const ctaFunnel = (body.payload as Record<string, unknown> | undefined)?.funnel as string | undefined;
+  const ctaPlanKey = (body.payload as Record<string, unknown> | undefined)?.plan as string | undefined;
+  const ctaExperiment = getExperiment(ctaFunnel);
+  if (body.event === "offer_cta_clicked" && (ctaFunnel === "dating" || ctaExperiment)) {
+    const ctaProduct = ctaExperiment
+      ? { name: ctaExperiment.productName, id: ctaExperiment.contentId, value: getExperimentPlan(ctaExperiment, ctaPlanKey).priceCents / 100 }
+      : { name: "Protocol Dating", id: "dating-ai-photos", value: 39 };
     const eventId = body.eventId ?? `${body.sessionId}:offer_cta_clicked:${eventTime}`;
     const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
     const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
@@ -144,12 +153,12 @@ export async function POST(request: Request) {
       ttclid,
       ttp,
       properties: {
-        value: 39,
+        value: ctaProduct.value,
         currency: "USD",
         contents: [{
-          content_id: "dating-ai-photos",
+          content_id: ctaProduct.id,
           content_type: "product",
-          content_name: "Protocol Dating",
+          content_name: ctaProduct.name,
         }],
       },
     });

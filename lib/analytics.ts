@@ -1,4 +1,5 @@
 import { tiktokTrackAddToCart } from "./tiktokPixel";
+import { getExperiment, getExperimentPlan } from "./experiments";
 
 type EventPayload = Record<string, unknown>;
 
@@ -47,6 +48,7 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
 
   if (name === "view_offer") {
     const isDating = payload.funnel === "dating";
+    const experiment = getExperiment(typeof payload.funnel === "string" ? payload.funnel : null);
     try {
       fbq?.("track", "ViewContent", isDating
         ? {
@@ -54,6 +56,14 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
             content_ids: ["dating-ai-photos"],
             content_type: "product",
             value: 39,
+            currency: "USD",
+          }
+        : experiment
+        ? {
+            content_name: experiment.productName,
+            content_ids: [experiment.contentId],
+            content_type: "product",
+            value: getExperimentPlan(experiment, typeof payload.plan === "string" ? payload.plan : null).priceCents / 100,
             currency: "USD",
           }
         : {

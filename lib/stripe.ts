@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { getExperiment, getExperimentPlan } from "./experiments";
 
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2024-06-20";
 const DEFAULT_CHECKOUT_AMOUNT = 1900;
@@ -30,7 +31,7 @@ export function getPublicSiteUrl(origin?: string | null) {
   return configuredUrl.replace(/\/$/, "");
 }
 
-export function getCheckoutLineItems(funnel = "main"): Stripe.Checkout.SessionCreateParams.LineItem[] {
+export function getCheckoutLineItems(funnel = "main", planKey?: string | null): Stripe.Checkout.SessionCreateParams.LineItem[] {
   if (funnel === "f1") {
     const f1PriceId = process.env.STRIPE_F1_PRICE_ID?.trim();
     if (f1PriceId) {
@@ -65,6 +66,27 @@ export function getCheckoutLineItems(funnel = "main"): Stripe.Checkout.SessionCr
           product_data: {
             name: "Protocol Dating — AI Dating Photos",
             description: "30 AI-generated dating profile photos, 5 styles, 24h delivery.",
+          },
+        },
+      },
+    ];
+  }
+
+  const experiment = getExperiment(funnel);
+  if (experiment) {
+    const plan = getExperimentPlan(experiment, planKey);
+    return [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: plan.priceCents,
+          ...(experiment.billing === "subscription" && {
+            recurring: { interval: plan.interval },
+          }),
+          product_data: {
+            name: experiment.productName,
+            description: experiment.productDescription,
           },
         },
       },
