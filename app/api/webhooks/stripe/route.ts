@@ -5,7 +5,8 @@ import { sendTiktokEvent } from "../../../../lib/tiktokEventsApi";
 import { sendGA4Purchase, extractGa4ClientId } from "../../../../lib/ga4";
 import { getStripeServerClient } from "../../../../lib/stripe";
 import { createRegistrationToken } from "../../../../lib/auth";
-import { sendWelcomeEmail, sendPurchaseConfirmationEmail, sendDatingConfirmationEmail } from "../../../../lib/email";
+import { sendWelcomeEmail, sendPurchaseConfirmationEmail, sendDatingConfirmationEmail, sendExperimentConfirmationEmail } from "../../../../lib/email";
+import { getExperiment, getExperimentPlan } from "../../../../lib/experiments";
 import { postDatingOrderRoot } from "../../../../lib/datingSlackFeed";
 import { promoteLeadToCustomer } from "../../../../lib/klaviyo";
 import { supabaseAdmin } from "../../../../lib/supabase";
@@ -450,8 +451,11 @@ export async function POST(request: Request) {
     const sessionPurchaseValue = typeof session.amount_total === "number" ? session.amount_total / 100 : 89;
     const sessionPurchaseCurrency = (session.currency ?? "usd").toUpperCase();
     const isDating = meta.funnel === "dating";
+    const experiment = getExperiment(meta.funnel);
     const purchaseProduct = isDating
       ? { name: "Protocol Dating — AI Dating Photos", id: "dating-ai-photos" }
+      : experiment
+      ? { name: experiment.productName, id: experiment.contentId }
       : { name: "Attractiveness Protocol", id: "f1-attractiveness-protocol" };
     // Use the PI id as the canonical event_id across ALL fire paths (this
     // handler, the payment_intent.succeeded handler, and any manual replay).
@@ -645,6 +649,51 @@ export async function POST(request: Request) {
             sessionId: session.id,
           });
         }
+        return NextResponse.json({ received: true });
+      }
+
+      if (experiment) {
+        // Experiment vertical — no Protocol account, no registration email.
+        // Purchase CAPI/TikTok/GA4 already fired above; just confirm to the
+        // customer and stop before the f1 account-creation flow below.
+        //
+        // Free-trial subscriptions complete with payment_status
+        // "no_payment_required" (no money captured yet) — that's a valid
+        // signup we must confirm, so only skip genuinely unsettled sessions.
+        if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
+          console.log("[webhook/stripe] Experiment session completed but unpaid — skipping", {
+            sessionId: session.id,
+            funnel: meta.funnel,
+            paymentStatus: session.payment_status,
+          });
+          return NextResponse.json({ received: true });
+        }
+        // Trials capture $0 up front — don't fraud-alert a legitimate $0 trial.
+        if (session.payment_status === "paid") {
+          alertIfSuspiciousAmount({ amount: session.amount_total, ref: session.id, email: customerEmail });
+        }
+        const emailPlan = getExperimentPlan(experiment, meta.plan);
+        await sendExperimentConfirmationEmail({
+          email: customerEmail,
+          firstName,
+          brand: experiment.brand,
+          productName: experiment.productName,
+          deliveryPromise: experiment.deliveryPromise,
+          billing: experiment.billing,
+          renewalInterval: emailPlan.interval,
+          trialDays: emailPlan.trialDays,
+        }).catch((err) => {
+          console.error("[webhook/stripe] Experiment confirmation email failed", {
+            error: String(err),
+            email: customerEmail,
+            funnel: meta.funnel,
+          });
+        });
+        console.log("[webhook/stripe] Experiment order confirmed", {
+          sessionId: session.id,
+          funnel: meta.funnel,
+          email: customerEmail,
+        });
         return NextResponse.json({ received: true });
       }
 

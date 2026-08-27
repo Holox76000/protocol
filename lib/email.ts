@@ -202,6 +202,75 @@ export async function sendDatingConfirmationEmail(props: {
 }
 
 // ─────────────────────────────────────────────────────────
+// Experiments — post-purchase confirmation (generic, driven
+// by the lib/experiments.ts registry)
+// ─────────────────────────────────────────────────────────
+export async function sendExperimentConfirmationEmail(props: {
+  email: string;
+  firstName?: string;
+  brand: string;
+  productName: string;
+  deliveryPromise: string;
+  billing?: "one_time" | "subscription";
+  renewalInterval?: "week" | "month" | "year";
+  trialDays?: number;
+}): Promise<void> {
+  const resend = getResend();
+  const name = props.firstName ?? "there";
+  const isSubscription = props.billing === "subscription";
+  const isTrial = isSubscription && !!props.trialDays;
+  const renews = props.renewalInterval ? `${props.renewalInterval}ly` : "automatically";
+
+  const headline = isTrial ? "Your free trial has started." : "You're all set.";
+
+  const openingLine = isTrial
+    ? `Hey ${name} — your ${props.brand} ${props.trialDays}-day free trial is live. You won&rsquo;t be charged until it ends.`
+    : `Hey ${name} — your ${props.brand} membership is in. Your first result lands by email ${props.deliveryPromise}.`;
+
+  const refundLine = isTrial
+    ? `Not for you? Cancel before the trial ends and you pay nothing — just reply &ldquo;cancel&rdquo; to this email.`
+    : isSubscription
+    ? `Not for you? Reply to this email — your first payment is refunded, no questions asked.`
+    : `Not for you? Reply to this email — full refund, no questions asked.`;
+
+  const renewalLine = isSubscription && !isTrial
+    ? `<p style="margin:24px 0 0;font-size:15px;color:${C.muted};line-height:1.65;">
+      Your membership renews ${renews}. Cancel anytime by replying &ldquo;cancel&rdquo; — handled the same day.
+    </p>`
+    : "";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:400;color:${C.brand};line-height:1.25;letter-spacing:-0.02em;">
+      ${headline}
+    </h1>
+
+    <p style="margin:24px 0;font-size:15px;color:${C.muted};line-height:1.65;">
+      ${openingLine}
+    </p>
+
+    <p style="margin:0;font-size:15px;color:${C.muted};line-height:1.65;">
+      ${refundLine}
+    </p>
+
+    ${renewalLine}
+
+    <p style="margin:32px 0 0;font-size:13px;color:${C.subtle};line-height:1.6;">
+      Order: ${props.productName}
+    </p>
+  `;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: props.email,
+    subject: isTrial ? `Your ${props.brand} free trial has started` : `Your ${props.brand} order is confirmed`,
+    html: emailShell(content),
+  });
+
+  if (error) throw new Error(`[resend] sendExperimentConfirmationEmail failed: ${error.message}`);
+  console.log("[resend] experiment confirmation email sent", { email: props.email, brand: props.brand });
+}
+
+// ─────────────────────────────────────────────────────────
 // Protocol Dating — delivery notification (photos are ready)
 // ─────────────────────────────────────────────────────────
 export async function sendDatingDeliveryEmail(props: {
