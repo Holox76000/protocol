@@ -16,6 +16,45 @@ appris.
 
 ---
 
+## Usine à tests d'idées — verticals painted-door (EN COURS, depuis le 27/08/2026)
+
+> ⚠️ Contrairement au reste de cette page, **cette section décrit des tests
+> ACTIFS**, pas des paris morts. Ce sont des landings de validation de demande.
+
+Objectif : valider la demande sur des idées de produit qui ont déjà un PMF
+ailleurs (apps app-store), en clonant le **format de la landing Dating** et en
+mesurant si des gens **paient** — avant de construire le produit. Chaque test =
+une landing + un paywall d'abonnement Stripe + le tracking Meta/TikTok/GA4.
+
+**Comment c'est fait (réutilisable).** Un registre `lib/experiments.ts` décrit
+chaque vertical (slug, marque, offre, plans, essai gratuit). Il pilote
+automatiquement les line items Stripe, les URLs de checkout, l'email de
+confirmation et les données produit envoyées aux pixels. Ajouter une idée =
+**une entrée dans le registre + un dossier de route**. Le paywall gère
+l'abonnement (`mode:subscription`), plusieurs plans (weekly/yearly), et l'essai
+gratuit (`trial_period_days`).
+
+**Painted-door.** Les pages encaissent un vrai abonnement mais **ne livrent pas
+encore le produit** : la page de succès promet une livraison, et on rembourse à
+la demande. À surveiller côté disputes Stripe (rembourser vite, surtout l'essai
+bluffai). Les visuels de résultat sont des **maquettes** (marquées par des
+placeholders visibles en dev uniquement, masqués en prod) à remplacer par de
+vrais assets avant un vrai lancement. Les témoignages / notes Trustpilot sont
+des placeholders hérités du format Dating.
+
+**Les 4 verticals live (v1.2.0.0) :**
+
+| Route | Marque | Idée / référence | Offre (calée sur le concurrent) |
+|---|---|---|---|
+| `/abs` | Protocol Abs | Scan d'abdos + plan (AbMaxx) | Weekly $8.99 · Monthly $11.99 · Yearly $34.99 |
+| `/bluffai` | Bluff AI | Éditeur photo « prank » (bluffai.app) | Weekly $6.99 **+ essai 3 j** · Yearly $39.99 |
+| `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | Weekly $2.99 · Yearly $17.99 |
+| `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
+
+Détail du process et des briefs de recherche : voir `tâches/a-faire.md` (repo).
+
+---
+
 ## Protocol — « analyse d'attractivité + transformation » (MORT)
 
 Le produit d'origine après le pivot depuis le tout premier « skinny-fat quiz ».
