@@ -3,6 +3,19 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.2.1.0] - 2026-08-27
+
+### Changed
+- **`/abs` result visuals are now real generated imagery instead of CSS/SVG
+  mock-ups.** The hero "Abs Scan Report" and the scan→plan cards use our own
+  images generated via nano-banana (Gemini image) from our own assets: a lean
+  torso as the scan subject (hero + zone scan) and per-exercise thumbnails in
+  the plan (hanging leg raises, reverse crunches, flutter kicks). Composed
+  inside our own CSS interface so all text/scores stay crisp and on-brand.
+  Images are web-sized (`public/abs/*.jpg`). Body-fat estimate recalibrated to
+  13–15% to match the visible-abs imagery. Placeholder markers removed from the
+  `/abs` visuals now that they carry real assets.
+
 ## [1.2.0.0] - 2026-08-27
 
 ### Added
