@@ -47,6 +47,13 @@ des placeholders hérités du format Dating.
 | Route | Marque | Idée / référence | Offre (calée sur le concurrent) |
 |---|---|---|---|
 | `/abs` | Protocol Abs | Scan d'abdos + plan (AbMaxx) | Weekly $8.99 · Monthly $11.99 · Yearly $34.99 |
+
+> **`/abs` — visuels réels (v1.2.1.0).** Les images de résultat de la page abs
+> (carte de scan du hero, zone scan, vignettes d'exercices du plan) sont
+> désormais de **vraies images générées par nous** via nano-banana (Gemini
+> image, `lib/nanoBanana.ts`) à partir de nos propres assets, composées dans
+> notre UI CSS. C'est le pipeline de référence pour remplacer les maquettes des
+> 3 autres verticals (bluffai/nose/jewelry), encore en maquette CSS en prod.
 | `/bluffai` | Bluff AI | Éditeur photo « prank » (bluffai.app) | Weekly $6.99 **+ essai 3 j** · Yearly $39.99 |
 | `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | Weekly $2.99 · Yearly $17.99 |
 | `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
