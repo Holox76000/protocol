@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.2.2.0] - 2026-08-27
+
+### Changed
+- **`/jewelry` now uses real generated imagery.** The hero "Appraisal Report"
+  card shows a real generated Art Deco ring as the scanned item (framed), and a
+  new "From heirlooms to yard-sale finds" gallery shows five appraised pieces
+  (ring, necklace, brooch, watch, earrings) each with a fair-market value range.
+  All photos generated via nano-banana (Gemini image) on our own studio
+  backdrop, composed inside our own CSS so text/values stay crisp. Web-sized
+  JPGs in `public/jewelry/`. Placeholder markers removed from the `/jewelry`
+  visuals now that they carry real assets.
+
 ## [1.2.1.0] - 2026-08-27
 
 ### Changed

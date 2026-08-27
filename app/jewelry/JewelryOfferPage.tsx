@@ -5,7 +5,6 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
-import { PlaceholderRibbon } from "../../components/ImagePlaceholder";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -328,35 +327,23 @@ const REPORT_DETAILS = [
   { label: "Hallmark", value: "585" },
 ];
 
-function RingMark() {
-  return (
-    <svg className="j-report__ring" viewBox="0 0 48 48" role="img" aria-label="Stylized ring">
-      {/* Band */}
-      <ellipse cx="24" cy="31" rx="11" ry="12" fill="none" stroke="#c9a961" strokeWidth="3" />
-      {/* Setting shoulders */}
-      <path d="M18 21 L24 15 L30 21" fill="none" stroke="#c9a961" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Gem */}
-      <path d="M24 6 L30 13 L24 21 L18 13 Z" fill="#e7d9a8" stroke="#c9a961" strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M18 13 H30 M24 6 V21" stroke="#c9a961" strokeWidth="0.8" />
-    </svg>
-  );
-}
-
 function JewelryReportCard() {
   return (
-    <div className="j-report img-ph-slot">
-      <PlaceholderRibbon note="real jewelry photo + appraisal result" />
+    <div className="j-report">
       <div className="j-report__head">
         <span className="j-report__title">Appraisal Report</span>
         <span className="j-report__tag">Sample</span>
       </div>
-      <div className="j-report__piece">
-        <RingMark />
-        <div>
-          <div className="j-report__from">From your photo</div>
-          <div className="j-report__piece-name">14k Gold Ring</div>
-          <div className="j-report__piece-sub">Art Deco · diamond solitaire</div>
-        </div>
+      <div className="j-report__subject">
+        <img src="/jewelry/piece.jpg" alt="Scanned jewelry piece" />
+        <span className="j-report__scan j-report__scan--tl" />
+        <span className="j-report__scan j-report__scan--tr" />
+        <span className="j-report__scan j-report__scan--bl" />
+        <span className="j-report__scan j-report__scan--br" />
+      </div>
+      <div className="j-report__pieceline">
+        <span className="j-report__from">From your photo</span>
+        <span className="j-report__piece-name">14k Gold Ring · Art Deco</span>
       </div>
       <div className="j-report__value">
         <span className="j-report__value-label">Fair-market value</span>
@@ -531,6 +518,42 @@ function JReport() {
         </div>
         <div className="mo-section-cta">
           <CheckoutButton label={CTA_LABEL} className="mo-cta" location="report" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const GALLERY = [
+  { img: "/jewelry/piece.jpg", name: "Art Deco diamond ring", value: "$1,800 – $2,400" },
+  { img: "/jewelry/g-necklace.jpg", name: "Diamond riviere necklace", value: "$4,200 – $5,600" },
+  { img: "/jewelry/g-brooch.jpg", name: "Victorian gold brooch", value: "$380 – $520" },
+  { img: "/jewelry/g-watch.jpg", name: "1950s gold dress watch", value: "$700 – $950" },
+  { img: "/jewelry/g-earrings.jpg", name: "Gold & pearl drop earrings", value: "$240 – $340" },
+];
+
+function JGallery() {
+  return (
+    <section className="mo-section">
+      <div className="mo-container">
+        <div className="mo-section-head--center">
+          <p className="mo-section-eyebrow mo-section-eyebrow--center">Real appraisals</p>
+          <h2 className="mo-section-title" style={{ marginTop: 12 }}>
+            From heirlooms to <em>yard-sale finds.</em>
+          </h2>
+          <p className="dt-research-sub">
+            Rings, necklaces, brooches, watches — every piece gets the same report: materials,
+            era, hallmarks, and a fair-market value range.
+          </p>
+        </div>
+        <div className="j-gallery">
+          {GALLERY.map((g) => (
+            <div key={g.name} className="j-gallery__card">
+              <div className="j-gallery__photo"><img src={g.img} alt={g.name} /></div>
+              <div className="j-gallery__name">{g.name}</div>
+              <div className="j-gallery__value">{g.value}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -826,6 +849,7 @@ export default function JewelryOfferPage() {
         <JWhy />
         <JSteps />
         <JReport />
+        <JGallery />
         <JGreatFor />
         <JOldNew />
         <JTestimonials />
