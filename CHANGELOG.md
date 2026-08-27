@@ -3,6 +3,29 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.2.0.0] - 2026-08-27
+
+### Added
+- **Experiment landing framework** (`lib/experiments.ts`): a registry that drives
+  Stripe line items, checkout success/cancel URLs, the confirmation email, and
+  Meta/TikTok/GA4 product data for painted-door test verticals. Adding an idea is
+  now one registry entry plus one route folder — no per-funnel branches to touch.
+- **Four painted-door test landings**, each a subscription paywall cloned from the
+  `/dating` format (plan selector, success page, per-vertical result mock-up):
+  - `/abs` — Protocol Abs, AI abs analysis + adaptive plan. Weekly $8.99 / Monthly
+    $11.99 / Yearly $34.99.
+  - `/bluffai` — Bluff AI, AI prank photo editor. Weekly $6.99 with a 3-day free
+    trial / Yearly $39.99.
+  - `/nose` — NoseLab, AI rhinoplasty preview. Weekly $2.99 / Yearly $17.99.
+  - `/jewelry` — GemCheck, AI jewelry identifier + value. Weekly $4.99 / Yearly $34.99.
+- **Subscription + free-trial support** in the shared checkout: `mode:subscription`,
+  per-plan `recurring.interval`, and `trial_period_days`. The Stripe webhook accepts
+  `no_payment_required` so free-trial signups are still confirmed; the confirmation
+  email is interval-neutral and trial-aware.
+- **Dev-only image placeholders** (`components/ImagePlaceholder.tsx`) flagging every
+  mock visual still to be swapped for a real asset. Scoped to
+  `html[data-env="development"]`, so production ships without them.
+
 ## [1.1.8.1] - 2026-08-07
 
 ### Added
