@@ -526,7 +526,7 @@ function JReport() {
 
 const GALLERY = [
   { img: "/jewelry/piece.jpg", name: "Art Deco diamond ring", value: "$1,800 – $2,400" },
-  { img: "/jewelry/g-necklace.jpg", name: "Diamond riviere necklace", value: "$4,200 – $5,600" },
+  { img: "/jewelry/g-necklace.jpg", name: "Diamond riviere necklace", value: "$8,500 – $12,000" },
   { img: "/jewelry/g-brooch.jpg", name: "Victorian gold brooch", value: "$380 – $520" },
   { img: "/jewelry/g-watch.jpg", name: "1950s gold dress watch", value: "$700 – $950" },
   { img: "/jewelry/g-earrings.jpg", name: "Gold & pearl drop earrings", value: "$240 – $340" },
@@ -842,7 +842,7 @@ export default function JewelryOfferPage() {
 
   return (
     <PlanContext.Provider value={{ plan, setPlan }}>
-      <div className="mo-page">
+      <div className="mo-page va-jewelry">
         <UrgencyBar />
         <JNav />
         <JHero />

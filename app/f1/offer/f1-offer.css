@@ -2102,3 +2102,28 @@ wistia-player[media-id='iw5y8ab8qj']:not(:defined) {
   .mo-wyg__grid{grid-template-columns:repeat(4,1fr);gap:18px}
   .mo-wyg{padding:90px 0}
 }
+
+/* ─── Per-vertical DA accent ──────────────────────────────────────────────
+   Bête et méchante : chaque page pose sa couleur via --accent (+ --accent-hi
+   pour le fond sombre du hero). On retint uniquement le <em> du H1, les <em>
+   des titres de section, le pastille "verified", et la grille "what you get"
+   (déjà câblée sur --accent). Layout, typo et CTA restent identiques. */
+.va-abs     { --accent:#2f9e63; --accent-hi:#57d493; } /* fitness / énergie */
+.va-bluffai { --accent:#7c5cff; --accent-hi:#a78bff; } /* prank / playful   */
+.va-nose    { --accent:#3e77b0; --accent-hi:#7db4e6; } /* clinique / trust  */
+.va-jewelry { --accent:#b89235; --accent-hi:#dcc27f; } /* or / luxe         */
+
+.va-abs .mo-hero__title em,
+.va-bluffai .mo-hero__title em,
+.va-nose .mo-hero__title em,
+.va-jewelry .mo-hero__title em { color: var(--accent-hi); }
+
+.va-abs .mo-section-title em,
+.va-bluffai .mo-section-title em,
+.va-nose .mo-section-title em,
+.va-jewelry .mo-section-title em { color: var(--accent); }
+
+.va-abs .dt-verified, .va-abs .dt-verified svg,
+.va-bluffai .dt-verified, .va-bluffai .dt-verified svg,
+.va-nose .dt-verified, .va-nose .dt-verified svg,
+.va-jewelry .dt-verified, .va-jewelry .dt-verified svg { color: var(--accent); }

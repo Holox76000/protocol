@@ -57,6 +57,27 @@
   align-items: center;
   justify-content: space-between;
 }
+/* Real before/after profile photo */
+.no-face-panel__photo {
+  aspect-ratio: 3 / 4;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #eef1f2;
+}
+.no-face-panel__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  display: block;
+  filter: saturate(0.93);
+}
+.no-s2p__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
 .no-face-panel__label {
   font-size: 11px;
   font-weight: 700;

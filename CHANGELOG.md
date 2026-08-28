@@ -3,6 +3,25 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.3.0.0] - 2026-08-28
+
+### Changed
+- **`/nose` and `/bluffai` now use real generated imagery.** `/nose` shows a
+  real before/after profile pair (same face, only the nose reshaped) in the hero
+  and the "Same face, different nose" section. `/bluffai` shows a real
+  before/after forearm (plain → fake tattoo) inside the iMessage mock, plus a
+  six-card gallery of real prank renders (fake tattoo, fake couple, aged, bald,
+  new hair color, cartoon). All generated via nano-banana (Gemini image) on our
+  own aesthetic, composed inside our own CSS. Web-sized JPGs in `public/nose/`
+  and `public/bluffai/`.
+- **Per-page DA accent color across the four idea-test landings.** Each vertical
+  now carries a simple accent that threads through the hero headline emphasis,
+  section-title emphasis, the "what you get" grid and the verified-purchase
+  marks — abs = green, bluffai = violet, nose = clinical blue, jewelry = gold.
+  Layout, type and CTAs are unchanged; it's a one-variable retint per page.
+- **`/jewelry` diamond-rivière necklace value corrected** to $8,500–$12,000
+  (the prior $4,200–$5,600 range was too low for the piece shown).
+
 ## [1.2.2.0] - 2026-08-27
 
 ### Changed
