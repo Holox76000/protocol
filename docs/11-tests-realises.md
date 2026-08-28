@@ -50,15 +50,22 @@ des placeholders hérités du format Dating.
 
 > **Visuels réels via Gemini (nano-banana).** Le pipeline `lib/nanoBanana.ts`
 > (Gemini image) génère nos **propres** images de résultat, composées dans notre
-> UI CSS (texte/valeurs nets). Déjà appliqué :
+> UI CSS (texte/valeurs nets). Appliqué sur **les 4 verticals** :
 > - **`/abs`** (v1.2.1.0) : torse scanné du hero, zone scan, vignettes
 >   d'exercices du plan.
 > - **`/jewelry`** (v1.2.2.0) : bague scannée du hero + galerie "From heirlooms
 >   to yard-sale finds" (5 pièces estimées : bague, collier, broche, montre,
 >   boucles).
+> - **`/nose`** (v1.3.0.0) : paire avant/après de profil (même visage, seul le
+>   nez change) dans le hero et la section "Same face, different nose".
+> - **`/bluffai`** (v1.3.0.0) : avant/après d'avant-bras (nu → faux tatouage)
+>   dans le mock iMessage + galerie de 6 rendus de prank (tatouage, faux couple,
+>   vieilli, chauve, couleur de cheveux, cartoon).
 >
-> Restent en maquette CSS en prod : **bluffai** et **nose** (mêmes traitement à
-> venir).
+> **DA par page (v1.3.0.0).** Chaque vertical porte une couleur d'accent simple
+> qui traverse le titre hero, les titres de section, la grille "what you get" et
+> les mentions "verified" — **abs = vert · bluffai = violet · nose = bleu
+> clinique · jewelry = or**. Layout, typo et CTA inchangés.
 | `/bluffai` | Bluff AI | Éditeur photo « prank » (bluffai.app) | Weekly $6.99 **+ essai 3 j** · Yearly $39.99 |
 | `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | Weekly $2.99 · Yearly $17.99 |
 | `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
