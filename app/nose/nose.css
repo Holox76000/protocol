@@ -287,3 +287,489 @@
     min-height: 0;
   }
 }
+
+/* ═══ "Show, don't tell" visual materializations ═══════════════════════════ */
+
+/* ─── Callout labels over the before/after nose (NBeforeAfter) ───────────────
+   The photo box is position-relative-ready (overflow:hidden); the overlay fills
+   it and pins tags/dots in % so it tracks the image at any width. */
+.no-face-panel__photo {
+  position: relative;
+}
+.no-cal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.no-cal__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.no-cal__lines line {
+  stroke: var(--accent, #3d7ea6);
+  stroke-width: 1.25;
+  opacity: 0.85;
+}
+.no-cal--after .no-cal__lines line {
+  stroke: #253239;
+}
+.no-cal__dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent, #3d7ea6);
+  border: 2px solid #fff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px rgba(37, 50, 57, 0.18);
+}
+.no-cal--after .no-cal__dot {
+  background: #253239;
+}
+.no-cal__tag {
+  position: absolute;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #253239;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dfe4e6;
+  border-left: 2px solid var(--accent, #3d7ea6);
+  border-radius: 6px;
+  padding: 3px 7px;
+  box-shadow: 0 2px 8px rgba(37, 50, 57, 0.16);
+}
+.no-cal--after .no-cal__tag {
+  border-left-color: #253239;
+}
+@media (max-width: 767px) {
+  .no-cal__tag {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+  .no-cal__dot {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ─── Good/bad upload example (Step 01 + FAQ) ───────────────────────────────── */
+.no-photo-ex {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+.mo-faq__a .no-photo-ex {
+  max-width: 340px;
+}
+.no-photo-ex__card {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 12px;
+}
+.no-photo-ex__card--good {
+  border-color: color-mix(in srgb, var(--accent, #3d7ea6) 40%, #edf0f1);
+}
+.no-photo-ex__card--bad {
+  border-color: #ecd6cf;
+}
+.no-photo-ex__thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #f4f7f8;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.no-photo-ex__thumb--dark {
+  background: #2c343a;
+}
+.no-photo-ex__fig {
+  width: 62%;
+  height: 100%;
+  display: block;
+}
+.no-photo-ex__profile {
+  fill: #cdd8dc;
+}
+.no-photo-ex__card--good .no-photo-ex__profile {
+  fill: color-mix(in srgb, var(--accent, #3d7ea6) 32%, #cdd8dc);
+}
+.no-photo-ex__face {
+  fill: #5c666d;
+}
+.no-photo-ex__hair {
+  fill: #1b2126;
+}
+.no-photo-ex__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(37, 50, 57, 0.22);
+}
+.no-photo-ex__badge--good {
+  background: var(--accent, #3d7ea6);
+}
+.no-photo-ex__badge--bad {
+  background: #c2492e;
+}
+.no-photo-ex__card figcaption {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #7f949b;
+  font-weight: 500;
+}
+
+/* ─── "Filters wreck the face" triptych (NWhy) ──────────────────────────────── */
+.no-trip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.no-trip__cell {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.no-trip__thumb {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #eef1f2;
+  border: 1px solid #edf0f1;
+}
+.no-trip__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 45% 32%;
+  display: block;
+}
+.no-trip__cell--warp .no-trip__thumb {
+  border-color: #c2492e;
+  box-shadow: 0 0 0 1px #c2492e;
+}
+.no-trip__cell--warp .no-trip__thumb img {
+  transform: scaleX(1.22) scaleY(0.92) translateX(-5%);
+  filter: saturate(1.45) contrast(1.12) hue-rotate(-6deg);
+}
+.no-trip__cell--ours .no-trip__thumb {
+  border-color: color-mix(in srgb, var(--accent, #3d7ea6) 50%, #edf0f1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #3d7ea6) 45%, transparent);
+}
+.no-trip__warp-tag {
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+  right: 5px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #fff;
+  background: rgba(194, 73, 46, 0.92);
+  border-radius: 5px;
+  padding: 3px 4px;
+}
+.no-trip__cell figcaption {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #7f949b;
+  text-align: center;
+}
+.no-trip__cap--bad {
+  color: #c2492e;
+}
+.no-trip__cap--ours {
+  color: var(--accent, #3d7ea6);
+}
+/* let the Filters card span the grid so the triptych breathes */
+.dt-research-grid .no-why-card--wide {
+  grid-column: 1 / -1;
+}
+.no-why-card--wide .no-trip {
+  max-width: 460px;
+}
+
+/* ─── Price-range bar (NWhy "$15,000, no preview") ──────────────────────────── */
+.no-prange {
+  margin-top: 20px;
+}
+.no-prange__track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #dfe4e6, #c2492e);
+  margin-top: 34px;
+}
+.no-prange__marker {
+  position: absolute;
+  left: 54.5%;
+  top: 0;
+  transform: translateX(-50%);
+}
+.no-prange__marker-stem {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: #253239;
+  transform: translateX(-50%);
+}
+.no-prange__marker-lbl {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #253239;
+  line-height: 1.1;
+}
+.no-prange__marker-lbl em {
+  font-style: normal;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #c2492e;
+  margin-top: 2px;
+}
+.no-prange__ends {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7f949b;
+}
+.no-prange__scale {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 9.5px;
+  color: #aab2b7;
+}
+
+/* ─── Annotated nose schema (NSteps step 02) ────────────────────────────────── */
+.no-schema {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f9fbfb;
+  border: 1px solid #edf0f1;
+  border-radius: 12px;
+}
+.no-schema__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.no-schema__profile {
+  fill: none;
+  stroke: #b9c4c8;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.no-schema__dot {
+  fill: var(--accent, #3d7ea6);
+}
+.no-schema__arrow {
+  stroke: #253239;
+  stroke-width: 1.4;
+}
+.no-schema__arrowhead {
+  fill: #253239;
+}
+.no-schema__label {
+  fill: #253239;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Surgeon-ready PDF mock (NVariants) ────────────────────────────────────── */
+.no-variant-card--pdf {
+  display: flex;
+  flex-direction: column;
+}
+.no-pdf {
+  margin-top: 16px;
+  align-self: flex-start;
+  width: 172px;
+  max-width: 100%;
+  background: #fff;
+  border: 1px solid #dfe4e6;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(37, 50, 57, 0.14);
+  padding: 12px 12px 10px;
+  transform: rotate(-1.4deg);
+}
+.no-pdf__bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf0f1;
+}
+.no-pdf__brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #253239;
+}
+.no-pdf__kicker {
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #aab2b7;
+}
+.no-pdf__ba {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 9px;
+}
+.no-pdf__shot {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.no-pdf__shot img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 45% 32%;
+  border-radius: 5px;
+  display: block;
+  background: #eef1f2;
+}
+.no-pdf__shot span {
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7f949b;
+  text-align: center;
+}
+.no-pdf__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 9px;
+}
+.no-pdf__chips span {
+  font-size: 7.5px;
+  font-weight: 600;
+  color: #7f949b;
+  background: #f1f4f5;
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+.no-pdf__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 9px;
+}
+.no-pdf__lines i {
+  height: 3px;
+  border-radius: 2px;
+  background: #edf0f1;
+}
+.no-pdf__foot {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf0f1;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent, #3d7ea6);
+  text-align: center;
+}
+
+/* Variant comparison strip — real before anchor + 4 labeled AI afters. */
+.no-vcompare {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-width: 940px;
+  margin: 0 auto 34px;
+}
+.no-vcompare__item { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.no-vcompare__photo {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: #eef1f2;
+  border: 1px solid #e6ebec;
+}
+.no-vcompare__item--anchor .no-vcompare__photo { border: 2px solid #253239; }
+.no-vcompare__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.no-vcompare__tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(37, 50, 57, 0.85);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.no-vcompare__cap {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5a62;
+}
+.no-vcompare__item--anchor .no-vcompare__cap { color: #253239; }
+@media (max-width: 720px) {
+  .no-vcompare {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: 46%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 6px;
+  }
+  .no-vcompare__item { scroll-snap-align: start; }
+}

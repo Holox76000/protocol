@@ -2127,3 +2127,45 @@ wistia-player[media-id='iw5y8ab8qj']:not(:defined) {
 .va-bluffai .dt-verified, .va-bluffai .dt-verified svg,
 .va-nose .dt-verified, .va-nose .dt-verified svg,
 .va-jewelry .dt-verified, .va-jewelry .dt-verified svg { color: var(--accent); }
+
+/* ─── Compare bars (old vs new — cost/time made visible) ──────────────────── */
+.mo-compare {
+  max-width: 620px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+}
+.mo-compare__row { display: flex; flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
+.mo-compare__line { width: 100%; }
+.mo-compare__label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #8a97a0;
+}
+.mo-compare__line { display: flex; align-items: center; gap: 12px; }
+.mo-compare__cell { flex: 1; min-width: 0; }
+.mo-compare__bar {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  min-width: 8px;
+}
+.mo-compare__bar--old { background: #d9e0e2; }
+.mo-compare__bar--new { background: var(--accent, #8aacb8); }
+.mo-compare__val {
+  flex: 0 0 auto;
+  width: 96px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #9aa4ac;
+  white-space: nowrap;
+}
+.mo-compare__val--new { color: #253239; }
+
+@media (max-width: 560px) {
+  .mo-compare__val { width: 78px; font-size: 12.5px; }
+}

@@ -3,6 +3,37 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.0.0] - 2026-08-28
+
+### Changed
+- **"Show, don't tell" pass across the four idea-test landings.** Where a page
+  was explaining a fact in prose, it now *shows* it as a concrete interface
+  artifact so it reads at a glance. Layout/type/CTAs unchanged, copy claims
+  preserved.
+  - **All 4 — cost/time compare bars** above each "old way → new way" table
+    (a full grey "old" bar vs a short accent "new" bar): abs $600/mo → ~$39,
+    jewelry $50–150 → $4.99 + 1 week → 24 h, nose $150–500 → $2.99 + wait → 24 h,
+    bluffai hours → 60 sec. New shared `components/CompareBars`.
+  - **`/abs`** — the "six things you get" list now annotates the real scan report
+    ①→⑥; a body-fat threshold gauge; abdominal anatomy schemas; two diverging
+    starter plans (28% vs 15% body fat); a 7-day schedule strip; numeric result
+    chips on testimonials; a "same routine → two outcomes" pivot visual.
+  - **`/bluffai`** — a pick→upload→60-sec visual flow; a 0:00→0:58 chrono; a
+    larger before/after "spot the fake" proof; "+54 more" template ghost tiles;
+    a trial billing timeline (Today $0 → Day 3 reminder → $6.99/wk) and a
+    "reply cancel" mock.
+  - **`/nose`** — hump/bridge/tip callouts pinned on the real before/after
+    photos; a good/bad photo ✓/✕ guide; a "filters wreck the face" triptych; a
+    surgeon-ready PDF mock; a nose-region schema; a $9K–20K price-range bar; and
+    a variant comparison strip (real before + four AI-generated options: hump
+    removed / tip refined / bridge smoothed / ethnic-preserving).
+  - **`/jewelry`** — the "on paper" section now renders a full annotated
+    appraisal sheet; a fair-market value gauge (pawn ↓ · fair-market · retail ↑);
+    a cost-vs-value bar; a scan-app-vs-GemCheck output comparison; and a
+    "hallmarks decoded" strip with real generated stamp macros (585 → 14k gold,
+    maker's mark). New assets in `public/nose/variants/` and
+    `public/jewelry/hallmarks/`, generated via nano-banana.
+
 ## [1.3.0.0] - 2026-08-28
 
 ### Changed

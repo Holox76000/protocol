@@ -5,6 +5,7 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
+import { CompareBars } from "../../components/CompareBars";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -24,6 +25,14 @@ function CheckIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8L7 12L13 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CrossIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -309,7 +318,15 @@ function UrgencyBar() {
 // Head silhouette facing right. Only the nose segment differs between the two
 // variants: `before` carries a convex dorsal hump, `after` a straight bridge
 // and a lifted, refined tip. Everything else is identical, on purpose.
-function FacePanel({ variant, tag }: { variant: "before" | "after"; tag?: string }) {
+function FacePanel({
+  variant,
+  tag,
+  annotate = false,
+}: {
+  variant: "before" | "after";
+  tag?: string;
+  annotate?: boolean;
+}) {
   const isAfter = variant === "after";
   return (
     <div className={`no-face-panel ${isAfter ? "no-face-panel--after" : ""}`}>
@@ -319,7 +336,199 @@ function FacePanel({ variant, tag }: { variant: "before" | "after"; tag?: string
       </div>
       <div className="no-face-panel__photo">
         <img src={isAfter ? "/nose/after.jpg" : "/nose/before.jpg"} alt="" />
+        {annotate && <NoseCallouts variant={variant} />}
       </div>
+    </div>
+  );
+}
+
+/* ─── Callout labels pinned over the before/after nose regions ───────────────
+   Positions are in % of the photo box (responsive); leader lines are drawn in a
+   non-uniformly-scaled SVG with non-scaling strokes so they stay crisp. */
+const NOSE_CALLOUTS: Record<
+  "before" | "after",
+  { key: string; label: string; x: number; y: number; tx: number; ty: number }[]
+> = {
+  before: [
+    { key: "bridge", label: "Bridge", x: 23, y: 39, tx: 48, ty: 27 },
+    { key: "hump", label: "Dorsal hump", x: 18, y: 45, tx: 50, ty: 49 },
+    { key: "tip", label: "Tip", x: 13, y: 51, tx: 45, ty: 69 },
+  ],
+  after: [
+    { key: "bridge", label: "Straight bridge", x: 23, y: 39, tx: 48, ty: 27 },
+    { key: "hump", label: "Hump smoothed", x: 18, y: 45, tx: 50, ty: 49 },
+    { key: "tip", label: "Lifted tip", x: 13, y: 50, tx: 45, ty: 69 },
+  ],
+};
+
+function NoseCallouts({ variant }: { variant: "before" | "after" }) {
+  const items = NOSE_CALLOUTS[variant];
+  return (
+    <div className={`no-cal no-cal--${variant}`} aria-hidden="true">
+      <svg className="no-cal__lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {items.map((c) => (
+          <line key={c.key} x1={c.x} y1={c.y} x2={c.tx} y2={c.ty} vectorEffect="non-scaling-stroke" />
+        ))}
+      </svg>
+      {items.map((c) => (
+        <span key={`${c.key}-d`} className="no-cal__dot" style={{ left: `${c.x}%`, top: `${c.y}%` }} />
+      ))}
+      {items.map((c) => (
+        <span key={`${c.key}-t`} className="no-cal__tag" style={{ left: `${c.tx}%`, top: `${c.ty}%` }}>
+          {c.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Good/bad upload example (Step 01 + FAQ) ───────────────────────────────
+   Stylized silhouettes — no photo assets — showing the one angle we need. */
+function PhotoExamplePair() {
+  return (
+    <div className="no-photo-ex" aria-hidden="true">
+      <figure className="no-photo-ex__card no-photo-ex__card--good">
+        <div className="no-photo-ex__thumb">
+          <svg viewBox="0 0 100 118" className="no-photo-ex__fig">
+            {/* side profile, facing left */}
+            <path
+              className="no-photo-ex__profile"
+              d="M70 8C52 8 43 22 43 37C43 44 33 50 27 59C23 65 30 68 33 70C33 80 38 88 47 92C44 101 49 111 60 114L92 118L92 8Z"
+            />
+          </svg>
+          <span className="no-photo-ex__badge no-photo-ex__badge--good"><CheckIcon size={12} /></span>
+        </div>
+        <figcaption>Side profile · plain light · hair back</figcaption>
+      </figure>
+      <figure className="no-photo-ex__card no-photo-ex__card--bad">
+        <div className="no-photo-ex__thumb no-photo-ex__thumb--dark">
+          <svg viewBox="0 0 100 118" className="no-photo-ex__fig">
+            {/* front-on face, hair sweeping over it */}
+            <ellipse className="no-photo-ex__face" cx="50" cy="60" rx="27" ry="35" />
+            <path
+              className="no-photo-ex__hair"
+              d="M20 44C20 18 80 18 80 46C80 34 66 52 50 52C40 52 30 40 26 58C23 70 20 60 20 44Z"
+            />
+            <path className="no-photo-ex__hair" d="M62 30C74 40 74 78 70 96C86 74 84 34 62 30Z" />
+          </svg>
+          <span className="no-photo-ex__badge no-photo-ex__badge--bad"><CrossIcon size={12} /></span>
+        </div>
+        <figcaption>Front-on · dark · hair over face</figcaption>
+      </figure>
+    </div>
+  );
+}
+
+/* ─── "Filters wreck the face" triptych (NWhy) ──────────────────────────────
+   Original → beauty-filter (whole face warped, red) → NoseLab (only the nose). */
+function FilterTriptych() {
+  return (
+    <div className="no-trip" aria-hidden="true">
+      <figure className="no-trip__cell">
+        <div className="no-trip__thumb">
+          <img src="/nose/before.jpg" alt="" />
+        </div>
+        <figcaption>Original</figcaption>
+      </figure>
+      <figure className="no-trip__cell no-trip__cell--warp">
+        <div className="no-trip__thumb">
+          <img src="/nose/before.jpg" alt="" />
+          <span className="no-trip__warp-tag">Whole face warped</span>
+        </div>
+        <figcaption className="no-trip__cap--bad">Beauty filter</figcaption>
+      </figure>
+      <figure className="no-trip__cell no-trip__cell--ours">
+        <div className="no-trip__thumb">
+          <img src="/nose/after.jpg" alt="" />
+        </div>
+        <figcaption className="no-trip__cap--ours">NoseLab · only the nose</figcaption>
+      </figure>
+    </div>
+  );
+}
+
+/* ─── Price-range bar (NWhy "$15,000, no preview") ──────────────────────────── */
+function PriceRangeBar() {
+  return (
+    <div className="no-prange" aria-hidden="true">
+      <div className="no-prange__track">
+        <div className="no-prange__marker">
+          <span className="no-prange__marker-lbl">
+            $15,000<em>permanent · no preview</em>
+          </span>
+          <span className="no-prange__marker-stem" />
+        </div>
+      </div>
+      <div className="no-prange__ends">
+        <span>$9K</span>
+        <span className="no-prange__scale">typical rhinoplasty</span>
+        <span>$20K</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Annotated nose schema (NSteps step 02) ────────────────────────────────
+   Stylized profile + 3 arrows: hump / bridge / tip. */
+function NoseSchema() {
+  return (
+    <div className="no-schema" aria-hidden="true">
+      <svg viewBox="0 0 200 132" className="no-schema__svg">
+        <defs>
+          <marker id="noArrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto">
+            <path d="M0 0L6 3L0 6Z" className="no-schema__arrowhead" />
+          </marker>
+        </defs>
+        {/* profile facing left, focus on the nose */}
+        <path
+          className="no-schema__profile"
+          d="M98 10C72 10 60 30 58 50C56 60 38 66 29 75C24 80 32 83 39 85C40 97 45 107 57 111C53 121 59 129 73 131"
+        />
+        {/* target dots on the nasal line: bridge (top) → hump (dorsum) → tip */}
+        <circle className="no-schema__dot" cx="49" cy="56" r="2.6" />
+        <circle className="no-schema__dot" cx="38" cy="66" r="2.6" />
+        <circle className="no-schema__dot" cx="30" cy="76" r="2.6" />
+        {/* arrows + labels */}
+        <line className="no-schema__arrow" x1="122" y1="32" x2="54" y2="54" markerEnd="url(#noArrow)" />
+        <text className="no-schema__label" x="126" y="28">Bridge</text>
+        <line className="no-schema__arrow" x1="122" y1="70" x2="43" y2="66" markerEnd="url(#noArrow)" />
+        <text className="no-schema__label" x="126" y="66">Hump</text>
+        <line className="no-schema__arrow" x1="122" y1="104" x2="35" y2="77" markerEnd="url(#noArrow)" />
+        <text className="no-schema__label" x="126" y="108">Tip</text>
+      </svg>
+    </div>
+  );
+}
+
+/* ─── Surgeon-ready PDF mock (NVariants) ─────────────────────────────────────── */
+function PdfReportMock() {
+  return (
+    <div className="no-pdf" aria-hidden="true">
+      <div className="no-pdf__bar">
+        <span className="no-pdf__brand">NoseLab</span>
+        <span className="no-pdf__kicker">Rhinoplasty preview</span>
+      </div>
+      <div className="no-pdf__ba">
+        <div className="no-pdf__shot">
+          <img src="/nose/before.jpg" alt="" />
+          <span>Before</span>
+        </div>
+        <div className="no-pdf__shot">
+          <img src="/nose/after.jpg" alt="" />
+          <span>After</span>
+        </div>
+      </div>
+      <div className="no-pdf__chips">
+        <span>Hump removed</span>
+        <span>Tip refined</span>
+        <span>Bridge</span>
+      </div>
+      <div className="no-pdf__lines">
+        <i />
+        <i />
+        <i style={{ width: "70%" }} />
+      </div>
+      <div className="no-pdf__foot">Surgeon-ready PDF · A4</div>
     </div>
   );
 }
@@ -416,9 +625,14 @@ function NWhy() {
         </div>
         <div className="dt-research-grid">
           {WHY_CARDS.map((c) => (
-            <div key={c.title} className="dt-research-card">
+            <div
+              key={c.title}
+              className={`dt-research-card${c.title === "Filters wreck the face" ? " no-why-card--wide" : ""}`}
+            >
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
+              {c.title === "$15,000, no preview" && <PriceRangeBar />}
+              {c.title === "Filters wreck the face" && <FilterTriptych />}
             </div>
           ))}
         </div>
@@ -446,6 +660,8 @@ function NSteps() {
               </div>
               <h3 className="mo-step__title">{s.title}</h3>
               <p className="mo-step__desc">{s.desc}</p>
+              {s.num === "01" && <PhotoExamplePair />}
+              {s.num === "02" && <NoseSchema />}
             </div>
           ))}
         </div>
@@ -469,7 +685,7 @@ function NBeforeAfter() {
         </div>
         <div className="no-s2p">
           <div className="no-s2p__col">
-            <FacePanel variant="before" tag="Your photo" />
+            <FacePanel variant="before" tag="Your photo" annotate />
             <p className="no-s2p__note">Dorsal hump, heavier tip — the profile you know.</p>
           </div>
           <div className="dt-ba-arrow no-s2p__arrow" aria-hidden="true">
@@ -478,7 +694,7 @@ function NBeforeAfter() {
             </svg>
           </div>
           <div className="no-s2p__col">
-            <FacePanel variant="after" tag="Preview" />
+            <FacePanel variant="after" tag="Preview" annotate />
             <p className="no-s2p__note">Straight bridge, lifted tip. Everything else untouched.</p>
           </div>
         </div>
@@ -487,6 +703,33 @@ function NBeforeAfter() {
         </div>
       </div>
     </section>
+  );
+}
+
+const VARIANT_PREVIEWS = [
+  { img: "/nose/before.jpg", label: "Your nose", anchor: true },
+  { img: "/nose/variants/hump.jpg", label: "Hump removed" },
+  { img: "/nose/variants/tip.jpg", label: "Tip refined" },
+  { img: "/nose/variants/bridge.jpg", label: "Bridge smoothed" },
+  { img: "/nose/variants/ethnic.jpg", label: "Ethnic-preserving" },
+];
+
+function NVariantCompare() {
+  return (
+    <div className="no-vcompare">
+      {VARIANT_PREVIEWS.map((v) => (
+        <figure
+          key={v.label}
+          className={`no-vcompare__item${v.anchor ? " no-vcompare__item--anchor" : ""}`}
+        >
+          <div className="no-vcompare__photo">
+            <img src={v.img} alt="" />
+            {v.anchor && <span className="no-vcompare__tag">Before</span>}
+          </div>
+          <figcaption className="no-vcompare__cap">{v.label}</figcaption>
+        </figure>
+      ))}
+    </div>
   );
 }
 
@@ -504,11 +747,16 @@ function NVariants() {
             best one to a surgeon.
           </p>
         </div>
+        <NVariantCompare />
         <div className="dt-research-grid">
           {VARIANT_ITEMS.map((c) => (
-            <div key={c.title} className="dt-research-card">
+            <div
+              key={c.title}
+              className={`dt-research-card${c.title === "Surgeon-ready export" ? " no-variant-card--pdf" : ""}`}
+            >
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
+              {c.title === "Surgeon-ready export" && <PdfReportMock />}
             </div>
           ))}
         </div>
@@ -544,6 +792,10 @@ function NOldNew() {
             A real preview, <em>before the $15,000.</em>
           </h2>
         </div>
+        <CompareBars metrics={[
+          { label: "Cost to preview", oldVal: "$150–500", newVal: "$2.99", newPct: 2 },
+          { label: "Wait", oldVal: "~1 week", newVal: "24 hours", newPct: 14 },
+        ]} />
         <div className="dt-oldnew-grid">
           <div className="dt-oldnew-card dt-oldnew-card--old">
             <div className="dt-oldnew-card__tag">The old way</div>
@@ -694,7 +946,12 @@ function NFaq() {
                   <div className="mo-faq__q">{f.q}</div>
                   <div className="mo-faq__plus">{open === i ? "−" : "+"}</div>
                 </div>
-                {open === i && <div className="mo-faq__a">{f.a}</div>}
+                {open === i && (
+                  <div className="mo-faq__a">
+                    {f.a}
+                    {f.q === "What photo do I need?" && <PhotoExamplePair />}
+                  </div>
+                )}
               </div>
             ))}
           </div>
