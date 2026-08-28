@@ -5,6 +5,7 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
+import { CompareBars } from "../../components/CompareBars";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -166,26 +167,32 @@ const STEPS = [
 const REPORT_ITEMS = [
   {
     title: "Materials",
+    example: "14k gold · 585",
     desc: "Gold, silver, or platinum — with the karat or purity, read from the piece and its marks.",
   },
   {
     title: "Gemstones",
+    example: "Diamond · ~0.5 ct · natural",
     desc: "What the stones are, rough carat weight, and whether they read as natural, treated, or synthetic.",
   },
   {
     title: "Style and era",
+    example: "Art Deco · 1920s",
     desc: "Victorian, Art Deco, Mid-Century, or contemporary — dated from the setting and the design.",
   },
   {
     title: "Hallmarks decoded",
+    example: "585 · maker's mark",
     desc: "Maker's marks, purity stamps, and country of origin, translated into plain English.",
   },
   {
     title: "Fair-market value range",
+    example: "$1,800 – $2,400",
     desc: "What comparable pieces actually sell for — not a retail sticker, not a pawn-counter lowball.",
   },
   {
     title: "Worth a real appraisal?",
+    example: "Yes",
     desc: "A straight yes or no on whether the piece is valuable enough to pay for a certified, in-person appraisal.",
   },
 ];
@@ -327,6 +334,41 @@ const REPORT_DETAILS = [
   { label: "Hallmark", value: "585" },
 ];
 
+// Range gauge — materializes "know your range". Three zones on one scale:
+// a pawn-counter lowball, the fair-market band (accent) where the estimate
+// sits, and a retail sticker. Reused on the hero card (dark) and the why-card.
+function JRangeGauge({
+  bubble,
+  low,
+  fair,
+  high,
+  dark = false,
+}: {
+  bubble: string;
+  low: string;
+  fair: string;
+  high: string;
+  dark?: boolean;
+}) {
+  return (
+    <div className={`j-gauge${dark ? " j-gauge--dark" : ""}`}>
+      <div className="j-gauge__bubble-wrap">
+        <span className="j-gauge__bubble">{bubble}</span>
+      </div>
+      <div className="j-gauge__track">
+        <span className="j-gauge__zone j-gauge__zone--low" />
+        <span className="j-gauge__zone j-gauge__zone--fair" />
+        <span className="j-gauge__zone j-gauge__zone--high" />
+      </div>
+      <div className="j-gauge__scale">
+        <span className="j-gauge__anchor j-gauge__anchor--low">{low}</span>
+        <span className="j-gauge__anchor j-gauge__anchor--fair">{fair}</span>
+        <span className="j-gauge__anchor j-gauge__anchor--high">{high}</span>
+      </div>
+    </div>
+  );
+}
+
 function JewelryReportCard() {
   return (
     <div className="j-report">
@@ -349,6 +391,13 @@ function JewelryReportCard() {
         <span className="j-report__value-label">Fair-market value</span>
         <strong className="j-report__value-num">$1,800 – $2,400</strong>
         <span className="j-report__value-note">Matched to 40+ recent comparable sales</span>
+        <JRangeGauge
+          dark
+          bubble="$1,800 – 2,400"
+          low="Pawn ~$900"
+          fair="Fair market"
+          high="Retail ~$3,600"
+        />
       </div>
       <div className="j-report__rows">
         {REPORT_DETAILS.map((d) => (
@@ -361,6 +410,118 @@ function JewelryReportCard() {
       <div className="j-report__verdict">
         <span className="j-report__verdict-check"><CheckIcon size={12} /></span>
         Worth a professional appraisal
+      </div>
+    </div>
+  );
+}
+
+// Cost-vs-value mini-bar — the appraisal fee ($50–150) as a band laid over
+// the piece's value (~$200), so "the expertise eats the value" is visible.
+function JCostBar() {
+  return (
+    <div className="j-costbar">
+      <div className="j-costbar__row">
+        <span className="j-costbar__label">Piece value</span>
+        <div className="j-costbar__track">
+          <span className="j-costbar__fill j-costbar__fill--value" />
+        </div>
+        <span className="j-costbar__amt">~$200</span>
+      </div>
+      <div className="j-costbar__row">
+        <span className="j-costbar__label">Appraisal fee</span>
+        <div className="j-costbar__track">
+          <span className="j-costbar__fill j-costbar__fill--cost" />
+        </div>
+        <span className="j-costbar__amt j-costbar__amt--cost">$50 – 150</span>
+      </div>
+      <p className="j-costbar__note">The fee eats up to <strong>¾ of the value.</strong></p>
+    </div>
+  );
+}
+
+// Depth gap: a bargain scan-app names the stone and stops; GemCheck resolves
+// the same five fields. Kept light so it doesn't repeat the old/new table.
+const SCAN_FIELDS = ["Metal", "Carat", "Era", "Hallmark", "Value"];
+
+function JScanCompare() {
+  return (
+    <div className="j-scan">
+      <div className="j-scan__col j-scan__col--app">
+        <span className="j-scan__head">Scan app</span>
+        <span className="j-scan__stone">Sapphire</span>
+        <ul className="j-scan__list">
+          {SCAN_FIELDS.map((f) => (
+            <li key={f} className="j-scan__miss">
+              <span className="j-scan__miss-name">{f}</span>
+              <span className="j-scan__miss-dash">—</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="j-scan__col j-scan__col--gc">
+        <span className="j-scan__head j-scan__head--gc">GemCheck</span>
+        <div className="j-scan__chips">
+          {SCAN_FIELDS.map((f) => (
+            <span key={f} className="j-scan__chip">
+              <CheckIcon size={11} />{f}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// The "on paper" report — an annotated appraisal sheet. Each of the six fields
+// a jeweler checks becomes a numbered, filled row (example value + what it
+// tells you), beside the scanned piece.
+function JAppraisalSheet() {
+  return (
+    <div className="j-sheet">
+      <div className="j-sheet__head">
+        <span className="j-sheet__brand">Gem<em>Check</em> Appraisal</span>
+        <div className="j-sheet__meta">
+          <span className="j-sheet__refno">No. GC-4471</span>
+          <span className="j-report__tag">Sample</span>
+        </div>
+      </div>
+      <div className="j-sheet__body">
+        <div className="j-sheet__aside">
+          <div className="j-sheet__photo">
+            <img src="/jewelry/piece.jpg" alt="Scanned jewelry piece" />
+            <span className="j-report__scan j-report__scan--tl" />
+            <span className="j-report__scan j-report__scan--tr" />
+            <span className="j-report__scan j-report__scan--bl" />
+            <span className="j-report__scan j-report__scan--br" />
+            <span className="j-sheet__pin j-sheet__pin--stone">2</span>
+            <span className="j-sheet__pin j-sheet__pin--mark">4</span>
+          </div>
+          <div className="j-sheet__from">From your photo</div>
+        </div>
+        <div className="j-sheet__rows">
+          {REPORT_ITEMS.map((it, i) => (
+            <div
+              key={it.title}
+              className={`j-sheet__row${i === 4 ? " j-sheet__row--value" : ""}${
+                i === 5 ? " j-sheet__row--verdict" : ""
+              }`}
+            >
+              <span className="j-sheet__num">{i + 1}</span>
+              <div className="j-sheet__field">
+                <div className="j-sheet__field-head">
+                  <span className="j-sheet__field-name">{it.title}</span>
+                  <span className="j-sheet__field-val">
+                    {i === 5 && (
+                      <span className="j-sheet__field-check"><CheckIcon size={11} /></span>
+                    )}
+                    {it.example}
+                  </span>
+                </div>
+                <p className="j-sheet__field-cap">{it.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -456,10 +617,22 @@ function JWhy() {
           </p>
         </div>
         <div className="dt-research-grid">
-          {WHY_CARDS.map((c) => (
-            <div key={c.title} className="dt-research-card">
+          {WHY_CARDS.map((c, i) => (
+            <div key={c.title} className="dt-research-card j-why-card">
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
+              <div className="j-why-card__viz">
+                {i === 0 && <JCostBar />}
+                {i === 1 && (
+                  <JRangeGauge
+                    bubble="Your range"
+                    low="Pawn lowball"
+                    fair="Fair market"
+                    high="Retail sticker"
+                  />
+                )}
+                {i === 2 && <JScanCompare />}
+              </div>
             </div>
           ))}
         </div>
@@ -498,6 +671,33 @@ function JSteps() {
   );
 }
 
+const HALLMARKS = [
+  { img: "/jewelry/hallmarks/585.jpg", decoded: "14k gold", cap: "Purity stamp" },
+  { img: "/jewelry/hallmarks/maker.jpg", decoded: "Maker's mark", cap: "Who made it" },
+];
+
+function JHallmarks() {
+  return (
+    <div className="j-hallmarks">
+      <p className="j-hallmarks__label">The marks, read for you</p>
+      <div className="j-hallmarks__grid">
+        {HALLMARKS.map((h) => (
+          <div className="j-hallmark" key={h.decoded}>
+            <div className="j-hallmark__photo">
+              <img src={h.img} alt="" />
+            </div>
+            <span className="j-hallmark__arrow" aria-hidden="true"><ArrowIcon size={16} /></span>
+            <div className="j-hallmark__read">
+              <span className="j-hallmark__decoded">{h.decoded}</span>
+              <span className="j-hallmark__cap">{h.cap}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function JReport() {
   return (
     <section className="mo-section mo-section--surface">
@@ -508,14 +708,8 @@ function JReport() {
             Everything a jeweler checks. <em>On paper.</em>
           </h2>
         </div>
-        <div className="dt-research-grid">
-          {REPORT_ITEMS.map((c) => (
-            <div key={c.title} className="dt-research-card">
-              <h3>{c.title}</h3>
-              <p>{c.desc}</p>
-            </div>
-          ))}
-        </div>
+        <JAppraisalSheet />
+        <JHallmarks />
         <div className="mo-section-cta">
           <CheckoutButton label={CTA_LABEL} className="mo-cta" location="report" />
         </div>
@@ -611,6 +805,10 @@ function JOldNew() {
             A second opinion, <em>without the appointment.</em>
           </h2>
         </div>
+        <CompareBars metrics={[
+          { label: "Cost per piece", oldVal: "$50–150", newVal: "$4.99", newPct: 5 },
+          { label: "Turnaround", oldVal: "~1 week", newVal: "24 hours", newPct: 14 },
+        ]} />
         <div className="dt-oldnew-grid">
           <div className="dt-oldnew-card dt-oldnew-card--old">
             <div className="dt-oldnew-card__tag">The old way</div>

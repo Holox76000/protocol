@@ -5,6 +5,7 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
+import { CompareBars } from "../../components/CompareBars";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -148,18 +149,21 @@ const STEPS = [
   },
 ];
 
-const RESEARCH_CARDS = [
+const RESEARCH_CARDS: { title: string; desc: string; art: "gauge" | "abs-lower" | "abs-frame" }[] = [
   {
     title: "Body fat is the gate",
     desc: "Below roughly 15% body fat, abs show. Above it, no volume of crunches makes them visible. Most men train the muscle and ignore the gate.",
+    art: "gauge",
   },
   {
     title: "Lower abs lag by design",
     desc: "The lower segment activates last and holds fat longest. If your top two abs show and nothing else, that's the pattern to break.",
+    art: "abs-lower",
   },
   {
     title: "Shape comes from the frame",
     desc: "Obliques and V-taper frame the six-pack. A strong rectus with weak obliques still reads as no abs in a photo.",
+    art: "abs-frame",
   },
 ];
 
@@ -190,14 +194,16 @@ const REPORT_ITEMS = [
   },
 ];
 
-const LIKE_YOU_CARDS = [
+const LIKE_YOU_CARDS: { title: string; desc: string; art?: "plans" | "calendar" }[] = [
   {
     title: "Your starting point",
     desc: "A 28% body-fat plan and a 15% plan look nothing alike. Yours starts from your numbers.",
+    art: "plans",
   },
   {
     title: "Your schedule",
     desc: "Three mornings a week or six evenings — the plan fits the sessions you'll actually do.",
+    art: "calendar",
   },
   {
     title: "Your blocker first",
@@ -211,18 +217,21 @@ const TESTIMONIALS = [
       "Turns out my abs weren't the problem — my body fat was 4% too high. Eight weeks into the plan the top four are visible.",
     name: "Marcus, 31",
     meta: "June 2026",
+    chip: { label: "Abs Score · 8 weeks", from: 48, to: 71 },
   },
   {
     quote:
       "First plan that told me what NOT to do. Dropped the daily crunches, fixed the diet, saw more in six weeks than in two years.",
     name: "Danny, 27",
     meta: "July 2026",
+    chip: { label: "Abs Score · 6 weeks", from: 52, to: 79 },
   },
   {
     quote:
       "The scan called out my lower abs and it was right. The lower-ab block in the plan is brutal but it works.",
     name: "Chris, 34",
     meta: "May 2026",
+    chip: { label: "Lower abs · 12 weeks", from: 39, to: 68 },
   },
 ];
 
@@ -433,6 +442,165 @@ function AbsPlanCard() {
   );
 }
 
+/* ─── Show-don't-tell materializations ──────────────────────────────────── */
+
+// Rectus-abdominis schema. `variant` decides what lights up in accent:
+//  · "abs-lower"  → top pair lit, everything below dimmed (lower abs lag)
+//  · "abs-frame"  → obliques + V-taper lit, central rectus dimmed (the frame)
+function AbsAnatomy({ variant }: { variant: "abs-lower" | "abs-frame" }) {
+  const lit = (part: "top" | "rest" | "frame") =>
+    variant === "abs-lower"
+      ? part === "top"
+      : part === "frame";
+  const seg = (part: "top" | "rest") => (lit(part) ? "var(--accent)" : "#e4e9eb");
+  const frame = lit("frame") ? "var(--accent)" : "#e4e9eb";
+  return (
+    <svg className="ab-anatomy" viewBox="0 0 120 150" fill="none" aria-hidden="true">
+      {/* obliques (the frame) */}
+      <path d="M42 34 L30 44 L34 104 L44 96 Z" fill={frame} opacity={0.9} />
+      <path d="M78 34 L90 44 L86 104 L76 96 Z" fill={frame} opacity={0.9} />
+      {/* upper pair — the two segments that show first */}
+      <rect x="45" y="22" width="14.5" height="21" rx="5" fill={seg("top")} />
+      <rect x="60.5" y="22" width="14.5" height="21" rx="5" fill={seg("top")} />
+      {/* mid pair */}
+      <rect x="45" y="47" width="14.5" height="21" rx="5" fill={seg("rest")} />
+      <rect x="60.5" y="47" width="14.5" height="21" rx="5" fill={seg("rest")} />
+      {/* lower pair — lags */}
+      <rect x="45" y="72" width="14.5" height="21" rx="5" fill={seg("rest")} />
+      <rect x="60.5" y="72" width="14.5" height="21" rx="5" fill={seg("rest")} />
+      {/* suprapubic block */}
+      <rect x="45" y="97" width="30" height="26" rx="9" fill={seg("rest")} />
+      {/* V-taper (part of the frame) */}
+      <path d="M34 104 L60 140 L86 104" stroke={frame} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Body-fat threshold gauge: 25%→10% scale, "abs visible" at ~15%.
+function BodyFatGauge() {
+  return (
+    <div className="ab-gauge" aria-hidden="true">
+      <div className="ab-gauge__track">
+        <div className="ab-gauge__zone ab-gauge__zone--hidden">hidden</div>
+        <div className="ab-gauge__zone ab-gauge__zone--visible">visible</div>
+      </div>
+      <div className="ab-gauge__marker">
+        <span className="ab-gauge__marker-lbl">abs visible ~15%</span>
+      </div>
+      <div className="ab-gauge__scale">
+        <span>25%</span>
+        <span className="ab-gauge__scale--mid">15%</span>
+        <span>10%</span>
+      </div>
+    </div>
+  );
+}
+
+function ResearchArt({ kind }: { kind: "gauge" | "abs-lower" | "abs-frame" }) {
+  return (
+    <div className="ab-research-art">
+      {kind === "gauge" ? <BodyFatGauge /> : <AbsAnatomy variant={kind} />}
+    </div>
+  );
+}
+
+// Two side-by-side mini plan-cards — same product, opposite prescriptions.
+const MINI_PLANS = [
+  { bf: "28% body fat", lead: "Diet leads", diet: 84, train: 30 },
+  { bf: "15% body fat", lead: "Training leads", diet: 34, train: 88 },
+];
+
+function StartingPointArt() {
+  return (
+    <div className="ab-mini-plans">
+      {MINI_PLANS.map((p) => (
+        <div key={p.bf} className="ab-mini">
+          <span className="ab-mini__bf">{p.bf}</span>
+          <div className="ab-mini__lead">{p.lead}</div>
+          <div className="ab-mini__split">
+            <span className="ab-mini__split-lbl">Diet</span>
+            <div className="ab-mini__bar"><div style={{ width: `${p.diet}%` }} /></div>
+            <span className="ab-mini__split-lbl">Train</span>
+            <div className="ab-mini__bar"><div style={{ width: `${p.train}%` }} /></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// 7-day calendar strip, two schedules — same plan, different sessions.
+const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const SCHEDULES = [
+  { tag: "3 mornings", slot: "AM", on: [0, 2, 4] },
+  { tag: "6 evenings", slot: "PM", on: [0, 1, 2, 3, 4, 5] },
+];
+
+function ScheduleStrip() {
+  return (
+    <div className="ab-cal">
+      {SCHEDULES.map((s) => (
+        <div key={s.tag} className="ab-cal__row">
+          <span className="ab-cal__tag">{s.tag}</span>
+          <div className="ab-cal__days">
+            {DAYS.map((d, i) => {
+              const on = s.on.includes(i);
+              return (
+                <span key={i} className={`ab-cal__day ${on ? "ab-cal__day--on" : ""}`}>
+                  <span className="ab-cal__dow">{d}</span>
+                  {on && <span className="ab-cal__slot">{s.slot}</span>}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LikeYouArt({ kind }: { kind: "plans" | "calendar" }) {
+  return (
+    <div className="ab-likeyou-art">
+      {kind === "plans" ? <StartingPointArt /> : <ScheduleStrip />}
+    </div>
+  );
+}
+
+// Numeric result chip, styled like the hero flashcard.
+function TestiChip({ label, from, to }: { label: string; from: number; to: number }) {
+  return (
+    <div className="ab-testi-chip">
+      <span className="ab-testi-chip__label">{label}</span>
+      <span className="ab-testi-chip__val">{from} <em>→</em> {to}</span>
+      <span className="ab-testi-chip__delta">+{to - from}</span>
+    </div>
+  );
+}
+
+// Founder pivot: one routine → two outcomes.
+function DivergeViz() {
+  return (
+    <div className="ab-diverge" aria-hidden="true">
+      <div className="ab-diverge__src">Same ab routine</div>
+      <svg className="ab-diverge__lines" viewBox="0 0 200 34" fill="none" preserveAspectRatio="none">
+        <path d="M100 0 C100 18 55 12 40 34" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" />
+        <path d="M100 0 C100 18 145 12 160 34" stroke="#c9d2d6" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <div className="ab-diverge__outs">
+        <div className="ab-diverge__out ab-diverge__out--win">
+          <span className="ab-diverge__ico"><CheckIcon size={12} /></span>
+          Six-pack in 3 months
+        </div>
+        <div className="ab-diverge__out ab-diverge__out--lose">
+          <span className="ab-diverge__ico ab-diverge__ico--x">✕</span>
+          Nothing in a year
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Sections ──────────────────────────────────────────────────────────── */
 
 function ANav() {
@@ -522,9 +690,10 @@ function AResearch() {
         </div>
         <div className="dt-research-grid">
           {RESEARCH_CARDS.map((c) => (
-            <div key={c.title} className="dt-research-card">
+            <div key={c.title} className="dt-research-card ab-research-card">
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
+              <ResearchArt kind={c.art} />
             </div>
           ))}
         </div>
@@ -573,13 +742,21 @@ function AReport() {
             Six things you get. <em>One decides the rest.</em>
           </h2>
         </div>
-        <div className="dt-research-grid">
-          {REPORT_ITEMS.map((c) => (
-            <div key={c.title} className="dt-research-card">
-              <h3>{c.title}</h3>
-              <p>{c.desc}</p>
-            </div>
-          ))}
+        <div className="ab-report-map">
+          <div className="ab-report-map__card">
+            <AbsReportCard />
+          </div>
+          <ol className="ab-report-legend">
+            {REPORT_ITEMS.map((c, i) => (
+              <li key={c.title} className="ab-report-legend__row">
+                <span className="ab-report-legend__num">{i + 1}</span>
+                <div>
+                  <h3 className="ab-report-legend__title">{c.title}</h3>
+                  <p className="ab-report-legend__desc">{c.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
         <div className="mo-section-cta">
           <CheckoutButton label={CTA_LABEL} className="mo-cta" location="report" />
@@ -632,9 +809,10 @@ function ALikeYou() {
         </div>
         <div className="dt-research-grid">
           {LIKE_YOU_CARDS.map((c) => (
-            <div key={c.title} className="dt-research-card">
+            <div key={c.title} className="dt-research-card ab-research-card">
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
+              {c.art && <LikeYouArt kind={c.art} />}
             </div>
           ))}
         </div>
@@ -671,6 +849,7 @@ function AFounderStory() {
               it. That&rsquo;s the whole product.
             </p>
           </div>
+          <DivergeViz />
           <div className="dt-founder__author">
             <div className="dt-founder__avatar">P</div>
             <div>
@@ -708,6 +887,7 @@ function AOldNew() {
             A trainer&rsquo;s eye, <em>at 3% of the price.</em>
           </h2>
         </div>
+        <CompareBars metrics={[{ label: "Cost per month", oldVal: "$600+", newVal: "~$39", newPct: 6.5 }]} />
         <div className="dt-oldnew-grid">
           <div className="dt-oldnew-card dt-oldnew-card--old">
             <div className="dt-oldnew-card__tag">The old way</div>
@@ -754,6 +934,7 @@ function ATestimonials() {
                 <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
               </div>
               <p className="mo-testi__quote">&ldquo;{t.quote}&rdquo;</p>
+              <TestiChip label={t.chip.label} from={t.chip.from} to={t.chip.to} />
               <div className="mo-testi__person">
                 <div className="mo-testi__avatar img-ph-avatar">{t.name[0]}</div>
                 <div>

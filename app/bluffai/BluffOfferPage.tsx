@@ -5,6 +5,7 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
+import { CompareBars } from "../../components/CompareBars";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -423,6 +424,57 @@ function BSteps() {
             <h2 className="mo-section-title">One photo in. <em>A perfect prank out.</em></h2>
           </div>
         </div>
+
+        {/* Mini visual flow: pick a template → upload a selfie → result back */}
+        <div className="bf-flow">
+          <div className="bf-flow__step">
+            <div className="bf-flow__thumb">
+              <div className="bf-flow__mini">
+                <img src="/bluffai/t-couple.jpg" alt="" />
+                <span className="bf-flow__mini-pick">
+                  <img src="/bluffai/t-tattoo.jpg" alt="" />
+                  <span className="bf-flow__tap" aria-hidden="true" />
+                </span>
+                <img src="/bluffai/t-bald.jpg" alt="" />
+                <img src="/bluffai/t-haircolor.jpg" alt="" />
+              </div>
+            </div>
+            <div className="bf-flow__cap">Pick</div>
+          </div>
+          <span className="bf-ba__arrow bf-flow__arrow" aria-hidden="true">→</span>
+          <div className="bf-flow__step">
+            <div className="bf-flow__thumb">
+              <img className="bf-flow__img" src="/bluffai/arm-before.jpg" alt="" />
+              <span className="bf-flow__tag">Camera roll</span>
+            </div>
+            <div className="bf-flow__cap">Upload</div>
+          </div>
+          <span className="bf-ba__arrow bf-flow__arrow" aria-hidden="true">→</span>
+          <div className="bf-flow__step">
+            <div className="bf-flow__thumb bf-flow__thumb--chat">
+              <div className="bf-flow__bubble"><img src="/bluffai/arm-after.jpg" alt="" /></div>
+            </div>
+            <div className="bf-flow__cap">60 sec</div>
+          </div>
+        </div>
+
+        {/* Speed chrono */}
+        <div className="bf-chrono" role="img" aria-label="Upload at 0 seconds, photoreal result back at 58 seconds">
+          <div className="bf-chrono__end">
+            <span className="bf-chrono__label">Upload</span>
+            <span className="bf-chrono__time">0:00</span>
+          </div>
+          <div className="bf-chrono__track">
+            <span className="bf-chrono__fill" />
+            <span className="bf-chrono__dot bf-chrono__dot--start" aria-hidden="true" />
+            <span className="bf-chrono__dot bf-chrono__dot--end" aria-hidden="true" />
+          </div>
+          <div className="bf-chrono__end bf-chrono__end--right">
+            <span className="bf-chrono__label">Result</span>
+            <span className="bf-chrono__time">0:58</span>
+          </div>
+        </div>
+
         <div className="mo-steps-grid">
           {STEPS.map((s) => (
             <div key={s.num} className="mo-step">
@@ -466,6 +518,20 @@ function BTemplates() {
             </div>
           ))}
         </div>
+        {/* Materialize the 60+ promise: 6 shown, 54 more stacked behind */}
+        <div className="bf-ghost-row" role="img" aria-label="54 more templates, with new ones added every week">
+          <span className="bf-ghost__badge">New this week</span>
+          <div className="bf-ghost-stack" aria-hidden="true">
+            <div className="bf-ghost"><img src="/bluffai/t-aged.jpg" alt="" /></div>
+            <div className="bf-ghost"><img src="/bluffai/t-cartoon.jpg" alt="" /></div>
+            <div className="bf-ghost"><img src="/bluffai/t-haircolor.jpg" alt="" /></div>
+            <div className="bf-ghost"><img src="/bluffai/t-bald.jpg" alt="" /></div>
+          </div>
+          <div className="bf-ghost bf-ghost--more">
+            <span className="bf-ghost__count">+54</span>
+            <span className="bf-ghost__more">more</span>
+          </div>
+        </div>
         <div className="mo-section-cta">
           <CheckoutButton label={CTA_LABEL} className="mo-cta" location="templates" />
         </div>
@@ -507,6 +573,21 @@ function BWhyItWorks() {
             Filters get ignored. <em>This one gets a phone call.</em>
           </h2>
         </div>
+        {/* Proof of "It looks real": a real photo vs its AI render, side by side */}
+        <div className="bf-proof">
+          <div className="bf-proof__ba">
+            <div className="bf-proof__panel">
+              <span className="bf-ba__cap">Real photo</span>
+              <img src="/bluffai/arm-before.jpg" alt="" />
+            </div>
+            <span className="bf-ba__arrow" aria-hidden="true">→</span>
+            <div className="bf-proof__panel">
+              <span className="bf-ba__cap">AI render</span>
+              <img src="/bluffai/arm-after.jpg" alt="" />
+            </div>
+          </div>
+          <div className="bf-proof__tag">Spot the fake?</div>
+        </div>
         <div className="dt-research-grid">
           {WHY_CARDS.map((c) => (
             <div key={c.title} className="dt-research-card">
@@ -544,6 +625,7 @@ function BOldNew() {
             Nobody can tell, <em>and you never touched an editor.</em>
           </h2>
         </div>
+        <CompareBars metrics={[{ label: "Time per edit", oldVal: "Hours", newVal: "60 sec", newPct: 3 }]} />
         <div className="dt-oldnew-grid">
           <div className="dt-oldnew-card dt-oldnew-card--old">
             <div className="dt-oldnew-card__tag">The old way</div>
@@ -674,6 +756,46 @@ function BGuarantee() {
               Make your first prank on the house.{" "}
               <em>Not for you? Cancel before day 3 and pay nothing.</em>
             </h2>
+          </div>
+        </div>
+
+        {/* Peace-of-mind band: exactly when you're charged + how to cancel */}
+        <div className="bf-assure">
+          <div className="bf-assure__card">
+            <div className="bf-assure__head">When you&rsquo;re charged</div>
+            <div className="bf-billing">
+              <div className="bf-billing__step">
+                <span className="bf-billing__dot bf-billing__dot--now" aria-hidden="true" />
+                <span className="bf-billing__day">Today</span>
+                <span className="bf-billing__amt">$0</span>
+                <span className="bf-billing__note">Trial starts</span>
+              </div>
+              <div className="bf-billing__step">
+                <span className="bf-billing__dot" aria-hidden="true" />
+                <span className="bf-billing__day">Day 3</span>
+                <span className="bf-billing__amt bf-billing__amt--muted">Reminder</span>
+                <span className="bf-billing__note">We email you first</span>
+              </div>
+              <div className="bf-billing__step">
+                <span className="bf-billing__dot" aria-hidden="true" />
+                <span className="bf-billing__day">After</span>
+                <span className="bf-billing__amt">$6.99</span>
+                <span className="bf-billing__note">per week</span>
+              </div>
+            </div>
+          </div>
+          <div className="bf-assure__card">
+            <div className="bf-assure__head">How to cancel</div>
+            <div className="bf-cancel__chat">
+              <div className="bf-msg bf-msg--out">
+                <div className="bf-bubble bf-bubble--out">cancel</div>
+              </div>
+              <div className="bf-msg bf-msg--in">
+                <div className="bf-bubble bf-bubble--in bf-cancel__done">
+                  <CheckIcon size={12} /> Done — same day
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

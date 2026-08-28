@@ -382,3 +382,416 @@
     right: 4px;
   }
 }
+
+/* ─── Range gauge (know your range) ─────────────────────────────────────── */
+/* One scale, three zones: pawn lowball, fair-market band (accent), retail
+   sticker. Used on the hero value block (dark) and the why-card (light). */
+.j-gauge {
+  margin-top: 14px;
+}
+.j-gauge__bubble-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 7px;
+}
+.j-gauge__bubble {
+  position: relative;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #253239;
+  background: var(--accent-hi, #dcc27f);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.j-gauge__bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 7px;
+  height: 7px;
+  background: var(--accent-hi, #dcc27f);
+  transform: translateX(-50%) rotate(45deg);
+}
+.j-gauge__track {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+}
+.j-gauge__zone {
+  border-radius: 3px;
+}
+.j-gauge__zone--low { flex: 26; background: #dfe4e6; }
+.j-gauge__zone--fair { flex: 40; background: var(--accent, #b89235); }
+.j-gauge__zone--high { flex: 26; background: #dfe4e6; }
+.j-gauge__scale {
+  display: flex;
+  margin-top: 7px;
+}
+.j-gauge__anchor {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #8a97a0;
+}
+.j-gauge__anchor--low { flex: 26; text-align: left; }
+.j-gauge__anchor--fair { flex: 40; text-align: center; color: var(--accent, #b89235); }
+.j-gauge__anchor--high { flex: 26; text-align: right; }
+
+/* Dark variant on the hero card's ink value block */
+.j-gauge--dark { margin-top: 12px; }
+.j-gauge--dark .j-gauge__zone--low,
+.j-gauge--dark .j-gauge__zone--high { background: rgba(255, 255, 255, 0.2); }
+.j-gauge--dark .j-gauge__zone--fair { background: var(--accent-hi, #dcc27f); }
+.j-gauge--dark .j-gauge__anchor { color: rgba(255, 255, 255, 0.6); }
+.j-gauge--dark .j-gauge__anchor--fair { color: var(--accent-hi, #dcc27f); }
+
+/* ─── Cost-vs-value mini-bar ────────────────────────────────────────────── */
+/* Appraisal fee band laid on the same scale as the piece value, so the fee
+   visibly eats most of the value. */
+.j-costbar {
+  margin-top: 2px;
+}
+.j-costbar__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.j-costbar__label {
+  flex: none;
+  width: 84px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7f949b;
+}
+.j-costbar__track {
+  position: relative;
+  flex: 1;
+  height: 14px;
+  background: #f1f4f5;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.j-costbar__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 7px;
+}
+.j-costbar__fill--value {
+  left: 0;
+  width: 100%;
+  background: var(--accent, #b89235);
+}
+/* The fee band spans roughly a quarter to three-quarters of the value bar */
+.j-costbar__fill--cost {
+  left: 25%;
+  right: 25%;
+  background: #c2cace;
+}
+.j-costbar__amt {
+  flex: none;
+  width: 58px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: #253239;
+  font-variant-numeric: tabular-nums;
+}
+.j-costbar__amt--cost { color: #8a97a0; }
+.j-costbar__note {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #7f949b;
+}
+.j-costbar__note strong { color: #253239; font-weight: 700; }
+
+/* ─── Scan-app vs GemCheck output comparison ────────────────────────────── */
+.j-scan {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 2px;
+  align-items: stretch;
+}
+.j-scan__col {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #edf0f1;
+  border-radius: 12px;
+  padding: 12px 13px;
+  background: #fafbfb;
+}
+.j-scan__col--gc {
+  background: #fff;
+  border-color: var(--accent-hi, #dcc27f);
+}
+.j-scan__head {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a97a0;
+  margin-bottom: 9px;
+}
+.j-scan__head--gc { color: var(--accent, #b89235); }
+.j-scan__stone {
+  font-size: 13px;
+  font-weight: 700;
+  color: #253239;
+  margin-bottom: 9px;
+}
+.j-scan__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.j-scan__miss {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #b5bec2;
+}
+.j-scan__miss-name { text-decoration: line-through; }
+.j-scan__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.j-scan__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #253239;
+  background: rgba(184, 146, 53, 0.1);
+  border: 1px solid var(--accent-hi, #dcc27f);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.j-scan__chip svg { color: var(--accent, #b89235); }
+
+/* Why-card visual — separator below the prose */
+.j-why-card__viz {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f1;
+}
+
+/* ─── Annotated appraisal sheet ("on paper") ────────────────────────────── */
+.j-sheet {
+  max-width: 820px;
+  margin: 40px auto 0;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(37, 50, 57, 0.1);
+  overflow: hidden;
+}
+.j-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #edf0f1;
+  background: #fbfcfc;
+}
+.j-sheet__brand {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #253239;
+}
+.j-sheet__brand em { font-style: normal; color: var(--accent, #b89235); }
+.j-sheet__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.j-sheet__refno {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #8a97a0;
+  font-variant-numeric: tabular-nums;
+}
+.j-sheet__body {
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  gap: 30px;
+  padding: 26px 24px;
+}
+.j-sheet__photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef1f2;
+}
+.j-sheet__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  filter: saturate(0.94);
+  display: block;
+}
+.j-sheet__pin {
+  position: absolute;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #253239;
+  background: var(--accent-hi, #dcc27f);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(37, 50, 57, 0.28);
+}
+.j-sheet__pin--stone { top: 33%; left: 44%; }
+.j-sheet__pin--mark { bottom: 15%; right: 20%; }
+.j-sheet__from {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent, #b89235);
+}
+.j-sheet__rows {
+  display: flex;
+  flex-direction: column;
+}
+.j-sheet__row {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px dashed #e5ebec;
+}
+.j-sheet__row:first-child { padding-top: 0; }
+.j-sheet__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.j-sheet__num {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7f949b;
+  background: #f1f4f5;
+  border: 1px solid #e5ebec;
+  margin-top: 1px;
+}
+.j-sheet__field {
+  flex: 1;
+  min-width: 0;
+}
+.j-sheet__field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.j-sheet__field-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a97a0;
+}
+.j-sheet__field-val {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #253239;
+  text-align: right;
+}
+.j-sheet__field-check {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 5px;
+  color: #4a7a3f;
+}
+.j-sheet__field-cap {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #7f949b;
+}
+/* Value row = the payoff; verdict row = the answer */
+.j-sheet__row--value .j-sheet__num {
+  background: var(--accent, #b89235);
+  border-color: var(--accent, #b89235);
+  color: #fff;
+}
+.j-sheet__row--value .j-sheet__field-val {
+  font-size: 18px;
+  color: var(--accent, #b89235);
+}
+.j-sheet__row--verdict .j-sheet__num {
+  background: #eef4ec;
+  border-color: #d7e6d2;
+  color: #4a7a3f;
+}
+
+@media (max-width: 767px) {
+  .j-sheet__body {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
+  .j-sheet__photo { aspect-ratio: 3 / 2; }
+  .j-sheet__field-val { font-size: 14px; }
+  .j-sheet__row--value .j-sheet__field-val { font-size: 16px; }
+}
+
+/* Hallmarks decoded — real stamp macro to plain-English translation. */
+.j-hallmarks { max-width: 620px; margin: 24px auto 0; }
+.j-hallmarks__label {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #8a97a0;
+  margin: 0 0 14px;
+}
+.j-hallmarks__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.j-hallmark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #edf0f1;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 18px rgba(37, 50, 57, 0.05);
+}
+.j-hallmark__photo {
+  flex: 0 0 auto;
+  width: 62px;
+  height: 62px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #eef1f2;
+}
+.j-hallmark__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.j-hallmark__arrow { flex: 0 0 auto; color: var(--accent, #b89235); display: inline-flex; }
+.j-hallmark__read { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.j-hallmark__decoded { font-size: 15px; font-weight: 600; color: #253239; }
+.j-hallmark__cap { font-size: 12px; color: #8a97a0; }
+@media (max-width: 560px) { .j-hallmarks__grid { grid-template-columns: 1fr; } }

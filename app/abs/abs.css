@@ -465,3 +465,362 @@
     right: 4px;
   }
 }
+
+/* ═══ Show-don't-tell materializations ═══════════════════════════════════ */
+
+/* Research cards get a visual at the bottom, pushed down so cards align. */
+.ab-research-card {
+  display: flex;
+  flex-direction: column;
+}
+.ab-research-art,
+.ab-likeyou-art {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+/* ─── Body-fat threshold gauge ──────────────────────────────────────────── */
+.ab-gauge {
+  position: relative;
+  padding-top: 18px; /* room for the marker label above the track */
+}
+.ab-gauge__track {
+  display: flex;
+  height: 26px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #edf0f1;
+}
+.ab-gauge__zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ab-gauge__zone--hidden {
+  flex: 10;
+  background: #eef1f2;
+  color: #97a3a9;
+}
+.ab-gauge__zone--visible {
+  flex: 5;
+  background: var(--accent);
+  color: #fff;
+}
+.ab-gauge__marker {
+  position: absolute;
+  top: 17px;
+  height: 28px;
+  left: 66.667%;
+  width: 2px;
+  background: #253239;
+}
+.ab-gauge__marker-lbl {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #253239;
+}
+.ab-gauge__scale {
+  position: relative;
+  height: 14px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7f949b;
+}
+.ab-gauge__scale span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+.ab-gauge__scale span:first-child { left: 0; transform: none; }
+.ab-gauge__scale span:last-child { right: 0; transform: none; }
+.ab-gauge__scale--mid { left: 66.667%; }
+
+/* ─── Abdominal anatomy schema ──────────────────────────────────────────── */
+.ab-anatomy {
+  display: block;
+  width: 96px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* ─── Report card + numbered legend ─────────────────────────────────────── */
+.ab-report-map {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: 44px;
+  align-items: start;
+  max-width: 880px;
+  margin: 48px auto 0;
+}
+.ab-report-map__card {
+  position: sticky;
+  top: 24px;
+}
+.ab-report-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.ab-report-legend__row {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.ab-report-legend__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  color: var(--accent);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 32%, #fff);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ab-report-legend__title {
+  margin: 3px 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #253239;
+}
+.ab-report-legend__desc {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #515255;
+}
+
+@media (max-width: 860px) {
+  .ab-report-map {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 440px;
+  }
+  .ab-report-map__card {
+    position: static;
+  }
+}
+
+/* ─── Mini plan-cards (starting point) ──────────────────────────────────── */
+.ab-mini-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ab-mini {
+  background: #f9fbfb;
+  border: 1px solid #edf0f1;
+  border-radius: 10px;
+  padding: 12px 12px 14px;
+}
+.ab-mini__bf {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7f949b;
+  background: #eef1f2;
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.ab-mini__lead {
+  margin: 9px 0 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #253239;
+}
+.ab-mini__split {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px 8px;
+}
+.ab-mini__split-lbl {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #7f949b;
+}
+.ab-mini__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e6ebec;
+  overflow: hidden;
+}
+.ab-mini__bar div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* ─── 7-day schedule strip ──────────────────────────────────────────────── */
+.ab-cal {
+  display: grid;
+  gap: 12px;
+}
+.ab-cal__row {
+  display: grid;
+  gap: 7px;
+}
+.ab-cal__tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #253239;
+}
+.ab-cal__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.ab-cal__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  height: 34px;
+  border-radius: 8px;
+  background: #f1f4f5;
+  border: 1px solid #edf0f1;
+}
+.ab-cal__day--on {
+  background: var(--accent);
+  border-color: transparent;
+}
+.ab-cal__dow {
+  font-size: 10px;
+  font-weight: 600;
+  color: #97a3a9;
+}
+.ab-cal__day--on .ab-cal__dow {
+  color: rgba(255, 255, 255, 0.72);
+}
+.ab-cal__slot {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+/* ─── Testimonial result chip (hero-flashcard style) ────────────────────── */
+.ab-testi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 16px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #e6ebec;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(37, 50, 57, 0.05);
+}
+.ab-testi-chip__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7f949b;
+}
+.ab-testi-chip__val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #253239;
+}
+.ab-testi-chip__val em {
+  font-style: normal;
+  color: #aab2b7;
+  margin: 0 1px;
+}
+.ab-testi-chip__delta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ─── Founder pivot: one routine → two outcomes ─────────────────────────── */
+.ab-diverge {
+  max-width: 420px;
+  margin: 28px 0 0;
+}
+.ab-diverge__src {
+  width: max-content;
+  margin: 0 auto;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #dfe4e6;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #253239;
+  box-shadow: 0 2px 10px rgba(37, 50, 57, 0.05);
+}
+.ab-diverge__lines {
+  display: block;
+  width: 100%;
+  height: 30px;
+}
+.ab-diverge__outs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ab-diverge__out {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.ab-diverge__out--win {
+  background: color-mix(in srgb, var(--accent) 9%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, #fff);
+  color: #253239;
+}
+.ab-diverge__out--lose {
+  background: #f7f9f9;
+  border: 1px solid #e6ebec;
+  color: #7f949b;
+}
+.ab-diverge__ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+}
+.ab-diverge__ico--x {
+  background: #c4ccd0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 460px) {
+  .ab-diverge__outs { grid-template-columns: 1fr; }
+  .ab-diverge__lines { height: 22px; }
+}
