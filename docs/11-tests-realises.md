@@ -66,6 +66,16 @@ des placeholders hérités du format Dating.
 > qui traverse le titre hero, les titres de section, la grille "what you get" et
 > les mentions "verified" — **abs = vert · bluffai = violet · nose = bleu
 > clinique · jewelry = or**. Layout, typo et CTA inchangés.
+>
+> **"Show don't tell" (v1.4.0.0).** Passe sur les 4 pages : partout où une info
+> était *racontée* en texte, on la *montre* via une interface concrète (lecture
+> d'un coup d'œil, layout/copy inchangés). Barres coût/délai au-dessus de chaque
+> tableau old/new sur les 4 ; abs = rapport annoté ①→⑥, jauge body-fat, plans
+> qui divergent, chips résultat ; bluffai = flow pick→upload→60s, frise de
+> facturation du trial, preuve before/after ; nose = callouts hump/bridge/tip sur
+> les vraies photos, triptyque anti-filtre, bande de comparaison de 4 variantes
+> de nez (générées IA) ; jewelry = fiche d'appraisal annotée, jauge de fourchette
+> de valeur, poinçons décodés (macros générées).
 | `/bluffai` | Bluff AI | Éditeur photo « prank » (bluffai.app) | Weekly $6.99 **+ essai 3 j** · Yearly $39.99 |
 | `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | Weekly $2.99 · Yearly $17.99 |
 | `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
