@@ -474,8 +474,9 @@
   box-shadow: 0 0 0 1px #c2492e;
 }
 .no-trip__cell--warp .no-trip__thumb img {
-  transform: scaleX(1.22) scaleY(0.92) translateX(-5%);
-  filter: saturate(1.45) contrast(1.12) hue-rotate(-6deg);
+  /* The "beauty filter" look now lives in the generated image itself
+     (over-smoothed, altered features) — just a hint of extra saturation. */
+  filter: saturate(1.06);
 }
 .no-trip__cell--ours .no-trip__thumb {
   border-color: color-mix(in srgb, var(--accent, #3d7ea6) 50%, #edf0f1);

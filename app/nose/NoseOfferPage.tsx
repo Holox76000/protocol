@@ -432,7 +432,7 @@ function FilterTriptych() {
       </figure>
       <figure className="no-trip__cell no-trip__cell--warp">
         <div className="no-trip__thumb">
-          <img src="/nose/before.jpg" alt="" />
+          <img src="/nose/filter.jpg" alt="" />
           <span className="no-trip__warp-tag">Whole face warped</span>
         </div>
         <figcaption className="no-trip__cap--bad">Beauty filter</figcaption>
@@ -843,7 +843,7 @@ function NTestimonials() {
               </div>
               <p className="mo-testi__quote">&ldquo;{t.quote}&rdquo;</p>
               <div className="mo-testi__person">
-                <div className="mo-testi__avatar img-ph-avatar">{t.name[0]}</div>
+                <div className="mo-testi__avatar"><img src={`/nose/testi/${t.name.split(",")[0].toLowerCase()}.jpg`} alt="" /></div>
                 <div>
                   <div className="mo-testi__name">{t.name}</div>
                   <div className="mo-testi__meta">Member · {t.meta}</div>

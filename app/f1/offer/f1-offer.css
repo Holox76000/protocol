@@ -519,14 +519,16 @@
 }
 
 .mo-testi__avatar {
-  width: 32px; height: 32px; border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 50%;
   background: var(--mo-surface);
   border: 1px solid var(--mo-border-mid);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--mo-font-display); font-size: 14px;
   color: var(--mo-brand-muted-light);
   flex-shrink: 0;
+  overflow: hidden;
 }
+.mo-testi__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .mo-testi__name { font-size: 13px; font-weight: 500; }
 .mo-testi__meta { font-family: var(--mo-font-mono); font-size: 10px; color: var(--mo-brand-muted); }
