@@ -936,7 +936,7 @@ function ATestimonials() {
               <p className="mo-testi__quote">&ldquo;{t.quote}&rdquo;</p>
               <TestiChip label={t.chip.label} from={t.chip.from} to={t.chip.to} />
               <div className="mo-testi__person">
-                <div className="mo-testi__avatar img-ph-avatar">{t.name[0]}</div>
+                <div className="mo-testi__avatar"><img src={`/abs/testi/${t.name.split(",")[0].toLowerCase()}.jpg`} alt="" /></div>
                 <div>
                   <div className="mo-testi__name">{t.name}</div>
                   <div className="mo-testi__meta">Member · {t.meta}</div>

@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.1.0] - 2026-08-28
+
+### Changed
+- **Testimonial photos across the 4 landings.** Each review now shows a real
+  headshot in its avatar, gender- and age-matched to the reviewer (abs = 3 men;
+  bluffai/nose = mixed; jewelry = women 49–63), generated via nano-banana in the
+  page aesthetic. Avatars bumped 32→40px. Assets in `public/<vertical>/testi/`.
+- **`/nose` "Filters wreck the face" — real beauty-filter image.** The middle
+  panel previously used a CSS `scaleX` stretch that looked broken; replaced with
+  a generated realistic beauty-filtered version of the face (over-smoothed,
+  altered features) so it reads as an actual filter, not a squished photo.
+
 ## [1.4.0.1] - 2026-08-28
 
 ### Fixed
