@@ -940,7 +940,7 @@ export default function AbsOfferPage() {
 
   return (
     <PlanContext.Provider value={{ plan, setPlan }}>
-      <div className="mo-page">
+      <div className="mo-page va-abs">
         <UrgencyBar />
         <ANav />
         <AHero />

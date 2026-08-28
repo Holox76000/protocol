@@ -5,7 +5,6 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
-import { PlaceholderRibbon } from "../../components/ImagePlaceholder";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -150,12 +149,12 @@ const STEPS = [
 ];
 
 const TEMPLATES = [
-  { emoji: "🖋️", name: "Fake tattoo", desc: "A full sleeve overnight. Nobody buys it until they zoom in." },
-  { emoji: "💍", name: "Fake couple", desc: "You and a stranger, arm in arm. Send it and say nothing." },
-  { emoji: "👴", name: "You at 80", desc: "Age yourself 50 years. Your group chat won't recover." },
-  { emoji: "🧑‍🦲", name: "Bald you", desc: "Shave the whole thing off. Text it to your barber." },
-  { emoji: "🎨", name: "New hair color", desc: "Go platinum, red, or blue before you touch the dye." },
-  { emoji: "🧸", name: "Cartoon you", desc: "Turn yourself into an animated character in one tap." },
+  { img: "/bluffai/t-tattoo.jpg", name: "Fake tattoo", desc: "A full sleeve overnight. Nobody buys it until they zoom in." },
+  { img: "/bluffai/t-couple.jpg", name: "Fake couple", desc: "You and a stranger, arm in arm. Send it and say nothing." },
+  { img: "/bluffai/t-aged.jpg", name: "You at 80", desc: "Age yourself 50 years. Your group chat won't recover." },
+  { img: "/bluffai/t-bald.jpg", name: "Bald you", desc: "Shave the whole thing off. Text it to your barber." },
+  { img: "/bluffai/t-haircolor.jpg", name: "New hair color", desc: "Go platinum, red, or blue before you touch the dye." },
+  { img: "/bluffai/t-cartoon.jpg", name: "Cartoon you", desc: "Turn yourself into an animated character in one tap." },
 ];
 
 const REACTIONS = [
@@ -308,24 +307,19 @@ function BluffChatMock() {
       <div className="bf-phone__thread" role="img" aria-label="Text thread: an AI before-and-after fake tattoo photo gets a shocked reaction">
         {/* Sent: the template render, shown as a before -> after so the fake is legible */}
         <div className="bf-msg bf-msg--out">
-          <div className="bf-photo img-ph-slot">
-            <PlaceholderRibbon note="real prank render (before/after example)" />
+          <div className="bf-photo">
             <div className="bf-photo__frame">
               <span className="bf-photo__tag">FAKE TATTOO</span>
               <span className="bf-photo__ai">AI result</span>
               <div className="bf-ba">
                 <div className="bf-ba__panel">
                   <span className="bf-ba__cap">Before</span>
-                  <div className="bf-photo__arm" aria-hidden="true" />
+                  <div className="bf-photo__img"><img src="/bluffai/arm-before.jpg" alt="" /></div>
                 </div>
                 <span className="bf-ba__arrow" aria-hidden="true">→</span>
                 <div className="bf-ba__panel">
                   <span className="bf-ba__cap">After</span>
-                  <div className="bf-photo__arm" aria-hidden="true">
-                    <span className="bf-photo__ink bf-photo__ink--1" />
-                    <span className="bf-photo__ink bf-photo__ink--2" />
-                    <span className="bf-photo__ink bf-photo__ink--3" />
-                  </div>
+                  <div className="bf-photo__img"><img src="/bluffai/arm-after.jpg" alt="" /></div>
                 </div>
               </div>
             </div>
@@ -465,9 +459,8 @@ function BTemplates() {
         </div>
         <div className="bf-template-grid">
           {TEMPLATES.map((t) => (
-            <div key={t.name} className="bf-template-card img-ph-slot">
-              <PlaceholderRibbon note="real example render for this template" />
-              <div className="bf-template-card__emoji" aria-hidden="true">{t.emoji}</div>
+            <div key={t.name} className="bf-template-card">
+              <div className="bf-template-card__photo"><img src={t.img} alt={t.name} /></div>
               <h3 className="bf-template-card__name">{t.name}</h3>
               <p className="bf-template-card__desc">{t.desc}</p>
             </div>
@@ -787,7 +780,7 @@ export default function BluffOfferPage() {
 
   return (
     <PlanContext.Provider value={{ plan, setPlan }}>
-      <div className="mo-page">
+      <div className="mo-page va-bluffai">
         <UrgencyBar />
         <BNav />
         <BHero />

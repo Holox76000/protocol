@@ -5,7 +5,6 @@ import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
 import { EXPERIMENTS } from "../../lib/experiments";
-import { PlaceholderRibbon } from "../../components/ImagePlaceholder";
 import "../f1/f1.css";
 import "../f1/offer/f1-offer.css";
 import "../dating/dating.css";
@@ -310,44 +309,17 @@ function UrgencyBar() {
 // Head silhouette facing right. Only the nose segment differs between the two
 // variants: `before` carries a convex dorsal hump, `after` a straight bridge
 // and a lifted, refined tip. Everything else is identical, on purpose.
-const FACE_BEFORE =
-  "M70 26 C150 24 168 56 160 93 C182 100 201 116 197 135 C195 146 189 155 174 160 " +
-  "C166 162 159 165 154 168 C162 173 164 181 158 191 C154 199 152 206 150 214 " +
-  "L150 240 L60 240 C56 200 52 170 48 140 C44 118 40 100 42 80 C44 50 54 30 70 26 Z";
-const FACE_AFTER =
-  "M70 26 C150 24 168 56 160 93 C169 105 176 121 176 137 C176 145 171 151 161 156 " +
-  "C158 160 156 165 154 168 C162 173 164 181 158 191 C154 199 152 206 150 214 " +
-  "L150 240 L60 240 C56 200 52 170 48 140 C44 118 40 100 42 80 C44 50 54 30 70 26 Z";
-
-function FaceProfile({ variant }: { variant: "before" | "after" }) {
-  return (
-    <svg className="no-face" viewBox="0 0 210 250" role="img"
-      aria-label={variant === "before" ? "Profile before, dorsal hump" : "Profile after, straightened bridge"}>
-      <path className="no-face__silhouette" d={variant === "before" ? FACE_BEFORE : FACE_AFTER} />
-      {/* After: dashed ghost of where the old hump used to sit */}
-      {variant === "after" && (
-        <path className="no-face__ghost" d="M160 93 C182 100 201 116 197 135" />
-      )}
-      {/* Eye */}
-      <ellipse className="no-face__detail" cx="128" cy="102" rx="6" ry="3.4" />
-      {/* Nostril hint */}
-      <path className="no-face__detail" d="M158 166 q7 3 11 -1" fill="none" stroke="#c9d2d6" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function FacePanel({ variant, tag }: { variant: "before" | "after"; tag?: string }) {
   const isAfter = variant === "after";
   return (
-    <div className={`no-face-panel img-ph-slot ${isAfter ? "no-face-panel--after" : ""}`}>
-      <PlaceholderRibbon
-        note={isAfter ? "real patient after preview, side profile" : "real patient before photo, side profile"}
-      />
+    <div className={`no-face-panel ${isAfter ? "no-face-panel--after" : ""}`}>
       <div className="no-face-panel__head">
         <span className="no-face-panel__label">{isAfter ? "After" : "Before"}</span>
         {tag && <span className="no-face-panel__tag">{tag}</span>}
       </div>
-      <FaceProfile variant={variant} />
+      <div className="no-face-panel__photo">
+        <img src={isAfter ? "/nose/after.jpg" : "/nose/before.jpg"} alt="" />
+      </div>
     </div>
   );
 }
@@ -496,13 +468,8 @@ function NBeforeAfter() {
           </h2>
         </div>
         <div className="no-s2p">
-          <div className="no-face-panel img-ph-slot">
-            <PlaceholderRibbon note="real patient before photo, side profile" />
-            <div className="no-face-panel__head">
-              <span className="no-face-panel__label">Before</span>
-              <span className="no-face-panel__tag">Your photo</span>
-            </div>
-            <FaceProfile variant="before" />
+          <div className="no-s2p__col">
+            <FacePanel variant="before" tag="Your photo" />
             <p className="no-s2p__note">Dorsal hump, heavier tip — the profile you know.</p>
           </div>
           <div className="dt-ba-arrow no-s2p__arrow" aria-hidden="true">
@@ -510,13 +477,8 @@ function NBeforeAfter() {
               <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <div className="no-face-panel no-face-panel--after img-ph-slot">
-            <PlaceholderRibbon note="real patient after preview, side profile" />
-            <div className="no-face-panel__head">
-              <span className="no-face-panel__label">After</span>
-              <span className="no-face-panel__tag">Preview</span>
-            </div>
-            <FaceProfile variant="after" />
+          <div className="no-s2p__col">
+            <FacePanel variant="after" tag="Preview" />
             <p className="no-s2p__note">Straight bridge, lifted tip. Everything else untouched.</p>
           </div>
         </div>
@@ -813,7 +775,7 @@ export default function NoseOfferPage() {
 
   return (
     <PlanContext.Provider value={{ plan, setPlan }}>
-      <div className="mo-page">
+      <div className="mo-page va-nose">
         <UrgencyBar />
         <NNav />
         <NHero />

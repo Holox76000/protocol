@@ -158,6 +158,16 @@
 .bf-ba__panel:last-child {
   border-left: 2px solid #fff;
 }
+.bf-photo__img {
+  position: absolute;
+  inset: 0;
+}
+.bf-photo__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .bf-ba__cap {
   position: absolute;
   bottom: 8px;
@@ -362,6 +372,20 @@
 .bf-template-card__emoji {
   font-size: 30px;
   line-height: 1;
+}
+.bf-template-card__photo {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #eef1f2;
+  margin-bottom: 10px;
+}
+.bf-template-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.96);
 }
 .bf-template-card__name {
   margin: 4px 0 0;
