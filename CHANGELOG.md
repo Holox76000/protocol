@@ -3,6 +3,13 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.0.1] - 2026-08-28
+
+### Fixed
+- **`/nose` — recalibrated the hump/bridge/tip callout dots** so they sit on the
+  actual nose profile (the "tip" dot was landing off the nose, in the
+  background). Applied to both before/after photos; verified desktop + mobile.
+
 ## [1.4.0.0] - 2026-08-28
 
 ### Changed
