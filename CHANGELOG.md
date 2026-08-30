@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.4.0] - 2026-08-30
+
+### Changed
+- **"from $X" price on the CTAs (4 landings).** Hero + section CTA buttons now
+  show the entry price next to the label (e.g. "See my nose preview · from
+  $2.99/wk"), driven by each page's cheapest plan so it stays correct if pricing
+  changes. Nav / pricing-card / sticky CTAs stay label-only. nose $2.99 · abs
+  $8.99 · jewelry $4.99 · bluffai $6.99 (after the 3-day trial).
+- **`/nose` — recalibrated the hump/bridge/tip callout dots** on the woman's
+  before/after profiles (the tip was sitting off the nose); before + after now
+  land on the nose profile.
+
 ## [1.4.3.0] - 2026-08-30
 
 ### Added

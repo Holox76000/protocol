@@ -127,6 +127,10 @@ function CheckoutButton({
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CTA_LABEL = "Start 3-day free trial";
+// Cheapest plan drives the "from $X" hint so it stays correct if pricing changes.
+const CTA_CHEAPEST = [...PLANS].sort((a, b) => a.priceCents - b.priceCents)[0];
+const CTA_PER = CTA_CHEAPEST.interval === "week" ? "/wk" : CTA_CHEAPEST.interval === "month" ? "/mo" : "/yr";
+const CTA_LABEL_PRICED = `${CTA_LABEL} · from ${CTA_CHEAPEST.priceLabel}${CTA_PER}`;
 
 const STEPS = [
   {
@@ -367,7 +371,7 @@ function BHero() {
             Fake tattoos, fake couples, you at 80, and 60+ more. Ready to text in 60 seconds.
           </p>
           <div className="mo-hero__ctas">
-            <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
+            <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero" />
             <a href="#bf-method" className="mo-hero__cta-ghost">See how it works</a>
           </div>
           <TrustpilotBadge />
@@ -406,7 +410,7 @@ function BHero() {
 
       {/* Mobile: CTA strip below the visual */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero-mobile" />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero-mobile" />
         <a href="#bf-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
       </div>
@@ -488,7 +492,7 @@ function BSteps() {
           ))}
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="steps" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="steps" />
         </div>
       </div>
     </section>
@@ -533,7 +537,7 @@ function BTemplates() {
           </div>
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="templates" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="templates" />
         </div>
       </div>
     </section>
