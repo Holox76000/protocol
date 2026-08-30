@@ -541,7 +541,7 @@ function JNav() {
         <a href="#j-method">How it works</a>
         <a href="#mo-pricing">Pricing</a>
       </div>
-      <CheckoutButton label={CTA_LABEL} className="mo-nav__cta" location="nav" withArrow={false} />
+      <CheckoutButton label={CTA_LABEL_PRICED} className="mo-nav__cta" location="nav" withArrow={false} />
     </nav>
   );
 }
@@ -917,29 +917,8 @@ function JPricing() {
               </li>
             ))}
           </ul>
-          <CheckoutButton label={CTA_LABEL} className="mo-pricing-card__cta" location="pricing" />
-          <div className="mo-pricing-card__guarantee">Cancel anytime — first payment refunded if it doesn&rsquo;t help</div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function JGuarantee() {
-  return (
-    <section className="mo-guarantee">
-      <div className="mo-container">
-        <div className="mo-guarantee__inner">
-          <div className="mo-guarantee__seal">
-            <div className="mo-guarantee__seal-num">100%</div>
-            <div className="mo-guarantee__seal-label">Refund</div>
-          </div>
-          <div>
-            <h2 className="mo-guarantee__title">
-              Read your full report.{" "}
-              <em>If it doesn&rsquo;t help, your first payment is refunded.</em>
-            </h2>
-          </div>
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-pricing-card__cta" location="pricing" />
+          <div className="mo-pricing-card__guarantee">Cancel anytime</div>
         </div>
       </div>
     </section>
@@ -1012,14 +991,14 @@ function JSticky({ visible }: { visible: boolean }) {
     <div className={`mo-sticky ${visible ? "mo-sticky--visible" : ""}`}>
       <div className="mo-sticky__mobile">
         <div className="mo-sticky__text">Full appraisal, {active.priceLabel}{active.perLabel}</div>
-        <CheckoutButton label={CTA_LABEL} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
       </div>
       <div className="mo-sticky__desktop dt-sticky-desktop">
         <div className="mo-sticky__desktop-text">
           <strong>GemCheck</strong>
           <span>{active.priceLabel}{active.perLabel} · cancel anytime</span>
         </div>
-        <CheckoutButton label={CTA_LABEL} className="mo-sticky__desktop-btn" location="sticky-desktop" withArrow={false} />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__desktop-btn" location="sticky-desktop" withArrow={false} />
       </div>
     </div>
   );
@@ -1056,7 +1035,6 @@ export default function JewelryOfferPage() {
         <JOldNew />
         <JTestimonials />
         <JPricing />
-        <JGuarantee />
         <JFaq />
         <JFooter />
         <JSticky visible={stickyVisible} />

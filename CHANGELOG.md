@@ -3,6 +3,21 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.5.0] - 2026-08-30
+
+### Changed
+- **"from $X" price now on every CTA** (nav, hero, section, pricing card, sticky)
+  across the 4 landings, not just hero/sections.
+
+### Removed
+- **Guarantee / refund promises removed from the 4 landings.** Dropped the
+  dedicated "100% Refund — if it doesn't help, refunded" section (abs, nose,
+  jewelry) and the "3 Days free — pay nothing" guarantee seal (bluffai), plus
+  the "first payment refunded if it doesn't help" line on each pricing card
+  (now just "Cancel anytime"). Kept: bluffai's billing timeline + how-to-cancel
+  band (factual), the "cancel anytime" terms, and the footer Refund Policy
+  legal link.
+
 ## [1.4.4.0] - 2026-08-30
 
 ### Changed

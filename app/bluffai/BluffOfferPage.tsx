@@ -355,7 +355,7 @@ function BNav() {
         <a href="#bf-method">How it works</a>
         <a href="#mo-pricing">Pricing</a>
       </div>
-      <CheckoutButton label={CTA_LABEL} className="mo-nav__cta" location="nav" withArrow={false} />
+      <CheckoutButton label={CTA_LABEL_PRICED} className="mo-nav__cta" location="nav" withArrow={false} />
     </nav>
   );
 }
@@ -738,7 +738,7 @@ function BPricing() {
               </li>
             ))}
           </ul>
-          <CheckoutButton label={CTA_LABEL} className="mo-pricing-card__cta" location="pricing" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-pricing-card__cta" location="pricing" />
           <div className="mo-pricing-card__guarantee">{disclosure}</div>
         </div>
       </div>
@@ -750,19 +750,6 @@ function BGuarantee() {
   return (
     <section className="mo-guarantee">
       <div className="mo-container">
-        <div className="mo-guarantee__inner">
-          <div className="mo-guarantee__seal">
-            <div className="mo-guarantee__seal-num">3</div>
-            <div className="mo-guarantee__seal-label">Days free</div>
-          </div>
-          <div>
-            <h2 className="mo-guarantee__title">
-              Make your first prank on the house.{" "}
-              <em>Not for you? Cancel before day 3 and pay nothing.</em>
-            </h2>
-          </div>
-        </div>
-
         {/* Peace-of-mind band: exactly when you're charged + how to cancel */}
         <div className="bf-assure">
           <div className="bf-assure__card">
@@ -874,14 +861,14 @@ function BSticky({ visible }: { visible: boolean }) {
     <div className={`mo-sticky ${visible ? "mo-sticky--visible" : ""}`}>
       <div className="mo-sticky__mobile">
         <div className="mo-sticky__text">60+ templates, {active.priceLabel}{active.perLabel}</div>
-        <CheckoutButton label={CTA_LABEL} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
       </div>
       <div className="mo-sticky__desktop dt-sticky-desktop">
         <div className="mo-sticky__desktop-text">
           <strong>Bluff AI</strong>
           <span>{active.priceLabel}{active.perLabel} · cancel anytime</span>
         </div>
-        <CheckoutButton label={CTA_LABEL} className="mo-sticky__desktop-btn" location="sticky-desktop" withArrow={false} />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__desktop-btn" location="sticky-desktop" withArrow={false} />
       </div>
     </div>
   );
