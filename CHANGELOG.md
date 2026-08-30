@@ -3,6 +3,17 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.3.0] - 2026-08-30
+
+### Added
+- **Daily report — per-campaign breakdown.** The Slack P&L report now adds a
+  "Par campagne" section (Meta `level=campaign`, same Paris day) listing each
+  spending campaign's spend · purchases · ROAS, so multiple concurrent tests
+  (Nose, Jewelry, dating…) are visible separately. Spend is exact;
+  purchases/ROAS are Meta-attributed. Account-level headline P&L (Stripe truth)
+  unchanged. Both notification hooks (new-ads + report) were already
+  account-wide; this only adds the per-campaign view.
+
 ## [1.4.2.1] - 2026-08-30
 
 ### Changed

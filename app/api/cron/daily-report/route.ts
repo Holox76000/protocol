@@ -85,6 +85,48 @@ export async function GET(request: Request) {
     metaError = String(err);
   }
 
+  // ── Per-campaign breakdown (Meta level=campaign, same Paris day) ──────
+  // Spend is exact; purchases/revenue are Meta-attributed (pixel/CAPI), which
+  // is the only campaign-level attribution we have without mapping every Stripe
+  // PI back to a campaign. Used for a relative "which test is working" view.
+  type CampaignRow = { name: string; spend: number; purchases: number; revenue: number; roas: number };
+  let campaigns: CampaignRow[] = [];
+  try {
+    const pickPurchase = (arr?: Array<{ action_type: string; value: string }>): number => {
+      if (!arr) return 0;
+      const chosen =
+        arr.find(a => a.action_type === "purchase") ??
+        arr.find(a => a.action_type === "offsite_conversion.fb_pixel_purchase") ??
+        arr.find(a => a.action_type.includes("purchase"));
+      return chosen ? parseFloat(chosen.value) || 0 : 0;
+    };
+    const params = new URLSearchParams({
+      fields: "campaign_name,spend,actions,action_values",
+      level: "campaign",
+      time_range: JSON.stringify({ since: yesterdayParisDate, until: yesterdayParisDate }),
+      limit: "200",
+      access_token: META_TOKEN,
+    });
+    const res = await fetch(`https://graph.facebook.com/v22.0/${META_ACCOUNT}/insights?${params.toString()}`);
+    const body: {
+      data?: { campaign_name?: string; spend?: string; actions?: Array<{ action_type: string; value: string }>; action_values?: Array<{ action_type: string; value: string }> }[];
+      error?: { message?: string };
+    } = await res.json();
+    if (!body.error && body.data) {
+      campaigns = body.data
+        .map(row => {
+          const spend = parseFloat(row.spend ?? "0") || 0;
+          const purchases = pickPurchase(row.actions);
+          const revenue = pickPurchase(row.action_values);
+          return { name: row.campaign_name ?? "—", spend, purchases, revenue, roas: spend > 0 ? revenue / spend : 0 };
+        })
+        .filter(c => c.spend > 0)
+        .sort((a, b) => b.spend - a.spend);
+    }
+  } catch {
+    // Non-fatal — the account-level headline still ships without the breakdown.
+  }
+
   // ── Opt-ins (funnel_sessions with email captured, external only) ──
   let optinCount = 0;
   let optinError: string | null = null;
@@ -164,6 +206,12 @@ export async function GET(request: Request) {
     n >= 0 ? `+$${n.toFixed(2)}` : `-$${Math.abs(n).toFixed(2)}`;
   const fmtUsdAbs = (n: number) => `$${n.toFixed(2)}`;
 
+  // Per-campaign Slack fields (Slack caps a section at 10 fields).
+  const campaignLines = campaigns.slice(0, 10).map(c => ({
+    type: "mrkdwn" as const,
+    text: `*${c.name}*\n${fmtUsdAbs(c.spend)} · ${c.purchases} ach. · ROAS ${c.roas > 0 ? `${c.roas.toFixed(2)}×` : "—"}`,
+  }));
+
   const headerEmoji = isProfit ? ":rocket:" : ":rotating_light:";
   const headerWord = isProfit ? "Profit" : "Loss";
   const headerLine = `${headerEmoji} *Daily Report — ${dateLabel}*`;
@@ -224,6 +272,14 @@ export async function GET(request: Request) {
           { type: "mrkdwn", text: `*Opt-in → Paid*\n${optinToPaidPct.toFixed(1)}% _(${stripeSalesCount}/${optinCount})_` },
         ],
       },
+      { type: "divider" },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: ":ledger: *Par campagne* _(spend exact · achats/ROAS attribués Meta)_" },
+      },
+      campaignLines.length > 0
+        ? { type: "section", fields: campaignLines }
+        : { type: "section", text: { type: "mrkdwn", text: "_Aucune campagne avec du spend hier._" } },
       ...(errLines.length > 0 ? [{
         type: "section",
         text: { type: "mrkdwn", text: errLines.join("\n") },
