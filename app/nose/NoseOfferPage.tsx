@@ -135,6 +135,10 @@ function CheckoutButton({
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CTA_LABEL = "See my nose preview";
+// Cheapest plan drives the "from $X" hint so it stays correct if pricing changes.
+const CTA_CHEAPEST = [...PLANS].sort((a, b) => a.priceCents - b.priceCents)[0];
+const CTA_PER = CTA_CHEAPEST.interval === "week" ? "/wk" : CTA_CHEAPEST.interval === "month" ? "/mo" : "/yr";
+const CTA_LABEL_PRICED = `${CTA_LABEL} · from ${CTA_CHEAPEST.priceLabel}${CTA_PER}`;
 
 const STEPS = [
   {
@@ -352,12 +356,12 @@ const NOSE_CALLOUTS: Record<
   before: [
     { key: "bridge", label: "Bridge", x: 76, y: 32, tx: 47, ty: 23 },
     { key: "hump", label: "Dorsal hump", x: 81, y: 38, tx: 49, ty: 49 },
-    { key: "tip", label: "Tip", x: 86, y: 38, tx: 45, ty: 67 },
+    { key: "tip", label: "Tip", x: 84, y: 41, tx: 45, ty: 67 },
   ],
   after: [
     { key: "bridge", label: "Straight bridge", x: 75, y: 32, tx: 47, ty: 23 },
     { key: "hump", label: "Hump smoothed", x: 80, y: 38, tx: 49, ty: 49 },
-    { key: "tip", label: "Lifted tip", x: 84, y: 38, tx: 45, ty: 67 },
+    { key: "tip", label: "Lifted tip", x: 80, y: 42, tx: 45, ty: 67 },
   ],
 };
 
@@ -559,7 +563,7 @@ function NHero() {
             leave the rest of your face untouched. Your preview lands in 24 hours.
           </p>
           <div className="mo-hero__ctas">
-            <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
+            <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero" />
             <a href="#no-method" className="mo-hero__cta-ghost">See how it works</a>
           </div>
           <TrustpilotBadge />
@@ -601,7 +605,7 @@ function NHero() {
 
       {/* Mobile: CTA strip below the visual */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero-mobile" />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero-mobile" />
         <a href="#no-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
       </div>
@@ -666,7 +670,7 @@ function NSteps() {
           ))}
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="steps" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="steps" />
         </div>
       </div>
     </section>
@@ -699,7 +703,7 @@ function NBeforeAfter() {
           </div>
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="before-after" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="before-after" />
         </div>
       </div>
     </section>
@@ -761,7 +765,7 @@ function NVariants() {
           ))}
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="variants" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="variants" />
         </div>
       </div>
     </section>

@@ -127,6 +127,10 @@ function CheckoutButton({
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CTA_LABEL = "Get my abs analysis";
+// Cheapest plan drives the "from $X" hint so it stays correct if pricing changes.
+const CTA_CHEAPEST = [...PLANS].sort((a, b) => a.priceCents - b.priceCents)[0];
+const CTA_PER = CTA_CHEAPEST.interval === "week" ? "/wk" : CTA_CHEAPEST.interval === "month" ? "/mo" : "/yr";
+const CTA_LABEL_PRICED = `${CTA_LABEL} · from ${CTA_CHEAPEST.priceLabel}${CTA_PER}`;
 
 const STEPS = [
   {
@@ -627,7 +631,7 @@ function AHero() {
             body fat, and builds a plan that adapts monthly. First report in 48 hours.
           </p>
           <div className="mo-hero__ctas">
-            <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
+            <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero" />
             <a href="#ab-method" className="mo-hero__cta-ghost">See how it works</a>
           </div>
           <TrustpilotBadge />
@@ -666,7 +670,7 @@ function AHero() {
 
       {/* Mobile: CTA strip below the visual */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero-mobile" />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero-mobile" />
         <a href="#ab-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
       </div>
@@ -725,7 +729,7 @@ function ASteps() {
           ))}
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="steps" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="steps" />
         </div>
       </div>
     </section>
@@ -759,7 +763,7 @@ function AReport() {
           </ol>
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="report" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="report" />
         </div>
       </div>
     </section>
@@ -786,7 +790,7 @@ function AScanToPlan() {
           <AbsPlanCard />
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="scan-to-plan" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="scan-to-plan" />
         </div>
       </div>
     </section>

@@ -127,6 +127,10 @@ function CheckoutButton({
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CTA_LABEL = "Identify my jewelry";
+// Cheapest plan drives the "from $X" hint so it stays correct if pricing changes.
+const CTA_CHEAPEST = [...PLANS].sort((a, b) => a.priceCents - b.priceCents)[0];
+const CTA_PER = CTA_CHEAPEST.interval === "week" ? "/wk" : CTA_CHEAPEST.interval === "month" ? "/mo" : "/yr";
+const CTA_LABEL_PRICED = `${CTA_LABEL} · from ${CTA_CHEAPEST.priceLabel}${CTA_PER}`;
 
 const WHY_CARDS = [
   {
@@ -554,7 +558,7 @@ function JHero() {
             report in 24 hours.
           </p>
           <div className="mo-hero__ctas">
-            <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero" />
+            <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero" />
             <a href="#j-method" className="mo-hero__cta-ghost">See how it works</a>
           </div>
           <TrustpilotBadge />
@@ -594,7 +598,7 @@ function JHero() {
 
       {/* Mobile: CTA strip below the visual */}
       <div className="mo-hero-v1__mobile-cta-strip mo-hero-pad">
-        <CheckoutButton label={CTA_LABEL} className="mo-cta mo-cta--hero" location="hero-mobile" />
+        <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta mo-cta--hero" location="hero-mobile" />
         <a href="#j-method" className="mo-hero__cta-ghost">See how it works</a>
         <TrustpilotBadge />
       </div>
@@ -664,7 +668,7 @@ function JSteps() {
           ))}
         </div>
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="steps" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="steps" />
         </div>
       </div>
     </section>
@@ -711,7 +715,7 @@ function JReport() {
         <JAppraisalSheet />
         <JHallmarks />
         <div className="mo-section-cta">
-          <CheckoutButton label={CTA_LABEL} className="mo-cta" location="report" />
+          <CheckoutButton label={CTA_LABEL_PRICED} className="mo-cta" location="report" />
         </div>
       </div>
     </section>
