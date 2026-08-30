@@ -3,6 +3,12 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.5.1] - 2026-08-30
+
+### Removed
+- **Nav CTA button removed** from the 4 landings' top menu (kept brand + "How it
+  works / Pricing" links). The hero, section, pricing and sticky CTAs remain.
+
 ## [1.4.5.0] - 2026-08-30
 
 ### Changed

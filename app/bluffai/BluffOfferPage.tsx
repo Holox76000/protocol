@@ -355,7 +355,6 @@ function BNav() {
         <a href="#bf-method">How it works</a>
         <a href="#mo-pricing">Pricing</a>
       </div>
-      <CheckoutButton label={CTA_LABEL_PRICED} className="mo-nav__cta" location="nav" withArrow={false} />
     </nav>
   );
 }
