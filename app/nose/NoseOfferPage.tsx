@@ -350,14 +350,14 @@ const NOSE_CALLOUTS: Record<
   { key: string; label: string; x: number; y: number; tx: number; ty: number }[]
 > = {
   before: [
-    { key: "bridge", label: "Bridge", x: 26, y: 37, tx: 48, ty: 27 },
-    { key: "hump", label: "Dorsal hump", x: 23, y: 44, tx: 50, ty: 49 },
-    { key: "tip", label: "Tip", x: 22, y: 48, tx: 45, ty: 69 },
+    { key: "bridge", label: "Bridge", x: 76, y: 32, tx: 47, ty: 23 },
+    { key: "hump", label: "Dorsal hump", x: 81, y: 38, tx: 49, ty: 49 },
+    { key: "tip", label: "Tip", x: 86, y: 38, tx: 45, ty: 67 },
   ],
   after: [
-    { key: "bridge", label: "Straight bridge", x: 26, y: 37, tx: 48, ty: 27 },
-    { key: "hump", label: "Hump smoothed", x: 23, y: 44, tx: 50, ty: 49 },
-    { key: "tip", label: "Lifted tip", x: 22, y: 47, tx: 45, ty: 69 },
+    { key: "bridge", label: "Straight bridge", x: 75, y: 32, tx: 47, ty: 23 },
+    { key: "hump", label: "Hump smoothed", x: 80, y: 38, tx: 49, ty: 49 },
+    { key: "tip", label: "Lifted tip", x: 84, y: 38, tx: 45, ty: 67 },
   ],
 };
 

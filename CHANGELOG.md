@@ -3,6 +3,16 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.2.0] - 2026-08-30
+
+### Changed
+- **`/nose` — real before/after photos (new subject).** Replaced the AI man with
+  a real woman's before (dorsal hump) / after (refined) profile pair provided by
+  the team. The woman is now the face of the whole page for consistency: hero and
+  the "Same face, different nose" callouts (hump/bridge/tip **recalibrated** to
+  her right-facing profile), the 4-option variant strip and the "filters wreck
+  the face" triptych were all regenerated from her before via nano-banana.
+
 ## [1.4.1.0] - 2026-08-28
 
 ### Changed
