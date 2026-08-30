@@ -45,7 +45,7 @@ Définis dans `lib/slack.ts` :
 | Dating : livré (édite racine ✅) | `sales` (bot) | `releaseOrder` |
 | Upsell Dating acheté (priority/luxury $20) | `sales` | `checkout.session.completed` |
 | **Nouvelle créa Meta détectée** | `ads` | cron `meta-ads-check` |
-| **P&L quotidien** (spend Meta, ventes Stripe, ROAS vs breakeven 1.2×, funnel) | `report` | cron `daily-report` |
+| **P&L quotidien** (spend Meta, ventes Stripe, ROAS vs breakeven 1.2×, funnel, **breakdown par campagne**) | `report` | cron `daily-report` |
 | **Digest ops Dating** (compte par statut, marge, warnings stuck/overdue) | `ops` | cron `dating-daily-ops` |
 | **Email entrant** (chaque inbound Resend) | `emails` | webhook `resend-inbound` |
 | **Réponse NPS Dating** | `survey` | route `nps/dating/submit` |
