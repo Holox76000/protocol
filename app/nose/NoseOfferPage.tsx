@@ -553,7 +553,7 @@ function NHero() {
     <section className="mo-hero mo-hero-v1">
       <div className="mo-hero-v1__left">
         <div className="mo-hero-v1__copy">
-          <h1 className="mo-hero__title">See your nose reshaped. <em>Before you book surgery.</em></h1>
+          <h1 className="mo-hero__title">See what nose would make you <em>the prettiest.</em></h1>
           <p className="mo-hero__desc">
             Upload one photo. We reshape only your nose — hump, bridge, tip — and
             leave the rest of your face untouched. Your preview lands in 24 hours.
@@ -575,7 +575,7 @@ function NHero() {
 
       {/* Mobile: copy above the visual */}
       <div className="mo-hero-v1__mobile-ctas mo-hero-pad">
-        <h1 className="mo-hero__title">See your nose reshaped. <em>Before you book surgery.</em></h1>
+        <h1 className="mo-hero__title">See what nose would make you <em>the prettiest.</em></h1>
         <p className="mo-hero__desc">
           Upload one photo. We reshape only your nose — hump, bridge, tip — and
           leave the rest of your face untouched. Your preview lands in 24 hours.

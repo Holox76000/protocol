@@ -3,6 +3,12 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.2.1] - 2026-08-30
+
+### Changed
+- **`/nose` H1** → "See what nose would make you *the prettiest.*" (aesthetic
+  angle), replacing "See your nose reshaped. Before you book surgery."
+
 ## [1.4.2.0] - 2026-08-30
 
 ### Changed
