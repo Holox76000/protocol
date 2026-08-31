@@ -225,7 +225,9 @@ export async function sendExperimentConfirmationEmail(props: {
 
   const openingLine = isTrial
     ? `Hey ${name} — your ${props.brand} ${props.trialDays}-day free trial is live. You won&rsquo;t be charged until it ends.`
-    : `Hey ${name} — your ${props.brand} membership is in. Your first result lands by email ${props.deliveryPromise}.`;
+    : isSubscription
+    ? `Hey ${name} — your ${props.brand} membership is in. Your first result lands by email ${props.deliveryPromise}.`
+    : `Hey ${name} — your ${props.brand} order is in. Your result lands by email ${props.deliveryPromise}.`;
 
   const refundLine = isTrial
     ? `Not for you? Cancel before the trial ends and you pay nothing — just reply &ldquo;cancel&rdquo; to this email.`

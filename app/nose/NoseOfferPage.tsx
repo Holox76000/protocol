@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { trackGa4Event } from "../../lib/ga4Event";
 import { trackEvent } from "../../lib/analytics";
 import { getUtmParams, persistUtmParams, getPersistedUtmParams } from "../../lib/utm";
@@ -47,26 +47,20 @@ function StarIcon() {
 
 /* ─── Plans ─────────────────────────────────────────────────────────────── */
 
-const PLANS = EXPERIMENTS.nose.plans;
-const DEFAULT_PLAN_KEY = EXPERIMENTS.nose.defaultPlanKey;
-
-// The selected plan is shared across every CTA on the page (nav, hero, sticky,
-// pricing selector) so any button checks out the tier the visitor picked.
-const PlanContext = createContext<{
-  plan: string;
-  setPlan: (key: string) => void;
-}>({ plan: DEFAULT_PLAN_KEY, setPlan: () => {} });
+// One-time, single price — there is nothing to pick, so every CTA on the page
+// checks out the same plan and no selection state travels through the tree.
+const PLAN = EXPERIMENTS.nose.plans[0];
 
 /* ─── Checkout ──────────────────────────────────────────────────────────── */
 
-async function startCheckout(location: string, label: string, plan: string): Promise<boolean> {
+async function startCheckout(location: string, label: string): Promise<boolean> {
   trackGa4Event("nose_offer_cta_clicked", {
     funnel: "nose",
     cta_location: location,
     cta_label: label,
-    plan,
+    plan: PLAN.key,
   });
-  trackEvent("offer_cta_clicked", { funnel: "nose", cta_location: location, plan });
+  trackEvent("offer_cta_clicked", { funnel: "nose", cta_location: location, plan: PLAN.key });
 
   const utms = { ...getPersistedUtmParams(), ...getUtmParams() };
   const gaClientId = document.cookie
@@ -81,7 +75,7 @@ async function startCheckout(location: string, label: string, plan: string): Pro
       body: JSON.stringify({
         funnel: "nose",
         landing_page: "/nose",
-        plan,
+        plan: PLAN.key,
         ...utms,
         ...(gaClientId && { ga_client_id: gaClientId }),
       }),
@@ -109,14 +103,13 @@ function CheckoutButton({
   withArrow?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
-  const { plan } = useContext(PlanContext);
 
   const handleClick = useCallback(async () => {
     if (loading) return;
     setLoading(true);
-    const ok = await startCheckout(location, label, plan);
+    const ok = await startCheckout(location, label);
     if (!ok) setLoading(false);
-  }, [loading, location, label, plan]);
+  }, [loading, location, label]);
 
   return (
     <button type="button" onClick={handleClick} className={`dt-btn ${className}`} disabled={loading}>
@@ -135,10 +128,8 @@ function CheckoutButton({
 /* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CTA_LABEL = "See my nose preview";
-// Cheapest plan drives the "from $X" hint so it stays correct if pricing changes.
-const CTA_CHEAPEST = [...PLANS].sort((a, b) => a.priceCents - b.priceCents)[0];
-const CTA_PER = CTA_CHEAPEST.interval === "week" ? "/wk" : CTA_CHEAPEST.interval === "month" ? "/mo" : "/yr";
-const CTA_LABEL_PRICED = `${CTA_LABEL} · from ${CTA_CHEAPEST.priceLabel}${CTA_PER}`;
+// Single price, so the CTA states it outright — no "from $X" hedge to maintain.
+const CTA_LABEL_PRICED = `${CTA_LABEL} · ${PLAN.priceLabel}`;
 
 const STEPS = [
   {
@@ -230,7 +221,7 @@ const PRICING_BULLETS = [
   "Multiple variants: hump, tip, bridge",
   "Ethnic-preserving option",
   "Surgeon-ready PDF export",
-  "Unlimited previews while subscribed",
+  "Your files, yours to keep — no expiry",
   "First preview by email within 24 hours",
 ];
 
@@ -252,8 +243,8 @@ const FAQS = [
     a: "Yes. The ethnic-preserving option refines the nose while keeping the features that read as you, instead of defaulting to one generic shape.",
   },
   {
-    q: "How do I cancel?",
-    a: "Reply \"cancel\" to any email from us — done the same day. No calls, no forms, no retention flow.",
+    q: "Is this a subscription?",
+    a: "No. You pay $29 once, you get your preview and your PDF, and that's the end of it. Nothing renews, so there is nothing to cancel and no card to remove.",
   },
   {
     q: "What happens to my photo?",
@@ -281,7 +272,7 @@ function TrustpilotBadge() {
 /* ─── Urgency: launch price countdown ───────────────────────────────────── */
 
 // Launch-pricing window ends here, then rates rise. Extend by moving this date.
-const PRICE_BUMP_AT = new Date("2026-09-02T22:00:00Z");
+const PRICE_BUMP_AT = new Date("2026-09-14T22:00:00Z");
 
 function formatCountdown(ms: number): string {
   const d = Math.floor(ms / 86_400_000);
@@ -567,11 +558,11 @@ function NHero() {
           </div>
           <TrustpilotBadge />
           <div className="mo-hero__meta">
-            <span>from $2.99/week</span>
+            <span>$29 one-time</span>
             <span className="mo-hero__meta-dot">·</span>
             <span>surgeon-ready export</span>
             <span className="mo-hero__meta-dot">·</span>
-            <span>cancel anytime</span>
+            <span>no subscription</span>
           </div>
         </div>
       </div>
@@ -779,7 +770,7 @@ const OLD_WAY = [
 ];
 
 const NEW_WAY = [
-  "From $2.99/week, cancel anytime",
+  "$29 one-time, no subscription",
   "Your own photo, only the nose changed",
   "Several variants to compare side by side",
   "A surgeon-ready PDF for your consult",
@@ -796,7 +787,7 @@ function NOldNew() {
           </h2>
         </div>
         <CompareBars metrics={[
-          { label: "Cost to preview", oldVal: "$150–500", newVal: "$2.99", newPct: 2 },
+          { label: "Cost to preview", oldVal: "$150–500", newVal: "$29", newPct: 10 },
           { label: "Wait", oldVal: "~1 week", newVal: "24 hours", newPct: 14 },
         ]} />
         <div className="dt-oldnew-grid">
@@ -862,38 +853,21 @@ function NTestimonials() {
 }
 
 function NPricing() {
-  const { plan, setPlan } = useContext(PlanContext);
   return (
     <section id="mo-pricing" className="mo-section mo-section--ink">
       <div className="mo-container">
         <div className="mo-section-head--center">
           <h2 className="mo-section-title" style={{ marginTop: 16, color: "#fff" }}>
-            Previews and exports. <em style={{ color: "rgba(255,255,255,0.5)" }}>Pick your plan.</em>
+            Previews and exports. <em style={{ color: "rgba(255,255,255,0.5)" }}>One price.</em>
           </h2>
         </div>
         <div className="mo-pricing-card">
-          <div className="no-plan-picker" role="radiogroup" aria-label="Choose a plan">
-            {PLANS.map((p) => {
-              const active = p.key === plan;
-              return (
-                <button
-                  key={p.key}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  className={`no-plan-opt ${active ? "no-plan-opt--active" : ""}`}
-                  onClick={() => setPlan(p.key)}
-                >
-                  {p.badge && <span className="no-plan-opt__badge">{p.badge}</span>}
-                  <span className="no-plan-opt__radio" aria-hidden="true" />
-                  <span className="no-plan-opt__label">{p.label}</span>
-                  <span className="no-plan-opt__price">
-                    {p.priceLabel}<span className="no-plan-opt__per">{p.perLabel}</span>
-                  </span>
-                  <span className="no-plan-opt__sub">{p.subLabel ?? "billed " + p.interval + "ly"}</span>
-                </button>
-              );
-            })}
+          <div className="no-plan-picker no-plan-picker--single">
+            <div className="no-plan-opt no-plan-opt--static no-plan-opt--active">
+              <span className="no-plan-opt__label">{PLAN.label}</span>
+              <span className="no-plan-opt__price">{PLAN.priceLabel}</span>
+              <span className="no-plan-opt__sub">Pay once. Nothing renews.</span>
+            </div>
           </div>
           <ul className="mo-pricing-card__list">
             {PRICING_BULLETS.map((b) => (
@@ -904,7 +878,7 @@ function NPricing() {
             ))}
           </ul>
           <CheckoutButton label={CTA_LABEL_PRICED} className="mo-pricing-card__cta" location="pricing" />
-          <div className="mo-pricing-card__guarantee">Cancel anytime</div>
+          <div className="mo-pricing-card__guarantee">One-time payment · no subscription</div>
         </div>
       </div>
     </section>
@@ -976,18 +950,16 @@ function NFooter() {
 }
 
 function NSticky({ visible }: { visible: boolean }) {
-  const { plan } = useContext(PlanContext);
-  const active = PLANS.find((p) => p.key === plan) ?? PLANS[0];
   return (
     <div className={`mo-sticky ${visible ? "mo-sticky--visible" : ""}`}>
       <div className="mo-sticky__mobile">
-        <div className="mo-sticky__text">Nose preview, {active.priceLabel}{active.perLabel}</div>
+        <div className="mo-sticky__text">Nose preview, {PLAN.priceLabel} one-time</div>
         <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__btn" location="sticky-mobile" withArrow={false} />
       </div>
       <div className="mo-sticky__desktop dt-sticky-desktop">
         <div className="mo-sticky__desktop-text">
           <strong>NoseLab</strong>
-          <span>{active.priceLabel}{active.perLabel} · cancel anytime</span>
+          <span>{PLAN.priceLabel} one-time · no subscription</span>
         </div>
         <CheckoutButton label={CTA_LABEL_PRICED} className="mo-sticky__desktop-btn" location="sticky-desktop" withArrow={false} />
       </div>
@@ -999,7 +971,6 @@ function NSticky({ visible }: { visible: boolean }) {
 
 export default function NoseOfferPage() {
   const [stickyVisible, setStickyVisible] = useState(false);
-  const [plan, setPlan] = useState<string>(DEFAULT_PLAN_KEY);
 
   useEffect(() => {
     trackGa4Event("view_offer", { funnel: "nose", page_path: "/nose" });
@@ -1013,22 +984,20 @@ export default function NoseOfferPage() {
   }, []);
 
   return (
-    <PlanContext.Provider value={{ plan, setPlan }}>
-      <div className="mo-page va-nose">
-        <UrgencyBar />
-        <NNav />
-        <NHero />
-        <NWhy />
-        <NSteps />
-        <NBeforeAfter />
-        <NVariants />
-        <NOldNew />
-        <NTestimonials />
-        <NPricing />
-        <NFaq />
-        <NFooter />
-        <NSticky visible={stickyVisible} />
-      </div>
-    </PlanContext.Provider>
+    <div className="mo-page va-nose">
+      <UrgencyBar />
+      <NNav />
+      <NHero />
+      <NWhy />
+      <NSteps />
+      <NBeforeAfter />
+      <NVariants />
+      <NOldNew />
+      <NTestimonials />
+      <NPricing />
+      <NFaq />
+      <NFooter />
+      <NSticky visible={stickyVisible} />
+    </div>
   );
 }
