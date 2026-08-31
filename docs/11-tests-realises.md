@@ -77,8 +77,76 @@ des placeholders hérités du format Dating.
 > de nez (générées IA) ; jewelry = fiche d'appraisal annotée, jauge de fourchette
 > de valeur, poinçons décodés (macros générées).
 | `/bluffai` | Bluff AI | Éditeur photo « prank » (bluffai.app) | Weekly $6.99 **+ essai 3 j** · Yearly $39.99 |
-| `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | Weekly $2.99 · Yearly $17.99 |
+| `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | **$29 one-time** (voir ci-dessous) |
 | `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
+
+### `/nose` est repassé au paiement unique — $29 (31/08/2026, v1.4.6.0)
+
+`/nose` vendait un **abonnement Weekly $2.99 / Yearly $17.99**, copié à
+l'identique sur Nosefix. Il vend maintenant **$29, une seule fois**.
+
+**Pourquoi le prix du concurrent ne marchait pas ici.** Nosefix est une **app de
+l'App Store** : la personne a déjà téléchargé l'app, déjà joué avec l'outil, déjà
+vu un aperçu de son résultat, et elle paie en un seul geste avec Face ID. Sur
+notre page, elle arrive d'une pub, ne voit jamais le produit, doit taper un
+numéro de carte, et attend 24 heures pour recevoir son image. Ce n'est pas la
+même vente, donc ce n'est pas le même prix.
+
+**Ce que $2.99 nous coûtait.**
+
+- On ne pouvait rien apprendre. Quelqu'un qui lâche 3 dollars par curiosité, ce
+  n'est pas très différent de quelqu'un qui clique. Ça ne dit rien sur l'envie
+  réelle de payer pour préparer une opération à $15 000.
+- La page perdait sa crédibilité. Elle explique qu'une consultation coûte
+  $150-500, puis affiche $2.99. L'écart est tellement gros qu'on passe pour un
+  filtre beauté gratuit plutôt que pour une vraie alternative.
+- On ne pouvait pas acheter de pub. Un abonnement à $2.99 gardé une à trois
+  semaines rapporte $3 à $9 au total. Aucune publicité Meta ne rentre dans ce
+  budget, donc même un test « réussi » n'aurait rien prouvé.
+
+**Pourquoi $29.** C'est le modèle qui marche déjà chez nous : `/dating` se vend
+$39 une seule fois, avec exactement la même mécanique (on paie, on attend 24h, on
+reçoit un livrable). $29 fait environ un dixième d'une consultation, ça reste un
+achat d'impulsion en une seule décision, et ça laisse enfin de la place pour
+payer de la pub.
+
+**À savoir en lisant les résultats.** Au premier test, la pub coûtera sans doute
+$70 à $200 par acheteur. Ce n'est pas rentable à $29 — et ça ne l'aurait pas été
+davantage à $2.99. Le but de ce prix n'est pas de gagner de l'argent tout de
+suite, c'est d'obtenir un signal qu'on peut interpréter. Grille de lecture :
+coût d'acquisition sous $30 = business direct viable ; entre $30 et $100 = mort
+en tant que produit à $29, à réévaluer comme canal de leads chirurgie ;
+au-dessus de $100 = la verticale ne tient pas sous cette forme.
+
+**Piste à garder en tête.** Quelqu'un qui *paie* pour prévisualiser sa
+rhinoplastie est le prospect le plus qualifié qui existe pour une opération à
+$9 000-20 000. En apport d'affaires esthétique, un rendez-vous qualifié se
+monnaie $50-300. Si c'est ça le vrai modèle, la preview n'est pas le produit,
+c'est un aimant à leads qu'on fait payer.
+
+**Ce qui a changé techniquement.** `lib/experiments.ts` passe `/nose` en
+`billing: "one_time"` avec un plan unique ; `lib/stripe.ts` n'ajoute plus de
+`recurring`, donc Stripe bascule seul en paiement unique. La landing perd son
+sélecteur de formule et affiche un prix unique partout (CTA, hero, carte de prix,
+barre collante, comparatif). Deux bugs corrigés au passage : la description
+Google de `/nose` annonçait encore « $4.99/week » (prix mort depuis v1.4.4.0), et
+l'email de confirmation disait « votre abonnement est en place » sur un achat
+unique.
+
+**Ce que ça implique pour la règle générale.** On copiait jusqu'ici la structure
+de prix du concurrent de chaque verticale. Cette règle ne tient que si le
+concurrent vend par le même canal que nous. Les trois autres verticales (`/abs`,
+`/bluffai`, `/jewelry`) portent le même décalage : elles copient des abonnements
+d'apps App Store alors qu'on vend en web froid avec livraison manuelle. À
+réévaluer une par une avant de pousser du trafic dessus.
+
+**Reste ouvert.** Les témoignages et la note « 4.8 Trustpilot » de `/nose` sont
+encore des placeholders hérités de Dating — à $29 sur une marque inconnue, la
+preuve sociale compte plus qu'à $2.99. Et la livraison reste manuelle : à voir
+combien de commandes par jour on absorbe avant que la promesse « 24 heures »
+casse.
+
+---
 
 Détail du process et des briefs de recherche : voir `tâches/a-faire.md` (repo).
 
