@@ -81,7 +81,9 @@ export function getCheckoutLineItems(funnel = "main", planKey?: string | null): 
         price_data: {
           currency: "usd",
           unit_amount: plan.priceCents,
-          ...(experiment.billing === "subscription" && {
+          // One-time plans carry no `interval` — omitting `recurring` is what
+          // makes Stripe treat the line item as a single charge.
+          ...(experiment.billing === "subscription" && plan.interval && {
             recurring: { interval: plan.interval },
           }),
           product_data: {

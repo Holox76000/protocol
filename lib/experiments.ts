@@ -14,8 +14,8 @@ export type ExperimentPlan = {
   /** Selector label, e.g. "Weekly". */
   label: string;
   priceCents: number;
-  /** Billing interval (subscription verticals only). */
-  interval: "week" | "month" | "year";
+  /** Billing interval. Subscription verticals only — omit for one-time plans. */
+  interval?: "week" | "month" | "year";
   /** Headline price, e.g. "$8.99". */
   priceLabel: string;
   /** Interval suffix, e.g. "/week". */
@@ -137,32 +137,24 @@ export const EXPERIMENTS: Record<string, Experiment> = {
     brand: "NoseLab",
     productName: "NoseLab — AI Rhinoplasty Preview",
     productDescription:
-      "See your nose reshaped before you book surgery. Photoreal previews — hump removed, tip refined, bridge smoothed — with a surgeon-ready export. Cancel anytime.",
+      "See your nose reshaped before you book surgery. Photoreal previews — hump removed, tip refined, bridge smoothed — with a surgeon-ready export. One-time payment, no subscription.",
     contentId: "nose-rhinoplasty-preview",
-    billing: "subscription",
-    // Mirrors Nosefix (the niche leader): weekly + annual, no monthly.
+    billing: "one_time",
+    // Nosefix sells a $2.99/week App Store sub, but that model rides on a
+    // one-tap Apple ID payment, an in-app teaser, and an instant result. Here
+    // the visitor pays a card form on cold web traffic, never tries the tool,
+    // and waits 24h for a one-shot deliverable — so we price it like /dating:
+    // a single one-time charge, anchored against the $150-500 surgeon consult.
     plans: [
       {
-        key: "weekly",
-        label: "Weekly",
-        priceCents: 299,
-        interval: "week",
-        priceLabel: "$2.99",
-        perLabel: "/week",
-        badge: "Most popular",
-      },
-      {
-        key: "yearly",
-        label: "Yearly",
-        priceCents: 1799,
-        interval: "year",
-        priceLabel: "$17.99",
-        perLabel: "/year",
-        subLabel: "just $0.35/week, billed yearly",
-        badge: "Best value",
+        key: "single",
+        label: "One-time payment",
+        priceCents: 2900,
+        priceLabel: "$29",
+        perLabel: "",
       },
     ],
-    defaultPlanKey: "weekly",
+    defaultPlanKey: "single",
     deliveryPromise: "within 24 hours",
   },
 

@@ -185,6 +185,10 @@
   gap: 10px;
   margin-bottom: 24px;
 }
+/* Single one-time price: one full-width card, nothing to choose. */
+.no-plan-picker--single {
+  grid-template-columns: 1fr;
+}
 .no-plan-opt {
   position: relative;
   display: flex;
@@ -202,6 +206,11 @@
 }
 .no-plan-opt:hover {
   border-color: #b9c4c8;
+}
+.no-plan-opt--static,
+.no-plan-opt--static:hover {
+  cursor: default;
+  border-color: #253239;
 }
 .no-plan-opt--active {
   border-color: #253239;

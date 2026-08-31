@@ -27,9 +27,9 @@ export default function NoseSuccessPage() {
             surgeon-ready PDF — and it lands in your inbox within 24 hours.
           </p>
           <p className="dt-success__muted">
-            Your membership renews on your plan&rsquo;s cycle. To cancel, reply
-            &ldquo;cancel&rdquo; to any email from us — handled the same day. If the preview
-            doesn&rsquo;t help, your first payment is refunded, no questions asked.
+            That&rsquo;s a one-time payment — nothing renews, so there&rsquo;s nothing to
+            cancel. If the preview doesn&rsquo;t help, reply to any email from us and we
+            refund you in full, no questions asked.
           </p>
           <p className="dt-success__muted">
             For visualization only. Not medical advice, not a prediction of surgical results.
