@@ -3,6 +3,32 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.6.0] - 2026-08-31
+
+### Changed
+- **`/nose` passe de l'abonnement au paiement unique — $29 one-time** (avant :
+  Weekly $2.99 / Yearly $17.99, calé sur Nosefix). Le prix hebdo venait d'une app
+  App Store où l'utilisateur a déjà essayé l'outil et paie en un tap ; sur `/nose`
+  le visiteur arrive en trafic froid, remplit un formulaire de carte, n'essaie
+  jamais le produit et attend 24h un livrable one-shot. À $2.99 la LTV (~$3-9)
+  ne couvrait aucun CAC Meta et l'ancrage de la page ($150-500 la consult) ne
+  tenait plus. Le modèle maison qui tourne est le one-time (`/dating` = $39).
+  Stripe Checkout bascule automatiquement en `mode: payment`.
+- **Landing `/nose` alignée sur le paiement unique** : CTA « See my nose preview
+  · $29 » (plus de « from $X/wk »), méta hero « $29 one-time · no subscription »,
+  carte de prix à bloc unique (le sélecteur 2 tiers disparaît), barre sticky,
+  comparatif old/new ($150-500 → $29). FAQ « How do I cancel? » remplacée par
+  « Is this a subscription? ». Page de succès : plus de mention de renouvellement.
+- **Fenêtre de launch pricing** prolongée au 14/09 (elle expirait le 02/09).
+
+### Fixed
+- **`/nose` metadata annonçait encore « $4.99/week »**, un prix mort depuis deux
+  versions — c'est ce que voyaient Google et les aperçus de partage. Corrigé.
+- **Email de confirmation des verticals** : le texte disait « your {brand}
+  membership is in » pour tous les achats non-trial, y compris les paiements
+  uniques. Désormais « your {brand} order is in » pour les verticals one-time.
+  Les trois autres verticals (abonnements) ne changent pas.
+
 ## [1.4.5.1] - 2026-08-30
 
 ### Removed
