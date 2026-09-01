@@ -3,6 +3,24 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.8.0] - 2026-09-02
+
+### Changed
+- **Le clic sur un CTA d'offre envoie maintenant un `AddToCart` Meta** (pixel +
+  CAPI, même `event_id` pour la dédup), en plus du `AddToCart` TikTok qui
+  existait déjà. Concerne `/dating` et les quatre verticals.
+- **Sur `/nose`, les deux étapes envoient deux events différents.** Le clic
+  depuis la landing vers `/nose/preview` = `AddToCart`. Le clic depuis
+  `/nose/preview` vers le paiement = `InitiateCheckout` (Meta CAPI + TikTok,
+  `event_id` = id de la session Stripe, déjà envoyé par
+  `/api/create-checkout-session`). Le CTA de la preview envoie l'event interne
+  `preview_checkout_started` au lieu de `offer_cta_clicked`, sinon il aurait été
+  recompté en AddToCart.
+
+### Docs
+- `docs/06-marketing-et-tracking.md` : matrice d'événements et note de dédup
+  mises à jour, plus la spécificité `/nose` en deux étapes.
+
 ## [1.4.7.1] - 2026-09-02
 
 ### Changed
