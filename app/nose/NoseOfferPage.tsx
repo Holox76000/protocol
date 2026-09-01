@@ -51,6 +51,11 @@ function StarIcon() {
 // checks out the same plan and no selection state travels through the tree.
 const PLAN = EXPERIMENTS.nose.plans[0];
 
+// Preview-interstitial test: every CTA lands on /nose/preview (the nose-shape
+// gallery) and checkout starts from there. Flip to false to send traffic
+// straight to Stripe again.
+const PREVIEW_INTERSTITIAL = true;
+
 /* ─── Checkout ──────────────────────────────────────────────────────────── */
 
 async function startCheckout(location: string, label: string): Promise<boolean> {
@@ -107,6 +112,20 @@ function CheckoutButton({
   const handleClick = useCallback(async () => {
     if (loading) return;
     setLoading(true);
+    if (PREVIEW_INTERSTITIAL) {
+      trackGa4Event("nose_offer_cta_clicked", {
+        funnel: "nose",
+        cta_location: location,
+        cta_label: label,
+        plan: PLAN.key,
+        destination: "preview",
+      });
+      trackEvent("offer_cta_clicked", { funnel: "nose", cta_location: location, plan: PLAN.key });
+      // Carry the ad query string over — the preview page persists UTMs and
+      // passes them to Stripe from there.
+      window.location.assign(`/nose/preview${window.location.search}`);
+      return;
+    }
     const ok = await startCheckout(location, label);
     if (!ok) setLoading(false);
   }, [loading, location, label]);
@@ -263,7 +282,7 @@ function TrustpilotBadge() {
             <span key={i} className="mo-tp-badge__star">★</span>
           ))}
         </div>
-        <p className="mo-tp-badge__meta"><strong>4.8</strong> · early member reviews</p>
+        <p className="mo-tp-badge__meta"><strong>4.8</strong> · out of 5</p>
       </div>
     </div>
   );
