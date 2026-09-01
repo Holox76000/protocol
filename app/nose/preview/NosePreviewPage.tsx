@@ -21,7 +21,10 @@ async function startCheckout(location: string, shapeKey: string): Promise<boolea
     shape: shapeKey,
     plan: PLAN.key,
   });
-  trackEvent("offer_cta_clicked", {
+  // Not an AddToCart: that already fired on the landing CTA that opened this
+  // page. This click creates the Stripe session, and /api/create-checkout-session
+  // sends the Meta + TikTok InitiateCheckout keyed on that session id.
+  trackEvent("preview_checkout_started", {
     funnel: "nose",
     cta_location: location,
     page: "/nose/preview",

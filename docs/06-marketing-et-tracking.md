@@ -49,7 +49,7 @@ serveur :
 
 | Event | `event_id` utilisé |
 |---|---|
-| AddToCart (dating) | `{sessionId}:offer_cta_clicked:{ts}` (partagé pixel ↔ CAPI) |
+| AddToCart | `{sessionId}:offer_cta_clicked:{ts}` (partagé pixel ↔ CAPI) |
 | InitiateCheckout | id de la Session Stripe (hosted) ou du PaymentIntent (embedded) |
 | **Purchase** | id du PaymentIntent (canonique sur tous les chemins de fire) |
 | ViewContent | `{sessionId}:view_offer:{ts}` |
@@ -60,7 +60,7 @@ serveur :
 |---|---|---|---|---|
 | PageView / route | `PageView` | `ViewContent` | `page_view` | — |
 | `view_offer` (dating) | `ViewContent` | `ViewContent` | — | **$39** |
-| **CTA `/dating` cliqué** | — | **`AddToCart`** pixel + Events API | — | **$39** |
+| **CTA d'offre cliqué** (`/dating` + verticals) | **`AddToCart`** pixel + CAPI | **`AddToCart`** pixel (dating) + Events API | — | prix du plan |
 | InitiateCheckout | pixel + CAPI | pixel + Events API | `checkout_started` | $39 |
 | **Purchase** | `Purchase` CAPI | `CompletePayment` Events API | `purchase` MP | **`amount_total` Stripe réel** |
 
@@ -69,12 +69,19 @@ serveur :
 > Stripe. *(Les events du funnel Protocol — `quiz_started`, `Lead`, etc. — sont
 > archivés dans* Précédentes itérations*.)*
 
-> 💡 **`AddToCart` (dating)** est fire sur **chaque clic CTA** de `/dating` (tous
-> passent par `startCheckout()`), donc plus haut et plus fréquent dans le funnel
-> que `InitiateCheckout` (qui n'arrive qu'une fois la session Stripe créée). TikTok
-> uniquement, pixel + Events API, dédup par `event_id` partagé. Gardé sur
-> `funnel === "dating"` → le funnel F1 n'est pas impacté. Funnel TikTok dating :
-> `ViewContent` → `AddToCart` → `InitiateCheckout` → `CompletePayment`.
+> 💡 **`AddToCart`** est fire sur **chaque clic de CTA d'offre** (`/dating` et les
+> verticals), donc plus haut et plus fréquent dans le funnel que
+> `InitiateCheckout` (qui n'arrive qu'une fois la session Stripe créée). Meta :
+> pixel + CAPI. TikTok : Events API sur tous, pixel navigateur sur dating.
+> Dédup par `event_id` partagé. Le funnel F1 n'est pas impacté.
+> Funnel : `ViewContent` → `AddToCart` → `InitiateCheckout` → `Purchase`.
+
+> 💡 **`/nose` a une étape de plus depuis la v1.4.7.0.** Le clic sur un CTA de la
+> landing `/nose` ouvre `/nose/preview` : c'est lui qui compte comme
+> **`AddToCart`**. Le CTA de `/nose/preview` crée la session Stripe, donc c'est
+> lui qui déclenche **`InitiateCheckout`** (Meta CAPI + TikTok, `event_id` = id de
+> la session Stripe). Le clic de la preview envoie l'event interne
+> `preview_checkout_started`, précisément pour ne pas être recompté en AddToCart.
 
 ## EMQ (Event Match Quality)
 

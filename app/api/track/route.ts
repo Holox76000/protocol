@@ -142,27 +142,47 @@ export async function POST(request: Request) {
     const eventId = body.eventId ?? `${body.sessionId}:offer_cta_clicked:${eventTime}`;
     const ttp = request.headers.get("cookie")?.match(/(?:^|;\s*)_ttp=([^;]+)/)?.[1];
     const ttclid = (body.payload as Record<string, unknown> | undefined)?.ttclid as string | undefined;
-    await sendTiktokEvent({
-      eventName: "AddToCart",
-      eventTime,
-      eventId,
-      eventSourceUrl,
-      userAgent,
-      ipAddress,
-      externalId: funnelSid ?? body.sessionId,
-      ttclid,
-      ttp,
-      properties: {
-        value: ctaProduct.value,
-        currency: "USD",
-        contents: [{
-          content_id: ctaProduct.id,
-          content_type: "product",
+    // Both platforms get the AddToCart. InitiateCheckout is a separate, later
+    // signal fired once the Stripe session exists, so the two stay distinct.
+    await Promise.allSettled([
+      sendMetaEvent({
+        eventName: "AddToCart",
+        eventTime,
+        eventId,
+        actionSource: "website",
+        eventSourceUrl,
+        userAgent,
+        ipAddress,
+        customData: {
           content_name: ctaProduct.name,
-        }],
-      },
-    });
-    console.log("[track] tiktok sent", { event: "AddToCart", sessionId: body.sessionId });
+          content_ids: [ctaProduct.id],
+          content_type: "product",
+          value: ctaProduct.value,
+          currency: "USD",
+        },
+      }),
+      sendTiktokEvent({
+        eventName: "AddToCart",
+        eventTime,
+        eventId,
+        eventSourceUrl,
+        userAgent,
+        ipAddress,
+        externalId: funnelSid ?? body.sessionId,
+        ttclid,
+        ttp,
+        properties: {
+          value: ctaProduct.value,
+          currency: "USD",
+          contents: [{
+            content_id: ctaProduct.id,
+            content_type: "product",
+            content_name: ctaProduct.name,
+          }],
+        },
+      }),
+    ]);
+    console.log("[track] meta+tiktok sent", { event: "AddToCart", sessionId: body.sessionId });
   }
 
   if (body.event === "cta_clicked") {

@@ -16,6 +16,7 @@ type EventName =
   | "checkout_form_viewed"
   | "intro_viewed"
   | "offer_cta_clicked"
+  | "preview_checkout_started"
   | "checkout_viewed"
   | "checkout_submitted"
   | "register_viewed";
@@ -86,10 +87,38 @@ export function trackEvent(name: EventName, payload: EventPayload = {}) {
     }
   }
 
-  // TikTok AddToCart on any /dating CTA click. Client pixel here + server CAPI
-  // in /api/track share this eventId for dedup (same pattern as view_offer).
-  if (name === "offer_cta_clicked" && payload.funnel === "dating") {
-    tiktokTrackAddToCart(eventId);
+  // An offer CTA click is an AddToCart: the visitor picked the product but has
+  // not reached the payment form yet. InitiateCheckout fires later, once the
+  // Stripe session exists (see /api/create-checkout-session). Client pixel here
+  // + server CAPI in /api/track share this eventId for dedup.
+  if (name === "offer_cta_clicked") {
+    const isDating = payload.funnel === "dating";
+    const experiment = getExperiment(typeof payload.funnel === "string" ? payload.funnel : null);
+    const product = isDating
+      ? { name: "Protocol Dating", id: "dating-ai-photos", value: 39 }
+      : experiment
+      ? {
+          name: experiment.productName,
+          id: experiment.contentId,
+          value: getExperimentPlan(experiment, typeof payload.plan === "string" ? payload.plan : null).priceCents / 100,
+        }
+      : null;
+
+    if (product) {
+      try {
+        fbq?.("track", "AddToCart", {
+          content_name: product.name,
+          content_ids: [product.id],
+          content_type: "product",
+          value: product.value,
+          currency: "USD",
+        }, { eventID: eventId });
+      } catch {
+        // Ignore Meta Pixel runtime issues in the UI flow.
+      }
+    }
+
+    if (isDating) tiktokTrackAddToCart(eventId);
   }
 
   console.log(`[event] ${name}`, payload);
