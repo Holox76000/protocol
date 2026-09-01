@@ -3,6 +3,18 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.7.1] - 2026-09-02
+
+### Changed
+- **`/nose/preview` : cadre du carousel élargi et flèches réduites** (26px au
+  lieu de 30, chevron 12px) — les gouttières passent de 46 à 32px, donc l'image
+  gagne de la largeur sans que les flèches reviennent mordre dessus.
+
+### Docs
+- `docs/11-tests-realises.md` : section sur la page de preview `/nose` (pourquoi
+  cette étape, ce qu'elle contient, ce qu'on mesure, et le fait que le test
+  tourne sur 100 % du trafic).
+
 ## [1.4.7.0] - 2026-09-02
 
 ### Added
