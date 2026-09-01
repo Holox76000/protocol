@@ -146,7 +146,7 @@ const CTA_LABEL = "Get my preview";
 
 function ChevronIcon({ dir }: { dir: "left" | "right" }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d={dir === "left" ? "M15 5L8 12L15 19" : "M9 5L16 12L9 19"}
         stroke="currentColor"

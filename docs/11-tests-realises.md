@@ -80,6 +80,35 @@ des placeholders hérités du format Dating.
 | `/nose` | NoseLab | Preview de rhinoplastie (Nosefix) | **$29 one-time** (voir ci-dessous) |
 | `/jewelry` | GemCheck | Estimation de bijoux (Kawaii) | Weekly $4.99 · Yearly $34.99 |
 
+### `/nose` : une page de preview entre la landing et le paiement (02/09/2026, v1.4.7.0)
+
+Avant, cliquer sur un bouton de `/nose` envoyait directement sur le formulaire de
+carte bancaire. Maintenant, ça ouvre d'abord **`/nose/preview`** : une page qui
+montre le produit avant de demander de payer.
+
+**Pourquoi.** Le visiteur arrive d'une pub, n'a jamais vu l'outil, et on lui
+demande $29 pour une image qu'il recevra le lendemain. Entre « je clique » et
+« je sors ma carte », il manquait une étape où il voit ce qu'il achète. C'est
+exactement ce que font les apps qui vendent ce genre de produit : elles montrent
+l'écran du résultat, puis le prix.
+
+**Ce qu'il y a sur la page.** Un carousel avec les visuels du produit (le même
+que dans les pubs), le prix — $29 une seule fois, mis en face des $150 à $500
+d'une consultation — un gros bouton de paiement, des avis, quelques chiffres,
+puis la FAQ. La structure est copiée sur le paywall de retake.photos, une app
+qui vend le même type de retouche photo.
+
+**Ce qu'on va apprendre.** On saura quelle image était affichée au moment du
+clic sur « payer » (l'info part avec le paiement dans Stripe), donc quel visuel
+convainc. Et on compare le taux de conversion de `/nose` avant et après : si la
+page en fait perdre plus qu'elle n'en convainc, on remet le paiement direct en
+changeant une seule ligne de code.
+
+**À savoir.** Le test tourne sur 100 % du trafic, il n'y a pas de moitié témoin :
+la comparaison se fait avant/après, pas en parallèle. Les chiffres affichés dans
+la bande d'avis (190 000 utilisateurs, etc.) viennent des visuels publicitaires
+et restent à confirmer.
+
 ### `/nose` est repassé au paiement unique — $29 (31/08/2026, v1.4.6.0)
 
 `/nose` vendait un **abonnement Weekly $2.99 / Yearly $17.99**, copié à

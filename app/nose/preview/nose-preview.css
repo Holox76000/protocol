@@ -78,7 +78,7 @@
    instead of floating in the middle of a full section gap. The side padding
    is the gutter the arrows live in. */
 .np-block--carousel {
-  padding: 28px 46px 6px;
+  padding: 28px 32px 6px;
 }
 .np-block--plan {
   padding-top: 14px;
@@ -162,10 +162,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border: 1px solid var(--np-line);
-  border-radius: 9px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -182,10 +182,10 @@
   pointer-events: none;
 }
 .np-arrow--prev {
-  left: -36px;
+  left: -29px;
 }
 .np-arrow--next {
-  right: -36px;
+  right: -29px;
 }
 
 .np-dots {
@@ -475,13 +475,13 @@
     font-size: 30px;
   }
   .np-block--carousel {
-    padding-left: 52px;
-    padding-right: 52px;
+    padding-left: 40px;
+    padding-right: 40px;
   }
   .np-arrow--prev {
-    left: -42px;
+    left: -36px;
   }
   .np-arrow--next {
-    right: -42px;
+    right: -36px;
   }
 }
