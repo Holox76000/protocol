@@ -3,6 +3,41 @@
 All notable changes to Protocol Club are documented in this file.
 Format: [MAJOR.MINOR.PATCH.MICRO] - YYYY-MM-DD.
 
+## [1.4.7.0] - 2026-09-02
+
+### Added
+- **Nouvelle étape `/nose/preview` entre la landing et le checkout.** Les CTA de
+  `/nose` n'envoient plus directement sur Stripe : ils ouvrent une page paywall
+  (layout calqué sur retake.photos) qui montre le produit avant de demander la
+  carte. Carousel encadré plein cadre (deux visuels : « See your face with a
+  different nose » et « More than one nose to choose from »), flèches en dehors
+  du cadre, dots, bloc prix $29 one-time ancré contre $150+ la consult, CTA
+  sombre pleine largeur, bande sociale (étoiles, « Used by 190,000+ people »,
+  trois chiffres, trois témoignages) et FAQ. Mobile first, CSS autonome pour
+  pouvoir régler la page sans toucher à la landing.
+- **La forme regardée au moment du clic part dans Stripe** (`from:
+  "preview:<slide>"` → metadata), donc on saura laquelle des slides ferme.
+  Événements GA4 : `view_nose_preview`, `nose_preview_shape_viewed`,
+  `nose_preview_cta_clicked`. Pas de ViewContent Meta en double : la landing l'a
+  déjà envoyé.
+- **Outillage images** : `scripts/gen-nose-preview-gallery.ts` (9 formes de nez
+  générées depuis `public/nose/before.jpg`, une seule modifiée à chaque fois) et
+  `scripts/promote-nose-preview.sh` (même fenêtre de crop et même taille pour
+  toutes, condition pour que seul le nez bouge à l'écran). Les 9 rendus restent
+  dans `public/nose/preview/` — le carousel n'affiche pour l'instant que les
+  deux visuels marketing.
+
+### Changed
+- **Note « early member reviews » retirée** de `/nose` (remplacée par « out of
+  5 »). `/abs` et `/jewelry` gardent l'ancienne formulation.
+
+### Notes
+- Le test tourne sur 100 % du trafic `/nose` : pas de split. Comparer le taux de
+  conversion avant/après. `PREVIEW_INTERSTITIAL = false` dans
+  `app/nose/NoseOfferPage.tsx` remet le checkout direct.
+- Les chiffres de la bande sociale (190,000+ users, 1M+ previews, 30+ pays)
+  viennent des visuels publicitaires et restent à valider.
+
 ## [1.4.6.0] - 2026-08-31
 
 ### Changed
